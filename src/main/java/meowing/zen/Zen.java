@@ -43,8 +43,8 @@ public class Zen implements ClientModInitializer {
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (shown) return;
-			long loadTime = System.currentTimeMillis() - startTime;
-			String message = String.format("§c[Zen] §fMod loaded in §c%dms §7| §c%d features", loadTime, moduleCount);
+			long loadTime = (System.currentTimeMillis() - startTime) / 1000;
+			String message = String.format("§c[Zen] §fMod loaded in §c%ds §7| §c%d features", loadTime, moduleCount);
 			Objects.requireNonNull(client.player).sendMessage(Text.literal(message), false);
 			shown = true;
 		});
