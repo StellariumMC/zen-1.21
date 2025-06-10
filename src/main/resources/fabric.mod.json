@@ -11,13 +11,13 @@
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/zen/icon.png",
-	"environment": "client",
+	"environment": "*",
 	"entrypoints": {
 		"client": [
-			{
-				"value": "meowing.zen.Zen",
-				"adapter": "kotlin"
-			}
+			"meowing.zen.Zen"
+		],
+		"modmenu": [
+			"meowing.zen.compat.zenmodmenu"
 		]
 	},
 	"mixins": [
@@ -28,7 +28,6 @@
 		"minecraft": "~1.21.5",
 		"java": ">=21",
 		"fabric-api": "*",
-		"fabric-language-kotlin": "*",
 		"yet_another_config_lib_v3": "3.6.6+1.21.5-fabric"
 	},
 	"suggests": {
