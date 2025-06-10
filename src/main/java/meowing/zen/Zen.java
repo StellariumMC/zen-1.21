@@ -26,7 +26,7 @@ public class Zen implements ClientModInitializer {
 		moduleCount++;
 		zencfg.Handler.load();
 
-		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+		ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
 			dispatcher.register(ClientCommandManager.literal("zen")
 					.executes(context -> {
 						TickScheduler.register();
@@ -36,8 +36,8 @@ public class Zen implements ClientModInitializer {
 						});
 						return 1;
 					})
-			);
-		});
+			)
+		);
 
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (shown) return;
