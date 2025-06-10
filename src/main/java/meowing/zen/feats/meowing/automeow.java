@@ -22,9 +22,8 @@ public class automeow {
             String content = message.getString();
             String playerName = MinecraftClient.getInstance().player != null ? MinecraftClient.getInstance().player.getName().getString() : "";
             if (content.contains("To ") || content.contains("From " + playerName)) return;
-            long delayTicks = (long) Math.ceil(random.nextDouble() * 40) + 10;
 
-            TickScheduler.schedule(delayTicks, () -> {
+            TickScheduler.schedule(random.nextLong(10, 50), () -> {
                 String cmd = content.startsWith("From ")
                         ? "msg " + regex.matcher(content).replaceFirst("$1")
                         : CHANNELS.entrySet().stream().filter(e -> content.startsWith(e.getKey())).findFirst().map(Map.Entry::getValue).orElse("ac");

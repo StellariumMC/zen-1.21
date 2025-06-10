@@ -9,10 +9,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 
-import meowing.zen.feats.meowing.automeow;
-
 public class zencfg {
-    public static ConfigClassHandler<zencfg> Handler = ConfigClassHandler.<zencfg>createBuilder(zencfg.class)
+    public static ConfigClassHandler<zencfg> Handler = ConfigClassHandler.createBuilder(zencfg.class)
             .id(net.minecraft.util.Identifier.of("meowing", "zen"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("zen.json5"))
@@ -29,27 +27,26 @@ public class zencfg {
     public boolean automeow;
 
     public static Screen createConfigScreen(Screen parent) {
-        return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> {
-            return builder
-                    .title(Text.literal("Zen Configuration"))
-                    .category(ConfigCategory.createBuilder()
-                            .name(Text.literal("General"))
-                            .group(OptionGroup.createBuilder()
-                                    .name(Text.literal("Meowing"))
-                                    .option(Option.<Boolean>createBuilder()
-                                            .name(Text.literal("Auto Meow"))
-                                            .description(OptionDescription.of(Text.literal("Automatically responds with a meow message whenever someone sends meow in chat.")))
-                                            .binding(defaults.automeow, () -> config.automeow, newVal -> config.automeow = newVal)
-                                            .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                    .formatValue(val -> val
-                                                            ? Text.literal("Meowing")
-                                                            : Text.literal("Not meowing")
-                                                    )
-                                                    .coloured(true)
-                                            )
-                                            .build())
-                                    .build())
-                            .build());
-        })).generateScreen(parent);
+        return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
+                .title(Text.literal("Zen Configuration"))
+                .category(ConfigCategory.createBuilder()
+                        .name(Text.literal("General"))
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.literal("Meowing"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Auto Meow"))
+                                        .description(OptionDescription.of(Text.literal("Automatically responds with a meow message whenever someone sends meow in chat.")))
+                                        .binding(defaults.automeow, () -> config.automeow, newVal -> config.automeow = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("Meowing")
+                                                        : Text.literal("Not meowing")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .build())
+                        .build())
+        )).generateScreen(parent);
     }
 }
