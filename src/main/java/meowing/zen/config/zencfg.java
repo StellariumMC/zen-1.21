@@ -23,8 +23,8 @@ public class zencfg {
     /////////////
 
     // Automeow //
-    @SerialEntry
-    public boolean automeow;
+    @SerialEntry public boolean automeow = true;
+    @SerialEntry public boolean meowchat = true;
 
     public static Screen createConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
@@ -41,6 +41,18 @@ public class zencfg {
                                                 .formatValue(val -> val
                                                         ? Text.literal("Meowing")
                                                         : Text.literal("Not meowing")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Meow Sounds"))
+                                        .description(OptionDescription.of(Text.literal("Plays a cat sound whenever someone sends \"meow\" in chat")))
+                                        .binding(defaults.meowchat, () -> config.meowchat, newVal -> config.meowchat = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
                                                 )
                                                 .coloured(true)
                                         )
