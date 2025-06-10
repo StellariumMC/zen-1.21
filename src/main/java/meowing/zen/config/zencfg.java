@@ -25,6 +25,7 @@ public class zencfg {
     // Automeow //
     @SerialEntry public boolean automeow = true;
     @SerialEntry public boolean meowchat = true;
+    @SerialEntry public boolean meowdeathsounds = true;
 
     public static Screen createConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
@@ -39,8 +40,8 @@ public class zencfg {
                                         .binding(defaults.automeow, () -> config.automeow, newVal -> config.automeow = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
-                                                        ? Text.literal("Meowing")
-                                                        : Text.literal("Not meowing")
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
                                                 )
                                                 .coloured(true)
                                         )
@@ -49,6 +50,18 @@ public class zencfg {
                                         .name(Text.literal("Meow Sounds"))
                                         .description(OptionDescription.of(Text.literal("Plays a cat sound whenever someone sends \"meow\" in chat")))
                                         .binding(defaults.meowchat, () -> config.meowchat, newVal -> config.meowchat = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Meow Death Sounds"))
+                                        .description(OptionDescription.of(Text.literal("Plays a cat sound whenever an entity dies")))
+                                        .binding(defaults.meowdeathsounds, () -> config.meowdeathsounds, newVal -> config.meowdeathsounds = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")
