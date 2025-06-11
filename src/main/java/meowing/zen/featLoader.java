@@ -37,8 +37,8 @@ public class featLoader {
                               if (startIdx == -1) return;
 
                               var className = pathStr.substring(startIdx)
-                                  .replace('/', '.').replace('\\', '.')
-                                  .replace(".class", "");
+                                    .replace('/', '.').replace('\\', '.')
+                                    .replace(".class", "");
 
                               Class.forName(className).getDeclaredMethod("initialize").invoke(null);
                               moduleCount++;
