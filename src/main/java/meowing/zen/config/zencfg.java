@@ -28,6 +28,7 @@ public class zencfg {
         @SerialEntry public String mvpcolor = "b";
         @SerialEntry public String mvppluscolor = "b";
         @SerialEntry public String mvppluspluscolor = "6";
+    @SerialEntry public boolean slayerkilltimer = false;
 
     public static Screen createConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
@@ -91,6 +92,24 @@ public class zencfg {
                                         .name(Text.literal("Clean messages"))
                                         .description(OptionDescription.of(Text.literal("Replaces the guild and friend chat messages with a cleaner version of them.")))
                                         .binding(defaults.cleanmsg, () -> config.cleanmsg, newVal -> config.cleanmsg = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .build())
+                        .build())
+                .category(ConfigCategory.createBuilder()
+                        .name(Text.literal("Slayers"))
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.literal("Slayers"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Slayer kill timer"))
+                                        .description(OptionDescription.of(Text.literal("Sends a message in your chat telling you how long it took to kill your boss.")))
+                                        .binding(defaults.slayerkilltimer, () -> config.slayerkilltimer, newVal -> config.slayerkilltimer = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")

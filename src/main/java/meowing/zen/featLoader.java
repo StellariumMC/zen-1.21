@@ -29,6 +29,7 @@ public class featLoader {
                                         .replace(".class", "");
                                 Class.forName(className).getDeclaredMethod("initialize").invoke(null);
                                 moduleCount++;
+                                System.out.println("[Zen] Init " + className);
                             } catch (Exception ignored) {}
                         });
             }
