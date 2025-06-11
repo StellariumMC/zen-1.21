@@ -29,6 +29,7 @@ public class zencfg {
         @SerialEntry public String mvppluscolor = "b";
         @SerialEntry public String mvppluspluscolor = "6";
     @SerialEntry public boolean slayerkilltimer = false;
+    @SerialEntry public boolean slayerhighlight = false;
 
     public static Screen createConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
@@ -110,6 +111,18 @@ public class zencfg {
                                         .name(Text.literal("Slayer kill timer"))
                                         .description(OptionDescription.of(Text.literal("Sends a message in your chat telling you how long it took to kill your boss.")))
                                         .binding(defaults.slayerkilltimer, () -> config.slayerkilltimer, newVal -> config.slayerkilltimer = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Slayer highlight"))
+                                        .description(OptionDescription.of(Text.literal("Highlights your slayer boss.")))
+                                        .binding(defaults.slayerhighlight, () -> config.slayerhighlight, newVal -> config.slayerhighlight = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")

@@ -24,9 +24,9 @@ public class slayertimer {
     private static final Pattern fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$");
     private static final Pattern questStart = Pattern.compile("^ {2}SLAYER QUEST STARTED!$");
 
-    private static int BossId = -1;
+    public static int BossId = -1;
+    public static boolean isFighting = false;
     private static long starttime = 0;
-    private static boolean isFighting = false;
     private static int serverticks = 0;
     private static long spawntime = 0;
 
@@ -55,19 +55,17 @@ public class slayertimer {
         if (!(entity instanceof net.minecraft.entity.decoration.ArmorStandEntity)) return;
         TickScheduler.schedule(2, () -> {
             String name = entity.getName().getString();
-            if (name.contains("Spawned by")) {
-                String[] parts = name.split("by: ");
-                if (parts.length > 1) {
-                    String playername = parts[1];
-                    ClientPlayerEntity Player = mc.player;
-                    if (Objects.requireNonNull(Player).getName().getString().equals(playername) && !isFighting) {
-                        BossId = entityId - 3;
-                        starttime = System.currentTimeMillis();
-                        isFighting = true;
-                        serverticks = 0;
-                        resetSpawnTimer();
-                    }
-                }
+            if (!(name.contains("Spawned by"))) return;
+            String[] parts = name.split("by: ");
+            if (parts.length > 1) {
+                String playername = parts[1];
+                ClientPlayerEntity Player = mc.player;
+                if (!(Objects.requireNonNull(Player).getName().getString().equals(playername)) || isFighting) return;
+                BossId = entityId - 3;
+                starttime = System.currentTimeMillis();
+                isFighting = true;
+                serverticks = 0;
+                resetSpawnTimer();
             }
         });
     }
@@ -87,11 +85,9 @@ public class slayertimer {
 
     private static void onSlayerFailed() {
         if (!isFighting) return;
-
         long timetaken = System.currentTimeMillis() - starttime;
         double seconds = (double) timetaken / 1000;
         double servertime = (double) serverticks / 1000;
-
         String content = String.format("§c[Zen] §fYour boss killed you in §b%.2fs §7| §b%.2fs", seconds, servertime);
         String hovercontent = String.format("§c%d ticks §f| §c%d ms", serverticks, timetaken);
         MutableText message = Text.literal(content).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Text.literal(hovercontent))));
