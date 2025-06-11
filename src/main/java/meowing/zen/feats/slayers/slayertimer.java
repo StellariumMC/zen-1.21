@@ -1,5 +1,6 @@
 package meowing.zen.feats.slayers;
 
+import meowing.zen.utils.chatutils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -18,14 +19,16 @@ import meowing.zen.utils.TickScheduler;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-public class slayerkilltimer {
+public class slayertimer {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final Pattern fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$");
+    private static final Pattern questStart = Pattern.compile("^ {2}SLAYER QUEST STARTED!$");
 
     private static int BossId = -1;
     private static long starttime = 0;
     private static boolean isFighting = false;
     private static int serverticks = 0;
+    private static long spawntime = 0;
 
     public static void initialize() {
         TickScheduler.register();
@@ -36,6 +39,7 @@ public class slayerkilltimer {
             if (!Zen.getConfig().slayerkilltimer || overlay) return;
             String text = message.getString();
             if (fail.matcher(text).matches()) onSlayerFailed();
+            if (questStart.matcher(text).matches()) spawntime = System.currentTimeMillis();
         }));
         ClientEntityEvents.ENTITY_LOAD.register((entity, clientWorld) -> {
             if (!Zen.getConfig().slayerkilltimer || isFighting) return;
@@ -61,6 +65,7 @@ public class slayerkilltimer {
                         starttime = System.currentTimeMillis();
                         isFighting = true;
                         serverticks = 0;
+                        resetSpawnTimer();
                     }
                 }
             }
@@ -100,5 +105,12 @@ public class slayerkilltimer {
         starttime = 0;
         isFighting = false;
         serverticks = 0;
+    }
+
+    private static void resetSpawnTimer() {
+        double spawnsecond = (double) (System.currentTimeMillis() - spawntime) / 1000;
+        String content = String.format("§c[Zen] §fYour boss spawned in §b%.2fs", spawnsecond);
+        chatutils.clientmsg(content);
+        spawntime = 0;
     }
 }
