@@ -5,12 +5,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 
+import meowing.zen.utils.chatutils;
 import meowing.zen.config.zencfg;
 import meowing.zen.utils.TickScheduler;
 
-import java.util.Objects;
 
 public class Zen implements ClientModInitializer {
     private static boolean shown = false;
@@ -18,7 +17,7 @@ public class Zen implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
         long startTime = System.currentTimeMillis();
-		featLoader.initializeAll();
+		featLoader.initAll();
 		zencfg.Handler.load();
 		long loadTime = System.currentTimeMillis() - startTime;
 
@@ -37,7 +36,7 @@ public class Zen implements ClientModInitializer {
 		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
 			if (shown) return;
 			String message = String.format("§c[Zen] §fMod loaded in §c%dms §7| §c%d features", loadTime, featLoader.moduleCount);
-			Objects.requireNonNull(client.player).sendMessage(Text.literal(message), false);
+			chatutils.clientmsg(message);
 			shown = true;
 		});
 	}

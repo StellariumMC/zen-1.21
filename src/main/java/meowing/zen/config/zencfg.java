@@ -18,14 +18,16 @@ public class zencfg {
                     .build())
             .build();
 
-    /////////////
-    // Meowing //
-    /////////////
-
-    // Automeow //
     @SerialEntry public boolean automeow = true;
     @SerialEntry public boolean meowchat = true;
     @SerialEntry public boolean meowdeathsounds = true;
+    @SerialEntry public boolean cleanmsg = false;
+    @SerialEntry public boolean cleanjoin = false;
+        @SerialEntry public String vipcolor = "a";
+        @SerialEntry public String vippluscolor = "a";
+        @SerialEntry public String mvpcolor = "b";
+        @SerialEntry public String mvppluscolor = "b";
+        @SerialEntry public String mvppluspluscolor = "6";
 
     public static Screen createConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(Handler, ((defaults, config, builder) -> builder
@@ -62,6 +64,33 @@ public class zencfg {
                                         .name(Text.literal("Meow Death Sounds"))
                                         .description(OptionDescription.of(Text.literal("Plays a cat sound whenever an entity dies")))
                                         .binding(defaults.meowdeathsounds, () -> config.meowdeathsounds, newVal -> config.meowdeathsounds = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .build())
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.literal("Clean Chat"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Clean join"))
+                                        .description(OptionDescription.of(Text.literal("Replaces the guild and friend join messages with a cleaner version of them.")))
+                                        .binding(defaults.cleanjoin, () -> config.cleanjoin, newVal -> config.cleanjoin = newVal)
+                                        .controller(opt -> BooleanControllerBuilder.create(opt)
+                                                .formatValue(val -> val
+                                                        ? Text.literal("On")
+                                                        : Text.literal("Off")
+                                                )
+                                                .coloured(true)
+                                        )
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.literal("Clean messages"))
+                                        .description(OptionDescription.of(Text.literal("Replaces the guild and friend chat messages with a cleaner version of them.")))
+                                        .binding(defaults.cleanmsg, () -> config.cleanmsg, newVal -> config.cleanmsg = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")
