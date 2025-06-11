@@ -38,7 +38,7 @@ public class slayerkilltimer {
             if (fail.matcher(text).matches()) onSlayerFailed();
         }));
         ClientEntityEvents.ENTITY_LOAD.register((entity, clientWorld) -> {
-            if (!Zen.getConfig().slayerkilltimer) return;
+            if (!Zen.getConfig().slayerkilltimer || isFighting) return;
             onEntitySpawn(entity, entity.getId());
         });
         ClientEntityEvents.ENTITY_UNLOAD.register(((entity, clientWorld) -> {
@@ -68,7 +68,7 @@ public class slayerkilltimer {
     }
 
     private static void onEntityDeath(Entity entity, int entityId) {
-        if (!(entity instanceof LivingEntity) || entityId != BossId || !isFighting) return;
+        if (!(entity instanceof LivingEntity) || entityId != BossId) return;
         long timetaken = System.currentTimeMillis() - starttime;
         double seconds = (double) timetaken / 1000;
         double servertime = (double) serverticks / 20;
