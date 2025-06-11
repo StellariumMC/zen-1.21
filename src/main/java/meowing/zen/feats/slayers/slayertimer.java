@@ -104,7 +104,8 @@ public class slayertimer {
     }
 
     private static void resetSpawnTimer() {
-        double spawnsecond = (double) (System.currentTimeMillis() - spawntime) / 1000;
+        double spawnsecond = (spawntime != 0L) ? (System.currentTimeMillis() - spawntime) / 1000.0 : 0.0;
+        if ((spawntime == 0L)) return;
         String content = String.format("§c[Zen] §fYour boss spawned in §b%.2fs", spawnsecond);
         chatutils.clientmsg(content);
         spawntime = 0;
