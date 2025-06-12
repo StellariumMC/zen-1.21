@@ -174,6 +174,7 @@ public class featManager {
     
     public static void initAll() {
         autoDiscFeats();
+        onConfigChange();
     }
     
     public static int getFeatCount() {
