@@ -13,13 +13,9 @@ public class EventProxy {
             EventBus.fire(event);
             return !event.hide;
         });
-        ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> 
-            EventBus.fire(new EntityUnloadEvent(entity, world)));
-        ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> 
-            EventBus.fire(new EntityLoadEvent(entity, world)));
-        ClientTickEvents.END_CLIENT_TICK.register(client -> 
-            EventBus.fire(new ClientTickEvent(client)));
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> 
-            EventBus.fire(new WorldRenderEvent(context)));
+        ClientEntityEvents.ENTITY_UNLOAD.register((entity, world) -> EventBus.fire(new EntityUnloadEvent(entity, world)));
+        ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> EventBus.fire(new EntityLoadEvent(entity, world)));
+        ClientTickEvents.END_CLIENT_TICK.register(client -> EventBus.fire(new ClientTickEvent(client)));
+        WorldRenderEvents.AFTER_ENTITIES.register(context -> EventBus.fire(new WorldRenderEvent(context)));
     }
 }

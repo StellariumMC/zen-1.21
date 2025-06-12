@@ -37,7 +37,7 @@ public class cleanmsg {
         
         if (processed != null) {
             chatutils.clientmsg(processed, true);
-            event.hide = true;
+            event.hide();
         }
     }
 

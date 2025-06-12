@@ -73,4 +73,44 @@ public class zencfg {
                         .coloured(true))
                 .build();
     }
+
+    private static Option<Integer> createSliderOption(String name, String desc, int defaultVal, java.util.function.Supplier<Integer> getter, java.util.function.Consumer<Integer> setter) {
+        return Option.<Integer>createBuilder()
+                .name(Text.literal(name))
+                .description(OptionDescription.of(Text.literal(desc)))
+                .binding(defaultVal, getter, v -> {
+                    setter.accept(v);
+                    featManager.onConfigChange();
+                })
+                .controller(opt -> IntegerSliderControllerBuilder.create(opt)
+                        .range(0, 100)
+                        .step(1)
+                        .formatValue(val -> Text.literal(val + "%")))
+                .build();
+    }
+
+    private static Option<String> createTextOption(String name, String desc, String defaultVal, java.util.function.Supplier<String> getter, java.util.function.Consumer<String> setter) {
+        return Option.<String>createBuilder()
+                .name(Text.literal(name))
+                .description(OptionDescription.of(Text.literal(desc)))
+                .binding(defaultVal, getter, v -> {
+                    setter.accept(v);
+                    featManager.onConfigChange();
+                })
+                .controller(opt -> StringControllerBuilder.create(opt))
+                .build();
+    }
+
+    private static Option<java.awt.Color> createColorOption(String name, String desc, java.awt.Color defaultVal, java.util.function.Supplier<java.awt.Color> getter, java.util.function.Consumer<java.awt.Color> setter) {
+        return Option.<java.awt.Color>createBuilder()
+                .name(Text.literal(name))
+                .description(OptionDescription.of(Text.literal(desc)))
+                .binding(defaultVal, getter, v -> {
+                    setter.accept(v);
+                    featManager.onConfigChange();
+                })
+                .controller(opt -> ColorControllerBuilder.create(opt)
+                        .allowAlpha(true))
+                .build();
+    }
 }

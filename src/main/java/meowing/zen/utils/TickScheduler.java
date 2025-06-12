@@ -1,38 +1,29 @@
 package meowing.zen.utils;
-
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
-
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.PriorityQueue;
+import java.util.Comparator;
 
 public final class TickScheduler {
-    private static final TickScheduler INSTANCE = new TickScheduler();
-    private final Queue<ScheduledTask> taskQueue = new ConcurrentLinkedQueue<>();
+    private static final TickScheduler instance = new TickScheduler();
+    private final PriorityQueue<ScheduledTask> taskQueue = new PriorityQueue<>(Comparator.comparingLong(ScheduledTask::executeTick));
+    private long currentTick = 0;
+
     private record ScheduledTask(long executeTick, Runnable action) {}
+
     private TickScheduler() {}
 
     public static void schedule(long delayTicks, Runnable action) {
-        final long executionTime = System.currentTimeMillis() + (delayTicks * 50);
-        INSTANCE.taskQueue.add(new ScheduledTask(executionTime, action));
+        instance.taskQueue.offer(new ScheduledTask(instance.currentTick + delayTicks, action));
     }
 
     public static void register() {
-        ClientTickEvents.END_CLIENT_TICK.register(INSTANCE::onClientTick);
+        ClientTickEvents.END_CLIENT_TICK.register(instance::onClientTick);
     }
 
     private void onClientTick(MinecraftClient client) {
-        final long currentTime = System.currentTimeMillis();
-        while (!taskQueue.isEmpty()) {
-            ScheduledTask task = taskQueue.peek();
-            if (task == null) break;
-
-            if (currentTime >= task.executeTick()) {
-                task.action().run();
-                taskQueue.poll();
-            } else {
-                break;
-            }
-        }
+        currentTick++;
+        ScheduledTask task;
+        while ((task = taskQueue.peek()) != null && currentTick >= task.executeTick()) taskQueue.poll().action().run();
     }
 }

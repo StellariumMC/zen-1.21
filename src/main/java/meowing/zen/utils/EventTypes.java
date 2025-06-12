@@ -23,7 +23,11 @@ public final class EventTypes {
         public void hide() {
             this.hide = true;
         }
-        
+
+        public void unhide() {
+            this.hide = false;
+        }
+
         public boolean isHidden() {
             return hide;
         }
