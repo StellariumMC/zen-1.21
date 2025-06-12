@@ -76,7 +76,7 @@ public class slayertimer {
         double seconds = (double) timetaken / 1000;
         double servertime = (double) serverticks / 20;
         String content = String.format("§c[Zen] §fYou killed your boss in §b%.2fs §7| §b%.2fs", seconds, servertime);
-        String hovercontent = String.format("§c%d ticks §f| §c%d ms", serverticks, timetaken);
+        String hovercontent = String.format("§c%d ms §f| §c%d ticks", timetaken, servertime);
         MutableText message = Text.literal(content).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Text.literal(hovercontent))));
         Objects.requireNonNull(mc.player).sendMessage(message, false);
 
@@ -89,7 +89,7 @@ public class slayertimer {
         double seconds = (double) timetaken / 1000;
         double servertime = (double) serverticks / 1000;
         String content = String.format("§c[Zen] §fYour boss killed you in §b%.2fs §7| §b%.2fs", seconds, servertime);
-        String hovercontent = String.format("§c%d ticks §f| §c%d ms", serverticks, timetaken);
+        String hovercontent = String.format("§c%d ms §f| §c%d ticks", timetaken, servertime);
         MutableText message = Text.literal(content).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Text.literal(hovercontent))));
         Objects.requireNonNull(mc.player).sendMessage(message, false);
 
