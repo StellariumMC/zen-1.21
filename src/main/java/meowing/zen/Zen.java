@@ -18,9 +18,9 @@ public class Zen implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         long startTime = System.currentTimeMillis();
+        zencfg.Handler.load();
         EventProxy.initialize();
         featManager.initAll();
-        zencfg.Handler.load();
         long loadTime = System.currentTimeMillis() - startTime;
         
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
