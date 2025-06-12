@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class slayertimer {
+    private static final slayertimer instance = new slayertimer();
+    private slayertimer() {}
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final Pattern fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$");
     private static final Pattern questStart = Pattern.compile("^ {2}SLAYER QUEST STARTED!$");
@@ -24,23 +26,23 @@ public class slayertimer {
 
     public static void initialize() {
         TickScheduler.register();
-        featManager.register(new slayertimer(), () -> {
-            EventBus.register(EventTypes.ClientTickEvent.class, slayertimer.class, e -> {
+        featManager.register(instance, () -> {
+            EventBus.register(EventTypes.ClientTickEvent.class, instance, e -> {
                 if (isFighting) serverticks++;
             });
-            EventBus.register(EventTypes.GameMessageEvent.class, slayertimer.class, slayertimer::handleGameMessage);
-            EventBus.register(EventTypes.EntityLoadEvent.class, slayertimer.class, e -> {
-                if (!isFighting) onEntitySpawn(e.entity, e.entity.getId());
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage);
+            EventBus.register(EventTypes.EntityLoadEvent.class, instance, e -> {
+                if (!isFighting) onEntitySpawn(e.getEntity(), e.getEntityId());
             });
-            EventBus.register(EventTypes.EntityUnloadEvent.class, slayertimer.class, e -> {
-                if (isFighting) onEntityDeath(e.entity, e.entity.getId());
+            EventBus.register(EventTypes.EntityUnloadEvent.class, instance, e -> {
+                if (isFighting) onEntityDeath(e.getEntity(), e.getEntityId());
             });
         });
     }
 
-    private static void handleGameMessage(EventTypes.GameMessageEvent event) {
+    private void handleGameMessage(EventTypes.GameMessageEvent event) {
         if (event.overlay) return;
-        String text = event.message.getString();
+        String text = event.getPlainText();
         if (fail.matcher(text).matches()) onSlayerFailed();
         if (questStart.matcher(text).matches()) spawntime = System.currentTimeMillis();
     }

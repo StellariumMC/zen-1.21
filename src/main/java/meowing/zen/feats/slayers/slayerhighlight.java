@@ -21,13 +21,15 @@ import static meowing.zen.feats.slayers.slayertimer.isFighting;
 import static meowing.zen.feats.slayers.slayertimer.BossId;
 
 public class slayerhighlight {
+    private static final slayerhighlight instance = new slayerhighlight();
+    private slayerhighlight() {}
     public static void initialize() {
-        featManager.register(new slayerhighlight(), () -> {
-            EventBus.register(EventTypes.WorldRenderEvent.class, slayerhighlight.class, slayerhighlight::handleWorldRender);
+        featManager.register(instance, () -> {
+            EventBus.register(EventTypes.WorldRenderEvent.class, instance, instance::handleWorldRender);
         });
     }
 
-    private static void handleWorldRender(EventTypes.WorldRenderEvent event) {
+    private void handleWorldRender(EventTypes.WorldRenderEvent event) {
         if (!isFighting || BossId == -1) return;
         
         MinecraftClient client = MinecraftClient.getInstance();
@@ -40,15 +42,15 @@ public class slayerhighlight {
         }
         if (bossEntity == null) return;
 
-        Vec3d cameraPos = event.context.camera().getPos();
-        Vec3d entityPos = bossEntity.getLerpedPos(event.context.tickCounter().getTickProgress(false));
+        Vec3d cameraPos = event.getContext().camera().getPos();
+        Vec3d entityPos = bossEntity.getLerpedPos(event.getTickDelta());
         double x = entityPos.x - cameraPos.x;
         double y = entityPos.y - cameraPos.y;
         double z = entityPos.z - cameraPos.z;
 
         float width = (float) (bossEntity.getWidth() + 0.5);
         float height = (float) (bossEntity.getHeight() + 0.25);
-        renderEntityBox(event.context.matrixStack(), event.context.consumers(), x, y, z, width, height);
+        renderEntityBox(event.getContext().matrixStack(), event.getContext().consumers(), x, y, z, width, height);
     }
 
     private static boolean isValidSlayerEntity(Entity entity) {

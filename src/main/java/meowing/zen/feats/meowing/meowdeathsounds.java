@@ -12,14 +12,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.particle.ParticleTypes;
 
 public class meowdeathsounds {
+    private static final meowdeathsounds instance = new meowdeathsounds();
+    private meowdeathsounds() {}
     public static void initialize() {
-        featManager.register(new meowdeathsounds(), () -> {
-            EventBus.register(EventTypes.EntityUnloadEvent.class, meowdeathsounds.class, meowdeathsounds::handleEntityUnload);
+        featManager.register(instance, () -> {
+            EventBus.register(EventTypes.EntityUnloadEvent.class, instance, instance::handleEntityUnload);
         });
     }
 
-    private static void handleEntityUnload(EventTypes.EntityUnloadEvent event) {
-        Entity ent = event.entity;
+    private void handleEntityUnload(EventTypes.EntityUnloadEvent event) {
+        Entity ent = event.getEntity();
         if (ent.isAlive() || ent instanceof ArmorStandEntity || ent.isInvisible()) return;
         if (ent instanceof LivingEntity livingEntity && livingEntity.isDead()) {
             utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 0.8f, 1.0f);

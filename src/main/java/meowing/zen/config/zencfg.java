@@ -8,6 +8,7 @@ import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import meowing.zen.featManager;
 
 public class zencfg {
     public static ConfigClassHandler<zencfg> Handler = ConfigClassHandler.createBuilder(zencfg.class)
@@ -23,11 +24,11 @@ public class zencfg {
     @SerialEntry public boolean meowdeathsounds = false;
     @SerialEntry public boolean cleanmsg = false;
     @SerialEntry public boolean cleanjoin = false;
-        @SerialEntry public String vipcolor = "a";
-        @SerialEntry public String vippluscolor = "a";
-        @SerialEntry public String mvpcolor = "b";
-        @SerialEntry public String mvppluscolor = "b";
-        @SerialEntry public String mvppluspluscolor = "6";
+    @SerialEntry public String vipcolor = "a";
+    @SerialEntry public String vippluscolor = "a";
+    @SerialEntry public String mvpcolor = "b";
+    @SerialEntry public String mvppluscolor = "b";
+    @SerialEntry public String mvppluspluscolor = "6";
     @SerialEntry public boolean slayertimer = false;
     @SerialEntry public boolean slayerhighlight = false;
 
@@ -38,101 +39,38 @@ public class zencfg {
                         .name(Text.literal("General"))
                         .group(OptionGroup.createBuilder()
                                 .name(Text.literal("Meowing"))
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Auto Meow"))
-                                        .description(OptionDescription.of(Text.literal("Automatically responds with a meow message whenever someone sends meow in chat.")))
-                                        .binding(defaults.automeow, () -> config.automeow, newVal -> config.automeow = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Meow Sounds"))
-                                        .description(OptionDescription.of(Text.literal("Plays a cat sound whenever someone sends \"meow\" in chat")))
-                                        .binding(defaults.meowsounds, () -> config.meowsounds, newVal -> config.meowsounds = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Meow Death Sounds"))
-                                        .description(OptionDescription.of(Text.literal("Plays a cat sound whenever an entity dies")))
-                                        .binding(defaults.meowdeathsounds, () -> config.meowdeathsounds, newVal -> config.meowdeathsounds = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
+                                .option(createBoolOption("Auto Meow", "Automatically responds with a meow message whenever someone sends meow in chat.", defaults.automeow, () -> config.automeow, v -> config.automeow = v))
+                                .option(createBoolOption("Meow Sounds", "Plays a cat sound whenever someone sends \"meow\" in chat", defaults.meowsounds, () -> config.meowsounds, v -> config.meowsounds = v))
+                                .option(createBoolOption("Meow Death Sounds", "Plays a cat sound whenever an entity dies", defaults.meowdeathsounds, () -> config.meowdeathsounds, v -> config.meowdeathsounds = v))
                                 .build())
                         .group(OptionGroup.createBuilder()
                                 .name(Text.literal("Clean Chat"))
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Clean join"))
-                                        .description(OptionDescription.of(Text.literal("Replaces the guild and friend join messages with a cleaner version of them.")))
-                                        .binding(defaults.cleanjoin, () -> config.cleanjoin, newVal -> config.cleanjoin = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Clean messages"))
-                                        .description(OptionDescription.of(Text.literal("Replaces the guild and friend chat messages with a cleaner version of them.")))
-                                        .binding(defaults.cleanmsg, () -> config.cleanmsg, newVal -> config.cleanmsg = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
+                                .option(createBoolOption("Clean join", "Replaces the guild and friend join messages with a cleaner version of them.", defaults.cleanjoin, () -> config.cleanjoin, v -> config.cleanjoin = v))
+                                .option(createBoolOption("Clean messages", "Replaces the guild and friend chat messages with a cleaner version of them.", defaults.cleanmsg, () -> config.cleanmsg, v -> config.cleanmsg = v))
                                 .build())
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(Text.literal("Slayers"))
                         .group(OptionGroup.createBuilder()
                                 .name(Text.literal("Slayers"))
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Slayer timer"))
-                                        .description(OptionDescription.of(Text.literal("Sends a message in your chat telling you how long it took to kill your boss.")))
-                                        .binding(defaults.slayertimer, () -> config.slayertimer, newVal -> config.slayertimer = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
-                                .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Slayer highlight"))
-                                        .description(OptionDescription.of(Text.literal("Highlights your slayer boss.")))
-                                        .binding(defaults.slayerhighlight, () -> config.slayerhighlight, newVal -> config.slayerhighlight = newVal)
-                                        .controller(opt -> BooleanControllerBuilder.create(opt)
-                                                .formatValue(val -> val
-                                                        ? Text.literal("On")
-                                                        : Text.literal("Off")
-                                                )
-                                                .coloured(true)
-                                        )
-                                        .build())
+                                .option(createBoolOption("Slayer timer", "Sends a message in your chat telling you how long it took to kill your boss.", defaults.slayertimer, () -> config.slayertimer, v -> config.slayertimer = v))
+                                .option(createBoolOption("Slayer highlight", "Highlights your slayer boss.", defaults.slayerhighlight, () -> config.slayerhighlight, v -> config.slayerhighlight = v))
                                 .build())
                         .build())
         )).generateScreen(parent);
+    }
+
+    private static Option<Boolean> createBoolOption(String name, String desc, boolean defaultVal, java.util.function.Supplier<Boolean> getter, java.util.function.Consumer<Boolean> setter) {
+        return Option.<Boolean>createBuilder()
+                .name(Text.literal(name))
+                .description(OptionDescription.of(Text.literal(desc)))
+                .binding(defaultVal, getter, v -> {
+                    setter.accept(v);
+                    featManager.onConfigChange();
+                })
+                .controller(opt -> BooleanControllerBuilder.create(opt)
+                        .formatValue(val -> Text.literal(val ? "On" : "Off"))
+                        .coloured(true))
+                .build();
     }
 }

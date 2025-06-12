@@ -14,6 +14,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class cleanmsg {
+    private static final cleanmsg instance = new cleanmsg();
+    private cleanmsg() {}
     private static final Pattern guild = Pattern.compile("^Guild > ?(\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?: (.+)");
     private static final Pattern party = Pattern.compile("^Party > (\\[.+?])? ?(.+?): (.+)");
     private static final Map<String, String> RANK_COLORS = Map.of(
@@ -26,12 +28,12 @@ public class cleanmsg {
     );
 
     public static void initialize() {
-        featManager.register(new cleanmsg(), () -> 
-            EventBus.register(EventTypes.GameMessageEvent.class, cleanmsg.class, cleanmsg::handleGameMessage));
+        featManager.register(instance, () -> 
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage));
     }
 
-    private static void handleGameMessage(EventTypes.GameMessageEvent event) {     
-        String text = chatutils.removeFormatting(event.message.getString());
+    private void handleGameMessage(EventTypes.GameMessageEvent event) {     
+        String text = chatutils.removeFormatting(event.getPlainText());
         String processed = processGuild(text);
         if (processed == null) processed = processParty(text);
         

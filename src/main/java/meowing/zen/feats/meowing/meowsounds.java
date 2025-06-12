@@ -7,14 +7,16 @@ import meowing.zen.utils.utils;
 import net.minecraft.sound.SoundEvents;
 
 public class meowsounds {
+    private static final meowsounds instance = new meowsounds();
+    private meowsounds() {}
     public static void initialize() {
-        featManager.register(new meowsounds(), () -> {
-            EventBus.register(EventTypes.GameMessageEvent.class, meowsounds.class, meowsounds::handleGameMessage);
+        featManager.register(instance, () -> {
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage);
         });
     }
 
-    private static void handleGameMessage(EventTypes.GameMessageEvent event) {
-        String content = event.message.getString().toLowerCase();
+    private void handleGameMessage(EventTypes.GameMessageEvent event) {
+        String content = event.getPlainText().toLowerCase();
         if (content.contains("meow")) utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 0.8f, 1.0f);
     }
 }
