@@ -51,7 +51,7 @@ public class slayertimer {
             String name = entity.getName().getString();
             if (!name.contains("Spawned by")) return;
             String[] parts = name.split("by: ");
-            if (parts.length > 1 && Objects.requireNonNull(mc.player).getName().getString().equals(parts[1]) && !isFighting) {
+            if (parts.length > 1 && Objects.requireNonNull(mc.player).getName().getString().equals(parts[1])) {
                 BossId = entityId - 3;
                 starttime = System.currentTimeMillis();
                 isFighting = true;

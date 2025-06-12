@@ -18,9 +18,9 @@ public class zencfg {
                     .build())
             .build();
 
-    @SerialEntry public boolean automeow = true;
-    @SerialEntry public boolean meowsounds = true;
-    @SerialEntry public boolean meowdeathsounds = true;
+    @SerialEntry public boolean automeow = false;
+    @SerialEntry public boolean meowsounds = false;
+    @SerialEntry public boolean meowdeathsounds = false;
     @SerialEntry public boolean cleanmsg = false;
     @SerialEntry public boolean cleanjoin = false;
         @SerialEntry public String vipcolor = "a";
