@@ -19,10 +19,10 @@ public class featManager {
     public static volatile int moduleCount = 0;
     
     static {
-        cacheConfigFields();
+        cacheConf();
     }
     
-    private static void cacheConfigFields() {
+    private static void cacheConf() {
         for (var field : zencfg.class.getDeclaredFields()) {
             if (field.getType() == boolean.class) {
                 field.setAccessible(true);
@@ -59,7 +59,7 @@ public class featManager {
         }
     }
     
-    private static void autoDiscoverFeatures() {
+    private static void autoDiscFeats() {
         var resource = featManager.class.getResource(featpath);
         if (resource == null) {
             LOGGER.warning("Features directory not found: " + featpath);
@@ -70,23 +70,23 @@ public class featManager {
             var uri = resource.toURI();
             var fsPath = uri.getScheme().equals("jar") ? getJarPath(uri) : Paths.get(uri);
             
-            discoverFeaturesInPath(fsPath);
+            discoverFeats(fsPath);
         } catch (Exception e) {
             LOGGER.severe("Failed to discover features: " + e.getMessage());
         }
     }
     
-    private static void discoverFeaturesInPath(Path path) {
+    private static void discoverFeats(Path path) {
         try (var stream = Files.walk(path, 3)) {
             stream.filter(p -> p.toString().endsWith(".class") && p.toString().contains("meowing/zen/feats"))
                 .parallel()
-                .forEach(featManager::loadFeatureClass);
+                .forEach(featManager::loadFeats);
         } catch (IOException e) {
             LOGGER.severe("Failed to walk features directory: " + e.getMessage());
         }
     }
     
-    private static void loadFeatureClass(Path classPath) {
+    private static void loadFeats(Path classPath) {
         try {
             var pathStr = classPath.toString();
             int startIdx = pathStr.indexOf("meowing/zen/feats");
@@ -166,16 +166,16 @@ public class featManager {
     }
     
     public static void initAll() {
-        autoDiscoverFeatures();
+        autoDiscFeats();
     }
     
-    public static int getActiveFeatureCount() {
+    public static int getFeatCount() {
         return (int) features.values().stream()
             .mapToInt(handler -> handler.isActive.get() ? 1 : 0)
             .sum();
     }
     
-    public static Set<String> getRegisteredFeatures() {
+    public static Set<String> getRegFeats() {
         return Collections.unmodifiableSet(features.keySet());
     }
 }
