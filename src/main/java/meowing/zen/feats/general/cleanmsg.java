@@ -2,8 +2,6 @@ package meowing.zen.feats.general;
 
 import meowing.zen.utils.EventBus;
 import meowing.zen.utils.EventTypes;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 import meowing.zen.utils.chatutils;
 import meowing.zen.Zen;
 import meowing.zen.featManager;
@@ -29,16 +27,16 @@ public class cleanmsg {
 
     public static void initialize() {
         featManager.register(instance, () -> 
-            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage));
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::onGameMessage));
     }
 
-    private void handleGameMessage(EventTypes.GameMessageEvent event) {     
+    private void onGameMessage(EventTypes.GameMessageEvent event) {     
         String text = chatutils.removeFormatting(event.getPlainText());
         String processed = processGuild(text);
         if (processed == null) processed = processParty(text);
         
         if (processed != null) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal(processed));
+            chatutils.clientmsg(processed, true);
             event.hide = true;
         }
     }

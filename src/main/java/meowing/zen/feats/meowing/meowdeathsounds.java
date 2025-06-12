@@ -16,11 +16,11 @@ public class meowdeathsounds {
     private meowdeathsounds() {}
     public static void initialize() {
         featManager.register(instance, () -> {
-            EventBus.register(EventTypes.EntityUnloadEvent.class, instance, instance::handleEntityUnload);
+            EventBus.register(EventTypes.EntityUnloadEvent.class, instance, instance::onEntityUnload);
         });
     }
 
-    private void handleEntityUnload(EventTypes.EntityUnloadEvent event) {
+    private void onEntityUnload(EventTypes.EntityUnloadEvent event) {
         Entity ent = event.getEntity();
         if (ent.isAlive() || ent instanceof ArmorStandEntity || ent.isInvisible()) return;
         if (ent instanceof LivingEntity livingEntity && livingEntity.isDead()) {

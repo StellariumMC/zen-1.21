@@ -15,20 +15,20 @@ public class cleanjoin {
     
     public static void initialize() {
         featManager.register(instance, () -> {
-            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage);
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::onGameMessage);
         });
     }
     
-    private void handleGameMessage(EventTypes.GameMessageEvent event) {
+    private void onGameMessage(EventTypes.GameMessageEvent event) {
         String text = chatutils.removeFormatting(event.getPlainText());
         Matcher m = guild.matcher(text);
         if (m.matches()) {
-            chatutils.clientmsg(String.format("§8G %s §b%s", "joined".equals(m.group(2)) ? "§2>>" : "§4<<", m.group(1)));
+            chatutils.clientmsg(String.format("§8G %s §b%s", "joined".equals(m.group(2)) ? "§2>>" : "§4<<", m.group(1)), true);
             event.hide = true;
         }
         m = friend.matcher(text);
         if (m.matches()) {
-            chatutils.clientmsg(String.format("§8F %s §b%s", "joined".equals(m.group(2)) ? "§2>>" : "§4<<", m.group(1)));
+            chatutils.clientmsg(String.format("§8F %s §b%s", "joined".equals(m.group(2)) ? "§2>>" : "§4<<", m.group(1)), true);
             event.hide = true;
         }
     }

@@ -6,8 +6,9 @@ import net.minecraft.text.Text;
 import java.util.Objects;
 
 public class chatutils {
-    public static void clientmsg(String message) {
-        Objects.requireNonNull(MinecraftClient.getInstance().player).sendMessage(Text.literal(message), false);
+    public static void clientmsg(String message, boolean addHud) {
+        if (addHud) MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal(message));
+        else Objects.requireNonNull(MinecraftClient.getInstance().player).sendMessage(Text.literal(message), false);
     }
     public static void sendmsg(String message) {
         Objects.requireNonNull(MinecraftClient.getInstance().player).networkHandler.sendChatMessage(message);

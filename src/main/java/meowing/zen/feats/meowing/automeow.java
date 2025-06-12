@@ -20,11 +20,11 @@ public class automeow {
     public static void initialize() {
         TickScheduler.register();
         featManager.register(instance, () -> {
-            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::handleGameMessage);
+            EventBus.register(EventTypes.GameMessageEvent.class, instance, instance::onGameMessage);
         });
     }
 
-    private void handleGameMessage(EventTypes.GameMessageEvent event) {
+    private void onGameMessage(EventTypes.GameMessageEvent event) {
         if (event.overlay || !regex.matcher(chatutils.removeFormatting(event.getPlainText())).matches()) return;
         
         String content = chatutils.removeFormatting(event.getPlainText());

@@ -3,20 +3,17 @@ package meowing.zen.feats.slayers;
 import meowing.zen.utils.EventBus;
 import meowing.zen.utils.EventTypes;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.debug.DebugRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.BlazeEntity;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.SpiderEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import java.util.Objects;
-import meowing.zen.featManager;
 
+import meowing.zen.featManager;
+import meowing.zen.utils.utils;
 import static meowing.zen.feats.slayers.slayertimer.isFighting;
 import static meowing.zen.feats.slayers.slayertimer.BossId;
 
@@ -50,18 +47,10 @@ public class slayerhighlight {
 
         float width = (float) (bossEntity.getWidth() + 0.5);
         float height = (float) (bossEntity.getHeight() + 0.25);
-        renderEntityBox(event.getContext().matrixStack(), event.getContext().consumers(), x, y, z, width, height);
+        utils.renderEntityBox(event.getContext().matrixStack(), event.getContext().consumers(), x, y, z, width, height, 0f, 1f, 1f, 0.5f);
     }
 
     private static boolean isValidSlayerEntity(Entity entity) {
-        return entity instanceof EndermanEntity || entity instanceof WolfEntity || 
-               entity instanceof SpiderEntity || entity instanceof ZombieEntity || 
-               entity instanceof BlazeEntity;
-    }
-
-    private static void renderEntityBox(MatrixStack matrices, VertexConsumerProvider vertexConsumers, 
-                                       double x, double y, double z, float width, float height) {
-        Box box = new Box(x - width / 2, y, z - width / 2, x + width / 2, y + height, z + width / 2);
-        DebugRenderer.drawBox(matrices, vertexConsumers, box, 0.0f, 1.0f, 1.0f, 0.5f);
+        return entity instanceof EndermanEntity || entity instanceof WolfEntity || entity instanceof SpiderEntity || entity instanceof ZombieEntity || entity instanceof BlazeEntity;
     }
 }
