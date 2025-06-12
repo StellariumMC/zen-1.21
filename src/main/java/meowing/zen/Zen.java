@@ -41,7 +41,7 @@ public class Zen implements ClientModInitializer {
         
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             if (shown) return;
-            chatutils.clientmsg(String.format("§c[Zen] §fMod loaded in §c%dms §7| §c%d features", loadTime, featManager.moduleCount), false);
+            chatutils.clientmsg(String.format("§c[Zen] §fMod loaded in §c%dms §7| §c%d features", loadTime, featManager.moduleCount.get()), false);
             shown = true;
         });
     }

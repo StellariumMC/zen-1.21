@@ -13,8 +13,8 @@ public class automeow {
     private static final automeow instance = new automeow();
     private automeow() {}
     private static final Pattern regex = Pattern.compile("^(?:\\w+(?:-\\w+)?\\s>\\s)?(?:\\[[^]]+]\\s)?(?:\\S+\\s)?(?:\\[[^]]+]\\s)?([A-Za-z0-9_.-]+)(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?:\\s(?:[A-Za-z0-9_.-]+(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?\\s?(?:[»>]|:)\\s)?meow$", Pattern.CASE_INSENSITIVE);
-    private static final String[] MEOWS = {"mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3"};
-    private static final Map<String, String> CHANNELS = Map.of("Party >", "pc", "Guild >", "gc", "Officer >", "oc", "Co-op >", "cc");
+    private static final String[] meows = {"mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3"};
+    private static final Map<String, String> channels = Map.of("Party >", "pc", "Guild >", "gc", "Officer >", "oc", "Co-op >", "cc");
     private static final Random random = new Random();
 
     public static void initialize() {
@@ -34,8 +34,8 @@ public class automeow {
         TickScheduler.schedule(random.nextLong(10, 50), () -> {
             String cmd = content.startsWith("From ")
                     ? "msg " + regex.matcher(content).replaceFirst("$1")
-                    : CHANNELS.entrySet().stream().filter(e -> content.startsWith(e.getKey())).findFirst().map(Map.Entry::getValue).orElse("ac");
-            chatutils.sendcmd(cmd + " " + MEOWS[random.nextInt(MEOWS.length)]);
+                    : channels.entrySet().stream().filter(e -> content.startsWith(e.getKey())).findFirst().map(Map.Entry::getValue).orElse("ac");
+            chatutils.sendcmd(cmd + " " + meows[random.nextInt(meows.length)]);
         });
     }
 }
