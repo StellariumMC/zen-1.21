@@ -1,10 +1,13 @@
 package meowing.zen.feats.general;
 
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import meowing.zen.utils.EventBus;
+import meowing.zen.utils.EventTypes;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import meowing.zen.utils.chatutils;
 import meowing.zen.Zen;
+import meowing.zen.featManager;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -23,18 +26,19 @@ public class cleanmsg {
     );
 
     public static void initialize() {
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if (!Zen.getConfig().cleanmsg) return true;
-            String text = chatutils.removeFormatting(message.getString());
+        featManager.register(new cleanmsg(), () -> 
+            EventBus.register(EventTypes.GameMessageEvent.class, cleanmsg.class, cleanmsg::handleGameMessage));
+    }
 
-            String processed = processGuild(text);
-            if (processed == null) processed = processParty(text);
-            if (processed != null) {
-                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal(processed));
-                return false;
-            }
-            return true;
-        });
+    private static void handleGameMessage(EventTypes.GameMessageEvent event) {     
+        String text = chatutils.removeFormatting(event.message.getString());
+        String processed = processGuild(text);
+        if (processed == null) processed = processParty(text);
+        
+        if (processed != null) {
+            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal(processed));
+            event.hide = true;
+        }
     }
 
     private static String processGuild(String text) {

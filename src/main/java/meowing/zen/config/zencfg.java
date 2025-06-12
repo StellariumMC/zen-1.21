@@ -19,7 +19,7 @@ public class zencfg {
             .build();
 
     @SerialEntry public boolean automeow = true;
-    @SerialEntry public boolean meowchat = true;
+    @SerialEntry public boolean meowsounds = true;
     @SerialEntry public boolean meowdeathsounds = true;
     @SerialEntry public boolean cleanmsg = false;
     @SerialEntry public boolean cleanjoin = false;
@@ -28,7 +28,7 @@ public class zencfg {
         @SerialEntry public String mvpcolor = "b";
         @SerialEntry public String mvppluscolor = "b";
         @SerialEntry public String mvppluspluscolor = "6";
-    @SerialEntry public boolean slayerkilltimer = false;
+    @SerialEntry public boolean slayertimer = false;
     @SerialEntry public boolean slayerhighlight = false;
 
     public static Screen createConfigScreen(Screen parent) {
@@ -53,7 +53,7 @@ public class zencfg {
                                 .option(Option.<Boolean>createBuilder()
                                         .name(Text.literal("Meow Sounds"))
                                         .description(OptionDescription.of(Text.literal("Plays a cat sound whenever someone sends \"meow\" in chat")))
-                                        .binding(defaults.meowchat, () -> config.meowchat, newVal -> config.meowchat = newVal)
+                                        .binding(defaults.meowsounds, () -> config.meowsounds, newVal -> config.meowsounds = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")
@@ -108,9 +108,9 @@ public class zencfg {
                         .group(OptionGroup.createBuilder()
                                 .name(Text.literal("Slayers"))
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Text.literal("Slayer kill timer"))
+                                        .name(Text.literal("Slayer timer"))
                                         .description(OptionDescription.of(Text.literal("Sends a message in your chat telling you how long it took to kill your boss.")))
-                                        .binding(defaults.slayerkilltimer, () -> config.slayerkilltimer, newVal -> config.slayerkilltimer = newVal)
+                                        .binding(defaults.slayertimer, () -> config.slayertimer, newVal -> config.slayertimer = newVal)
                                         .controller(opt -> BooleanControllerBuilder.create(opt)
                                                 .formatValue(val -> val
                                                         ? Text.literal("On")

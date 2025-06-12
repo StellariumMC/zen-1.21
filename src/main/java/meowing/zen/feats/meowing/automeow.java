@@ -1,12 +1,11 @@
 package meowing.zen.feats.meowing;
 
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import meowing.zen.utils.EventBus;
+import meowing.zen.utils.EventTypes;
 import net.minecraft.client.MinecraftClient;
-
-import meowing.zen.Zen;
+import meowing.zen.featManager;
 import meowing.zen.utils.TickScheduler;
 import meowing.zen.utils.chatutils;
-
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -18,20 +17,23 @@ public class automeow {
 
     public static void initialize() {
         TickScheduler.register();
+        featManager.register(new automeow(), () -> {
+            EventBus.register(EventTypes.GameMessageEvent.class, automeow.class, automeow::handleGameMessage);
+        });
+    }
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
-            if (!Zen.getConfig().automeow || overlay || !regex.matcher(chatutils.removeFormatting(message.getString())).matches()) return true;
-            String content = chatutils.removeFormatting(message.getString());
-            String playerName = Objects.requireNonNull(MinecraftClient.getInstance().player).getName().getString();
-            if (content.contains("To ") || content.contains(playerName)) return true;
+    private static void handleGameMessage(EventTypes.GameMessageEvent event) {
+        if (event.overlay || !regex.matcher(chatutils.removeFormatting(event.message.getString())).matches()) return;
+        
+        String content = chatutils.removeFormatting(event.message.getString());
+        String playerName = Objects.requireNonNull(MinecraftClient.getInstance().player).getName().getString();
+        if (content.contains("To ") || content.contains(playerName)) return;
 
-            TickScheduler.schedule(random.nextLong(10, 50), () -> {
-                String cmd = content.startsWith("From ")
-                        ? "msg " + regex.matcher(content).replaceFirst("$1")
-                        : CHANNELS.entrySet().stream().filter(e -> content.startsWith(e.getKey())).findFirst().map(Map.Entry::getValue).orElse("ac");
-                chatutils.sendcmd(cmd + " " + MEOWS[random.nextInt(MEOWS.length)]);
-            });
-            return true;
+        TickScheduler.schedule(random.nextLong(10, 50), () -> {
+            String cmd = content.startsWith("From ")
+                    ? "msg " + regex.matcher(content).replaceFirst("$1")
+                    : CHANNELS.entrySet().stream().filter(e -> content.startsWith(e.getKey())).findFirst().map(Map.Entry::getValue).orElse("ac");
+            chatutils.sendcmd(cmd + " " + MEOWS[random.nextInt(MEOWS.length)]);
         });
     }
 }
