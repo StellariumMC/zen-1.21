@@ -17,7 +17,7 @@ public class featManager {
     private static final Map<String, Field> fieldCache = new ConcurrentHashMap<>();
     private static final String featpath = "/meowing/zen/feats";
     private static final Set<String> immutableFeats = ConcurrentHashMap.newKeySet();
-    public static final AtomicInteger moduleCount = new AtomicInteger(0);
+    private static final AtomicInteger moduleCount = new AtomicInteger(0);
     
     static {
         cacheConf();
@@ -76,10 +76,23 @@ public class featManager {
         
         try {
             var uri = resource.toURI();
-            var fsPath = uri.getScheme().equals("jar") ? getJarPath(uri) : Paths.get(uri);
-            discoverFeats(fsPath);
+            if (uri.getScheme().equals("jar")) {
+                try (var fs = getOrCreateFileSystem(uri)) {
+                    discoverFeats(fs.getPath(featpath));
+                }
+            } else {
+                discoverFeats(Paths.get(uri));
+            }
         } catch (Exception e) {
             LOGGER.severe("Failed to discover features: " + e.getMessage());
+        }
+    }
+    
+    private static FileSystem getOrCreateFileSystem(java.net.URI uri) throws IOException {
+        try {
+            return FileSystems.getFileSystem(uri);
+        } catch (FileSystemNotFoundException e) {
+            return FileSystems.newFileSystem(uri, Collections.emptyMap());
         }
     }
     
@@ -116,18 +129,6 @@ public class featManager {
             LOGGER.fine("Skipping non-feature class or initialization failed: " + classPath);
         } catch (Exception e) {
             LOGGER.warning("Unexpected error loading feature class " + classPath + ": " + e.getMessage());
-        }
-    }
-    
-    private static Path getJarPath(java.net.URI uri) throws IOException {
-        try {
-            return FileSystems.getFileSystem(uri).getPath(featpath);
-        } catch (Exception e) {
-            try {
-                return FileSystems.newFileSystem(uri, Collections.emptyMap()).getPath(featpath);
-            } catch (Exception ex) {
-                throw new IOException("Failed to access JAR filesystem", ex);
-            }
         }
     }
     
