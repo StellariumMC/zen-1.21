@@ -20,9 +20,6 @@
 			"meowing.zen.compat.zenmodmenu"
 		]
 	},
-	"mixins": [
-		"zen.mixins.json"
-	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.21.5",
