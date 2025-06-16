@@ -26,6 +26,13 @@
 			}
 		]
 	},
+	"mixins": [
+		"mixins.zen.json",
+		{
+			"config": "meowing.zen.mixins.json",
+			"environment": "*"
+		}
+	],
 	"depends": {
 		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.21.5",

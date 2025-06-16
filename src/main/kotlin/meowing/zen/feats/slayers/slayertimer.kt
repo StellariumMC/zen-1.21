@@ -7,7 +7,6 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.entity.LivingEntity
 import net.minecraft.text.*
 import meowing.zen.featManager
-import meowing.zen.utils.TickScheduler
 import java.util.regex.Pattern
 
 object slayertimer {
@@ -27,13 +26,12 @@ object slayertimer {
 
     @JvmStatic
     fun initialize() {
-        TickScheduler.register()
         featManager.register(this) {
             EventBus.register(EventTypes.ClientTickEvent::class.java, this) {
                 if (isFighting) serverticks++
             }
             EventBus.register(EventTypes.GameMessageEvent::class.java, this, this::onGameMessage)
-            EventBus.register(EventTypes.EntityLoadEvent::class.java, this, this::onEntitySpawn)
+            EventBus.register(EventTypes.EntityTrackerUpdateEvent::class.java, this, this::onEntityTrackerUpdate)
             EventBus.register(EventTypes.EntityUnloadEvent::class.java, this, this::onEntityDeath)
         }
     }
@@ -78,19 +76,17 @@ object slayertimer {
         if (questStart.matcher(text).matches()) spawntime = System.currentTimeMillis()
     }
 
-    private fun onEntitySpawn(event: EventTypes.EntityLoadEvent) {
-        if (event.entity !is net.minecraft.entity.decoration.ArmorStandEntity) return
-        TickScheduler.schedule(2) {
-            val name = event.entity.name.string
-            if (!name.contains("Spawned by")) return@schedule
-            val parts = name.split("by: ")
-            if (parts.size > 1 && mc.player?.name?.string == parts[1]) {
-                BossId = event.getEntityId() - 3
-                starttime = System.currentTimeMillis()
-                isFighting = true
-                serverticks = 0
-                resetSpawnTimer()
-            }
+    private fun onEntityTrackerUpdate(event: EventTypes.EntityTrackerUpdateEvent) {
+        val customName = event.getCustomName() ?: return
+        if (!customName.contains("Spawned by")) return
+
+        val parts = customName.split("by: ")
+        if (parts.size > 1 && mc.player?.name?.string == parts[1]) {
+            BossId = event.getEntityId() - 3
+            starttime = System.currentTimeMillis()
+            isFighting = true
+            serverticks = 0
+            resetSpawnTimer()
         }
     }
 

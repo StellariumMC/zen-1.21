@@ -6,9 +6,10 @@ import net.minecraft.world.World
 import net.minecraft.client.MinecraftClient
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import java.util.Objects
+import java.util.Optional
 
 object EventTypes {
-
+    open class BaseEvent
     class GameMessageEvent(
         val message: Text,
         val overlay: Boolean
@@ -86,5 +87,17 @@ object EventTypes {
         fun getTickDelta(): Float {
             return context.tickCounter().getTickProgress(false)
         }
+    }
+
+    class EntityTrackerUpdateEvent(private val packet: net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket) : BaseEvent() {
+        fun getEntityId(): Int = packet.id()
+        fun getCustomName(): String? =
+            packet.trackedValues()?.firstOrNull { it.id == 2 }?.value.let { value ->
+                when (value) {
+                    is Text -> value.string
+                    is Optional<*> -> (value.orElse(null) as Text).string
+                    else -> null
+                }
+            }
     }
 }
