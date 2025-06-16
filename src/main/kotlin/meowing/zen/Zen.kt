@@ -12,7 +12,7 @@ import meowing.zen.utils.TickScheduler
 import meowing.zen.utils.EventProxy
 import com.mojang.brigadier.Command
 
-class Zen : ClientModInitializer {
+object Zen : ClientModInitializer {
     private var shown = false
 
     override fun onInitializeClient() {
@@ -45,9 +45,7 @@ class Zen : ClientModInitializer {
         }
     }
 
-    companion object {
-        fun getConfig(): zencfg {
-            return zencfg.Handler.instance()
-        }
+    fun getConfig(): zencfg {
+        return zencfg.Handler.instance()
     }
 }
