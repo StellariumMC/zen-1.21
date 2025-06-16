@@ -6,19 +6,17 @@ import meowing.zen.utils.chatutils
 import meowing.zen.featManager
 import java.util.regex.Pattern
 
-class cleanjoin private constructor() {
-    companion object {
-        private val instance = cleanjoin()
-        private val guild = Pattern.compile("^Guild > (.+) (joined|left).")
-        private val friend = Pattern.compile("^Friend > (.+) (joined|left).")
+object cleanjoin {
+    private val guild = Pattern.compile("^Guild > (.+) (joined|left).")
+    private val friend = Pattern.compile("^Friend > (.+) (joined|left).")
 
-        @JvmStatic
-        fun initialize() {
-            featManager.register(instance) {
-                EventBus.register(EventTypes.GameMessageEvent::class.java, instance, instance::onGameMessage)
-            }
+    @JvmStatic
+    fun initialize() {
+        featManager.register(this) {
+            EventBus.register(EventTypes.GameMessageEvent::class.java, this, this::onGameMessage)
         }
     }
+
 
     private fun onGameMessage(event: EventTypes.GameMessageEvent) {
         val text = chatutils.removeFormatting(event.getPlainText())

@@ -6,15 +6,11 @@ import meowing.zen.featManager
 import meowing.zen.utils.utils
 import net.minecraft.sound.SoundEvents
 
-class meowsounds private constructor() {
-    companion object {
-        private val instance = meowsounds()
-
-        @JvmStatic
-        fun initialize() {
-            featManager.register(instance) {
-                EventBus.register(EventTypes.GameMessageEvent::class.java, instance, instance::onGameMessage)
-            }
+object meowsounds {
+    @JvmStatic
+    fun initialize() {
+        featManager.register(this) {
+            EventBus.register(EventTypes.GameMessageEvent::class.java, this, this::onGameMessage)
         }
     }
 

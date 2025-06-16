@@ -11,17 +11,14 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.particle.ParticleTypes
 import kotlin.random.Random
 
-class meowdeathsounds private constructor() {
-    companion object {
-        private val instance = meowdeathsounds()
-
-        @JvmStatic
-        fun initialize() {
-            featManager.register(instance) {
-                EventBus.register(EventTypes.EntityUnloadEvent::class.java, instance, instance::onEntityUnload)
-            }
+object meowdeathsounds {
+    @JvmStatic
+    fun initialize() {
+        featManager.register(this) {
+            EventBus.register(EventTypes.EntityUnloadEvent::class.java, this, this::onEntityUnload)
         }
     }
+
 
     private fun onEntityUnload(event: EventTypes.EntityUnloadEvent) {
         val ent = event.entity

@@ -5,18 +5,14 @@ import meowing.zen.utils.EventTypes
 import net.minecraft.client.MinecraftClient
 import meowing.zen.featManager
 import meowing.zen.utils.utils
-import meowing.zen.feats.slayers.slayertimer.Companion.BossId
-import meowing.zen.feats.slayers.slayertimer.Companion.isFighting
+import meowing.zen.feats.slayers.slayertimer.BossId
+import meowing.zen.feats.slayers.slayertimer.isFighting
 
-class slayerhighlight private constructor() {
-    companion object {
-        private val instance = slayerhighlight()
-
-        @JvmStatic
-        fun initialize() {
-            featManager.register(instance) {
-                EventBus.register(EventTypes.WorldRenderEvent::class.java, instance, instance::handleWorldRender)
-            }
+object slayerhighlight  {
+    @JvmStatic
+    fun initialize() {
+        featManager.register(this) {
+            EventBus.register(EventTypes.WorldRenderEvent::class.java, this, this::handleWorldRender)
         }
     }
 
