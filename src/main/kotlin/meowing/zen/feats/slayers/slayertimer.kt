@@ -78,7 +78,7 @@ object slayertimer {
 
     private fun onEntityTrackerUpdate(event: EventTypes.EntityTrackerUpdateEvent) {
         val customName = event.getCustomName() ?: return
-        if (!customName.contains("Spawned by")) return
+        if (!customName.contains("Spawned by") || isFighting) return
 
         val parts = customName.split("by: ")
         if (parts.size > 1 && mc.player?.name?.string == parts[1]) {
