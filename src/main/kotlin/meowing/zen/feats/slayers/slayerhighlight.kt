@@ -1,35 +1,27 @@
 package meowing.zen.feats.slayers
 
-import meowing.zen.utils.EventBus
-import meowing.zen.utils.EventTypes
-import net.minecraft.client.MinecraftClient
-import meowing.zen.featManager
-import meowing.zen.utils.utils
-import meowing.zen.feats.slayers.slayertimer.BossId
-import meowing.zen.feats.slayers.slayertimer.isFighting
+import meowing.zen.Zen.Companion.mc
+import meowing.zen.events.RenderWorldPostEntitiesEvent
+import meowing.zen.feats.Feature
+import meowing.zen.utils.RenderUtils
 
-object slayerhighlight  {
-    @JvmStatic
-    fun initialize() {
-        featManager.register(this) {
-            EventBus.register(EventTypes.WorldRenderEvent::class.java, this, this::handleWorldRender)
+object slayerhighlight : Feature("slayerhighlight") {
+    override fun initialize() {
+        register<RenderWorldPostEntitiesEvent> { event ->
+            if (!slayertimer.isFighting || slayertimer.BossId == -1) return@register
+            val bossEntity = mc.world!!.getEntityById(slayertimer.BossId) ?: return@register
+            val width = (bossEntity.width + 0.5).toFloat()
+            val height = (bossEntity.height + 0.25).toFloat()
+            val entityPos = bossEntity.getLerpedPos(event.context!!.tickCounter().getTickProgress(true))
+            val x = entityPos.x - mc.gameRenderer.camera.pos.x
+            val y = entityPos.y - mc.gameRenderer.camera.pos.y
+            val z = entityPos.z - mc.gameRenderer.camera.pos.z
+            RenderUtils.renderEntityBox(
+                event.context.matrixStack(),
+                event.context.consumers(),
+                x, y, z, width, height,
+                0f, 1f, 1f, 0.5f
+            )
         }
-    }
-
-    private fun handleWorldRender(event: EventTypes.WorldRenderEvent) {
-        if (!isFighting || BossId == -1) return
-
-        val client = MinecraftClient.getInstance()
-        val bossEntity = client.world?.getEntityById(BossId) ?: return
-
-        val cameraPos = event.context.camera().pos
-        val entityPos = bossEntity.getLerpedPos(event.getTickDelta())
-        val x = entityPos.x - cameraPos.x
-        val y = entityPos.y - cameraPos.y
-        val z = entityPos.z - cameraPos.z
-
-        val width = (bossEntity.width + 0.5).toFloat()
-        val height = (bossEntity.height + 0.25).toFloat()
-        utils.renderEntityBox(event.context.matrixStack(), event.context.consumers(), x, y, z, width, height, 0f, 1f, 1f, 0.5f)
     }
 }

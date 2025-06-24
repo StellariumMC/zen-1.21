@@ -3,7 +3,7 @@
   "package": "meowing.zen.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "MixinEntitySpawn"
+    "NetworkManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

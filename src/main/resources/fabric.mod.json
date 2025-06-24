@@ -9,7 +9,7 @@
 		"homepage": "https://meowaddons.top/",
 		"sources": "https://github.com/kiwidotzip/zen"
 	},
-	"license": "MIT",
+	"license": "GPL-3.0-or-later",
 	"icon": "assets/zen/icon.png",
 	"environment": "*",
 	"entrypoints": {

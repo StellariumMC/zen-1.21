@@ -1,49 +1,43 @@
 package meowing.zen.feats.meowing
 
-import meowing.zen.utils.EventBus
-import meowing.zen.utils.EventTypes
-import net.minecraft.client.MinecraftClient
-import meowing.zen.featManager
-import meowing.zen.utils.TickScheduler
-import meowing.zen.utils.chatutils
-import java.util.regex.Pattern
+import meowing.zen.events.ChatReceiveEvent
+import meowing.zen.feats.Feature
+import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.TickUtils
+import meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
+import net.minecraft.client.MinecraftClient
 
-object automeow {
-    private val regex = Pattern.compile(
-        "^(?:\\w+(?:-\\w+)?\\s>\\s)?(?:\\[[^]]+]\\s)?(?:\\S+\\s)?(?:\\[[^]]+]\\s)?([A-Za-z0-9_.-]+)(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?:\\s(?:[A-Za-z0-9_.-]+(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?\\s?(?:[»>]|:)\\s)?meow$",
-        Pattern.CASE_INSENSITIVE
-    )
+object automeow : Feature("automeow") {
+    private val regex = "^(?:(Guild|Party|Officer|Co-op) > |From )?([A-Za-z0-9_]+)(?:\\s\\[[^]]+])?\\s*(?:>|:)\\s*(?:[A-Za-z0-9_]+\\s*(?:>|:)\\s*)?meow$".toRegex(RegexOption.IGNORE_CASE)
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
     private val channels = mapOf(
-        "Party >" to "pc",
         "Guild >" to "gc",
+        "Party >" to "pc",
         "Officer >" to "oc",
         "Co-op >" to "cc"
     )
 
-    @JvmStatic
-    fun initialize() {
-        TickScheduler.register()
-        featManager.register(this) {
-            EventBus.register(EventTypes.GameMessageEvent::class.java, this, this::onGameMessage)
-        }
-    }
+    override fun initialize() {
+        register<ChatReceiveEvent> { event ->
+            if (event.overlay) return@register
+            val content = event.message?.string!!.removeFormatting()
 
-    private fun onGameMessage(event: EventTypes.GameMessageEvent) {
-        if (event.overlay || !regex.matcher(chatutils.removeFormatting(event.getPlainText())).matches()) return
+            val matchResult = regex.find(content) ?: return@register
 
-        val content = chatutils.removeFormatting(event.getPlainText())
-        val playerName = MinecraftClient.getInstance().player?.name?.string ?: return
-        if (content.contains("To ") || content.contains(playerName)) return
+            val playerName = MinecraftClient.getInstance().player?.name?.string ?: return@register
+            val username = matchResult.groupValues[2]
 
-        TickScheduler.schedule(Random.nextLong(10, 50)) {
-            val cmd = if (content.startsWith("From ")) {
-                "msg " + regex.matcher(content).replaceFirst("$1")
-            } else {
-                channels.entries.find { content.startsWith(it.key) }?.value ?: "ac"
+            if (content.contains("To ") || username == playerName) return@register
+            TickUtils.schedule(Random.nextLong(10, 50)) {
+                val cmd = when {
+                    content.startsWith("From ") -> {
+                        "msg $username"
+                    }
+                    else -> channels.entries.find { content.startsWith(it.key) }?.value ?: "ac"
+                }
+                ChatUtils.command("$cmd ${meows.random()}")
             }
-            chatutils.sendcmd("$cmd ${meows.random()}")
         }
     }
 }

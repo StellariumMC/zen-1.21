@@ -1,36 +1,54 @@
 package meowing.zen.feats.general
 
-import meowing.zen.utils.EventBus
-import meowing.zen.utils.EventTypes
-import meowing.zen.utils.chatutils
-import meowing.zen.featManager
+import meowing.zen.events.ChatReceiveEvent
+import meowing.zen.feats.Feature
+import meowing.zen.utils.ChatUtils
 import java.util.regex.Pattern
 
-object cleanjoin {
-    private val guild = Pattern.compile("^Guild > (.+) (joined|left).")
-    private val friend = Pattern.compile("^Friend > (.+) (joined|left).")
+object guildjoinleave : Feature("guildjoinleave") {
+    private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
-    @JvmStatic
-    fun initialize() {
-        featManager.register(this) {
-            EventBus.register(EventTypes.GameMessageEvent::class.java, this, this::onGameMessage)
+    override fun initialize() {
+        register<ChatReceiveEvent> { event ->
+            if (event.overlay) return@register
+            println(event.message!!.string)
+            val m = guildPattern.matcher(event.message!!.string)
+            if (m.matches()) {
+                event.cancel()
+                val color = m.group(1) ?: ""
+                val user = m.group(2) ?: ""
+                val action = m.group(3) ?: ""
+                val message = when (action) {
+                    "joined" -> "§8G §a>> $color$user"
+                    "left" -> "§8G §c<< $color$user"
+                    else -> return@register
+                }
+                ChatUtils.addMessage(message)
+            }
         }
     }
+}
 
+object friendjoinleave : Feature("friendjoinleave") {
+    private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
-    private fun onGameMessage(event: EventTypes.GameMessageEvent) {
-        val text = chatutils.removeFormatting(event.getPlainText())
-        var m = guild.matcher(text)
-        if (m.matches()) {
-            val action = if ("joined" == m.group(2)) "§2>>" else "§4<<"
-            chatutils.clientmsg("§8G $action §b${m.group(1)}", true)
-            event.hide()
-        }
-        m = friend.matcher(text)
-        if (m.matches()) {
-            val action = if ("joined" == m.group(2)) "§2>>" else "§4<<"
-            chatutils.clientmsg("§8F $action §b${m.group(1)}", true)
-            event.hide()
+    override fun initialize() {
+        register<ChatReceiveEvent> { event ->
+            if (event.overlay) return@register
+            println(event.message!!.string)
+            val m = friendPattern.matcher(event.message!!.string)
+            if (m.matches()) {
+                event.cancel()
+                val color = m.group(1) ?: ""
+                val user = m.group(2) ?: ""
+                val action = m.group(3) ?: ""
+                val message = when (action) {
+                    "joined" -> "§8F §a>> $color$user"
+                    "left" -> "§8F §c<< $color$user"
+                    else -> return@register
+                }
+                ChatUtils.addMessage(message)
+            }
         }
     }
 }
