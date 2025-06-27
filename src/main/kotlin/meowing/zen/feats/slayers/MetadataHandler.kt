@@ -18,10 +18,13 @@ object MetadataHandler {
                 val optional = obj.value as Optional<*>
                 val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
                 if (name.contains("Spawned by") && name.endsWith("by: ${player.gameProfile.name}")) {
-                    val entity = world.getEntityById(packet.id) ?: return@let
-                    val hasBlackhole = world.entities.any {
-                        it.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true && entity.distanceTo(it) <= 3f
-                    }
+                    val targetEntity = world.getEntityById(packet.id)
+
+                    val hasBlackhole = targetEntity?.let { entity ->
+                        world.entities.any { Entity ->
+                            entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
+                        }
+                    } ?: false
 
                     if (hasBlackhole) return@register
                     if (Zen.config.slayertimer) slayertimer.handleBossSpawn(packet.id)

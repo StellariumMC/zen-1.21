@@ -125,6 +125,14 @@ object carrycounter : Feature("carrycounter") {
                     val optional = obj.value as Optional<*>
                     val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
                     if (name.contains("Spawned by")) {
+                        val targetEntity = mc.world!!.getEntityById(packet.id)
+                        val hasBlackhole = targetEntity?.let { entity ->
+                            mc.world!!.entities.any { Entity ->
+                                entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
+                            }
+                        } ?: false
+
+                        if (hasBlackhole) return@let
                         val spawnerName = name.substringAfter("by: ")
                         carryeesByName[spawnerName]?.onSpawn(event.packet.id - 3)
                     }
