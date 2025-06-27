@@ -62,6 +62,7 @@ class Zen : ClientModInitializer {
                 "§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
                 "§c${FeatureLoader.getLoadtime()}ms §7| §c7 utils §7| §c4 commands"
             )
+            UpdateChecker.checkForUpdates()
             shown = true
         }
 
