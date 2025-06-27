@@ -16,6 +16,7 @@ import meowing.zen.events.GuiOpenEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import meowing.zen.hud.HudEditorScreen
 import java.util.concurrent.ConcurrentHashMap
 
 class Zen : ClientModInitializer {
@@ -25,7 +26,7 @@ class Zen : ClientModInitializer {
         ZenConfig.Handler.load()
         FeatureLoader.init()
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            val cmd = Command<FabricClientCommandSource> { _ ->
+            val configCmd = Command<FabricClientCommandSource> { _ ->
                 TickUtils.schedule(2) {
                     val client = MinecraftClient.getInstance()
                     client.execute {
@@ -34,9 +35,25 @@ class Zen : ClientModInitializer {
                 }
                 1
             }
-            dispatcher.register(ClientCommandManager.literal("zen").executes(cmd))
-            dispatcher.register(ClientCommandManager.literal("ma").executes(cmd))
-            dispatcher.register(ClientCommandManager.literal("meowaddons").executes(cmd))
+
+            val hudCmd = Command<FabricClientCommandSource> { _ ->
+                TickUtils.schedule(2) {
+                    val client = MinecraftClient.getInstance()
+                    client.execute {
+                        client.setScreen(HudEditorScreen())
+                    }
+                }
+                1
+            }
+
+            dispatcher.register(
+                ClientCommandManager.literal("zen")
+                    .executes(configCmd)
+                    .then(ClientCommandManager.literal("hud").executes(hudCmd))
+            )
+
+            dispatcher.register(ClientCommandManager.literal("ma").executes(configCmd))
+            dispatcher.register(ClientCommandManager.literal("meowaddons").executes(configCmd))
         }
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->

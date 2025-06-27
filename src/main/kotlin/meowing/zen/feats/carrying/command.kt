@@ -6,7 +6,6 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import meowing.zen.Zen
-import meowing.zen.config.ZenConfig
 import meowing.zen.utils.ChatUtils
 import meowing.zen.hud.HudEditorScreen
 import meowing.zen.utils.TickUtils
@@ -49,6 +48,10 @@ object carrycommand {
                     .executes { showLogs(it, currentLogPage) }
                     .then(argument("page", IntegerArgumentType.integer(1))
                         .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
+                .then(literal("logs")
+                    .executes { showLogs(it, currentLogPage) }
+                    .then(argument("page", IntegerArgumentType.integer(1))
+                        .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
                 .then(literal("gui").executes { openHudEditor(it) })
                 .executes { showHelp(it) }
         )
@@ -59,9 +62,7 @@ object carrycommand {
     private val playerSuggestions = SuggestionProvider<FabricClientCommandSource> { _, builder ->
         val mc = Zen.mc
         mc.world?.players?.forEach { player ->
-            if (player.name.string.isNotBlank()) {
-                builder.suggest(player.name.string)
-            }
+            if (player.name.string.isNotBlank() && player.uuid.version() == 4) builder.suggest(player.name.string)
         }
         carrycounter.carryees.forEach { builder.suggest(it.name) }
         builder.buildFuture()
