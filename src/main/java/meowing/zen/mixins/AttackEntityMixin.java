@@ -17,6 +17,5 @@ public class AttackEntityMixin {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo callbackInfo) {
         EventBus.INSTANCE.post(new AttackEntityEvent(player, target));
-        ChatUtils.INSTANCE.addMessage("mob hit", "", ClickEvent.Action.COPY_TO_CLIPBOARD, "", "", false);
     }
 }
