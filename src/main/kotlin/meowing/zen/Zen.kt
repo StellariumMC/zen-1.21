@@ -10,8 +10,12 @@ import meowing.zen.config.ZenConfig
 import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
 import com.mojang.brigadier.Command
+import meowing.zen.events.EventBus
+import meowing.zen.events.GuiCloseEvent
+import meowing.zen.events.GuiOpenEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
+import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import java.util.concurrent.ConcurrentHashMap
 
 class Zen : ClientModInitializer {
@@ -39,6 +43,14 @@ class Zen : ClientModInitializer {
             ChatUtils.addMessage("§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures", "§c${FeatureLoader.getLoadtime()}ms")
             shown = true
         }
+
+        EventBus.register<GuiOpenEvent> ({ event ->
+            if (event.screen is InventoryScreen) isInInventory = true
+        })
+
+        EventBus.register<GuiCloseEvent> ({ event ->
+            if (event.screen is InventoryScreen) isInInventory = false
+        })
     }
 
     companion object {
@@ -46,6 +58,7 @@ class Zen : ClientModInitializer {
         private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
         val mc = MinecraftClient.getInstance()
         val config: ZenConfig get() = ZenConfig.Handler.instance()
+        var isInInventory = false
 
         fun addFeature(feature: Feature) {
             features.add(feature)

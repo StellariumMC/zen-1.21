@@ -4,11 +4,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
+import net.minecraft.client.gui.screen.Screen
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import org.lwjgl.glfw.GLFW
@@ -62,6 +62,15 @@ object EventBus {
                 post(event)
                 !event.isCancelled()
             }
+            ScreenEvents.remove(screen).register { screen ->
+                post(GuiCloseEvent(screen))
+            }
+            ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
+                post(GuiAfterRenderEvent(screen))
+            }
+        }
+        ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
+            if (screen != null) post(GuiOpenEvent(screen))
         }
     }
 

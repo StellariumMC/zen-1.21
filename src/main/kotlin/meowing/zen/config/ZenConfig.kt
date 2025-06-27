@@ -11,8 +11,9 @@ import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import meowing.zen.Zen
 import java.awt.Color
-import java.util.function.Consumer
-import java.util.function.Supplier
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.memberProperties
 
 class ZenConfig {
     companion object {
@@ -33,115 +34,144 @@ class ZenConfig {
                     .category(
                         ConfigCategory.createBuilder()
                             .name(Text.literal("General"))
-                            .group(
-                                OptionGroup.createBuilder()
-                                    .name(Text.literal("Meowing"))
-                                    .option(createBoolOption("Auto Meow", "Automatically responds with a meow message whenever someone sends meow in chat.", "automeow", defaults.automeow, { config.automeow }, { v -> config.automeow = v }))
-                                    .option(createBoolOption("Meow Sounds", "Plays a cat sound whenever someone sends \"meow\" in chat", "meowsounds", defaults.meowsounds, { config.meowsounds }, { v -> config.meowsounds = v }))
-                                    .option(createBoolOption("Meow Death Sounds", "Plays a cat sound whenever an entity dies", "meowdeathsounds", defaults.meowdeathsounds, { config.meowdeathsounds }, { v -> config.meowdeathsounds = v }))
-                                    .build()
-                            )
-                            .group(
-                                OptionGroup.createBuilder()
-                                    .name(Text.literal("Clean Chat"))
-                                    .option(createBoolOption("Clean guild join/leave", "Replaces the guild and friend join messages with a cleaner version of them.", "guildjoinleave", defaults.guildjoinleave, { config.guildjoinleave }, { v -> config.guildjoinleave = v }))
-                                    .option(createBoolOption("Clean friend join/leave", "Replaces the guild and friend join messages with a cleaner version of them.", "friendjoinleave", defaults.friendjoinleave, { config.friendjoinleave }, { v -> config.friendjoinleave = v }))
-                                    .option(createBoolOption("Clean guild messages", "Replaces the guild chat messages with a cleaner version of them.", "cleanmsg", defaults.guildmessage, { config.guildmessage }, { v -> config.guildmessage = v }))
-                                    .option(createBoolOption("Clean party messages", "Replaces the party chat messages with a cleaner version of them.", "cleanmsg", defaults.partymessage, { config.partymessage }, { v -> config.partymessage = v }))
-                                    .option(createBoolOption("Better Auction house", "Better auction house messages.", "betterah", defaults.betterah, { config.betterah }, { v -> config.betterah = v }))
-                                    .option(createBoolOption("Better Bazaar", "Better bazaar messages.", "betterbz", defaults.betterbz, { config.betterbz }, { v -> config.betterbz = v }))
-                                    .build()
-                            )
-                            .group(
-                                OptionGroup.createBuilder()
-                                    .name(Text.literal("Misc"))
-                                    .option(createBoolOption("Send world age", "Sends world age to your chat.", "worldage", defaults.worldage, { config.worldage }, { v -> config.worldage = v }))
-                                    .build()
-                            )
+                            .group(createGroup("Meowing", listOf(
+                                ConfigOption("Auto Meow", "Automatically responds with a meow message whenever someone sends meow in chat.", "automeow"),
+                                ConfigOption("Meow Sounds", "Plays a cat sound whenever someone sends \"meow\" in chat", "meowsounds"),
+                                ConfigOption("Meow Death Sounds", "Plays a cat sound whenever an entity dies", "meowdeathsounds")
+                            ), defaults, config))
+                            .group(createGroup("Clean Chat", listOf(
+                                ConfigOption("Clean guild join/leave", "Replaces the guild and friend join messages with a cleaner version of them.", "guildjoinleave"),
+                                ConfigOption("Clean friend join/leave", "Replaces the guild and friend join messages with a cleaner version of them.", "friendjoinleave"),
+                                ConfigOption("Clean guild messages", "Replaces the guild chat messages with a cleaner version of them.", "guildmessage"),
+                                ConfigOption("Clean party messages", "Replaces the party chat messages with a cleaner version of them.", "partymessage"),
+                                ConfigOption("Better Auction house", "Better auction house messages.", "betterah"),
+                                ConfigOption("Better Bazaar", "Better bazaar messages.", "betterbz")
+                            ), defaults, config))
+                            .group(createGroup("Misc", listOf(
+                                ConfigOption("Send world age", "Sends world age to your chat.", "worldage")
+                            ), defaults, config))
                             .build()
                     )
                     .category(
                         ConfigCategory.createBuilder()
                             .name(Text.literal("Slayers"))
-                            .group(
-                                OptionGroup.createBuilder()
-                                    .name(Text.literal("Slayers"))
-                                    .option(createBoolOption("Slayer timer", "Sends a message in your chat telling you how long it took to kill your boss.", "slayertimer", defaults.slayertimer, { config.slayertimer }, { v -> config.slayertimer = v }))
-                                    .option(createBoolOption("Slayer highlight", "Highlights your slayer boss.", "slayerhighlight", defaults.slayerhighlight, { config.slayerhighlight }, { v -> config.slayerhighlight = v }))
-                                    .option(createBoolOption("Vengeance damager tracker", "Tracks and sends your vegeance damage in the chat.", "vengdmg", defaults.vengdmg, { config.vengdmg }, { v -> config.vengdmg = v }))
-                                    .build()
-                            )
+                            .group(createGroup("Slayers", listOf(
+                                ConfigOption("Slayer timer", "Sends a message in your chat telling you how long it took to kill your boss.", "slayertimer"),
+                                ConfigOption("Slayer highlight", "Highlights your slayer boss.", "slayerhighlight"),
+                                ConfigOption("Vengeance damager tracker", "Tracks and sends your vegeance damage in the chat.", "vengdmg")
+                            ), defaults, config))
+                            .group(createGroup("Carrying", listOf(
+                                ConfigOption("Carry counter", "Counts and sends the carries that you do.", "carrycounter"),
+                                ConfigOption("Carry boss highlight", "Highlights your client's boss.", "carrybosshighlight"),
+                                ConfigOption("Carry boss highlight color", "The color for boss highlight", "carrybosshighlightcolor"),
+                                ConfigOption("Carry client highlight", "Highlights your client's boss.", "carryclienthighlight"),
+                                ConfigOption("Carry client highlight color", "The color for client highlight", "carryclienthighlightcolor"),
+                                ConfigOption("Carry value", "Carry values for the mod to automatically detect in a trade", "carryvalue")
+                            ), defaults, config))
                             .build()
                     )
             }.generateScreen(parent)
         }
 
-        private fun createBoolOption(name: String, desc: String, configKey: String, defaultVal: Boolean, getter: Supplier<Boolean>, setter: Consumer<Boolean>): Option<Boolean> {
-            return Option.createBuilder<Boolean>()
-                .name(Text.literal(name))
-                .description(OptionDescription.of(Text.literal(desc)))
-                .binding(defaultVal, getter) { v ->
-                    if (getter.get() != v) {
-                        setter.accept(v)
-                        Handler.save()
-                        Zen.onConfigChange(configKey)
-                    }
-                }
-                .controller { opt ->
-                    BooleanControllerBuilder.create(opt)
-                        .formatValue { value -> Text.literal(if (value) "On" else "Off") }
-                        .coloured(true)
-                }
-                .build()
+        private data class ConfigOption(val name: String, val description: String, val key: String)
+
+        private fun createGroup(name: String, options: List<ConfigOption>, defaults: ZenConfig, config: ZenConfig): OptionGroup {
+            val groupBuilder = OptionGroup.createBuilder().name(Text.literal(name))
+
+            options.forEach { opt ->
+                val option = createOptionForProperty(opt.name, opt.description, opt.key, defaults, config)
+                option?.let { groupBuilder.option(it) }
+            }
+
+            return groupBuilder.build()
         }
 
-        private fun createSliderOption(name: String, desc: String, configKey: String, defaultVal: Int, getter: Supplier<Int>, setter: Consumer<Int>): Option<Int> {
-            return Option.createBuilder<Int>()
-                .name(Text.literal(name))
-                .description(OptionDescription.of(Text.literal(desc)))
-                .binding(defaultVal, getter) { v ->
-                    if (getter.get() != v) {
-                        setter.accept(v)
-                        Handler.save()
-                        Zen.onConfigChange(configKey)
+        @Suppress("UNCHECKED_CAST")
+        private fun createOptionForProperty(name: String, desc: String, key: String, defaults: ZenConfig, config: ZenConfig): Option<*>? {
+            val property = ZenConfig::class.memberProperties.find { it.name == key } as? KMutableProperty1<ZenConfig, *>
+                ?: return null
+
+            return when (val defaultValue = property.get(defaults)) {
+                is Boolean -> {
+                    val boolProperty = property as KMutableProperty1<ZenConfig, Boolean>
+                    createOption(
+                        name, desc, key, defaultValue,
+                        { boolProperty.get(config) },
+                        { v -> boolProperty.set(config, v) }
+                    ) { opt ->
+                        BooleanControllerBuilder.create(opt)
+                            .formatValue { value -> Text.literal(if (value) "On" else "Off") }
+                            .coloured(true)
                     }
                 }
-                .controller { opt ->
-                    IntegerSliderControllerBuilder.create(opt)
-                        .range(0, 100)
-                        .step(1)
-                        .formatValue { value -> Text.literal("$value%") }
+
+                is String -> {
+                    val stringProperty = property as KMutableProperty1<ZenConfig, String>
+                    createOption(
+                        name, desc, key, defaultValue,
+                        { stringProperty.get(config) },
+                        { v -> stringProperty.set(config, v) }
+                    ) { opt -> StringControllerBuilder.create(opt) }
                 }
-                .build()
+
+                is FloatArray -> {
+                    val floatArrayProperty = property as KMutableProperty1<ZenConfig, FloatArray>
+                    createOption(
+                        name, desc, key,
+                        Color(defaultValue[0], defaultValue[1], defaultValue[2], if (defaultValue.size > 3) defaultValue[3] else 1f),
+                        {
+                            val arr = floatArrayProperty.get(config)
+                            Color(arr[0], arr[1], arr[2], if (arr.size > 3) arr[3] else 1f)
+                        },
+                        { v ->
+                            floatArrayProperty.set(config, floatArrayOf(
+                                v.red / 255f,
+                                v.green / 255f,
+                                v.blue / 255f,
+                                v.alpha / 255f
+                            ))
+                        }
+                    ) { opt -> ColorControllerBuilder.create(opt).allowAlpha(true) }
+                }
+
+                is Int -> {
+                    val intProperty = property as KMutableProperty1<ZenConfig, Int>
+                    createOption(
+                        name, desc, key, defaultValue,
+                        { intProperty.get(config) },
+                        { v -> intProperty.set(config, v) }
+                    ) { opt ->
+                        IntegerSliderControllerBuilder.create(opt)
+                            .range(0, 100)
+                            .step(1)
+                            .formatValue { value -> Text.literal("$value%") }
+                    }
+                }
+
+                else -> null
+            }
         }
 
-        private fun createTextOption(name: String, desc: String, configKey: String, defaultVal: String, getter: Supplier<String>, setter: Consumer<String>): Option<String> {
-            return Option.createBuilder<String>()
+        private inline fun <T : Any> createOption(
+            name: String,
+            desc: String,
+            configKey: String,
+            defaultVal: T,
+            noinline getter: () -> T,
+            crossinline setter: (T) -> Unit,
+            noinline controllerBuilder: (Option<T>) -> ControllerBuilder<T>
+        ): Option<T> {
+            return Option.createBuilder<T>()
                 .name(Text.literal(name))
                 .description(OptionDescription.of(Text.literal(desc)))
                 .binding(defaultVal, getter) { v ->
-                    if (getter.get() != v) {
-                        setter.accept(v)
+                    if (getter() != v) {
+                        setter(v)
                         Handler.save()
                         Zen.onConfigChange(configKey)
                     }
                 }
-                .controller { opt -> StringControllerBuilder.create(opt) }
-                .build()
-        }
-
-        private fun createColorOption(name: String, desc: String, configKey: String, defaultVal: Color, getter: Supplier<Color>, setter: Consumer<Color>): Option<Color> {
-            return Option.createBuilder<Color>()
-                .name(Text.literal(name))
-                .description(OptionDescription.of(Text.literal(desc)))
-                .binding(defaultVal, getter) { v ->
-                    if (getter.get() != v) {
-                        setter.accept(v)
-                        Handler.save()
-                        Zen.onConfigChange(configKey)
-                    }
-                }
-                .controller { opt -> ColorControllerBuilder.create(opt).allowAlpha(true) }
+                .controller(controllerBuilder)
                 .build()
         }
     }
@@ -158,5 +188,11 @@ class ZenConfig {
     @SerialEntry var worldage: Boolean = false
     @SerialEntry var slayertimer: Boolean = false
     @SerialEntry var slayerhighlight: Boolean = false
+    @SerialEntry var carrycounter: Boolean = false
+    @SerialEntry var carrybosshighlight: Boolean = false
+    @SerialEntry var carrybosshighlightcolor: FloatArray = floatArrayOf(0f, 1f, 1f, 0.5f)
+    @SerialEntry var carryclienthighlightcolor: FloatArray = floatArrayOf(0f, 1f, 1f, 0.5f)
+    @SerialEntry var carryclienthighlight: Boolean = false
+    @SerialEntry var carryvalue: String = ""
     @SerialEntry var vengdmg: Boolean = false
 }

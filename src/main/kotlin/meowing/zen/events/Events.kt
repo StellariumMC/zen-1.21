@@ -31,9 +31,13 @@ class EntityLeaveEvent(val entity: Entity) : Event()
 
 class ChatReceiveEvent(val message: Text?, val overlay: Boolean) : CancellableEvent()
 
-class RenderHudEvent(val context: DrawContext, val tickCounter: RenderTickCounter) : Event()
-
 class WorldChangeEvent(val mc: MinecraftClient?, val world: ClientWorld) : Event()
+
+class GuiAfterRenderEvent(val screen: Screen) : Event()
+
+class GuiOpenEvent(val screen: Screen) : Event()
+
+class GuiCloseEvent(val screen: Screen) : Event()
 
 class GuiClickEvent(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
 

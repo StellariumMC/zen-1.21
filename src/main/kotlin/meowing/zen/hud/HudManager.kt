@@ -25,6 +25,13 @@ object HudManager {
         loadElementConfig(element)
     }
 
+    fun registerCustom(element: HudElement, renderer: HudRenderer) {
+        elements[element.id] = element
+        renderers[element.id] = renderer
+        loadElementConfig(element)
+        println("Registered custom element: ${element.id}")
+    }
+
     private fun loadElementConfig(element: HudElement) {
         val elementData = config.getData().elements[element.id]
         if (elementData != null) {
