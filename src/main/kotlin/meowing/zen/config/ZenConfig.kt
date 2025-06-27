@@ -58,7 +58,9 @@ class ZenConfig {
                             .group(createGroup("Slayers", listOf(
                                 ConfigOption("Slayer timer", "Sends a message in your chat telling you how long it took to kill your boss.", "slayertimer"),
                                 ConfigOption("Slayer highlight", "Highlights your slayer boss.", "slayerhighlight"),
-                                ConfigOption("Vengeance damager tracker", "Tracks and sends your vegeance damage in the chat.", "vengdmg")
+                                ConfigOption("Vengeance damager tracker", "Tracks and sends your vegeance damage in the chat.", "vengdmg"),
+                                ConfigOption("Vengeance proc timer", "Time until vengeance procs.", "vengtimer"),
+                                ConfigOption("Slayer stats", "Shows stats about your kill times", "slayerstats")
                             ), defaults, config))
                             .group(createGroup("Carrying", listOf(
                                 ConfigOption("Carry counter", "Counts and sends the carries that you do.", "carrycounter"),
@@ -188,6 +190,7 @@ class ZenConfig {
     @SerialEntry var worldage: Boolean = false
     @SerialEntry var slayertimer: Boolean = false
     @SerialEntry var slayerhighlight: Boolean = false
+    @SerialEntry var slayerstats: Boolean = false
     @SerialEntry var carrycounter: Boolean = false
     @SerialEntry var carrybosshighlight: Boolean = false
     @SerialEntry var carrybosshighlightcolor: FloatArray = floatArrayOf(0f, 1f, 1f, 0.5f)
@@ -195,4 +198,5 @@ class ZenConfig {
     @SerialEntry var carryclienthighlight: Boolean = false
     @SerialEntry var carryvalue: String = ""
     @SerialEntry var vengdmg: Boolean = false
+    @SerialEntry var vengtimer: Boolean = false
 }

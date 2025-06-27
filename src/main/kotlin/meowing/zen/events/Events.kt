@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.text.Text
@@ -29,6 +30,8 @@ class EntityJoinEvent(val entity: Entity) : Event()
 
 class EntityLeaveEvent(val entity: Entity) : Event()
 
+class AttackEntityEvent(val entityPlayer: PlayerEntity, val target: Entity) : Event()
+
 class ChatReceiveEvent(val message: Text?, val overlay: Boolean) : CancellableEvent()
 
 class WorldChangeEvent(val mc: MinecraftClient?, val world: ClientWorld) : Event()
@@ -42,6 +45,8 @@ class GuiCloseEvent(val screen: Screen) : Event()
 class GuiClickEvent(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
 
 class GuiKeyEvent(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
+
+class HudRenderEvent(val context: DrawContext) : Event()
 
 sealed class PacketEvent(val packet: Packet<*>) : Event() {
     class Received(packet: Packet<*>) : PacketEvent(packet)

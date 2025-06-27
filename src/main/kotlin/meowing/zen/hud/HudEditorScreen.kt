@@ -73,12 +73,9 @@ class HudEditorScreen : Screen(Text.literal("HUD Editor")) {
     }
 
     private fun renderHudElements(context: DrawContext) {
-        println("Available elements: ${HudManager.getElements().map { it.id }}")
         HudManager.getElements().forEach { element ->
-            println("Rendering element: ${element.id}, enabled: ${element.enabled}")
             if (!element.enabled) return@forEach
             val renderer = HudManager.getRenderer(element.id)
-            println("Renderer for ${element.id}: $renderer")
             renderer?.render(context, mc.renderTickCounter)
         }
     }

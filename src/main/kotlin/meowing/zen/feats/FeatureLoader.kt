@@ -3,6 +3,7 @@ package meowing.zen.feats
 import meowing.zen.feats.carrying.carrycommand
 import meowing.zen.feats.carrying.carryhud
 import meowing.zen.feats.general.calculator
+import meowing.zen.feats.slayers.slayerstatscommand
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 
@@ -21,12 +22,14 @@ object FeatureLoader {
         "slayers.MetadataHandler",
         "slayers.slayertimer",
         "slayers.slayerhighlight",
+        "slayers.slayerstats",
+        "slayers.vengdmg",
+        "slayers.vengtimer",
         "carrying.carrycounter"
     )
 
     private var moduleCount = 0
     private var moduleErr = 0
-    private var commandCount = 0
     private var loadtime: Long = 0
 
     fun init() {
@@ -47,6 +50,7 @@ object FeatureLoader {
         }
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             carrycommand.register(dispatcher)
+            slayerstatscommand.register(dispatcher)
         }
         carryhud.initialize()
         loadtime = System.currentTimeMillis() - starttime

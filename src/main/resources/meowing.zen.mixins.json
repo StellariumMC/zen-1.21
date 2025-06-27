@@ -3,6 +3,8 @@
   "package": "meowing.zen.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AttackEntityMixin",
+    "HudRenderMixin",
     "NetworkManagerMixin"
   ],
   "injectors": {

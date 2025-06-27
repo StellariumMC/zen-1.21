@@ -38,9 +38,13 @@ class Zen : ClientModInitializer {
             dispatcher.register(ClientCommandManager.literal("ma").executes(cmd))
             dispatcher.register(ClientCommandManager.literal("meowaddons").executes(cmd))
         }
+
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
-            ChatUtils.addMessage("§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures", "§c${FeatureLoader.getLoadtime()}ms")
+            ChatUtils.addMessage(
+                "§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
+                "§c${FeatureLoader.getLoadtime()}ms §7| §c7 utils §7| §c4 commands"
+            )
             shown = true
         }
 

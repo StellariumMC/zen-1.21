@@ -54,6 +54,23 @@ object carrycounter : Feature("carrycounter") {
         }
     }
 
+    private fun loadCompletedCarries() {
+        try {
+            val carriesList = dataUtils.getData().completedCarries
+            completedCarriesMap.clear()
+            carriesList.forEach { carry ->
+                completedCarriesMap[carry.playerName] = carry
+            }
+            println("[Zen] Data loaded.")
+        } catch (e: Exception) {
+            println("[Zen] Data error: $e")
+        }
+    }
+
+    private fun ensureDataLoaded() {
+        if (completedCarriesMap.isEmpty()) loadCompletedCarries()
+    }
+
     private fun checkRegistration() {
         if (carryeesByName.isNotEmpty()) {
             EntityEvents.register()
@@ -330,6 +347,8 @@ object carrycounter : Feature("carrycounter") {
 
         fun complete() {
             val sessionTime = System.currentTimeMillis() - sessionStartTime
+
+            ensureDataLoaded()
 
             val updatedCarry = completedCarriesMap[name]?.let { existing ->
                 CompletedCarry(

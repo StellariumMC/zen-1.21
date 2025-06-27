@@ -29,6 +29,7 @@ object slayertimer : Feature("slayertimer") {
         register<EntityLeaveEvent> { event ->
             if (event.entity is LivingEntity && event.entity.id == BossId && isFighting) {
                 val timeTaken = System.currentTimeMillis() - startTime
+                slayerstats.addKill(timeTaken)
                 sendTimerMessage("You killed your boss", timeTaken)
                 resetBossTracker()
             }
