@@ -2,8 +2,8 @@ package meowing.zen
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Text
+import meowing.zen.utils.ChatUtils
+import net.minecraft.text.ClickEvent
 import java.net.HttpURLConnection
 import java.net.URL
 import java.util.concurrent.CompletableFuture
@@ -39,7 +39,7 @@ object UpdateChecker {
                     val releases: List<Release> = Gson().fromJson(response, type)
 
                     if (releases.isEmpty()) {
-                        addMessage("§c[Zen] §fNo releases found.")
+                        ChatUtils.addMessage("§c[Zen] §fNo releases found.")
                         return@supplyAsync
                     }
 
@@ -53,22 +53,21 @@ object UpdateChecker {
 
                     if (isNewerVersion(latestVersion, currentVersion)) {
                         isMessageShown = true
-                        addMessage("§c[Zen] §fUpdate available! §c$current §f-> §c$latestVersion")
-                        addMessage("§c[Zen] §fDownload: §c${latestRelease.html_url}")
+                        ChatUtils.addMessage("§c[Zen] §fUpdate available! §c$current §f-> §c$latestVersion")
+                        ChatUtils.addMessage(
+                            message = "§c[Zen] §fDownload: ",
+                            hover = "Click to open in browser",
+                            clickAction = ClickEvent.Action.OPEN_URL,
+                            clickValue = latestRelease.html_url,
+                            siblingText = "§c${latestRelease.html_url}"
+                        )
                     }
                 } else {
-                    addMessage("§c[Zen] §fFailed to check for updates (${connection.responseCode})")
+                    ChatUtils.addMessage("§c[Zen] §fFailed to check for updates (${connection.responseCode})")
                 }
             } catch (e: Exception) {
-                addMessage("§c[Zen] §fUpdate check failed: ${e.message}")
+                ChatUtils.addMessage("§c[Zen] §fUpdate check failed: ${e.message}")
             }
-        }
-    }
-
-    private fun addMessage(message: String) {
-        val client = MinecraftClient.getInstance()
-        if (client.player != null) {
-            client.player!!.sendMessage(Text.literal(message), false)
         }
     }
 
