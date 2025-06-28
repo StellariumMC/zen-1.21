@@ -5,7 +5,8 @@
   "client": [
     "MixinAttackEntity",
     "MixinHudRender",
-    "MixinNetworkManager"
+    "MixinNetworkManager",
+    "MixinPlayerEntityRender"
   ],
   "injectors": {
     "defaultRequire": 1

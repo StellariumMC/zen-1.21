@@ -48,7 +48,11 @@ class ZenConfig {
                                 ConfigOption("Better Bazaar", "Better bazaar messages.", "betterbz")
                             ), defaults, config))
                             .group(createGroup("Misc", listOf(
-                                ConfigOption("Send world age", "Sends world age to your chat.", "worldage")
+                                ConfigOption("Send world age", "Sends world age to your chat.", "worldage"),
+                                ConfigOption("Custom player model size", "Changes the size of your player model", "customsize"),
+                                ConfigOption("Custom X", "X scale", "customX", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) },
+                                ConfigOption("Custom Y", "Y scale", "customY", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) },
+                                ConfigOption("Custom Z", "Z scale", "customZ", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) }
                             ), defaults, config))
                             .build()
                     )
@@ -227,6 +231,10 @@ class ZenConfig {
     @SerialEntry var betterah: Boolean = false
     @SerialEntry var betterbz: Boolean = false
     @SerialEntry var worldage: Boolean = false
+    @SerialEntry var customsize: Boolean = false
+    @SerialEntry var customX: Float = 1f
+    @SerialEntry var customY: Float = 1f
+    @SerialEntry var customZ: Float = 1f
     @SerialEntry var slayertimer: Boolean = false
     @SerialEntry var slayerhighlight: Boolean = false
     @SerialEntry var slayerstats: Boolean = false
