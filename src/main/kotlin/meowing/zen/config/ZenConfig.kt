@@ -75,21 +75,35 @@ class ZenConfig {
             }.generateScreen(parent)
         }
 
-        private data class ConfigOption(val name: String, val description: String, val key: String)
+        private data class ConfigOption(
+            val name: String,
+            val description: String,
+            val key: String,
+            val intRange: IntRange? = null,
+            val intStep: Int? = null,
+            val floatRange: ClosedFloatingPointRange<Float>? = null,
+            val floatStep: Float? = null,
+            val formatValue: ((Any) -> Text)? = null
+        ) {
+            constructor(name: String, description: String, key: String) :
+                    this(name, description, key, null, null, null, null, null)
+            constructor(name: String, description: String, key: String, range: IntRange, step: Int = 1, formatter: ((Int) -> Text)? = null) :
+                    this(name, description, key, range, step, null, null, formatter?.let { f -> { v -> f(v as Int) } })
+            constructor(name: String, description: String, key: String, range: ClosedFloatingPointRange<Float>, step: Float = 0.1f, formatter: ((Float) -> Text)? = null) :
+                    this(name, description, key, null, null, range, step, formatter?.let { f -> { v -> f(v as Float) } })
+        }
 
         private fun createGroup(name: String, options: List<ConfigOption>, defaults: ZenConfig, config: ZenConfig): OptionGroup {
             val groupBuilder = OptionGroup.createBuilder().name(Text.literal(name))
-
             options.forEach { opt ->
-                val option = createOptionForProperty(opt.name, opt.description, opt.key, defaults, config)
+                val option = createOptionForProperty(opt.name, opt.description, opt.key, defaults, config, opt)
                 option?.let { groupBuilder.option(it) }
             }
-
             return groupBuilder.build()
         }
 
         @Suppress("UNCHECKED_CAST")
-        private fun createOptionForProperty(name: String, desc: String, key: String, defaults: ZenConfig, config: ZenConfig): Option<*>? {
+        private fun createOptionForProperty(name: String, desc: String, key: String, defaults: ZenConfig, config: ZenConfig, configOption: ConfigOption): Option<*>? {
             val property = ZenConfig::class.memberProperties.find { it.name == key } as? KMutableProperty1<ZenConfig, *>
                 ?: return null
 
@@ -114,6 +128,24 @@ class ZenConfig {
                         { stringProperty.get(config) },
                         { v -> stringProperty.set(config, v) }
                     ) { opt -> StringControllerBuilder.create(opt) }
+                }
+
+                is Float -> {
+                    val floatProperty = property as KMutableProperty1<ZenConfig, Float>
+                    createOption(
+                        name, desc, key, defaultValue,
+                        { floatProperty.get(config) },
+                        { v -> floatProperty.set(config, v) }
+                    ) { opt ->
+                        val builder = FloatSliderControllerBuilder.create(opt)
+                        val range = configOption.floatRange ?: (0.0f..1.0f)
+                        builder.range(range.start, range.endInclusive)
+                        val step = configOption.floatStep ?: 0.1f
+                        builder.step(step)
+                        if (configOption.formatValue != null) builder.formatValue { value -> configOption.formatValue.invoke(value) }
+                        else builder.formatValue { value -> Text.literal("%.2f".format(value)) }
+                        builder
+                    }
                 }
 
                 is FloatArray -> {
@@ -143,10 +175,17 @@ class ZenConfig {
                         { intProperty.get(config) },
                         { v -> intProperty.set(config, v) }
                     ) { opt ->
-                        IntegerSliderControllerBuilder.create(opt)
-                            .range(0, 100)
-                            .step(1)
-                            .formatValue { value -> Text.literal("$value%") }
+                        val builder = IntegerSliderControllerBuilder.create(opt)
+                        val range = configOption.intRange ?: (0..100)
+                        builder.range(range.first, range.last)
+                        val step = configOption.intStep ?: 1
+                        builder.step(step)
+                        if (configOption.formatValue != null) {
+                            builder.formatValue { value -> configOption.formatValue.invoke(value) }
+                        } else {
+                            builder.formatValue { value -> Text.literal("$value%") }
+                        }
+                        builder
                     }
                 }
 

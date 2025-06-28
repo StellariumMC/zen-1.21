@@ -83,6 +83,7 @@ class Zen : ClientModInitializer {
     companion object {
         private val features = mutableListOf<Feature>()
         private val configListeners = ConcurrentHashMap<String, MutableList<Feature>>()
+        private val ConfigCallback = ConcurrentHashMap<String, MutableList<() -> Unit>>()
         val mc = MinecraftClient.getInstance()
         val config: ZenConfig get() = ZenConfig.Handler.instance()
         var isInInventory = false
@@ -93,6 +94,10 @@ class Zen : ClientModInitializer {
 
         fun registerListener(configName: String, feature: Feature) {
             configListeners.getOrPut(configName) { mutableListOf() }.add(feature)
+        }
+
+        fun registerListener(configName: String, callback: () -> Unit) {
+            ConfigCallback.getOrPut(configName) { mutableListOf() }.add(callback)
         }
 
         fun updateFeatures() {

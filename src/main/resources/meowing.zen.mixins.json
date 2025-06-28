@@ -3,9 +3,9 @@
   "package": "meowing.zen.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "AttackEntityMixin",
-    "HudRenderMixin",
-    "NetworkManagerMixin"
+    "MixinAttackEntity",
+    "MixinHudRender",
+    "MixinNetworkManager"
   ],
   "injectors": {
     "defaultRequire": 1
