@@ -13,6 +13,8 @@ import com.mojang.brigadier.Command
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiCloseEvent
 import meowing.zen.events.GuiOpenEvent
+import meowing.zen.events.AreaEvent
+import meowing.zen.events.SubAreaEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
@@ -73,6 +75,9 @@ class Zen : ClientModInitializer {
         EventBus.register<GuiCloseEvent> ({ event ->
             if (event.screen is InventoryScreen) isInInventory = false
         })
+
+        EventBus.register<AreaEvent> ({ updateFeatures() })
+        EventBus.register<SubAreaEvent> ({ updateFeatures() })
     }
 
     companion object {

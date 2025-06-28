@@ -29,6 +29,7 @@ object automeow : Feature("automeow") {
             val username = matchResult.groupValues[2]
 
             if (content.contains("To ") || username == playerName) return@register
+            if (content.startsWith("G >") || content.startsWith("P >")) return@register
             TickUtils.schedule(Random.nextLong(10, 50)) {
                 val cmd = when {
                     content.startsWith("From ") -> {
