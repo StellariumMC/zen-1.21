@@ -41,26 +41,15 @@ object EventBus {
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mbtn ->
-                val event = GuiClickEvent(mx, my, mbtn, true, screen)
-                post(event)
-                !event.isCancelled()
+                !post(GuiClickEvent(mx, my, mbtn, true, screen))
             }
 
             ScreenMouseEvents.allowMouseRelease(screen).register { _, mx, my, mbtn ->
-                val event = GuiClickEvent(mx, my, mbtn, false, screen)
-                post(event)
-                !event.isCancelled()
+                !post(GuiClickEvent(mx, my, mbtn, false, screen))
             }
 
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, _ ->
-                val event = GuiKeyEvent(
-                    GLFW.glfwGetKeyName(key, scancode),
-                    key,
-                    scancode,
-                    screen
-                )
-                post(event)
-                !event.isCancelled()
+                !post(GuiKeyEvent(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
             }
             ScreenEvents.remove(screen).register { screen ->
                 post(GuiCloseEvent(screen))
@@ -71,6 +60,9 @@ object EventBus {
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (screen != null) post(GuiOpenEvent(screen))
+        }
+        WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
+            !post(BlockOutlineEvent(worldContext, blockContext))
         }
     }
 

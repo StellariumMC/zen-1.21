@@ -56,5 +56,14 @@ object Utils {
 
     fun getPartialTicks(): Float = MinecraftClient.getInstance().renderTickCounter.getTickProgress(true)
 
+    fun FloatArray.toColorInt(hasAlpha: Boolean = size > 3): Int {
+        val r = (this[0] * 255f + 0.5f).toInt() and 0xFF
+        val g = (this[1] * 255f + 0.5f).toInt() and 0xFF
+        val b = (this[2] * 255f + 0.5f).toInt() and 0xFF
+        val a = if (hasAlpha) (this[3] * 255f + 0.5f).toInt() and 0xFF else 0xFF
+
+        return (a shl 24) or (r shl 16) or (g shl 8) or b
+    }
+
     inline fun <reified R> Any.getField(name: String): R = javaClass.getDeclaredField(name).apply { isAccessible = true }[this] as R
 }

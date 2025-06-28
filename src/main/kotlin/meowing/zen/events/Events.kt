@@ -35,6 +35,8 @@ class ChatReceiveEvent(val message: Text?, val overlay: Boolean) : CancellableEv
 
 class WorldChangeEvent(val mc: MinecraftClient?, val world: ClientWorld) : Event()
 
+class BlockOutlineEvent(val WorldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
+
 class GuiAfterRenderEvent(val screen: Screen) : Event()
 
 class GuiOpenEvent(val screen: Screen) : Event()

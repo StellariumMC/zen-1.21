@@ -52,7 +52,10 @@ class ZenConfig {
                                 ConfigOption("Custom player model size", "Changes the size of your player model", "customsize"),
                                 ConfigOption("Custom X", "X scale", "customX", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) },
                                 ConfigOption("Custom Y", "Y scale", "customY", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) },
-                                ConfigOption("Custom Z", "Z scale", "customZ", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) }
+                                ConfigOption("Custom Z", "Z scale", "customZ", 0.1f..5.0f, 0.1f) { Text.literal("%.1fx".format(it)) },
+                                ConfigOption("Block overlay", "Custom block highlighting", "blockoverlay"),
+                                ConfigOption("Block overlay width", "Block overlay line width", "blockoverlaywidth", 0.1f..5.0f, 0.1f) { Text.literal("%.1f".format(it)) },
+                                ConfigOption("Block overlay color", "The color for Block overlay", "blockoverlaycolor"),
                             ), defaults, config))
                             .build()
                     )
@@ -235,6 +238,9 @@ class ZenConfig {
     @SerialEntry var customX: Float = 1f
     @SerialEntry var customY: Float = 1f
     @SerialEntry var customZ: Float = 1f
+    @SerialEntry var blockoverlay: Boolean = false
+    @SerialEntry var blockoverlaywidth: Float = 1f
+    @SerialEntry var blockoverlaycolor: FloatArray = floatArrayOf(0f, 1f, 1f, 0.5f)
     @SerialEntry var slayertimer: Boolean = false
     @SerialEntry var slayerhighlight: Boolean = false
     @SerialEntry var slayerstats: Boolean = false

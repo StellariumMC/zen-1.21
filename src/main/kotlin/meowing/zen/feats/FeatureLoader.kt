@@ -19,6 +19,7 @@ object FeatureLoader {
         "general.worldage",
         "general.betterah",
         "general.betterbz",
+        "general.blockoverlay",
         "slayers.MetadataHandler",
         "slayers.slayertimer",
         "slayers.slayerhighlight",
