@@ -4,6 +4,7 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.UIWrappedText
+import gg.essential.elementa.constraints.AdditiveConstraint
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
@@ -12,9 +13,12 @@ import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.types.ConfigCategory
 import meowing.zen.config.ui.types.ConfigSection
+import meowing.zen.hud.HudEditorScreen
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.TickUtils
 import java.awt.Color
 
 class UIBuilder(private val theme: ConfigTheme) {
@@ -56,11 +60,15 @@ class UIBuilder(private val theme: ConfigTheme) {
         }.onMouseLeave {
             setColor(Color(theme.accent.red, theme.accent.green, theme.accent.blue, 40))
         }.onMouseClick {
-            ChatUtils.clientCommand("zen hud")
+            TickUtils.schedule(1) {
+                mc.execute {
+                    mc.setScreen(HudEditorScreen())
+                }
+            }
         }
 
         UIText("HUD Editor").constrain {
-            x = CenterConstraint()
+            x = AdditiveConstraint(CenterConstraint(), 5.pixels())
             y = CenterConstraint()
             textScale = 1.3.pixels()
         }.setColor(theme.accent2) childOf button
