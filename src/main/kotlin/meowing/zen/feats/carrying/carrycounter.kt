@@ -8,6 +8,7 @@ import meowing.zen.utils.*
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.utils.LoopUtils
 import meowing.zen.utils.DataUtils
+import meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.Text
@@ -177,7 +178,7 @@ object carrycounter : Feature("carrycounter") {
                             event.context.matrixStack(),
                             event.context.consumers(),
                             x, y, z, entity.width + 0.5f, entity.height  + 0.25f,
-                            color[0], color[1], color[2], color[3]
+                            color.red.toColorFloat(), color.green.toColorFloat(), color.blue.toColorFloat(), color.alpha.toColorFloat()
                         )
                     }
                 }
@@ -214,7 +215,7 @@ object carrycounter : Feature("carrycounter") {
                             event.context.matrixStack(),
                             event.context.consumers(),
                             x, y, z, player.width, player.height,
-                            color[0], color[1], color[2], color[3]
+                            color.red.toColorFloat(), color.green.toColorFloat(), color.blue.toColorFloat(), color.alpha.toColorFloat()
                         )
                     }
                 }

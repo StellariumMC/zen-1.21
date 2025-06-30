@@ -1,7 +1,10 @@
 package meowing.zen.feats.slayers
 
+import meowing.zen.Zen
 import meowing.zen.events.ChatReceiveEvent
 import meowing.zen.events.EntityLeaveEvent
+import meowing.zen.events.EventBus
+import meowing.zen.events.ServerTickEvent
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.feats.Feature
@@ -16,6 +19,7 @@ object slayertimer : Feature("slayertimer") {
     private var startTime = 0L
     private var spawnTime = 0L
     private var serverTicks = 0
+    private var servertickcall: EventBus.EventCall = EventBus.register<ServerTickEvent> ({ serverTicks++ }, false)
 
     override fun initialize() {
         register<ChatReceiveEvent> { event ->
@@ -29,8 +33,8 @@ object slayertimer : Feature("slayertimer") {
         register<EntityLeaveEvent> { event ->
             if (event.entity is LivingEntity && event.entity.id == BossId && isFighting) {
                 val timeTaken = System.currentTimeMillis() - startTime
-                slayerstats.addKill(timeTaken)
-                sendTimerMessage("You killed your boss", timeTaken)
+                sendTimerMessage("You killed your boss", timeTaken, serverTicks)
+                if (Zen.config.slayerstats) slayerstats.addKill(timeTaken)
                 resetBossTracker()
             }
         }
@@ -42,21 +46,22 @@ object slayertimer : Feature("slayertimer") {
         startTime = System.currentTimeMillis()
         isFighting = true
         serverTicks = 0
+        servertickcall.register()
         resetSpawnTimer()
-        slayerhighlight.update()
     }
 
     private fun onSlayerFailed() {
         if (!isFighting) return
         val timeTaken = System.currentTimeMillis() - startTime
-        sendTimerMessage("Your boss killed you", timeTaken)
+        sendTimerMessage("Your boss killed you", timeTaken, serverTicks)
         resetBossTracker()
     }
 
-    private fun sendTimerMessage(action: String, timeTaken: Long) {
+    private fun sendTimerMessage(action: String, timeTaken: Long, ticks: Int) {
         val seconds = timeTaken / 1000.0
-        val content = "§c[Zen] §f$action in §b${"%.2f".format(seconds)}s"
-        val hoverText = "§c${timeTaken}ms"
+        val serverTime = ticks / 20.0
+        val content = "§c[Zen] §f$action in §b${"%.2f".format(seconds)}s §7| §b${"%.2f".format(serverTime)}s"
+        val hoverText = "§c${timeTaken}ms §f| §c${"%.0f".format(ticks.toFloat())} ticks"
         ChatUtils.addMessage(content, hoverText)
     }
 
@@ -65,7 +70,7 @@ object slayertimer : Feature("slayertimer") {
         startTime = 0
         isFighting = false
         serverTicks = 0
-        slayerhighlight.update()
+        servertickcall.unregister()
     }
 
     private fun resetSpawnTimer() {

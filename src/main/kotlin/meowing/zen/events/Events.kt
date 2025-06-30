@@ -54,6 +54,12 @@ sealed class PacketEvent(val packet: Packet<*>) : Event() {
     class Sent(packet: Packet<*>) : PacketEvent(packet)
 }
 
+class GameLoadEvent() : Event()
+
+class GameUnloadEvent() : Event()
+
+class ServerTickEvent() : Event()
+
 class EntityMetadataEvent(val packet: EntityTrackerUpdateS2CPacket) : Event()
 
 class ScoreboardEvent(val packet: Packet<*>) : Event()

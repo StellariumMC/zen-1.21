@@ -23,7 +23,7 @@ object blockoverlay : Feature("blockoverlay") {
             if (blockShape.isEmpty) return@register
 
             val camPos = camera.pos
-            RenderSystem.lineWidth(Zen.config.blockoverlaywidth)
+            RenderSystem.lineWidth(Zen.config.blockoverlaywidth.toFloat())
             event.cancel()
 
             VertexRendering.drawOutline(

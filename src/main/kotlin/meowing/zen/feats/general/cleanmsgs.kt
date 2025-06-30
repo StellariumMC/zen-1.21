@@ -1,7 +1,5 @@
 package meowing.zen.feats.general
 
-import meowing.zen.Zen
-import meowing.zen.config.ZenConfig
 import meowing.zen.events.ChatReceiveEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils

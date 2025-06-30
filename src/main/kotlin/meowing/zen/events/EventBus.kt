@@ -1,6 +1,7 @@
 package meowing.zen.events
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -8,8 +9,8 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.network.packet.Packet
+import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 import net.minecraft.network.packet.s2c.play.*
 import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
@@ -64,6 +65,12 @@ object EventBus {
         WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
             !post(BlockOutlineEvent(worldContext, blockContext))
         }
+        ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
+            post(GameLoadEvent())
+        }
+        ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
+            post(GameUnloadEvent())
+        }
     }
 
     fun onPacketReceived(packet: Packet<*>) {
@@ -77,6 +84,9 @@ object EventBus {
 
     private fun PacketReceived(packet: Packet<*>) {
         when (packet) {
+            is CommonPingS2CPacket -> {
+                post(ServerTickEvent())
+            }
             is EntityTrackerUpdateS2CPacket -> {
                 post(EntityMetadataEvent(packet))
             }

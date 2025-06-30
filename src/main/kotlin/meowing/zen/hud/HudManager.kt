@@ -1,6 +1,5 @@
 package meowing.zen.hud
 
-import com.mojang.blaze3d.systems.RenderSystem
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.DataUtils
 import meowing.zen.events.EventBus

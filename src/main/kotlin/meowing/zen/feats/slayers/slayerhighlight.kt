@@ -1,9 +1,11 @@
 package meowing.zen.feats.slayers
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.RenderWorldPostEntitiesEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
+import meowing.zen.utils.Utils.toColorFloat
 
 object slayerhighlight : Feature("slayerhighlight") {
     override fun initialize() {
@@ -16,11 +18,12 @@ object slayerhighlight : Feature("slayerhighlight") {
             val x = entityPos.x - mc.gameRenderer.camera.pos.x
             val y = entityPos.y - mc.gameRenderer.camera.pos.y
             val z = entityPos.z - mc.gameRenderer.camera.pos.z
+            val color = Zen.config.slayerhighlightcolor
             RenderUtils.renderEntityBox(
                 event.context.matrixStack(),
                 event.context.consumers(),
                 x, y, z, width, height,
-                0f, 1f, 1f, 0.5f
+                color.red.toColorFloat(), color.green.toColorFloat(), color.blue.toColorFloat(), color.alpha.toColorFloat()
             )
         }
     }
