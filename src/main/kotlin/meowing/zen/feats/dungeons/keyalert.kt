@@ -1,0 +1,39 @@
+package meowing.zen.feats.dungeons
+
+import meowing.zen.feats.Feature
+import meowing.zen.utils.TickUtils
+import meowing.zen.utils.Utils
+import meowing.zen.utils.Utils.removeFormatting
+import meowing.zen.events.EntityJoinEvent
+import meowing.zen.events.ChatReceiveEvent
+import net.minecraft.entity.decoration.ArmorStandEntity
+
+object keyalert : Feature("keyalert", area = "catacombs") {
+    private var bloodOpen = false
+
+    override fun initialize() {
+        register<ChatReceiveEvent> { event ->
+            if (!bloodOpen && event.message!!.string.removeFormatting().startsWith("[BOSS] The Watcher: ")) bloodOpen = true
+        }
+
+        register<EntityJoinEvent> { event ->
+            if (bloodOpen) return@register
+            if (event.entity !is ArmorStandEntity) return@register
+            TickUtils.scheduleServer(2) {
+                val name = event.entity.name?.string?.removeFormatting() ?: return@scheduleServer
+                when {
+                    name.contains("Wither Key") -> Utils.showTitle("§8Wither §fkey spawned!", "", 40)
+                    name.contains("Blood Key") -> Utils.showTitle("§cBlood §fkey spawned!", "", 40)
+                }
+            }
+        }
+    }
+
+    override fun onRegister() {
+        bloodOpen = false
+    }
+
+    override fun onUnregister() {
+        bloodOpen = false
+    }
+}

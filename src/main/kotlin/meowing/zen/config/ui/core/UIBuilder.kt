@@ -14,6 +14,7 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import meowing.zen.config.ui.types.ConfigCategory
 import meowing.zen.config.ui.types.ConfigSection
+import meowing.zen.utils.ChatUtils
 import java.awt.Color
 
 class UIBuilder(private val theme: ConfigTheme) {
@@ -38,6 +39,31 @@ class UIBuilder(private val theme: ConfigTheme) {
             y = CenterConstraint()
             textScale = 1.3.pixels()
         }.setColor(if (isActive) theme.accent else theme.accent2) childOf button
+
+        return button
+    }
+
+    fun createHudButton(): UIComponent {
+        val button = UIRoundedRectangle(5f).constrain {
+            x = CenterConstraint()
+            y = 5.pixels(true)
+            width = 90.percent()
+            height = 35.pixels()
+        }.setColor(Color(theme.accent.red, theme.accent.green, theme.accent.blue, 40))
+
+        button.onMouseEnter {
+            setColor(Color(theme.accent2.red, theme.accent2.green, theme.accent2.blue, 20))
+        }.onMouseLeave {
+            setColor(Color(theme.accent.red, theme.accent.green, theme.accent.blue, 40))
+        }.onMouseClick {
+            ChatUtils.clientCommand("zen hud")
+        }
+
+        UIText("HUD Editor").constrain {
+            x = CenterConstraint()
+            y = CenterConstraint()
+            textScale = 1.3.pixels()
+        }.setColor(theme.accent2) childOf button
 
         return button
     }

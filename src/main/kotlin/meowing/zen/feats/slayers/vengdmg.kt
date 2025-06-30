@@ -16,20 +16,21 @@ object vengdmg : Feature("vengdmg") {
     override fun initialize() {
         register<EntityJoinEvent> { event ->
             if (nametagID == -1) return@register
-            TickUtils.schedule(2) {
-                val entityName = event.entity.name.string?.removeFormatting() ?: return@schedule
+            TickUtils.scheduleServer(2) {
+                val entityName = event.entity.name.string?.removeFormatting() ?: return@scheduleServer
                 val vengMatch = veng.matcher(entityName)
-                if (vengMatch.matches()) {
-                    val spawnedEntity = mc.world?.getEntityById(event.entity.id) ?: return@schedule
-                    val nametagEntity = mc.world?.getEntityById(nametagID) ?: return@schedule
+                if (!vengMatch.matches()) return@scheduleServer
 
-                    if (spawnedEntity.distanceTo(nametagEntity) <= 5) {
-                        val numStr = vengMatch.group(0).replace("ﬗ", "").replace(",", "")
-                        numStr.toLongOrNull()?.let { num ->
-                            if (num > 500000) ChatUtils.addMessage("§c[Zen] §fVeng DMG: §c${vengMatch.group(0).replace("ﬗ", "")}")
-                        }
-                    }
-                }
+                val spawnedEntity = mc.world?.getEntityById(event.entity.id) ?: return@scheduleServer
+                val nametagEntity = mc.world?.getEntityById(nametagID) ?: return@scheduleServer
+
+                if (spawnedEntity.distanceTo(nametagEntity) > 5) return@scheduleServer
+
+                val numStr = vengMatch.group(0).replace("ﬗ", "").replace(",", "")
+                val num = numStr.toLongOrNull() ?: return@scheduleServer
+
+                if (num > 500000)
+                    ChatUtils.addMessage("§c[Zen] §fVeng DMG: §c${vengMatch.group(0).replace("ﬗ", "")}")
             }
         }
     }

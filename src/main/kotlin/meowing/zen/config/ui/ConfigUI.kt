@@ -10,7 +10,6 @@ import gg.essential.universal.UKeyboard
 import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.types.*
 import meowing.zen.config.ui.core.*
-import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
 
 typealias ConfigData = Map<String, Any>
@@ -25,10 +24,10 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
     private val categories = mutableListOf<ConfigCategory>()
     private var activeCategory: String? = null
-    private var activePopup: UIComponent? = null
     private val elementContainers = mutableMapOf<String, UIComponent>()
     private val elementRefs = mutableMapOf<String, ConfigElement>()
     private val configListeners = mutableMapOf<String, MutableList<(Any) -> Unit>>()
+
     private lateinit var leftPanel: UIRoundedRectangle
     private lateinit var rightPanel: UIRoundedRectangle
     private lateinit var categoryScroll: ScrollComponent
@@ -37,6 +36,10 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
     private val visibilityCache = mutableMapOf<String, Boolean>()
     private var needsVisibilityUpdate = false
+
+    companion object {
+        var activePopup: UIComponent? = null
+    }
 
     init {
         createGUI()
@@ -73,6 +76,8 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             width = 92.percent()
             height = RelativeConstraint(1f) - 36.pixels()
         } childOf leftPanel
+
+        uiBuilder.createHudButton() childOf leftPanel
 
         rightPanel = (UIRoundedRectangle(2f).constrain {
             x = 18.percent()

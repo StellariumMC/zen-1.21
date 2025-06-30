@@ -26,7 +26,13 @@ object FeatureLoader {
         "slayers.slayerstats",
         "slayers.vengdmg",
         "slayers.vengtimer",
-        "carrying.carrycounter"
+        "carrying.carrycounter",
+        "dungeons.bloodtimer",
+        "dungeons.cryptreminder",
+        "dungeons.keyalert",
+        "dungeons.partyfinder",
+        "dungeons.serverlagtimer",
+        "dungeons.termtracker"
     )
 
     private var moduleCount = 0

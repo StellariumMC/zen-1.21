@@ -34,10 +34,9 @@ class Zen : ClientModInitializer {
             }
 
             val hudCmd = Command<FabricClientCommandSource> { _ ->
-                TickUtils.schedule(2) {
-                    val client = MinecraftClient.getInstance()
-                    client.execute {
-                        client.setScreen(HudEditorScreen())
+                TickUtils.schedule(1) {
+                    mc.execute {
+                        mc.setScreen(HudEditorScreen())
                     }
                 }
                 1
