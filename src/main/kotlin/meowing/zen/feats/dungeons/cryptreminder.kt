@@ -12,7 +12,7 @@ import meowing.zen.utils.Utils.removeFormatting
 object cryptreminder : Feature("cryptreminder") {
     override fun initialize() {
         register<ChatReceiveEvent> { event ->
-            if (event.overlay && event.message!!.string.removeFormatting() == "[NPC] Mort: Good luck.") {
+            if (event.message!!.string.removeFormatting() == "[NPC] Mort: Good luck.") {
                 setTimeout(1000 * 60 * Zen.config.cryptreminderdelay.toLong()) {
                     if (DungeonUtils.getCryptCount() == 5) return@setTimeout
                     ChatUtils.command("/pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")

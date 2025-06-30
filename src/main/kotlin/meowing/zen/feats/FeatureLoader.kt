@@ -32,7 +32,8 @@ object FeatureLoader {
         "dungeons.keyalert",
         "dungeons.partyfinder",
         "dungeons.serverlagtimer",
-        "dungeons.termtracker"
+        "dungeons.termtracker",
+        "dungeons.firefreeze"
     )
 
     private var moduleCount = 0

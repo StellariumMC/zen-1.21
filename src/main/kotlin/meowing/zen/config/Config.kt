@@ -204,7 +204,7 @@ fun ZenConfig(): ConfigUI {
         .addElement("Dungeons", "Keys", ConfigElement(
             "keyalert",
             "Key spawn alert",
-            null,
+            "Displays a title when the wither/blood key spawns",
             ElementType.Switch(false)
         ))
         .addElement("Dungeons", "Party finder", ConfigElement(
