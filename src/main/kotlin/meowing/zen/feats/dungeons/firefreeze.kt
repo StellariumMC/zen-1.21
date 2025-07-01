@@ -11,6 +11,7 @@ import meowing.zen.events.ServerTickEvent
 import meowing.zen.hud.HudElement
 import meowing.zen.hud.HudManager
 import meowing.zen.hud.HudRenderer
+import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.sound.SoundEvents
@@ -20,6 +21,7 @@ object firefreeze : Feature("firefreeze") {
     var ticks = 0
     private var servertickcall: EventBus.EventCall = EventBus.register<ServerTickEvent>({
         if (ticks > 0) ticks--
+        ChatUtils.addMessage("tick")
     }, false)
     private var hudElement: HudElement? = null
 

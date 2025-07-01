@@ -141,6 +141,7 @@ object carrycounter : Feature("carrycounter") {
             }))
 
             events.add(EventBus.register<EntityLeaveEvent> ({ event ->
+                if (event.entity.isAlive) return@register
                 carryeesByBossId[event.entity.id]?.let {
                     val ms = System.currentTimeMillis() - (it.startTime ?: 0L)
                     ChatUtils.addMessage("§c[Zen] §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(ms / 1000.0)}s")
@@ -319,6 +320,7 @@ object carrycounter : Feature("carrycounter") {
             startTime?.let { bossTimes.add(System.currentTimeMillis() - it) }
             cleanup()
             if (++count >= total) complete()
+            if (Zen.config.carrycountsend) ChatUtils.command("/pc $name: $count/$total")
         }
 
         fun reset() {

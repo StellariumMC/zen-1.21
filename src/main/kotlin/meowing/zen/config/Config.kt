@@ -116,6 +116,12 @@ fun ZenConfig(): ConfigUI {
             ElementType.Switch(false)
         ))
         .addElement("Slayers", "General", ConfigElement(
+            "slayerstats",
+            "Slayer stats",
+            "Shows stats about your kill times",
+            ElementType.Switch(false)
+        ))
+        .addElement("Slayers", "Blaze", ConfigElement(
             "vengdmg",
             "Vengeance damager tracker",
             "Tracks and sends your vegeance damage in the chat.",
@@ -127,17 +133,17 @@ fun ZenConfig(): ConfigUI {
             "Time until vengeance procs.",
             ElementType.Switch(false)
         ))
-        .addElement("Slayers", "Blaze", ConfigElement(
-            "slayerstats",
-            "Slayer stats",
-            "Shows stats about your kill times",
-            ElementType.Switch(false)
-        ))
         .addElement("Slayers", "Carrying", ConfigElement(
             "carrycounter",
             "Carry counter",
             "Counts and sends the carries that you do.",
             ElementType.Switch(false)
+        ))
+        .addElement("Slayers", "Carrying", ConfigElement(
+            "carrycountsend",
+            "Send count",
+            "Sends the count in party chat",
+            ElementType.Switch(true)
         ))
         .addElement("Slayers", "Carrying", ConfigElement(
             "carrybosshighlight",

@@ -17,6 +17,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val blockoverlaycolor: Color get() = configUI.getConfigValue("blockoverlaycolor") as? Color ?: Color(0, 255, 255, 127)
     val blockoverlaywidth: Double get() = configUI.getConfigValue("blockoverlaywidth") as? Double ?: 2.0
     val cryptreminderdelay: Double get() = configUI.getConfigValue("cryptreminderdelay") as? Double ?: 2.0
+    val carrycountsend: Boolean get() = configUI.getConfigValue("carrycountsend") as? Boolean ?: false
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)
 

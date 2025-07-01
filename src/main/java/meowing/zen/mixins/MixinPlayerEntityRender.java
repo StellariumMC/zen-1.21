@@ -15,7 +15,6 @@ import java.util.Objects;
 
 @Mixin(PlayerEntityRenderer.class)
 public class MixinPlayerEntityRender {
-    MinecraftClient mc;
     @Unique private static boolean enabled = false;
     @Unique private static float x = 1.0f;
     @Unique private static float y = 1.0f;
@@ -40,8 +39,7 @@ public class MixinPlayerEntityRender {
     }
     @Inject(method = "scale(Lnet/minecraft/client/render/entity/state/PlayerEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;)V", at = @At("HEAD"))
     private void scalePlayerModel(PlayerEntityRenderState playerEntityRenderState, MatrixStack matrixStack, CallbackInfo ci) {
-        if (enabled && mc.player != null && Objects.equals(playerEntityRenderState.name, mc.player.getName().getString()))
-            matrixStack.scale(x, y, z);
+        if (enabled) matrixStack.scale(x, y, z);
     }
 }
 
