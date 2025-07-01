@@ -14,6 +14,7 @@ import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigCategory
 import meowing.zen.config.ui.types.ConfigSection
 import meowing.zen.hud.HudEditorScreen
@@ -96,6 +97,7 @@ class UIBuilder(private val theme: ConfigTheme) {
                 onClick()
             }
             .onMouseEnter {
+                if (ConfigUI.activePopup != null) return@onMouseEnter
                 setColor(theme.elementHover)
                 card.setColor(theme.accent)
             }

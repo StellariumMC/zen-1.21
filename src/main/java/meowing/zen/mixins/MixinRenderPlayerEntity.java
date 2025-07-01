@@ -2,7 +2,6 @@ package meowing.zen.mixins;
 
 import kotlin.Unit;
 import meowing.zen.Zen;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.client.util.math.MatrixStack;
@@ -11,10 +10,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import java.util.Objects;
 
 @Mixin(PlayerEntityRenderer.class)
-public class MixinPlayerEntityRender {
+public class MixinRenderPlayerEntity {
     @Unique private static boolean enabled = false;
     @Unique private static float x = 1.0f;
     @Unique private static float y = 1.0f;

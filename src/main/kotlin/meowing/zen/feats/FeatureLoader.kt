@@ -33,7 +33,8 @@ object FeatureLoader {
         "dungeons.partyfinder",
         "dungeons.serverlagtimer",
         "dungeons.termtracker",
-        "dungeons.firefreeze"
+        "dungeons.firefreeze",
+        "dungeons.architectdraft"
     )
 
     private var moduleCount = 0
@@ -64,6 +65,6 @@ object FeatureLoader {
         loadtime = System.currentTimeMillis() - starttime
     }
 
-    fun getFeatCount(): Int = moduleCount
+    fun getFeatCount(): Int = moduleCount + 3 // Mixin feats
     fun getLoadtime(): Long = loadtime
 }

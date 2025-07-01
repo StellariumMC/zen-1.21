@@ -244,4 +244,40 @@ fun ZenConfig(): ConfigUI {
             "Time until you should activate fire freeze",
             ElementType.Switch(false)
         ))
+        .addElement("Dungeons", "Architect Draft", ConfigElement(
+            "architectdraft",
+            "Architect draft message",
+            "Automatically sends a message in your chat that you can click to get a draft from your sacks on puzzle fail",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Architect Draft", ConfigElement(
+            "selfdraft",
+            null,
+            "Only send when you fail a puzzle",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Architect Draft", ConfigElement(
+            "autogetdraft",
+            "Auto Architect draft",
+            "Automatically runs the command to get a draft into your inventory on puzzle fail",
+            ElementType.Switch(false)
+        ))
+        .addElement("No clutter", "General", ConfigElement(
+            "hidefallingblocks",
+            "Hide falling blocks",
+            "Cancels the animation of the blocks falling",
+            ElementType.Switch(false)
+        ))
+        .addElement("No clutter", "General", ConfigElement(
+            "nothunder",
+            "Hide thunder",
+            "Cancels thunder animation and sound.",
+            ElementType.Switch(false)
+        ))
+        .addElement("No clutter", "General", ConfigElement(
+            "hidestatuseffects",
+            "Hide status effects",
+            "Hides the status effects in your inventory.",
+            ElementType.Switch(false)
+        ))
 }

@@ -4,11 +4,17 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "MixinAttackEntity",
-    "MixinHudRender",
     "MixinNetworkManager",
-    "MixinPlayerEntityRender"
+    "MixinRenderFallingBlocks",
+    "MixinRenderHud",
+    "MixinRenderLightning",
+    "MixinRenderPlayerEntity",
+    "MixinRenderStatusEffects"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "MixinYggdrasil"
+  ]
 }
