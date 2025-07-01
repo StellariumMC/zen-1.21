@@ -21,7 +21,6 @@ object firefreeze : Feature("firefreeze") {
     var ticks = 0
     private var servertickcall: EventBus.EventCall = EventBus.register<ServerTickEvent>({
         if (ticks > 0) ticks--
-        ChatUtils.addMessage("tick")
     }, false)
     private var hudElement: HudElement? = null
 
@@ -32,7 +31,7 @@ object firefreeze : Feature("firefreeze") {
         register<ChatReceiveEvent> { event ->
             if (event.message!!.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
                 ticks = 100
-
+                servertickcall.register()
                 TickUtils.scheduleServer(105) {
                     Utils.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1f, 0.5f)
                     ticks = 0
@@ -56,13 +55,7 @@ class FireFreezeRenderer(element: HudElement) : HudRenderer(element) {
     override fun render(context: DrawContext, tickCounter: RenderTickCounter) {
         val text = getText()
         if (text.isEmpty() && !HudManager.editMode) return
-
-        val displayText = if (HudManager.editMode && text.isEmpty()) {
-            "§bFire freeze: §c4.3s"
-        } else {
-            text
-        }
-
+        val displayText = if (HudManager.editMode && text.isEmpty()) "§bFire freeze: §c4.3s" else text
         if (displayText.isNotEmpty()) {
             val actualX = element.getActualX(mc.window.scaledWidth)
             val actualY = element.getActualY(mc.window.scaledHeight)
@@ -84,9 +77,7 @@ class FireFreezeRenderer(element: HudElement) : HudRenderer(element) {
     }
 
     private fun getText(): String {
-        if (firefreeze.ticks > 0) {
-            return "§bFire freeze: §c${"%.1f".format(firefreeze.ticks / 20.0)}s"
-        }
+        if (firefreeze.ticks > 0) return "§bFire freeze: §c${"%.1f".format(firefreeze.ticks / 20.0)}s"
         return ""
     }
 }
