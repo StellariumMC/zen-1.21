@@ -13,59 +13,8 @@ object ModMenuCompat {
 
 fun ZenConfig(): ConfigUI {
     return ConfigUI("ZenConfig")
-        .addElement("General", "Custom model", ConfigElement(
-            "worldage",
-            "Send world age",
-            "Sends world age to your chat.",
-            ElementType.Switch(false)
-        ))
-        .addElement("General", "Custom model", ConfigElement(
-            "customsize",
-            "Custom player model size",
-            "Changes the size of your player model",
-            ElementType.Switch(false)
-        ))
-        .addElement("General", "Custom model", ConfigElement(
-            "customX",
-            "Custom X",
-            "X scale",
-            ElementType.Slider(0.1, 5.0, 1.0, true),
-            { config -> config["customsize"] as? Boolean == true }
-        ))
-        .addElement("General", "Custom model", ConfigElement(
-            "customY",
-            "Custom Y",
-            "Y scale",
-            ElementType.Slider(0.1, 5.0, 1.0, true),
-            { config -> config["customsize"] as? Boolean == true }
-        ))
-        .addElement("General", "Custom model", ConfigElement(
-            "customZ",
-            "Custom Z",
-            "Z scale",
-            ElementType.Slider(0.1, 5.0, 1.0, true),
-            { config -> config["customsize"] as? Boolean == true }
-        ))
-        .addElement("General", "Block overlay", ConfigElement(
-            "blockoverlay",
-            "Block overlay",
-            "Custom block highlighting",
-            ElementType.Switch(false)
-        ))
-        .addElement("General", "Block overlay", ConfigElement(
-            "blockoverlaywidth",
-            "Block overlay width",
-            "Block overlay line width",
-            ElementType.Slider(0.1, 5.0, 1.0, false),
-            { config -> config["blockoverlay"] as? Boolean == true }
-        ))
-        .addElement("General", "Block overlay", ConfigElement(
-            "blockoverlaycolor",
-            "Block overlay color",
-            "The color for Block overlay",
-            ElementType.ColorPicker(Color(0, 255, 255, 127)),
-            { config -> config["blockoverlay"] as? Boolean == true }
-        ))
+
+        // General - Clean chat
 
         .addElement("General", "Clean Chat", ConfigElement(
             "guildjoinleave",
@@ -103,6 +52,68 @@ fun ZenConfig(): ConfigUI {
             "Better bazaar messages.",
             ElementType.Switch(false)
         ))
+
+        // General - Custom model
+
+        .addElement("General", "Custom model", ConfigElement(
+            "worldage",
+            "Send world age",
+            "Sends world age to your chat.",
+            ElementType.Switch(false)
+        ))
+        .addElement("General", "Custom model", ConfigElement(
+            "customsize",
+            "Custom player model size",
+            "Changes the size of your player model",
+            ElementType.Switch(false)
+        ))
+        .addElement("General", "Custom model", ConfigElement(
+            "customX",
+            "Custom X",
+            "X scale",
+            ElementType.Slider(0.1, 5.0, 1.0, true),
+            { config -> config["customsize"] as? Boolean == true }
+        ))
+        .addElement("General", "Custom model", ConfigElement(
+            "customY",
+            "Custom Y",
+            "Y scale",
+            ElementType.Slider(0.1, 5.0, 1.0, true),
+            { config -> config["customsize"] as? Boolean == true }
+        ))
+        .addElement("General", "Custom model", ConfigElement(
+            "customZ",
+            "Custom Z",
+            "Z scale",
+            ElementType.Slider(0.1, 5.0, 1.0, true),
+            { config -> config["customsize"] as? Boolean == true }
+        ))
+
+        // General - block overlay
+
+        .addElement("General", "Block overlay", ConfigElement(
+            "blockoverlay",
+            "Block overlay",
+            "Custom block highlighting",
+            ElementType.Switch(false)
+        ))
+        .addElement("General", "Block overlay", ConfigElement(
+            "blockoverlaywidth",
+            "Block overlay width",
+            "Block overlay line width",
+            ElementType.Slider(0.1, 5.0, 1.0, false),
+            { config -> config["blockoverlay"] as? Boolean == true }
+        ))
+        .addElement("General", "Block overlay", ConfigElement(
+            "blockoverlaycolor",
+            "Block overlay color",
+            "The color for Block overlay",
+            ElementType.ColorPicker(Color(0, 255, 255, 127)),
+            { config -> config["blockoverlay"] as? Boolean == true }
+        ))
+
+        // Slayers - General
+
         .addElement("Slayers", "General", ConfigElement(
             "slayertimer",
             "Slayer timer",
@@ -121,6 +132,9 @@ fun ZenConfig(): ConfigUI {
             "Shows stats about your kill times",
             ElementType.Switch(false)
         ))
+
+        // Slayers - Blaze
+
         .addElement("Slayers", "Blaze", ConfigElement(
             "vengdmg",
             "Vengeance damager tracker",
@@ -139,6 +153,9 @@ fun ZenConfig(): ConfigUI {
             "Counts and sends the carries that you do.",
             ElementType.Switch(false)
         ))
+
+        // Slayers - Carrying
+
         .addElement("Slayers", "Carrying", ConfigElement(
             "carrycountsend",
             "Send count",
@@ -175,8 +192,11 @@ fun ZenConfig(): ConfigUI {
             "carryvalue",
             "Carry value",
             "Carry values for the mod to automatically detect in a trade",
-            ElementType.TextInput("", "Enter carry values...")
+            ElementType.TextInput("1.3", "1.3")
         ))
+
+        // Meowing
+
         .addElement("Meowing", "Auto meow", ConfigElement(
             "automeow",
             "Auto Meow",
@@ -195,18 +215,27 @@ fun ZenConfig(): ConfigUI {
             "Plays a cat sound whenever an entity dies",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Blood helper
+
         .addElement("Dungeons", "Blood helper", ConfigElement(
             "bloodtimer",
             "Blood camp helper",
             "Sends information related to blood camping.",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Terminals
+
         .addElement("Dungeons", "Terminals", ConfigElement(
             "termtracker",
             "Terminal tracker",
             "Tracks the terminals/levers/devices that your party does.",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Keys
+
         .addElement("Dungeons", "Keys", ConfigElement(
             "keyalert",
             "Key spawn alert",
@@ -226,18 +255,42 @@ fun ZenConfig(): ConfigUI {
             ElementType.ColorPicker(Color(0, 255, 255, 127)),
             { config -> config["keyhighlight"] as? Boolean == true }
         ))
+
+        // Dungeons - Party finder
+
         .addElement("Dungeons", "Party finder", ConfigElement(
             "partyfindermsgs",
             "Party finder messages",
             "Custom party finder messages.",
             ElementType.Switch(false)
         ))
-        .addElement("Dungeons", "Misc", ConfigElement(
+
+        // Dungeons - Leap announce
+
+        .addElement("Dungeons", "Leap announce", ConfigElement(
+            "leapannounce",
+            "Leap announce",
+            "Sends a party chat message when you leap to someone.",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Leap announce", ConfigElement(
+            "leapmessage",
+            "Leap announce message",
+            "The message to send for leap announce",
+            ElementType.TextInput("Leaping to", "Leaping to")
+        ))
+
+        // Dungeons - Server lag timer
+
+        .addElement("Dungeons", "Server lag timer", ConfigElement(
             "serverlagtimer",
             "Server lag timer",
             "Amount of difference between the client ticks and the server ticks",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Crypt reminder
+
         .addElement("Dungeons", "Crypt reminder", ConfigElement(
             "cryptreminder",
             "Crypt reminder",
@@ -251,12 +304,18 @@ fun ZenConfig(): ConfigUI {
             ElementType.Slider(1.0, 5.0, 2.0, false),
             { config -> config["cryptreminderdelay"] as? Boolean == true }
         ))
+
+        // Dungeons - Fire freeze
+
         .addElement("Dungeons", "Fire freeze", ConfigElement(
             "firefreeze",
             "Fire freeze timer",
             "Time until you should activate fire freeze",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Architect Draft
+
         .addElement("Dungeons", "Architect Draft", ConfigElement(
             "architectdraft",
             "Architect draft message",
@@ -275,6 +334,9 @@ fun ZenConfig(): ConfigUI {
             "Automatically runs the command to get a draft into your inventory on puzzle fail",
             ElementType.Switch(false)
         ))
+
+        // Dungeons - Box star mobs
+
         .addElement("Dungeons", "Box star mobs", ConfigElement(
             "boxstarmobs",
             "Box star mobs",
@@ -294,6 +356,9 @@ fun ZenConfig(): ConfigUI {
             "Enable to render a filled color highlight.",
             ElementType.Switch(false)
         ))
+
+        // No clutter
+
         .addElement("No clutter", "General", ConfigElement(
             "hidefallingblocks",
             "Hide falling blocks",

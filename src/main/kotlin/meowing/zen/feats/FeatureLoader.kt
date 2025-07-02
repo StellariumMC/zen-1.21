@@ -35,7 +35,8 @@ object FeatureLoader {
         "dungeons.termtracker",
         "dungeons.firefreeze",
         "dungeons.architectdraft",
-        "dungeons.boxstarmobs"
+        "dungeons.boxstarmobs",
+        "dungeons.leapannounce"
     )
 
     private var moduleCount = 0
