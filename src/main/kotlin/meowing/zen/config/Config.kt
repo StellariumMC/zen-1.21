@@ -280,4 +280,10 @@ fun ZenConfig(): ConfigUI {
             "Hides the status effects in your inventory.",
             ElementType.Switch(false)
         ))
+        .addElement("No clutter", "General", ConfigElement(
+            "hidefireoverlay",
+            "Hide fire overlay",
+            "Cancels the fire overlay rendering on your screen.",
+            ElementType.Switch(false)
+        ))
 }

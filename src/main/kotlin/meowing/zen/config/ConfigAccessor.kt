@@ -24,6 +24,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val hidefallingblocks: Boolean get() = configUI.getConfigValue("hidefallingblocks") as? Boolean ?: false
     val nothunder: Boolean get() = configUI.getConfigValue("nothunder") as? Boolean ?: false
     val hidestatuseffects: Boolean get() = configUI.getConfigValue("hidestatuseffects") as? Boolean ?: false
+    val hidefireoverlay: Boolean get() = configUI.getConfigValue("hidefireoverlay") as? Boolean ?: false
     fun getValue(key: String): Any? = configUI.getConfigValue(key)
 
     inline fun <reified T> getValue(key: String, default: T): T {

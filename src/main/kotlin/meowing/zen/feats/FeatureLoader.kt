@@ -65,6 +65,6 @@ object FeatureLoader {
         loadtime = System.currentTimeMillis() - starttime
     }
 
-    fun getFeatCount(): Int = moduleCount + 3 // Mixin feats
+    fun getFeatCount(): Int = moduleCount + 5 // Mixin feats
     fun getLoadtime(): Long = loadtime
 }
