@@ -11,6 +11,7 @@ import meowing.zen.config.ZenConfig
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
+import meowing.zen.utils.DataUtils
 import com.mojang.brigadier.Command
 import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
@@ -20,11 +21,17 @@ import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import meowing.zen.hud.HudEditorScreen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.text.ClickEvent
+
+data class firstInstall(val isFirstInstall: Boolean = true)
 
 class Zen : ClientModInitializer {
     private var shown = false
+    private lateinit var dataUtils: DataUtils<firstInstall>
 
     override fun onInitializeClient() {
+        dataUtils = DataUtils("zen-data", firstInstall())
+
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             val configCmd = Command<FabricClientCommandSource> { _ ->
                 openConfig()
@@ -52,10 +59,19 @@ class Zen : ClientModInitializer {
 
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
+
             ChatUtils.addMessage(
-                "§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount() + 1} §ffeatures",
-                "§c${FeatureLoader.getLoadtime()}ms §8- §c4 commands §7| §c10 utils"
+                "§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
+                "§c${FeatureLoader.getLoadtime()}ms §8- §c4 commands §7| §c8 utils"
             )
+            val data = dataUtils.getData()
+            if (data.isFirstInstall) {
+                ChatUtils.addMessage("§c[Zen] §fThanks for installing Zen!")
+                ChatUtils.addMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+                ChatUtils.addMessage("§7> §cDiscord:§b [Discord]", "Discord server", ClickEvent.Action.OPEN_URL, "https://discord.gg/KPmHQUC97G")
+            }
+            dataUtils.setData(data.copy(isFirstInstall = false))
+            dataUtils.save()
             UpdateChecker.checkForUpdates()
             shown = true
         }
