@@ -28,6 +28,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val boxstarmobscolor: Color get() = configUI.getConfigValue("boxstarmobscolor") as? Color ?: Color(0, 255, 255, 127)
     val keyhighlightcolor: Color get() = configUI.getConfigValue("keyhighlightcolor") as? Color ?: Color(0, 255, 255, 127)
     val leapmessage: String get() = configUI.getConfigValue("leapmessage") as? String ?: "Leaping to"
+
     fun getValue(key: String): Any? = configUI.getConfigValue(key)
 
     inline fun <reified T> getValue(key: String, default: T): T {
