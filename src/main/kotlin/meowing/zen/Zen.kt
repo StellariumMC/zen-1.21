@@ -13,11 +13,9 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
 import com.mojang.brigadier.Command
 import meowing.zen.events.EventBus
-import meowing.zen.events.GuiCloseEvent
-import meowing.zen.events.GuiOpenEvent
 import meowing.zen.events.AreaEvent
-import meowing.zen.events.GameLoadEvent
-import meowing.zen.events.SubAreaEvent
+import meowing.zen.events.GameEvent
+import meowing.zen.events.GuiEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import meowing.zen.hud.HudEditorScreen
@@ -62,22 +60,22 @@ class Zen : ClientModInitializer {
             shown = true
         }
 
-        EventBus.register<GameLoadEvent> ({
+        EventBus.register<GameEvent.Load> ({
             configUI = ZenConfig()
             config = ConfigAccessor(configUI)
             FeatureLoader.init()
         })
 
-        EventBus.register<GuiOpenEvent> ({ event ->
+        EventBus.register<GuiEvent.Open> ({ event ->
             if (event.screen is InventoryScreen) isInInventory = true
         })
 
-        EventBus.register<GuiCloseEvent> ({
+        EventBus.register<GuiEvent.Close> ({
             isInInventory = false
         })
 
-        EventBus.register<AreaEvent> ({ updateFeatures() })
-        EventBus.register<SubAreaEvent> ({ updateFeatures() })
+        EventBus.register<AreaEvent.Main> ({ updateFeatures() })
+        EventBus.register<AreaEvent.Sub> ({ updateFeatures() })
     }
 
     companion object {

@@ -3,7 +3,7 @@ package meowing.zen.hud
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.DataUtils
 import meowing.zen.events.EventBus
-import meowing.zen.events.HudRenderEvent
+import meowing.zen.events.RenderEvent
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import java.util.concurrent.ConcurrentHashMap
@@ -16,7 +16,7 @@ object HudManager {
     var editMode = false
 
     init {
-        hudRenderCall = EventBus.register<HudRenderEvent> ({ event ->
+        hudRenderCall = EventBus.register<RenderEvent.Hud> ({ event ->
             if (!editMode && mc.currentScreen == null) renderHudElements(event.context)
         })
     }

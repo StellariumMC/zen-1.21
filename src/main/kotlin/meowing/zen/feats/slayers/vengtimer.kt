@@ -27,7 +27,7 @@ object vengtimer : Feature("vengtimer") {
         hudElement = HudElement(100f, 200f, 100f, 20f, 1.0f, true, "vengtimer", "Veng Timer")
         HudManager.registerCustom(hudElement!!, VengTimerRenderer(hudElement!!))
 
-        register<ScoreboardEvent> { event ->
+        register<ScoreboardEvent.Update> { event ->
             val world = mc.world ?: return@register
             val scoreboard = world.scoreboard
 
@@ -47,17 +47,17 @@ object vengtimer : Feature("vengtimer") {
             }
         }
 
-        register<ChatReceiveEvent> { event ->
+        register<ChatEvent.Receive> { event ->
             if (fail.matcher(event.message!!.string.removeFormatting()).matches() && isFighting) TickUtils.schedule(10) { cleanup() }
         }
 
-        register<AttackEntityEvent> { event ->
+        register<EntityEvent.Attack> { event ->
             if (hit || event.target !is BlazeEntity || !isFighting) return@register
 
             val player = mc.player ?: return@register
             val heldItem = player.mainHandStack ?: return@register
 
-            if (event.entityPlayer.name?.string != player.name?.string ||
+            if (event.player.name?.string != player.name?.string ||
                 !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
 
             val nametagEntity = cachedNametag ?: mc.world?.entities?.find { entity ->

@@ -2,8 +2,7 @@ package meowing.zen.feats.carrying
 
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
-import meowing.zen.events.GuiClickEvent
-import meowing.zen.events.GuiAfterRenderEvent
+import meowing.zen.events.GuiEvent
 import meowing.zen.hud.HudElement
 import meowing.zen.hud.HudManager
 import meowing.zen.hud.HudRenderer
@@ -42,10 +41,10 @@ class carryhud(element: HudElement) : HudRenderer(element) {
     private var hoveredButton: ButtonInfo? = null
 
     init {
-        EventBus.register<GuiClickEvent> ({ event ->
+        EventBus.register<GuiEvent.Click> ({ event ->
             if (event.state) handleClick(event.mx, event.my)
         })
-        EventBus.register<GuiAfterRenderEvent> ({ event ->
+        EventBus.register<GuiEvent.AfterRender> ({ event ->
             if (event.screen is HandledScreen<*>) renderInventoryOverlay()
         })
         CarryHudState.element = element

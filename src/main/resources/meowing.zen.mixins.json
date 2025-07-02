@@ -5,6 +5,7 @@
   "client": [
     "MixinAttackEntity",
     "MixinNetworkManager",
+    "MixinRenderEntity",
     "MixinRenderFallingBlocks",
     "MixinRenderFire",
     "MixinRenderHud",

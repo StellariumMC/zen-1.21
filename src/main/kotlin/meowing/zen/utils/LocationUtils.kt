@@ -24,7 +24,7 @@ object LocationUtils {
                         val match = areaRegex.find(line) ?: return@forEach
                         val newArea = match.groupValues[1]
                         if (newArea.lowercase() != area) {
-                            EventBus.post(AreaEvent(newArea))
+                            EventBus.post(AreaEvent.Main(newArea))
                             area = newArea.lowercase()
                         }
                     }
@@ -38,7 +38,7 @@ object LocationUtils {
                     val line = prefix + suffix
                     if (!subAreaRegex.matches(line)) return@register
                     if (line.lowercase() != subarea) {
-                        EventBus.post(SubAreaEvent(line))
+                        EventBus.post(AreaEvent.Sub(line))
                         subarea = line.lowercase()
                     }
                 }

@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.events.AttackEntityEvent;
+import meowing.zen.events.EntityEvent;
 import meowing.zen.events.EventBus;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.entity.Entity;
@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinAttackEntity {
     @Inject(method = "attackEntity", at = @At("HEAD"))
     private void onAttackEntity(PlayerEntity player, Entity target, CallbackInfo callbackInfo) {
-        EventBus.INSTANCE.post(new AttackEntityEvent(player, target));
+        EventBus.INSTANCE.post(new EntityEvent.Attack(player, target));
     }
 }

@@ -25,6 +25,9 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val nothunder: Boolean get() = configUI.getConfigValue("nothunder") as? Boolean ?: false
     val hidestatuseffects: Boolean get() = configUI.getConfigValue("hidestatuseffects") as? Boolean ?: false
     val hidefireoverlay: Boolean get() = configUI.getConfigValue("hidefireoverlay") as? Boolean ?: false
+    val boxstarmobscolor: Color get() = configUI.getConfigValue("boxstarmobscolor") as? Color ?: Color(0, 255, 255, 127)
+    val keyhighlightcolor: Color get() = configUI.getConfigValue("keyhighlightcolor") as? Color ?: Color(0, 255, 255, 127)
+
     fun getValue(key: String): Any? = configUI.getConfigValue(key)
 
     inline fun <reified T> getValue(key: String, default: T): T {

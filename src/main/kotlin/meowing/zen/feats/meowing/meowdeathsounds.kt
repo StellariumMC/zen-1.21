@@ -1,8 +1,8 @@
 package meowing.zen.feats.meowing
 
-import meowing.zen.events.EntityLeaveEvent
 import meowing.zen.feats.Feature
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.events.EntityEvent
 import meowing.zen.utils.Utils
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.particle.ParticleTypes
@@ -11,7 +11,7 @@ import kotlin.random.Random
 
 object meowdeathsounds : Feature("meowdeathsounds") {
     override fun initialize() {
-        register<EntityLeaveEvent> {
+        register<EntityEvent.Leave> {
             val entity = it.entity
             if (entity is ArmorStandEntity || entity.isInvisible || entity.isAlive) return@register
 

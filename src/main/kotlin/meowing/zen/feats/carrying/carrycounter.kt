@@ -2,12 +2,17 @@ package meowing.zen.feats.carrying
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
-import meowing.zen.events.*
+import meowing.zen.events.EntityEvent
+import meowing.zen.events.EventBus
+import meowing.zen.events.RenderEvent
+import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
-import meowing.zen.utils.*
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.utils.LoopUtils
 import meowing.zen.utils.DataUtils
+import meowing.zen.utils.RenderUtils
+import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
@@ -43,7 +48,7 @@ object carrycounter : Feature("carrycounter") {
             deadCarryees.forEach { it.reset() }
         }
 
-        register<ChatReceiveEvent> { event ->
+        register<ChatEvent.Receive> { event ->
             val text = event.message!!.string.removeFormatting()
             tradeInit.matcher(text).let { matcher ->
                 if (matcher.matches()) {
@@ -120,7 +125,7 @@ object carrycounter : Feature("carrycounter") {
 
         fun register() {
             if (registered) return
-            events.add(EventBus.register<EntityMetadataEvent> ({ event ->
+            events.add(EventBus.register<EntityEvent.Metadata> ({ event ->
                 val packet = event.packet
                 packet.trackedValues?.find { it.id == 2 && it.value is Optional<*> }?.let { obj ->
                     val optional = obj.value as Optional<*>
@@ -140,7 +145,7 @@ object carrycounter : Feature("carrycounter") {
                 }
             }))
 
-            events.add(EventBus.register<EntityLeaveEvent> ({ event ->
+            events.add(EventBus.register<EntityEvent.Leave> ({ event ->
                 if (event.entity.isAlive) return@register
                 carryeesByBossId[event.entity.id]?.let {
                     val ms = System.currentTimeMillis() - (it.startTime ?: 0L)
@@ -165,7 +170,7 @@ object carrycounter : Feature("carrycounter") {
 
         fun register() {
             if (registered || !Zen.config.carrybosshighlight) return
-            events.add(EventBus.register<RenderWorldPostEntitiesEvent> ({ event ->
+            events.add(EventBus.register<RenderEvent.WorldPostEntities> ({ event ->
                 val world = mc.world ?: return@register
                 carryeesByBossId.forEach { bossId, _ ->
                     val entity = world.getEntityById(bossId)
@@ -175,7 +180,7 @@ object carrycounter : Feature("carrycounter") {
                         val y = entityPos.y - mc.gameRenderer.camera.pos.y
                         val z = entityPos.z - mc.gameRenderer.camera.pos.z
                         val color = Zen.config.carrybosshighlightcolor
-                        RenderUtils.renderEntityBox(
+                        RenderUtils.renderEntityFilled(
                             event.context.matrixStack(),
                             event.context.consumers(),
                             x, y, z, entity.width + 0.5f, entity.height  + 0.25f,
@@ -201,7 +206,7 @@ object carrycounter : Feature("carrycounter") {
 
         fun register() {
             if (registered || !Zen.config.carryclienthighlight) return
-            events.add(EventBus.register<RenderWorldPostEntitiesEvent> ({ event ->
+            events.add(EventBus.register<RenderEvent.WorldPostEntities> ({ event ->
                 val world = mc.world ?: return@register
 
                 world.players.forEach { player ->
@@ -212,7 +217,7 @@ object carrycounter : Feature("carrycounter") {
                         val y = entityPos.y - mc.gameRenderer.camera.pos.y
                         val z = entityPos.z - mc.gameRenderer.camera.pos.z
                         val color = Zen.config.carryclienthighlightcolor
-                        RenderUtils.renderEntityBox(
+                        RenderUtils.renderEntityFilled(
                             event.context.matrixStack(),
                             event.context.consumers(),
                             x, y, z, player.width, player.height,
@@ -238,7 +243,7 @@ object carrycounter : Feature("carrycounter") {
 
         fun register() {
             if (registered) return
-            events.add(EventBus.register<ChatReceiveEvent> ({ event ->
+            events.add(EventBus.register<ChatEvent.Receive> ({ event ->
                 val text = event.message!!.string.removeFormatting()
 
                 tradeComp.matcher(text).let { matcher ->

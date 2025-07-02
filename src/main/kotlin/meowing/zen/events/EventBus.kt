@@ -20,56 +20,56 @@ object EventBus {
 
     init {
         ClientTickEvents.END_CLIENT_TICK.register { client ->
-            post(TickEvent())
+            post(TickEvent.Client())
         }
         ClientEntityEvents.ENTITY_LOAD.register { entity, _ ->
-            post(EntityJoinEvent(entity))
+            post(EntityEvent.Join(entity))
         }
         ClientEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
-            post(EntityLeaveEvent(entity))
+            post(EntityEvent.Leave(entity))
         }
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { mc, world ->
-            post(WorldChangeEvent(mc, world))
+            post(WorldEvent.Change(mc, world))
         }
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
-            !post(ChatReceiveEvent(msg, show))
+            !post(ChatEvent.Receive(msg, show))
         }
         WorldRenderEvents.LAST.register { context ->
-            post(RenderWorldEvent(context))
+            post(RenderEvent.World(context))
         }
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderWorldPostEntitiesEvent(context))
+            post(RenderEvent.WorldPostEntities(context))
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mbtn ->
-                !post(GuiClickEvent(mx, my, mbtn, true, screen))
+                !post(GuiEvent.Click(mx, my, mbtn, true, screen))
             }
 
             ScreenMouseEvents.allowMouseRelease(screen).register { _, mx, my, mbtn ->
-                !post(GuiClickEvent(mx, my, mbtn, false, screen))
+                !post(GuiEvent.Click(mx, my, mbtn, false, screen))
             }
 
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, _ ->
-                !post(GuiKeyEvent(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
+                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
             }
             ScreenEvents.remove(screen).register { screen ->
-                post(GuiCloseEvent(screen))
+                post(GuiEvent.Close(screen))
             }
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
-                post(GuiAfterRenderEvent(screen))
+                post(GuiEvent.AfterRender(screen))
             }
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
-            if (screen != null) post(GuiOpenEvent(screen))
+            if (screen != null) post(GuiEvent.Open(screen))
         }
         WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
-            !post(BlockOutlineEvent(worldContext, blockContext))
+            !post(RenderEvent.BlockOutline(worldContext, blockContext))
         }
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
-            post(GameLoadEvent())
+            post(GameEvent.Load())
         }
         ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
-            post(GameUnloadEvent())
+            post(GameEvent.Unload())
         }
     }
 
@@ -85,18 +85,18 @@ object EventBus {
     private fun PacketReceived(packet: Packet<*>) {
         when (packet) {
             is CommonPingS2CPacket -> {
-                post(ServerTickEvent())
+                post(TickEvent.Server())
             }
             is EntityTrackerUpdateS2CPacket -> {
-                post(EntityMetadataEvent(packet))
+                post(EntityEvent.Metadata(packet))
             }
             is ScoreboardObjectiveUpdateS2CPacket, is ScoreboardScoreUpdateS2CPacket, is ScoreboardDisplayS2CPacket, is TeamS2CPacket -> {
-                post(ScoreboardEvent(packet))
+                post(ScoreboardEvent.Update(packet))
             }
             is PlayerListS2CPacket -> {
                 when (packet.actions.firstOrNull()) {
                     PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME -> {
-                        post(TablistEvent(packet))
+                        post(TablistEvent.Update(packet))
                     }
                     else -> {}
                 }

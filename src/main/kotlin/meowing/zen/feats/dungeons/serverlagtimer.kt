@@ -1,11 +1,10 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
-import meowing.zen.events.ChatReceiveEvent
-import meowing.zen.events.ServerTickEvent
 import meowing.zen.events.TickEvent
 import java.util.regex.Pattern
 
@@ -17,7 +16,7 @@ object serverlagtimer : Feature("serverlagtimer", area = "catacombs") {
     private var servertick: Long = 0
 
     override fun initialize() {
-        register<ChatReceiveEvent> { event ->
+        register<ChatEvent.Receive> { event ->
             val text = event.message!!.string.removeFormatting()
             when {
                 text == "[NPC] Mort: Good luck." -> {
@@ -36,10 +35,10 @@ object serverlagtimer : Feature("serverlagtimer", area = "catacombs") {
                 else -> {}
             }
         }
-        register<ServerTickEvent> { event ->
+        register<TickEvent.Server> { event ->
             if (ticking) servertick++
         }
-        register<TickEvent> { event ->
+        register<TickEvent.Client> { event ->
             if (ticking) clienttick++
         }
     }

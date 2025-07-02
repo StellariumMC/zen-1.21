@@ -18,10 +18,10 @@ class HudEditorScreen : Screen(Text.literal("HUD Editor")) {
 
     override fun init() {
         HudManager.editMode = true
-        guiClickCall = EventBus.register<GuiClickEvent> ({ event ->
+        guiClickCall = EventBus.register<GuiEvent.Click> ({ event ->
             if (event.screen == this) handleClick(event)
         })
-        guiKeyCall = EventBus.register<GuiKeyEvent> ({ event ->
+        guiKeyCall = EventBus.register<GuiEvent.Key> ({ event ->
             if (event.screen == this && event.key == GLFW.GLFW_KEY_ESCAPE) close()
         })
     }
@@ -34,7 +34,7 @@ class HudEditorScreen : Screen(Text.literal("HUD Editor")) {
         super.close()
     }
 
-    private fun handleClick(event: GuiClickEvent) {
+    private fun handleClick(event: GuiEvent.Click) {
         if (event.state) {
             selectedElement = getElementAt(event.mx, event.my)?.also { element ->
                 isDragging = true

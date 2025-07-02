@@ -213,6 +213,19 @@ fun ZenConfig(): ConfigUI {
             "Displays a title when the wither/blood key spawns",
             ElementType.Switch(false)
         ))
+        .addElement("Dungeons", "Keys", ConfigElement(
+            "keyhighlight",
+            "Key highlight",
+            "Highlights the wither/blood key",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Keys", ConfigElement(
+            "keyhighlightcolor",
+            "Key highlight color",
+            null,
+            ElementType.ColorPicker(Color(0, 255, 255, 127)),
+            { config -> config["keyhighlight"] as? Boolean == true }
+        ))
         .addElement("Dungeons", "Party finder", ConfigElement(
             "partyfindermsgs",
             "Party finder messages",
@@ -260,6 +273,25 @@ fun ZenConfig(): ConfigUI {
             "autogetdraft",
             "Auto Architect draft",
             "Automatically runs the command to get a draft into your inventory on puzzle fail",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Box star mobs", ConfigElement(
+            "boxstarmobs",
+            "Box star mobs",
+            "Highlights star mobs in dungeons.",
+            ElementType.Switch(false)
+        ))
+        .addElement("Dungeons", "Box star mobs", ConfigElement(
+            "boxstarmobscolor",
+            "Box star mobs color",
+            null,
+            ElementType.ColorPicker(Color(0, 255, 255, 127)),
+            { config -> config["boxstarmobs"] as? Boolean == true }
+        ))
+        .addElement("Dungeons", "Box star mobs", ConfigElement(
+            "boxstarmobsfilled",
+            "Filled outline",
+            "Enable to render a filled color highlight.",
             ElementType.Switch(false)
         ))
         .addElement("No clutter", "General", ConfigElement(

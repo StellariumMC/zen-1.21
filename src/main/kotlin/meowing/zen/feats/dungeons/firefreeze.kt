@@ -1,17 +1,16 @@
 package meowing.zen.feats.dungeons
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting
-import meowing.zen.events.ChatReceiveEvent
 import meowing.zen.events.EventBus
-import meowing.zen.events.ServerTickEvent
+import meowing.zen.events.TickEvent
 import meowing.zen.hud.HudElement
 import meowing.zen.hud.HudManager
 import meowing.zen.hud.HudRenderer
-import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.sound.SoundEvents
@@ -19,7 +18,7 @@ import net.minecraft.util.Colors
 
 object firefreeze : Feature("firefreeze") {
     var ticks = 0
-    private var servertickcall: EventBus.EventCall = EventBus.register<ServerTickEvent>({
+    private var servertickcall: EventBus.EventCall = EventBus.register<TickEvent.Server>({
         if (ticks > 0) ticks--
     }, false)
     private var hudElement: HudElement? = null
@@ -28,7 +27,7 @@ object firefreeze : Feature("firefreeze") {
         hudElement = HudElement(10f, 10f, 150f, 20f, 1.0f, true, "firefreeze", "Fire Freeze")
         HudManager.registerCustom(hudElement!!, FireFreezeRenderer(hudElement!!))
 
-        register<ChatReceiveEvent> { event ->
+        register<ChatEvent.Receive> { event ->
             if (event.message!!.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
                 ticks = 100
                 servertickcall.register()

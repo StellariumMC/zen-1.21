@@ -34,7 +34,8 @@ object FeatureLoader {
         "dungeons.serverlagtimer",
         "dungeons.termtracker",
         "dungeons.firefreeze",
-        "dungeons.architectdraft"
+        "dungeons.architectdraft",
+        "dungeons.boxstarmobs"
     )
 
     private var moduleCount = 0
