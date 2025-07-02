@@ -17,7 +17,7 @@ object bloodtimer : Feature("bloodtimer", area = "catacombs") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             when {
                 !bloodopen && bloodstart.matcher(text).matches() -> {
                     bloodopen = true

@@ -48,7 +48,7 @@ object vengtimer : Feature("vengtimer") {
         }
 
         register<ChatEvent.Receive> { event ->
-            if (fail.matcher(event.message!!.string.removeFormatting()).matches() && isFighting) TickUtils.schedule(10) { cleanup() }
+            if (fail.matcher(event.message.string.removeFormatting()).matches() && isFighting) TickUtils.schedule(10) { cleanup() }
         }
 
         register<EntityEvent.Attack> { event ->

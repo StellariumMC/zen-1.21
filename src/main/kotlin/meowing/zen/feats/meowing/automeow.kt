@@ -21,7 +21,7 @@ object automeow : Feature("automeow") {
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             if (event.overlay) return@register
-            val content = event.message?.string!!.removeFormatting()
+            val content = event.message.string.removeFormatting()
 
             val matchResult = regex.find(content) ?: return@register
 

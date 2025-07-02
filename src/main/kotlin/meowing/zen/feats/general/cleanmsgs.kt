@@ -14,7 +14,7 @@ object guildmessage : Feature("guildmessage") {
         register<ChatEvent.Receive> { event ->
             if (event.overlay) return@register
 
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             val m = guildPattern.matcher(text)
             if (m.matches()) {
                 event.cancel()
@@ -50,7 +50,7 @@ object partymessage : Feature("partymessage") {
         register<ChatEvent.Receive> { event ->
             if (event.overlay) return@register
 
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             val m = partyPattern.matcher(text)
             if (m.matches()) {
                 event.cancel()

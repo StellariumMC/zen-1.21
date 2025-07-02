@@ -23,7 +23,7 @@ object slayertimer : Feature("slayertimer") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             when {
                 fail.matches(text) -> onSlayerFailed()
                 questStart.matches(text) -> spawnTime = System.currentTimeMillis()

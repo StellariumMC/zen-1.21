@@ -17,7 +17,7 @@ object partyfinder : Feature("partyfindermsgs") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
 
             when {
                 text == "Party Finder > Your party has been queued in the dungeon finder!" -> {

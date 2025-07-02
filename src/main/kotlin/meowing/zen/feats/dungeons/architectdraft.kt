@@ -14,7 +14,7 @@ object architectdraft : Feature("architectdraft") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
 
             puzzlefail.find(text)?.let { matchResult ->
                 if (matchResult.groupValues[1] != Zen.mc.player!!.name.toString() && Zen.config.draftself) return@register

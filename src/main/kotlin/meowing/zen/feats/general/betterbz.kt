@@ -22,7 +22,7 @@ object betterbz : Feature("betterbz") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             var cancelled = false
 
             patterns["instaBuy"]?.find(text)?.let {

@@ -13,7 +13,8 @@ object keyalert : Feature("keyalert", area = "catacombs") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            if (!bloodOpen && event.message!!.string.removeFormatting().startsWith("[BOSS] The Watcher: ")) bloodOpen = true
+            val message = event.message.string
+            if (!bloodOpen && message.startsWith("[BOSS] The Watcher: ")) bloodOpen = true
         }
 
         register<EntityEvent.Join> { event ->

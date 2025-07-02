@@ -58,7 +58,7 @@ abstract class GuiEvent {
 }
 
 abstract class ChatEvent {
-    class Receive(val message: Text?, val overlay: Boolean) : CancellableEvent()
+    class Receive(val message: Text, val overlay: Boolean) : CancellableEvent()
 }
 
 abstract class WorldEvent {

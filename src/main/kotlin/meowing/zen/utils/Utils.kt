@@ -49,7 +49,8 @@ object Utils {
         mc.inGameHud.setSubtitle(Text.literal(subtitle))
     }
 
-    fun String.removeFormatting(): String {
+    fun String?.removeFormatting(): String {
+        if (this == null) return ""
         return this.replace(Regex("[§&][0-9a-fk-or]", RegexOption.IGNORE_CASE), "")
     }
 

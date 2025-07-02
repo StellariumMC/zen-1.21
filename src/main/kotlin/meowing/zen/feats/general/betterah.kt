@@ -23,7 +23,7 @@ object betterah : Feature("betterah") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
 
             when {
                 patterns["separator"]?.matcher(event.message.string)?.matches() == true -> {

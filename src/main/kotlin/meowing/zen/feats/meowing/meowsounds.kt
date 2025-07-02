@@ -3,6 +3,7 @@ package meowing.zen.feats.meowing
 import meowing.zen.feats.Feature
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.ChatEvent
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
 
 object meowsounds : Feature("meowsounds") {
@@ -10,7 +11,7 @@ object meowsounds : Feature("meowsounds") {
 
     override fun initialize() {
         register<ChatEvent.Receive> {
-            val content = it.message!!.string.lowercase()
+            val content = it.message.string.removeFormatting().lowercase()
             val match = meowRegex.find(content) ?: return@register
             if (match.groups[1]?.value?.contains("meow", ignoreCase = true) != true) return@register
 

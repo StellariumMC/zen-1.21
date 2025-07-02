@@ -17,7 +17,7 @@ object serverlagtimer : Feature("serverlagtimer", area = "catacombs") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             when {
                 text == "[NPC] Mort: Good luck." -> {
                     ticking = true

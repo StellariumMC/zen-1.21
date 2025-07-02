@@ -28,7 +28,7 @@ object firefreeze : Feature("firefreeze") {
         HudManager.registerCustom(hudElement!!, FireFreezeRenderer(hudElement!!))
 
         register<ChatEvent.Receive> { event ->
-            if (event.message!!.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
+            if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
                 ticks = 100
                 servertickcall.register()
                 TickUtils.scheduleServer(105) {

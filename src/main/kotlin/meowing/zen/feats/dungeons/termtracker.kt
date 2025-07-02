@@ -13,7 +13,7 @@ object termtracker : Feature("termtracker", area = "catacombs") {
     override fun initialize() {
         completed = mutableMapOf()
         register<ChatEvent.Receive> { event ->
-            val msg = event.message!!.string.removeFormatting()
+            val msg = event.message.string.removeFormatting()
             val matcher = pattern.matcher(msg)
 
             when {
