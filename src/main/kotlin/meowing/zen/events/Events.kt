@@ -24,17 +24,17 @@ abstract class CancellableEvent : Event() {
     fun isCancelled() = cancelled
 }
 
-open class TickEvent {
+abstract class TickEvent {
     class Client : Event()
     class Server : Event()
 }
 
-open class GameEvent {
+abstract class GameEvent {
     class Load : Event()
     class Unload : Event()
 }
 
-open class RenderEvent {
+abstract class RenderEvent {
     class World(val context: WorldRenderContext?) : Event()
     class WorldPostEntities(val context: WorldRenderContext?) : Event()
     class EntityPre(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
@@ -42,14 +42,14 @@ open class RenderEvent {
     class Hud(val context: DrawContext) : Event()
 }
 
-open class EntityEvent {
+abstract class EntityEvent {
     class Join(val entity: Entity) : Event()
     class Leave(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
 }
 
-open class GuiEvent {
+abstract class GuiEvent {
     class AfterRender(val screen: Screen) : Event()
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen) : Event()
@@ -57,28 +57,28 @@ open class GuiEvent {
     class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
 }
 
-open class ChatEvent {
+abstract class ChatEvent {
     class Receive(val message: Text?, val overlay: Boolean) : CancellableEvent()
 }
 
-open class WorldEvent {
+abstract class WorldEvent {
     class Change(val mc: MinecraftClient?, val world: ClientWorld) : Event()
 }
 
-open class PacketEvent {
+abstract class PacketEvent {
     class Received(val packet: Packet<*>) : Event()
     class Sent(val packet: Packet<*>) : Event()
 }
 
-open class ScoreboardEvent {
+abstract class ScoreboardEvent {
     class Update(val packet: Packet<*>) : Event()
 }
 
-open class TablistEvent {
+abstract class TablistEvent {
     class Update(val packet: PlayerListS2CPacket) : Event()
 }
 
-open class AreaEvent {
+abstract class AreaEvent {
     class Main(val area: String) : Event()
     class Sub(val subarea: String) : Event()
 }
