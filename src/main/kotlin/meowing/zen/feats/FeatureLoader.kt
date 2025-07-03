@@ -20,6 +20,8 @@ object FeatureLoader {
         "general.betterah",
         "general.betterbz",
         "general.blockoverlay",
+        "general.customsize",
+        "general.serveralert",
         "slayers.MetadataHandler",
         "slayers.slayertimer",
         "slayers.slayerhighlight",
@@ -68,6 +70,6 @@ object FeatureLoader {
         loadtime = System.currentTimeMillis() - starttime
     }
 
-    fun getFeatCount(): Int = moduleCount + 5 // Mixin feats
+    fun getFeatCount(): Int = moduleCount + 4 // Mixin feats
     fun getLoadtime(): Long = loadtime
 }

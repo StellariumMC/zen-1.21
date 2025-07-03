@@ -53,14 +53,26 @@ fun ZenConfig(): ConfigUI {
             ElementType.Switch(false)
         ))
 
-        // General - Custom model
+        // General - World age
 
-        .addElement("General", "Custom model", ConfigElement(
+        .addElement("General", "World age", ConfigElement(
             "worldage",
             "Send world age",
             "Sends world age to your chat.",
             ElementType.Switch(false)
         ))
+
+        // General - Server alert
+
+        .addElement("General", "Server alert", ConfigElement(
+            "serveralert",
+            "Same server alert",
+            "Shows a chat message when you join a server you previously joined.",
+            ElementType.Switch(false)
+        ))
+
+        // General - Custom model
+
         .addElement("General", "Custom model", ConfigElement(
             "customsize",
             "Custom player model size",
@@ -87,6 +99,12 @@ fun ZenConfig(): ConfigUI {
             "Z scale",
             ElementType.Slider(0.1, 5.0, 1.0, true),
             { config -> config["customsize"] as? Boolean == true }
+        ))
+        .addElement("General", "Custom model", ConfigElement(
+            "customself",
+            "Only scale yourself",
+            "Enable to only scale your player model, disable to scale all players.",
+            ElementType.Switch(true)
         ))
 
         // General - block overlay
