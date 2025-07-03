@@ -80,6 +80,7 @@ class Zen : ClientModInitializer {
             configUI = ZenConfig()
             config = ConfigAccessor(configUI)
             FeatureLoader.init()
+            executePendingCallbacks()
         })
 
         EventBus.register<GuiEvent.Open> ({ event ->
@@ -100,23 +101,48 @@ class Zen : ClientModInitializer {
         var isInInventory = false
         lateinit var configUI: ConfigUI
         lateinit var config: ConfigAccessor
+        private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
 
         private fun updateFeatures() {
             features.forEach { it.update() }
         }
 
+        private fun executePendingCallbacks() {
+            pendingCallbacks.forEach { (configKey, callback) ->
+                configUI.registerListener(configKey, callback)
+            }
+            pendingCallbacks.clear()
+        }
+
         fun registerListener(configKey: String, instance: Any) {
-            configUI.registerListener(configKey) { newValue ->
-                val isEnabled = newValue as? Boolean ?: false
-                if (instance is Feature) {
-                    instance.onToggle(isEnabled)
+            if (::configUI.isInitialized) {
+                configUI.registerListener(configKey) { newValue ->
+                    val isEnabled = newValue as? Boolean ?: false
+                    if (instance is Feature) {
+                        instance.onToggle(isEnabled)
+                    }
                 }
+            } else {
+                val stackTrace = Thread.currentThread().stackTrace
+                val caller = stackTrace.getOrNull(2)
+                println("[Zen] WARN: Callback accessed before configUI was initialized from: ${caller?.className}:${caller?.lineNumber} (${caller?.methodName})")
+                pendingCallbacks.add(configKey to { newValue ->
+                    val isEnabled = newValue as? Boolean ?: false
+                    if (instance is Feature) {
+                        instance.onToggle(isEnabled)
+                    }
+                })
             }
         }
 
         fun registerCallback(configKey: String, callback: (Any) -> Unit) {
-            configUI.registerListener(configKey) { newValue ->
-                callback(newValue)
+            if (::configUI.isInitialized) {
+                configUI.registerListener(configKey, callback)
+            } else {
+                val stackTrace = Thread.currentThread().stackTrace
+                val caller = stackTrace.getOrNull(2)
+                println("[Zen] WARN: Callback accessed before configUI was initialized from: ${caller?.className}:${caller?.lineNumber} (${caller?.methodName})")
+                pendingCallbacks.add(configKey to callback)
             }
         }
 
@@ -127,7 +153,9 @@ class Zen : ClientModInitializer {
         fun openConfig() {
             TickUtils.schedule(2) {
                 mc.execute {
-                    mc.setScreen(configUI)
+                    if (::configUI.isInitialized) {
+                        mc.setScreen(configUI)
+                    }
                 }
             }
         }
