@@ -16,7 +16,7 @@ object serveralert : Feature("serveralert") {
                 val currentTime = System.currentTimeMillis()
 
                 servers[server]?.let { lastJoined ->
-                    ChatUtils.addMessage("§c[Zen] §fLast joined $server - ${(currentTime - lastJoined) / 1000}s ago")
+                    ChatUtils.addMessage("§c[Zen] §fLast joined §b$server §f- §b${(currentTime - lastJoined) / 1000}s §fago")
                 }
 
                 servers[server] = currentTime
