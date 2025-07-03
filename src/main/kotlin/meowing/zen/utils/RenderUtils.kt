@@ -16,6 +16,7 @@ import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 object RenderUtils {
@@ -75,50 +76,50 @@ object RenderUtils {
         )
     }
 
-    fun renderText(
+    fun renderString(
         text: String,
         pos: Vec3d,
         color: Int,
         scale: Float = 1.0f,
-        yOffset: Float = 0.0f,
-        throughWalls: Boolean = false
+        yOffset: Float = 0.0f
     ) {
-        val lines = text.split('\n')
         val camera = mc.gameRenderer.camera
         val cameraPos = camera.pos
-        val textRenderer = mc.textRenderer
-        val adjustedScale = scale * 0.025f
-
         val allocator = BufferAllocator(256)
         val consumers = VertexConsumerProvider.immediate(allocator)
 
-        lines.forEachIndexed { i, line ->
-            val positionMatrix = Matrix4f()
-                .translate(
-                    (pos.x - cameraPos.x).toFloat(),
-                    (pos.y - cameraPos.y).toFloat(),
-                    (pos.z - cameraPos.z).toFloat()
-                )
-                .rotate(camera.rotation)
-                .scale(adjustedScale, -adjustedScale, adjustedScale)
-
-            val xOffset = -textRenderer.getWidth(line) / 2f
-            val lineYOffset = yOffset + i * 10f
-
-            textRenderer.draw(
-                line,
-                xOffset,
-                lineYOffset,
-                color,
-                false,
-                positionMatrix,
-                consumers,
-                if (throughWalls) TextRenderer.TextLayerType.SEE_THROUGH else TextRenderer.TextLayerType.NORMAL,
-                0,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE
+        val positionMatrix = Matrix4f()
+            .translate(
+                (pos.x - cameraPos.x).toFloat(),
+                (pos.y - cameraPos.y + yOffset).toFloat(),
+                (pos.z - cameraPos.z).toFloat()
             )
-        }
+            .rotate(camera.rotation)
+            .scale(scale * 0.025f, -scale * 0.025f, scale * 0.025f)
+
+        val xOffset = -mc.textRenderer.getWidth(text) / 2f
+        val depthFunc = GL11.glGetInteger(GL11.GL_DEPTH_FUNC)
+        val depthTest = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
+
+        GL11.glEnable(GL11.GL_DEPTH_TEST)
+        GL11.glDepthFunc(GL11.GL_ALWAYS)
+
+        mc.textRenderer.draw(
+            text,
+            xOffset,
+            0f,
+            color,
+            false,
+            positionMatrix,
+            consumers,
+            TextRenderer.TextLayerType.NORMAL,
+            0,
+            LightmapTextureManager.MAX_LIGHT_COORDINATE
+        )
 
         consumers.draw()
+
+        GL11.glDepthFunc(depthFunc)
+        if (!depthTest) GL11.glDisable(GL11.GL_DEPTH_TEST)
     }
 }
