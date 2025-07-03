@@ -11,6 +11,7 @@ import java.util.Optional
 object MetadataHandler {
     init {
         EventBus.register<EntityEvent.Metadata> ({ event ->
+            if (!Zen.config.slayertimer && !Zen.config.vengdmg && !Zen.config.lasertimer) return@register
             val world = mc.world ?: return@register
             val player = mc.player ?: return@register
 
@@ -30,6 +31,7 @@ object MetadataHandler {
                     if (hasBlackhole) return@register
                     if (Zen.config.slayertimer) slayertimer.handleBossSpawn(packet.id)
                     if (Zen.config.vengdmg) vengdmg.handleNametagUpdate(packet.id)
+                     if (Zen.config.lasertimer) lasertimer.handleSpawn(packet.id)
                 }
             }
         })

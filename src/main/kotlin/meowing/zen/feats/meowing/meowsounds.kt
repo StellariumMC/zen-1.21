@@ -7,7 +7,7 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
 
 object meowsounds : Feature("meowsounds") {
-    private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?(?:>)? ?(?:\\[.+?])? ?(?:[a-zA-Z0-9_]+) ?(?:\\[.+?])?: (.+)")
+    private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
 
     override fun initialize() {
         register<ChatEvent.Receive> {

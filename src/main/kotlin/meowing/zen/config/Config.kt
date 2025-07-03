@@ -133,6 +133,15 @@ fun ZenConfig(): ConfigUI {
             ElementType.Switch(false)
         ))
 
+        // Slayers - Enderman
+
+        .addElement("Slayers", "Enderman", ConfigElement(
+            "lasertimer",
+            "Laser phase timer",
+            "Time until laser phase ends",
+            ElementType.Switch(false)
+        ))
+
         // Slayers - Blaze
 
         .addElement("Slayers", "Blaze", ConfigElement(

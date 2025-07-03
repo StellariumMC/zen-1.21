@@ -9,7 +9,7 @@ import kotlin.random.Random
 import net.minecraft.client.MinecraftClient
 
 object automeow : Feature("automeow") {
-    private val regex = "^(?:(Guild|Party|Officer|Co-op) > |From )?([A-Za-z0-9_]+)(?:\\s\\[[^]]+])?\\s*(?:>|:)\\s*(?:[A-Za-z0-9_]+\\s*(?:>|:)\\s*)?meow$".toRegex(RegexOption.IGNORE_CASE)
+    private val regex = "^(?:(Guild|Party|Officer|Co-op) > |From )?([A-Za-z0-9_]+)(?:\\s\\[[^]]+])?\\s*[>:]\\s*(?:[A-Za-z0-9_]+\\s*[>:]\\s*)?meow$".toRegex(RegexOption.IGNORE_CASE)
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
     private val channels = mapOf(
         "Guild >" to "gc",

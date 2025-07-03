@@ -49,7 +49,7 @@ object carrycounter : Feature("carrycounter") {
         }
 
         register<ChatEvent.Receive> { event ->
-            val text = event.message!!.string.removeFormatting()
+            val text = event.message.string.removeFormatting()
             tradeInit.matcher(text).let { matcher ->
                 if (matcher.matches()) {
                     lasttradeuser = matcher.group(1)
@@ -244,7 +244,7 @@ object carrycounter : Feature("carrycounter") {
         fun register() {
             if (registered) return
             events.add(EventBus.register<ChatEvent.Receive> ({ event ->
-                val text = event.message!!.string.removeFormatting()
+                val text = event.message.string.removeFormatting()
 
                 tradeComp.matcher(text).let { matcher ->
                     if (matcher.matches()) {

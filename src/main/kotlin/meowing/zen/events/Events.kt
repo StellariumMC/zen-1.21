@@ -38,6 +38,7 @@ abstract class RenderEvent {
     class World(val context: WorldRenderContext?) : Event()
     class WorldPostEntities(val context: WorldRenderContext?) : Event()
     class EntityPre(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
+    class EntityPost(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
     class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
     class Hud(val context: DrawContext) : Event()
 }

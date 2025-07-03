@@ -26,6 +26,7 @@ object FeatureLoader {
         "slayers.slayerstats",
         "slayers.vengdmg",
         "slayers.vengtimer",
+        "slayers.lasertimer",
         "carrying.carrycounter",
         "dungeons.bloodtimer",
         "dungeons.cryptreminder",

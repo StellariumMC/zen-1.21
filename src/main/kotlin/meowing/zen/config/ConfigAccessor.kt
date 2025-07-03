@@ -13,6 +13,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val slayertimer: Boolean get() = configUI.getConfigValue("slayertimer") as? Boolean ?: false
     val slayerhighlightcolor: Color get() = configUI.getConfigValue("slayerhighlightcolor") as? Color ?: Color(0, 255, 255, 127)
     val vengdmg: Boolean get() = configUI.getConfigValue("vengdmg") as? Boolean ?: false
+    val lasertimer: Boolean get() = configUI.getConfigValue("lasertimer") as? Boolean ?: false
     val slayerstats: Boolean get() = configUI.getConfigValue("slayerstats") as? Boolean ?: false
     val blockoverlaycolor: Color get() = configUI.getConfigValue("blockoverlaycolor") as? Color ?: Color(0, 255, 255, 127)
     val blockoverlaywidth: Double get() = configUI.getConfigValue("blockoverlaywidth") as? Double ?: 2.0
