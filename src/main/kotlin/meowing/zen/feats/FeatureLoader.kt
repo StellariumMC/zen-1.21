@@ -22,6 +22,7 @@ object FeatureLoader {
         "general.blockoverlay",
         "general.customsize",
         "general.serveralert",
+        "general.damagetracker",
         "slayers.MetadataHandler",
         "slayers.slayertimer",
         "slayers.slayerhighlight",

@@ -90,6 +90,9 @@ object EventBus {
             is EntityTrackerUpdateS2CPacket -> {
                 post(EntityEvent.Metadata(packet))
             }
+            is EntitySpawnS2CPacket -> {
+                post(EntityEvent.Spawn(packet))
+            }
             is ScoreboardObjectiveUpdateS2CPacket, is ScoreboardScoreUpdateS2CPacket, is ScoreboardDisplayS2CPacket, is TeamS2CPacket -> {
                 post(ScoreboardEvent.Update(packet))
             }

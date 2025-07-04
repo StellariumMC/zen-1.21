@@ -107,7 +107,7 @@ fun ZenConfig(): ConfigUI {
             ElementType.Switch(true)
         ))
 
-        // General - block overlay
+        // General - Block overlay
 
         .addElement("General", "Block overlay", ConfigElement(
             "blockoverlay",
@@ -128,6 +128,15 @@ fun ZenConfig(): ConfigUI {
             "The color for Block overlay",
             ElementType.ColorPicker(Color(0, 255, 255, 127)),
             { config -> config["blockoverlay"] as? Boolean == true }
+        ))
+
+        // General - Damage tracker
+
+        .addElement("General", "Damage tracker", ConfigElement(
+            "damagetracker",
+            "Damage tracker",
+            "Sends the damage that you/others do in chat.",
+            ElementType.Switch(false)
         ))
 
         // Slayers - General

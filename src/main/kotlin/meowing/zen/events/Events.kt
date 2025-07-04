@@ -50,6 +50,7 @@ abstract class EntityEvent {
     class Leave(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
+    class Spawn(val packet: EntitySpawnS2CPacket) : Event()
 }
 
 abstract class GuiEvent {
