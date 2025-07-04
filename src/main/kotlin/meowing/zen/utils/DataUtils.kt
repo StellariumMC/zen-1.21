@@ -4,42 +4,45 @@ import com.google.gson.GsonBuilder
 import net.fabricmc.loader.api.FabricLoader
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
-import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
+import com.google.gson.*
 import java.awt.Color
+import java.lang.reflect.Type
 
-class ColorTypeAdapter : TypeAdapter<Color>() {
-    override fun write(out: JsonWriter, value: Color?) {
-        if (value == null) {
-            out.nullValue()
-            return
-        }
-        out.beginObject()
-        out.name("r").value(value.red)
-        out.name("g").value(value.green)
-        out.name("b").value(value.blue)
-        out.name("a").value(value.alpha)
-        out.endObject()
+class ColorTypeAdapter : JsonSerializer<Color>, JsonDeserializer<Color> {
+    override fun serialize(src: Color, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        val jsonObject = JsonObject()
+        val value = (src.red shl 16) or (src.green shl 8) or src.blue
+        val falpha = src.alpha.toDouble() / 255.0
+        jsonObject.addProperty("value", value)
+        jsonObject.addProperty("falpha", falpha)
+        return jsonObject
     }
 
-    override fun read(reader: JsonReader): Color? {
-        var r = 0
-        var g = 0
-        var b = 0
-        var a = 255
+    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Color {
+        val jsonObject = json.asJsonObject
 
-        reader.beginObject()
-        while (reader.hasNext()) {
-            when (reader.nextName()) {
-                "r" -> r = reader.nextInt()
-                "g" -> g = reader.nextInt()
-                "b" -> b = reader.nextInt()
-                "a" -> a = reader.nextInt()
+        return when {
+            jsonObject.has("value") && jsonObject.has("falpha") -> {
+                val value = jsonObject.get("value").asInt
+                val falpha = jsonObject.get("falpha").asDouble
+                val r = (value shr 16) and 0xFF
+                val g = (value shr 8) and 0xFF
+                val b = value and 0xFF
+                val a = (falpha * 255).toInt().coerceIn(0, 255)
+                Color(r, g, b, a)
             }
+
+            // backwards compat
+            jsonObject.has("r") && jsonObject.has("g") && jsonObject.has("b") -> {
+                val r = jsonObject.get("r")?.asInt ?: 255
+                val g = jsonObject.get("g")?.asInt ?: 255
+                val b = jsonObject.get("b")?.asInt ?: 255
+                val a = jsonObject.get("a")?.asInt ?: 255
+                Color(r, g, b, a)
+            }
+
+            else -> Color(255, 255, 255, 255)
         }
-        reader.endObject()
-        return Color(r, g, b, a)
     }
 }
 
@@ -47,12 +50,12 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
     companion object {
         private val gson = GsonBuilder()
             .registerTypeAdapter(Color::class.java, ColorTypeAdapter())
+            .setPrettyPrinting()
             .create()
 
         private val autosaveIntervals = ConcurrentHashMap<DataUtils<*>, Long>()
         private var loopStarted = false
     }
-
 
     private val dataFile = File(FabricLoader.getInstance().configDir.toFile(), "Zen-1.21/${fileName}.json")
     private var data: T = loadData()
@@ -70,6 +73,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
                 gson.fromJson(dataFile.readText(), defaultObject::class.java) ?: defaultObject
             } else defaultObject
         } catch (e: Exception) {
+            println("Error loading data from ${dataFile.absolutePath}: ${e.message}")
             defaultObject
         }
     }
@@ -79,6 +83,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         try {
             dataFile.writeText(gson.toJson(data))
         } catch (e: Exception) {
+            println("Error saving data to ${dataFile.absolutePath}: ${e.message}")
             e.printStackTrace()
         }
     }

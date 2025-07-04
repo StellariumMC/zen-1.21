@@ -66,5 +66,35 @@ object Utils {
         return this / 255f
     }
 
+    fun Map<*, *>.toColorFromMap(): Color? {
+        return try {
+            val rgbValue = (this["value"] as? Number)?.toInt() ?: return null
+            val alpha = ((this["falpha"] as? Number)?.toDouble() ?: 1.0).coerceIn(0.0, 1.0)
+
+            val r = (rgbValue shr 16) and 0xFF
+            val g = (rgbValue shr 8) and 0xFF
+            val b = rgbValue and 0xFF
+            val a = (alpha * 255).toInt()
+
+            Color(r, g, b, a)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun List<*>.toColorFromList(): Color? {
+        return try {
+            if (size < 4) return null
+            Color(
+                (this[0] as? Number)?.toInt() ?: return null,
+                (this[1] as? Number)?.toInt() ?: return null,
+                (this[2] as? Number)?.toInt() ?: return null,
+                (this[3] as? Number)?.toInt() ?: return null
+            )
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     inline fun <reified R> Any.getField(name: String): R = javaClass.getDeclaredField(name).apply { isAccessible = true }[this] as R
 }
