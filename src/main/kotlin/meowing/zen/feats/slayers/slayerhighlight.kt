@@ -7,9 +7,20 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorFloat
+import java.awt.Color
 
 object slayerhighlight : Feature("slayerhighlight") {
+    private var filled = false
+    private var color = Zen.config.slayerhighlightcolor
+
     override fun initialize() {
+        Zen.registerCallback("slayerhighlightfilled") { newval ->
+            filled = newval as Boolean
+        }
+        Zen.registerCallback("slayerhighlightcolor") { newval ->
+            color = newval as Color
+        }
+
         register<RenderEvent.EntityPre> { event ->
             if (!slayertimer.isFighting || slayertimer.BossId == -1 || event.entity.id != slayertimer.BossId) return@register
             val entity = event.entity
@@ -20,20 +31,36 @@ object slayerhighlight : Feature("slayerhighlight") {
             val x = entityPos.x - cam.pos.x
             val y = entityPos.y - cam.pos.y
             val z = entityPos.z - cam.pos.z
-            val color = Zen.config.slayerhighlightcolor
-            RenderUtils.renderEntityOutline(
-                event.matrices,
-                event.vertex,
-                x,
-                y,
-                z,
-                width,
-                height,
-                color.red.toColorFloat(),
-                color.green.toColorFloat(),
-                color.blue.toColorFloat(),
-                color.alpha.toColorFloat()
-            )
+
+            if (filled) {
+                RenderUtils.renderEntityFilled(
+                    event.matrices,
+                    event.vertex,
+                    x,
+                    y,
+                    z,
+                    width.toFloat(),
+                    height,
+                    color.red.toColorFloat(),
+                    color.green.toColorFloat(),
+                    color.blue.toColorFloat(),
+                    color.alpha.toColorFloat()
+                )
+            } else {
+                RenderUtils.renderEntityOutline(
+                    event.matrices,
+                    event.vertex,
+                    x,
+                    y,
+                    z,
+                    width,
+                    height,
+                    color.red.toColorFloat(),
+                    color.green.toColorFloat(),
+                    color.blue.toColorFloat(),
+                    color.alpha.toColorFloat()
+                )
+            }
         }
     }
 }

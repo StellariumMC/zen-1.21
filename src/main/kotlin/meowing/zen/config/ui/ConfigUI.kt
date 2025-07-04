@@ -11,6 +11,7 @@ import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.types.*
 import meowing.zen.config.ui.core.*
 import meowing.zen.utils.DataUtils
+import java.awt.Color
 
 typealias ConfigData = Map<String, Any>
 
@@ -373,11 +374,32 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     fun registerListener(configKey: String, listener: (Any) -> Unit): ConfigUI {
         configListeners.getOrPut(configKey) { mutableListOf() }.add(listener)
         val currentValue = config[configKey] ?: getDefaultValue(elementRefs[configKey]?.type)
-        currentValue?.let { listener(it) }
+        currentValue?.let {
+            val resolvedValue = when (currentValue) {
+                is Map<*, *> -> currentValue.toColor()
+                else -> currentValue
+            }
+            listener(resolvedValue)
+        }
         return this
     }
 
-    fun getConfigValue(configKey: String): Any? = config[configKey]
+    fun getConfigValue(configKey: String): Any? {
+        val value = config[configKey] ?: return null
+        return when (value) {
+            is Map<*, *> -> value.toColor()
+            else -> value
+        }
+    }
 
     fun saveConfig() = dataUtils.save()
+}
+
+private fun Map<*, *>.toColor(): Color {
+    val map = this as Map<String, Any>
+    val r = (map["r"] as? Number)?.toInt() ?: 255
+    val g = (map["g"] as? Number)?.toInt() ?: 255
+    val b = (map["b"] as? Number)?.toInt() ?: 255
+    val a = (map["a"] as? Number)?.toInt() ?: 255
+    return Color(r, g, b, a)
 }

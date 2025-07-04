@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.Zen;
+import meowing.zen.feats.noclutter.hidefireoverlay;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRenderFire {
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
     private static void renderFireOverlay(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, CallbackInfo callbackInfo) {
-        if (Zen.config.getHidefireoverlay()) callbackInfo.cancel();
+        if (hidefireoverlay.INSTANCE.isEnabled()) callbackInfo.cancel();
     }
 }

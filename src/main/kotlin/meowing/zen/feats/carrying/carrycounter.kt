@@ -8,9 +8,9 @@ import meowing.zen.events.RenderEvent
 import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.DataUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.utils.LoopUtils
-import meowing.zen.utils.DataUtils
 import meowing.zen.utils.RenderUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorFloat

@@ -13,17 +13,14 @@ import net.minecraft.client.render.debug.DebugRenderer
 import net.minecraft.client.util.BufferAllocator
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
-import java.awt.Color
 
 object RenderUtils {
     fun renderEntityFilled(
         matrices: MatrixStack?,
-        vertexConsumers:
-        VertexConsumerProvider?,
+        vertexConsumers: VertexConsumerProvider?,
         x: Double,
         y: Double,
         z: Double,

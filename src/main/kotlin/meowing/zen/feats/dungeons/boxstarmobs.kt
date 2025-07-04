@@ -11,11 +11,17 @@ import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.entity.decoration.ArmorStandEntity
+import java.awt.Color
 
 object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
-    val entities = mutableListOf<Int>()
+    private val entities = mutableListOf<Int>()
+    private var color = Color(0, 255, 255, 127)
 
     override fun initialize() {
+        Zen.registerCallback("boxstarmobscolor") { newval ->
+            color = newval as Color
+        }
+
         register<EntityEvent.Join> { event ->
             if (event.entity !is ArmorStandEntity) return@register
             val ent = event.entity
@@ -46,7 +52,6 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
             val x = entityPos.x - cam.pos.x
             val y = entityPos.y - cam.pos.y
             val z = entityPos.z - cam.pos.z
-            val color = Zen.config.boxstarmobscolor
             RenderUtils.renderEntityOutline(
                 matrices,
                 vertex,

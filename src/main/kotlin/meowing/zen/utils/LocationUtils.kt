@@ -1,6 +1,8 @@
 package meowing.zen.utils
 
-import meowing.zen.events.*
+import meowing.zen.events.AreaEvent
+import meowing.zen.events.EventBus
+import meowing.zen.events.PacketEvent
 import meowing.zen.utils.Utils.removeEmotes
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
@@ -8,6 +10,8 @@ import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
+    private var cachedAreas = mutableMapOf<String?, Boolean>()
+    private var cachedSubareas = mutableMapOf<String?, Boolean>()
     var area: String? = null
     var subarea: String? = null
 
@@ -44,5 +48,24 @@ object LocationUtils {
                 }
             }
         })
+
+        EventBus.register<AreaEvent.Main> ({
+            cachedAreas.clear()
+        })
+        EventBus.register<AreaEvent.Sub> ({
+            cachedSubareas.clear()
+        })
+    }
+
+    fun checkArea(areaLower: String?): Boolean {
+        return cachedAreas.getOrPut(areaLower) {
+            areaLower?.let { area == it } ?: true
+        }
+    }
+
+    fun checkSubarea(subareaLower: String?): Boolean {
+        return cachedSubareas.getOrPut(subareaLower) {
+            subareaLower?.let { subarea?.contains(it) == true } ?: true
+        }
     }
 }

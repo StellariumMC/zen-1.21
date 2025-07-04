@@ -22,12 +22,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val draftself: Boolean get() = configUI.getConfigValue("draftself") as? Boolean ?: false
     val autogetdraft: Boolean get() = configUI.getConfigValue("autogetdraft") as? Boolean ?: false
 
-    val hidefallingblocks: Boolean get() = configUI.getConfigValue("hidefallingblocks") as? Boolean ?: false
-    val nothunder: Boolean get() = configUI.getConfigValue("nothunder") as? Boolean ?: false
-    val hidestatuseffects: Boolean get() = configUI.getConfigValue("hidestatuseffects") as? Boolean ?: false
-    val hidefireoverlay: Boolean get() = configUI.getConfigValue("hidefireoverlay") as? Boolean ?: false
     val boxstarmobscolor: Color get() = configUI.getConfigValue("boxstarmobscolor") as? Color ?: Color(0, 255, 255, 127)
-    val keyhighlightcolor: Color get() = configUI.getConfigValue("keyhighlightcolor") as? Color ?: Color(0, 255, 255, 127)
     val leapmessage: String get() = configUI.getConfigValue("leapmessage") as? String ?: "Leaping to"
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

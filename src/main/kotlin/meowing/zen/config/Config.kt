@@ -174,15 +174,15 @@ fun ZenConfig(): ConfigUI {
             "Time until vengeance procs.",
             ElementType.Switch(false)
         ))
+
+        // Slayers - Carrying
+
         .addElement("Slayers", "Carrying", ConfigElement(
             "carrycounter",
             "Carry counter",
             "Counts and sends the carries that you do.",
             ElementType.Switch(false)
         ))
-
-        // Slayers - Carrying
-
         .addElement("Slayers", "Carrying", ConfigElement(
             "carrycountsend",
             "Send count",

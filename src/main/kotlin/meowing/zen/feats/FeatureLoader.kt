@@ -39,7 +39,11 @@ object FeatureLoader {
         "dungeons.firefreeze",
         "dungeons.architectdraft",
         "dungeons.boxstarmobs",
-        "dungeons.leapannounce"
+        "dungeons.leapannounce",
+        "noclutter.hidefallingblocks",
+        "noclutter.hidefireoverlay",
+        "noclutter.hidestatuseffects",
+        "noclutter.nothunder"
     )
 
     private var moduleCount = 0
@@ -70,6 +74,6 @@ object FeatureLoader {
         loadtime = System.currentTimeMillis() - starttime
     }
 
-    fun getFeatCount(): Int = moduleCount + 4 // Mixin feats
+    fun getFeatCount(): Int = moduleCount
     fun getLoadtime(): Long = loadtime
 }
