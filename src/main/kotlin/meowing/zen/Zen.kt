@@ -69,9 +69,9 @@ class Zen : ClientModInitializer {
                 ChatUtils.addMessage("§c[Zen] §fThanks for installing Zen!")
                 ChatUtils.addMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
                 ChatUtils.addMessage("§7> §cDiscord:§b [Discord]", "Discord server", ClickEvent.Action.OPEN_URL, "https://discord.gg/KPmHQUC97G")
+                dataUtils.setData(data.copy(isFirstInstall = false))
+                dataUtils.save()
             }
-            dataUtils.setData(data.copy(isFirstInstall = false))
-            dataUtils.save()
             UpdateChecker.checkForUpdates()
             shown = true
         }
@@ -140,9 +140,7 @@ class Zen : ClientModInitializer {
         fun openConfig() {
             TickUtils.schedule(2) {
                 mc.execute {
-                    if (::configUI.isInitialized) {
-                        mc.setScreen(configUI)
-                    }
+                    if (::configUI.isInitialized) mc.setScreen(configUI)
                 }
             }
         }

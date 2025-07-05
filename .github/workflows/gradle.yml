@@ -1,25 +1,65 @@
-name: build
-on: [pull_request, push]
+name: Run Gradle Build
+
+on:
+  - push
+  - pull_request
 
 jobs:
-  build:
-    runs-on: ubuntu-24.04
+  gradle:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_NUMBER: ${{ github.run_number }}
     steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
-      - name: validate gradle wrapper
-        uses: gradle/actions/wrapper-validation@v4
-      - name: setup jdk
-        uses: actions/setup-java@v4
+      - name: Checkout source
+        uses: actions/checkout@v4.1.1
+
+      - name: Setup Java
+        uses: actions/setup-java@v4.0.0
         with:
-          java-version: '21'
-          distribution: 'microsoft'
-      - name: make gradle wrapper executable
+          distribution: temurin
+          java-version: 21
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-      - name: build
+
+      - name: Execute Gradle build
         run: ./gradlew build
-      - name: capture build artifacts
-        uses: actions/upload-artifact@v4
+
+      - name: Rename built JAR
+        run: |
+          ORIGINAL_JAR=$(find build/libs -name "*.jar" | head -n 1)
+          TARGET_JAR="build/libs/zen-1.21.5-fabric-dev-${BUILD_NUMBER}.jar"
+          mv "$ORIGINAL_JAR" "$TARGET_JAR"
+
+      - name: Upload built mod JAR
+        uses: actions/upload-artifact@v4.3.0
         with:
-          name: Artifacts
-          path: build/libs/
+          name: zen-1.21.5-fabric-dev-${{ github.run_number }}
+          path: build/libs/zen-1.21.5-fabric-dev-${{ github.run_number }}.jar
+
+  send-to-discord:
+    if: github.event_name == 'push'
+    needs: gradle
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK }}
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - name: Download built artifact
+        uses: actions/download-artifact@v4.1.7
+        with:
+          name: zen-1.21.5-fabric-dev-${{ github.run_number }}
+          path: ./artifact
+
+      - name: Send jar to Discord
+        run: |
+          JAR_FILE="./artifact/zen-1.21.5-fabric-dev-${BUILD_NUMBER}.jar"
+          echo "Uploading $JAR_FILE to Discord..."
+          curl -X POST \
+            -H "Content-Type: multipart/form-data" \
+            -F "payload_json={\"content\":\"Zen 1.21.5 dev build!\"}" \
+            -F "file=@${JAR_FILE}" \
+            "$DISCORD_WEBHOOK_URL"
