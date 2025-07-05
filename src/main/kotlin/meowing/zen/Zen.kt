@@ -77,9 +77,9 @@ class Zen : ClientModInitializer {
         }
 
         EventBus.register<GameEvent.Load> ({
+            FeatureLoader.init()
             configUI = ZenConfig()
             config = ConfigAccessor(configUI)
-            FeatureLoader.init()
             executePendingCallbacks()
         })
 

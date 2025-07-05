@@ -1,5 +1,8 @@
 package meowing.zen.feats.general
 
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
@@ -9,6 +12,16 @@ import java.util.Optional
 
 object damagetracker : Feature("damagetracker") {
     private val regex = "\\s|^§\\w\\D$".toRegex()
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("General", "Damage tracker", ConfigElement(
+                "damagetracker",
+                "Damage tracker",
+                "Sends the damage that you/others do in chat.",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<EntityEvent.Metadata> { event ->

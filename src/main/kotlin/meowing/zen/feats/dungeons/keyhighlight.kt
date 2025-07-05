@@ -1,7 +1,9 @@
 package meowing.zen.feats.dungeons
 
 import meowing.zen.Zen
-import meowing.zen.events.EntityEvent
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
@@ -11,6 +13,29 @@ import net.minecraft.entity.decoration.ArmorStandEntity
 import java.awt.Color
 
 object keyhighlight : Feature("keyhighlight", area = "catacombs") {
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Dungeons", "Keys", ConfigElement(
+                "keyalert",
+                "Key spawn alert",
+                "Displays a title when the wither/blood key spawns",
+                ElementType.Switch(false)
+            ))
+            .addElement("Dungeons", "Keys", ConfigElement(
+                "keyhighlight",
+                "Key highlight",
+                "Highlights the wither/blood key",
+                ElementType.Switch(false)
+            ))
+            .addElement("Dungeons", "Keys", ConfigElement(
+                "keyhighlightcolor",
+                "Key highlight color",
+                null,
+                ElementType.ColorPicker(Color(0, 255, 255, 127)),
+                { config -> config["keyhighlight"] as? Boolean == true }
+            ))
+    }
+
     override fun initialize() {
         var color = Color(0, 255, 255, 127)
 

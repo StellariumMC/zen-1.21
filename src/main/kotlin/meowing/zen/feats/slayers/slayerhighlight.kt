@@ -2,6 +2,9 @@ package meowing.zen.feats.slayers
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
@@ -10,6 +13,16 @@ import meowing.zen.utils.Utils.toColorFloat
 import java.awt.Color
 
 object slayerhighlight : Feature("slayerhighlight") {
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Slayers", "General", ConfigElement(
+                "slayerhighlight",
+                "Slayer highlight",
+                "Highlights your slayer boss.",
+                ElementType.Switch(false)
+            ))
+    }
+
     override fun initialize() {
         var color = Color(0, 255, 255, 127)
         var filled = false

@@ -34,6 +34,7 @@ object FeatureLoader {
         "dungeons.bloodtimer",
         "dungeons.cryptreminder",
         "dungeons.keyalert",
+        "dungeons.keyhighlight",
         "dungeons.partyfinder",
         "dungeons.serverlagtimer",
         "dungeons.termtracker",
@@ -63,7 +64,7 @@ object FeatureLoader {
                 e.printStackTrace()
             }
         }
-        
+
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             calculator.register(dispatcher)
         }

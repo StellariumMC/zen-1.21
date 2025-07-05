@@ -1,6 +1,7 @@
 package meowing.zen.feats
 
 import meowing.zen.Zen
+import meowing.zen.config.ui.ConfigUI
 import meowing.zen.events.Event
 import meowing.zen.events.EventBus
 import meowing.zen.utils.LocationUtils
@@ -30,6 +31,8 @@ open class Feature(
     open fun onRegister() {}
 
     open fun onUnregister() {}
+
+    open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
 
     private fun INTERNAL_isEnabled(): Boolean {
         return try {

@@ -1,5 +1,8 @@
 package meowing.zen.feats.general
 
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
@@ -9,6 +12,16 @@ import java.util.regex.Pattern
 object guildmessage : Feature("guildmessage") {
     private val guildPattern = Pattern.compile("Guild > (?:(\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("General", "Clean Chat", ConfigElement(
+                "guildmessage",
+                "Clean guild messages",
+                "Replaces the guild chat messages with a cleaner version of them.",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -45,6 +58,16 @@ object guildmessage : Feature("guildmessage") {
 object partymessage : Feature("partymessage") {
     private val partyPattern = Pattern.compile("Party > (?:(\\[.+?])? ?(.+?)): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("General", "Clean Chat", ConfigElement(
+                "partymessage",
+                "Clean party messages",
+                "Replaces the party chat messages with a cleaner version of them.",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

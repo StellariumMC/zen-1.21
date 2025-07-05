@@ -2,6 +2,9 @@ package meowing.zen.feats.carrying
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
@@ -17,6 +20,7 @@ import meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.Text
+import java.awt.Color
 import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
@@ -37,6 +41,55 @@ object carrycounter : Feature("carrycounter") {
 
     val carryees get() = carryeesByName.values.toList()
     val dataUtils = DataUtils("carrylogs", CarryLogs())
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carrycounter",
+                "Carry counter",
+                "Counts and sends the carries that you do.",
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carrycountsend",
+                "Send count",
+                "Sends the count in party chat",
+                ElementType.Switch(true)
+            )
+            )
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carrybosshighlight",
+                "Carry boss highlight",
+                "Highlights your client's boss.",
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carrybosshighlightcolor",
+                "Carry boss highlight color",
+                "The color for boss highlight",
+                ElementType.ColorPicker(Color(0, 255, 255, 127)),
+                { config -> config["carrybosshighlight"] as? Boolean == true }
+            ))
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carryclienthighlight",
+                "Carry client highlight",
+                "Highlights your client's boss.",
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carryclienthighlightcolor",
+                "Carry client highlight color",
+                "The color for client highlight",
+                ElementType.ColorPicker(Color(0, 255, 255, 127)),
+                { config -> config["carryclienthighlight"] as? Boolean == true }
+            ))
+            .addElement("Slayers", "Carrying", ConfigElement(
+                "carryvalue",
+                "Carry value",
+                "Carry values for the mod to automatically detect in a trade",
+                ElementType.TextInput("1.3", "1.3")
+            ))
+    }
 
     override fun initialize() {
         LoopUtils.loop(400) {

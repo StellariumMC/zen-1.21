@@ -4,12 +4,25 @@ import meowing.zen.events.EventBus
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.utils.TickUtils
 
 object worldage : Feature("worldage") {
     private var tickCall: EventBus.EventCall? = null
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("General", "World age", ConfigElement(
+                "worldage",
+                "Send world age",
+                "Sends world age to your chat.",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<WorldEvent.Change> {

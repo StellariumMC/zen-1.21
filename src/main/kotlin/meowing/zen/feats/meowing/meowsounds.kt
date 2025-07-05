@@ -2,12 +2,25 @@ package meowing.zen.feats.meowing
 
 import meowing.zen.feats.Feature
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
 
 object meowsounds : Feature("meowsounds") {
     private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Meowing", "Meow Sounds", ConfigElement(
+                "meowdeathsounds",
+                "Meow Death Sounds",
+                "Plays a cat sound whenever an entity dies",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<ChatEvent.Receive> {

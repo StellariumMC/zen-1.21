@@ -1,5 +1,8 @@
 package meowing.zen.feats.meowing
 
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
@@ -17,6 +20,16 @@ object automeow : Feature("automeow") {
         "Officer >" to "oc",
         "Co-op >" to "cc"
     )
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Meowing", "Auto meow", ConfigElement(
+                "automeow",
+                "Auto Meow",
+                "Automatically responds with a meow message whenever someone sends meow in chat.",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

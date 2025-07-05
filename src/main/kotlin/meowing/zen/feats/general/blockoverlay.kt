@@ -2,6 +2,9 @@ package meowing.zen.feats.general
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import meowing.zen.feats.Feature
 import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.block.ShapeContext
@@ -12,6 +15,23 @@ import meowing.zen.events.RenderEvent
 import java.awt.Color
 
 object blockoverlay : Feature("blockoverlay") {
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("General", "Block overlay", ConfigElement(
+                "blockoverlay",
+                "Block overlay",
+                "Custom block highlighting",
+                ElementType.Switch(false)
+            ))
+            .addElement("General", "Block overlay", ConfigElement(
+                "blockoverlaycolor",
+                "Block overlay color",
+                "The color for Block overlay",
+                ElementType.ColorPicker(Color(0, 255, 255, 127)),
+                { config -> config["blockoverlay"] as? Boolean == true }
+            ))
+    }
+
     override fun initialize() {
         var color = Color(255, 255, 255, 255)
 

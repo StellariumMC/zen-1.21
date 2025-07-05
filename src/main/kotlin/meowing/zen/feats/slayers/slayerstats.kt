@@ -8,6 +8,9 @@ import meowing.zen.hud.HudRenderer
 import meowing.zen.utils.ChatUtils
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
+import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.types.ConfigElement
+import meowing.zen.config.ui.types.ElementType
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
@@ -19,6 +22,16 @@ object slayerstats : Feature("slayerstats") {
     private var sessionStart = System.currentTimeMillis()
     private var totalKillTime = 0L
     private var hudElement: HudElement? = null
+
+    override fun addConfig(configUI: ConfigUI): ConfigUI {
+        return configUI
+            .addElement("Slayers", "General", ConfigElement(
+                "slayerstats",
+                "Slayer stats",
+                "Shows stats about your kill times",
+                ElementType.Switch(false)
+            ))
+    }
 
     override fun initialize() {
         hudElement = HudElement(10f, 150f, 200f, 50f, 1.0f, true, "slayerstats", "Slayer Stats")
