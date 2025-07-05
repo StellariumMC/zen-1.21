@@ -10,13 +10,14 @@ import meowing.zen.utils.Utils.toColorFloat
 import java.awt.Color
 
 object slayerhighlight : Feature("slayerhighlight") {
-    private var filled = false
-    private var color = Zen.config.slayerhighlightcolor
-
     override fun initialize() {
+        var color = Color(0, 255, 255, 127)
+        var filled = false
+
         Zen.registerCallback("slayerhighlightfilled") { newval ->
             filled = newval as Boolean
         }
+
         Zen.registerCallback("slayerhighlightcolor") { newval ->
             color = newval as Color
         }

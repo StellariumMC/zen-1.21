@@ -365,9 +365,10 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
 private fun Map<*, *>.toColor(): Color {
     val map = this as Map<String, Any>
-    val r = (map["r"] as? Number)?.toInt() ?: 255
-    val g = (map["g"] as? Number)?.toInt() ?: 255
-    val b = (map["b"] as? Number)?.toInt() ?: 255
-    val a = (map["a"] as? Number)?.toInt() ?: 255
-    return Color(r, g, b, a)
+    val packedValue = (map["value"] as? Number)?.toInt() ?: 0
+    val alpha = ((map["falpha"] as? Number)?.toDouble() ?: 1.0) * 255
+    val r = (packedValue shr 16) and 0xFF
+    val g = (packedValue shr 8) and 0xFF
+    val b = packedValue and 0xFF
+    return Color(r, g, b, alpha.toInt())
 }

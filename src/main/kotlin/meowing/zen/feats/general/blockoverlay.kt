@@ -8,20 +8,15 @@ import net.minecraft.block.ShapeContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
-import com.mojang.blaze3d.systems.RenderSystem
 import meowing.zen.events.RenderEvent
 import java.awt.Color
 
 object blockoverlay : Feature("blockoverlay") {
-    private var color = Color(0, 255, 255, 127)
-    private var width = 2f
-
     override fun initialize() {
+        var color = Color(255, 255, 255, 255)
+
         Zen.registerCallback("blockoverlaycolor") { newval ->
             color = newval as Color
-        }
-        Zen.registerCallback("blockoverlaywidth") { newval ->
-            width = (newval as Double).toFloat()
         }
 
         register<RenderEvent.BlockOutline> { event ->
@@ -32,7 +27,6 @@ object blockoverlay : Feature("blockoverlay") {
             if (blockShape.isEmpty) return@register
 
             val camPos = camera.pos
-            RenderSystem.lineWidth(width)
             event.cancel()
             VertexRendering.drawOutline(
                 event.worldContext.matrixStack(),

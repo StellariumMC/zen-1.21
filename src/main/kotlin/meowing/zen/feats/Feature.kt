@@ -31,7 +31,7 @@ open class Feature(
 
     open fun onUnregister() {}
 
-    private fun _isEnabled(): Boolean {
+    private fun INTERNAL_isEnabled(): Boolean {
         return try {
             val configEnabled = configKey?.let {
                 Zen.config.getValue(it, false)
@@ -42,7 +42,7 @@ open class Feature(
         }
     }
 
-    fun isEnabled(): Boolean = _isEnabled() && inArea() && inSubarea()
+    fun isEnabled(): Boolean = INTERNAL_isEnabled() && inArea() && inSubarea()
 
     fun update() = onToggle(isEnabled())
 

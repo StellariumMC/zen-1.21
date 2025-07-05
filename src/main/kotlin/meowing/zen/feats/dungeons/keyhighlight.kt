@@ -11,9 +11,9 @@ import net.minecraft.entity.decoration.ArmorStandEntity
 import java.awt.Color
 
 object keyhighlight : Feature("keyhighlight", area = "catacombs") {
-    private var color = Color(0, 255, 255, 127)
-
     override fun initialize() {
+        var color = Color(0, 255, 255, 127)
+
         Zen.registerCallback("keyhighlightcolor") { newval ->
             color = newval as Color
         }

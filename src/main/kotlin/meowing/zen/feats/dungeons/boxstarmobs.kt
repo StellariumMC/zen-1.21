@@ -15,9 +15,10 @@ import java.awt.Color
 
 object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
     private val entities = mutableListOf<Int>()
-    private var color = Color(0, 255, 255, 127)
 
     override fun initialize() {
+        var color = Color(0, 255, 255, 127)
+
         Zen.registerCallback("boxstarmobscolor") { newval ->
             color = newval as Color
         }
