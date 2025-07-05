@@ -69,7 +69,7 @@ jobs:
           echo "Uploading $JAR_FILE to Discord..."
 
           EMBED_PAYLOAD=$(jq -n \
-            --arg title "Zen 1.21.5 dev build!" \
+            --arg title "Zen 1.21.5 dev build" \
             --arg desc "[Commit: $COMMIT_MESSAGE]($COMMIT_URL)" \
             '{embeds: [{title: $title, description: $desc, color: 5814783}]}')
 
