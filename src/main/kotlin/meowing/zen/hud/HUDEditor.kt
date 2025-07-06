@@ -1,5 +1,6 @@
 package meowing.zen.hud
 
+import meowing.zen.hud.HUDManager.setPosition
 import meowing.zen.utils.Utils
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
@@ -25,12 +26,23 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private var scaleStartMouseY = 0
     private val undoStack = mutableListOf<Map<String, HUDPosition>>()
     private val redoStack = mutableListOf<Map<String, HUDPosition>>()
+    private var dirty = false
 
     override fun init() {
         super.init()
         elements.clear()
         loadElements()
         saveState()
+        dirty = false
+    }
+
+    override fun close() {
+        super.close()
+        if (dirty) {
+            elements.forEach { element ->
+                setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
+            }
+        }
     }
 
     private fun loadElements() {
@@ -52,7 +64,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             drawToolbar(context, mouseX, mouseY)
             drawElementList(context, mouseX, mouseY)
             selected?.let { drawProperties(context, it) }
-            drawTooltips(context, mouseX, mouseY)
+            drawTooltips(context)
         } else {
             drawPreviewHint(context)
         }
@@ -164,7 +176,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.drawTextWithShadow(textRenderer, "Enabled: ${element.enabled}", x + 15, y + 70, Color.WHITE.rgb)
     }
 
-    private fun drawTooltips(context: DrawContext, mouseX: Int, mouseY: Int) {
+    private fun drawTooltips(context: DrawContext) {
         val tooltip = when {
             scaling != null -> "Left/Right: Fine Scale, Up/Down: Coarse Scale"
             selected != null && (Screen.hasShiftDown()) -> "Hold Shift + Click to start scaling"
@@ -239,7 +251,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val element = elements[clickedIndex]
         if (mouseX >= listX + listWidth - 40) {
             element.enabled = !element.enabled
-            HUDManager.setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
+            dirty = true
         } else {
             selected = element
         }
@@ -292,12 +304,13 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
         scaling?.let { element ->
-            HUDManager.setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
+            dirty = true
             scaling = null
         }
 
         dragging?.let { element ->
-            HUDManager.setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
+            dragging = null
+            dirty = true
         }
         dragging = null
         return super.mouseReleased(mouseX, mouseY, button)
@@ -328,7 +341,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun scale(element: HUDElement, delta: Float) {
         saveState()
         element.scale = (element.scale + delta).coerceIn(0.2f, 5f)
-        HUDManager.setPosition(element.name, element.targetX, element.targetY, element.scale, element.enabled)
+        dirty = true
     }
 
     private fun move(element: HUDElement, deltaX: Int, deltaY: Int) {
@@ -341,13 +354,13 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val clampedY = newY.coerceIn(0f, (height - element.height).toFloat())
 
         element.setPosition(clampedX, clampedY)
-        HUDManager.setPosition(element.name, clampedX, clampedY, element.scale, element.enabled)
+        dirty = true
     }
 
     private fun delete(element: HUDElement) {
         saveState()
         element.enabled = false
-        HUDManager.setPosition(element.name, element.targetX, element.targetY, element.scale, false)
+        dirty = true
         selected = null
     }
 
@@ -357,8 +370,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             element.setPosition(10f, 10f)
             element.enabled = true
             element.scale = 1f
-            HUDManager.setPosition(element.name, 10f, 10f, 1f, true)
         }
+        dirty = true
     }
 
     private fun saveState() {
@@ -372,6 +385,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         if (undoStack.size > 1) {
             redoStack.add(undoStack.removeLast())
             applyState(undoStack.last())
+            dirty = true
         }
     }
 
@@ -380,6 +394,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             val state = redoStack.removeLast()
             undoStack.add(state)
             applyState(state)
+            dirty = true
         }
     }
 
@@ -389,7 +404,6 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                 element.setPosition(pos.x, pos.y)
                 element.scale = pos.scale
                 element.enabled = pos.enabled
-                HUDManager.setPosition(element.name, pos.x, pos.y, pos.scale, pos.enabled)
             }
         }
     }
