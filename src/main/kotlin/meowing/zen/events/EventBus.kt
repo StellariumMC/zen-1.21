@@ -56,7 +56,7 @@ object EventBus {
                 post(GuiEvent.Close(screen))
             }
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
-                post(GuiEvent.AfterRender(screen))
+                post(GuiEvent.AfterRender(screen, context))
             }
         }
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->

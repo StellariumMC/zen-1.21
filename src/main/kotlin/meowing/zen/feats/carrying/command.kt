@@ -6,8 +6,10 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.mc
+import meowing.zen.hud.HUDEditor
+import meowing.zen.hud.HUDManager
 import meowing.zen.utils.ChatUtils
-import meowing.zen.hud.HudEditorScreen
 import meowing.zen.utils.TickUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -213,9 +215,8 @@ object carrycommand {
         if (!checkEnabled()) return 0
 
         TickUtils.schedule(2) {
-            val client = MinecraftClient.getInstance()
-            client.execute {
-                client.setScreen(HudEditorScreen())
+            mc.execute {
+                mc.setScreen(HUDEditor())
             }
         }
         ChatUtils.addMessage("§c[Zen] §fOpened HUD editor.")

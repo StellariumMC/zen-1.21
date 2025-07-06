@@ -6,13 +6,11 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.*
 import meowing.zen.feats.Feature
-import meowing.zen.hud.HudElement
-import meowing.zen.hud.HudManager
-import meowing.zen.hud.HudRenderer
+import meowing.zen.hud.HUDEditor
+import meowing.zen.hud.HUDManager
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.text.Text
 import net.minecraft.util.Colors
@@ -24,7 +22,6 @@ object vengtimer : Feature("vengtimer") {
     private val fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$")
     private var isFighting = false
     private var cachedNametag: net.minecraft.entity.Entity? = null
-    private var hudElement: HudElement? = null
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -37,8 +34,7 @@ object vengtimer : Feature("vengtimer") {
     }
 
     override fun initialize() {
-        hudElement = HudElement(100f, 200f, 100f, 20f, 1.0f, true, "vengtimer", "Veng Timer")
-        HudManager.registerCustom(hudElement!!, VengTimerRenderer(hudElement!!))
+        HUDManager.register("vengtimer", "§bVeng proc: §c4.3s", "Slayers")
 
         register<ScoreboardEvent.Update> { event ->
             val world = mc.world ?: return@register
@@ -87,6 +83,8 @@ object vengtimer : Feature("vengtimer") {
                 }
             }
         }
+
+        register<GuiEvent.Hud> { renderHUD(it.context) }
     }
 
     private fun cleanup() {
@@ -95,40 +93,28 @@ object vengtimer : Feature("vengtimer") {
         if (starttime > 0) starttime = 0
     }
 
-    fun getDisplayText(): String {
+    fun renderHUD(context: DrawContext) {
+        if (!HUDManager.isEnabled("vengtimer")) return
+
+        val text = getDisplayText()
+        if (text.isEmpty()) return
+
+        val x = HUDManager.getX("vengtimer")
+        val y = HUDManager.getY("vengtimer")
+        val scale = HUDManager.getScale("vengtimer")
+
+        context.matrices.push()
+        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
+        context.matrices.scale(scale, scale, 1.0f)
+        context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, false)
+        context.matrices.pop()
+    }
+
+    private fun getDisplayText(): String {
         if (hit && starttime > 0) {
             val timeLeft = (starttime - System.currentTimeMillis()) / 1000.0
             if (timeLeft > 0) return "§bVeng proc: §c${"%.1f".format(timeLeft)}s"
         }
         return ""
-    }
-}
-
-class VengTimerRenderer(element: HudElement) : HudRenderer(element) {
-    override fun render(context: DrawContext, tickCounter: RenderTickCounter) {
-        val text = vengtimer.getDisplayText()
-        if (text.isEmpty() && !HudManager.editMode) return
-
-        val displayText =
-            if (HudManager.editMode && text.isEmpty()) "§bVeng proc: §c4.3s"
-            else text
-
-        val actualX = element.getActualX(mc.window.scaledWidth)
-        val actualY = element.getActualY(mc.window.scaledHeight)
-
-        context.matrices.push()
-        context.matrices.translate(actualX.toDouble(), actualY.toDouble(), 0.0)
-        context.matrices.scale(element.scale, element.scale, 1.0f)
-        context.drawText(mc.textRenderer, displayText, 0, 0, Colors.WHITE, false)
-        context.matrices.pop()
-    }
-
-    override fun getPreviewSize(): Pair<Float, Float> {
-        val text = if (HudManager.editMode) "§bVeng proc: §c4.3s" else vengtimer.getDisplayText()
-        val displayText = text.ifEmpty { "§bVeng proc: §c4.3s" }
-        return Pair(
-            mc.textRenderer.getWidth(displayText) * element.scale,
-            mc.textRenderer.fontHeight * element.scale
-        )
     }
 }

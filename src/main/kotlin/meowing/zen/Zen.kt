@@ -18,8 +18,8 @@ import meowing.zen.events.AreaEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
 import meowing.zen.feats.FeatureLoader
+import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.ChatUtils
-import meowing.zen.hud.HudEditorScreen
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
 
@@ -41,7 +41,7 @@ class Zen : ClientModInitializer {
             val hudCmd = Command<FabricClientCommandSource> { _ ->
                 TickUtils.schedule(1) {
                     mc.execute {
-                        mc.setScreen(HudEditorScreen())
+                        mc.setScreen(HUDEditor())
                     }
                 }
                 1

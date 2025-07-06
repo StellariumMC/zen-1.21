@@ -1,254 +1,168 @@
 package meowing.zen.feats.carrying
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
-import meowing.zen.hud.HudElement
-import meowing.zen.hud.HudManager
-import meowing.zen.hud.HudRenderer
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback
+import meowing.zen.hud.HUDEditor
+import meowing.zen.hud.HUDManager
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.util.Colors
-import net.minecraft.util.Identifier
-import net.minecraft.util.math.ColorHelper
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer
 
-object CarryHudState {
-    var element: HudElement? = null
-    var renderer: carryhud? = null
+object CarryHUD {
+    private data class Button(val x: Float, val y: Float, val width: Float, val height: Float, val action: String, val carryee: carrycounter.Carryee, val tooltip: String)
+    private data class RenderItem(val text: String, val x: Float, val y: Float, val color: Int, val shadow: Boolean)
 
-    fun init() {
-        if (element != null) return
-        element = HudElement(100f, 100f, 200f, 50f, 1.0f, true, "carry_hud", "Carry HUD")
-        renderer = carryhud(element!!)
-        HudManager.registerCustom(element!!, renderer!!)
-        HudLayerRegistrationCallback.EVENT.register { registrar ->
-            registrar.addLayer(object : IdentifiedLayer {
-                override fun render(context: DrawContext, tickCounter: RenderTickCounter) {
-                    if (!HudManager.editMode && element!!.enabled) renderer!!.render(context, tickCounter)
+    private val buttons = mutableListOf<Button>()
+    private val renderItems = mutableListOf<RenderItem>()
+    private var hoveredButton: Button? = null
+    private var isRegistered = false
+    private var guiClickHandler: EventBus.EventCall? = null
+    private var guiDrawHandler: EventBus.EventCall? = null
+    private const val name = "CarryHud"
+
+    fun initialize() {
+        HUDManager.register(name, "§c[Zen] §f§lCarries:\n§7> §bPlayer1§f: §b5§f/§b10 §7(2.3s | 45/hr)\n§7> §bPlayer2§f: §b1§f/§b3 §7(15.7s | 32/hr)")
+    }
+
+    fun renderHUD(context: DrawContext) {
+        if (carrycounter.carryees.isEmpty() || Zen.isInInventory || !HUDManager.isEnabled(name)) return
+
+        val x = HUDManager.getX(name)
+        val y = HUDManager.getY(name)
+
+        val lines = getLines()
+        if (lines.isNotEmpty()) {
+            var currentY = y
+            for (line in lines) {
+                context.drawText(mc.textRenderer, line, x.toInt(), currentY.toInt(), Colors.WHITE, false)
+                currentY += mc.textRenderer.fontHeight + 2
+            }
+        }
+    }
+
+    private fun getLines(): List<String> {
+        if (carrycounter.carryees.isEmpty() || Zen.isInInventory) return emptyList()
+
+        val lines = mutableListOf<String>()
+        lines.add("§c[Zen] §f§lCarries:")
+        carrycounter.carryees.mapTo(lines) {
+            "§7> §b${it.name}§f: §b${it.count}§f/§b${it.total} §7(${it.getTimeSinceLastBoss()} | ${it.getBossPerHour()}§7)"
+        }
+        return lines
+    }
+
+    fun checkRegistration() {
+        val shouldRegister = carrycounter.carryees.isNotEmpty()
+        if (shouldRegister != isRegistered) {
+            try {
+                if (shouldRegister) {
+                    guiClickHandler = EventBus.register<GuiEvent.Click> ({ onMouseInput() })
+                    guiDrawHandler = EventBus.register<GuiEvent.AfterRender> ({ onGuiRender(it.context) })
+                } else {
+                    guiClickHandler?.unregister()
+                    guiDrawHandler?.unregister()
                 }
-                override fun id(): Identifier? = Identifier.of("zen", "carry_hud")
-            })
-        }
-    }
-}
-
-data class ButtonInfo(val tooltip: String, val x: Int, val y: Int, val width: Int, val height: Int)
-
-class carryhud(element: HudElement) : HudRenderer(element) {
-    private var hoveredButton: ButtonInfo? = null
-
-    init {
-        EventBus.register<GuiEvent.Click> ({ event ->
-            if (event.state) handleClick(event.mx, event.my)
-        })
-        EventBus.register<GuiEvent.AfterRender> ({ event ->
-            if (event.screen is HandledScreen<*>) renderInventoryOverlay()
-        })
-        CarryHudState.element = element
-        CarryHudState.renderer = this
-    }
-
-    override fun render(context: DrawContext, tickCounter: RenderTickCounter) {
-        if (!HudManager.editMode && carrycounter.carryees.isEmpty()) return
-        if (HudManager.editMode && getDummyCarryees().isEmpty()) return
-
-        val actualX = element.getActualX(mc.window.scaledWidth)
-        val actualY = element.getActualY(mc.window.scaledHeight)
-
-        context.matrices.push()
-        context.matrices.translate(actualX.toDouble(), actualY.toDouble(), 0.0)
-        context.matrices.scale(element.scale, element.scale, 1.0f)
-
-        context.drawText(mc.textRenderer, "§c[Zen] §f§lCarries:", 0, 0, Colors.WHITE, false)
-
-        if (HudManager.editMode) {
-            getDummyCarryees().forEachIndexed { i, carryee ->
-                val y = 12 + i * 12
-                val text = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-                context.drawText(mc.textRenderer, text, 0, y, Colors.WHITE, false)
-            }
-        } else {
-            carrycounter.carryees.forEachIndexed { i, carryee ->
-                val y = 12 + i * 12
-                val text = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-                context.drawText(mc.textRenderer, text, 0, y, Colors.WHITE, false)
+                isRegistered = shouldRegister
+            } catch (e: Exception) {
+                isRegistered = false
             }
         }
-
-        context.matrices.pop()
     }
 
-    override fun getPreviewSize(): Pair<Float, Float> {
-        val titleWidth = mc.textRenderer.getWidth("§c[Zen] §f§lCarries:")
-        val maxWidth = if (HudManager.editMode) {
-            getDummyCarryees().maxOfOrNull { carryee ->
-                mc.textRenderer.getWidth("§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)")
-            } ?: titleWidth
-        } else {
-            carrycounter.carryees.maxOfOrNull { carryee ->
-                mc.textRenderer.getWidth("§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)")
-            } ?: titleWidth
-        }
-
-        val size = if (HudManager.editMode) getDummyCarryees().size else carrycounter.carryees.size
-        return Pair(
-            maxOf(titleWidth, maxWidth) * element.scale,
-            (12 + size * 12) * element.scale
-        )
+    private fun onGuiRender(context: DrawContext) {
+        if (carrycounter.carryees.isEmpty() || !Zen.isInInventory || !HUDManager.isEnabled(name)) return
+        buildRenderData()
+        render(context)
     }
 
-    private fun getDummyCarryees() = listOf(
-        DummyCarryee("Player1", 45, 50, "129s", "23/h"),
-        DummyCarryee("Player2", 23, 30, "45s", "60/h"),
-        DummyCarryee("Player3", 67, 100, "32s", "46/h")
-    )
+    private fun onMouseInput() {
+        if (carrycounter.carryees.isEmpty() || !Zen.isInInventory) return
 
-    fun renderInventoryOverlay() {
-        if (!HudManager.editMode && carrycounter.carryees.isEmpty()) return
-        if (HudManager.editMode && getDummyCarryees().isEmpty()) return
+        val window = mc.window
+        val mouseX = mc.mouse.x * window.scaledWidth / window.width
+        val mouseY = mc.mouse.y * window.scaledHeight / window.height
 
-        val context = mc.currentScreen?.let {
-            if (it is HandledScreen<*>) DrawContext(mc, mc.bufferBuilders.entityVertexConsumers) else null
-        } ?: return
-
-        val mouseX = mc.mouse.x.toInt() * mc.window.scaledWidth / mc.window.width
-        val mouseY = mc.mouse.y.toInt() * mc.window.scaledHeight / mc.window.height
-        val actualX = element.getActualX(mc.window.scaledWidth)
-        val actualY = element.getActualY(mc.window.scaledHeight)
-        hoveredButton = null
-
-        context.matrices.push()
-        context.matrices.translate(actualX.toDouble(), actualY.toDouble(), 0.0)
-        context.matrices.scale(element.scale, element.scale, 1.0f)
-
-        context.drawText(mc.textRenderer, "§c[Zen] §f§lCarries:", 0, 0, Colors.WHITE, true)
-
-        if (HudManager.editMode) {
-            getDummyCarryees().forEachIndexed { i, carryee ->
-                val y = 12 + i * 12
-                val text = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-                val x = mc.textRenderer.getWidth(text) + 4
-
-                context.drawText(mc.textRenderer, text, 0, y, Colors.WHITE, true)
-
-                val buttons = listOf(
-                    Triple(x, "§a[+]", "§aIncrease"),
-                    Triple(x + 20, "§c[-]", "§cDecrease"),
-                    Triple(x + 40, "§4[×]", "§4Remove")
-                )
-
-                buttons.forEach { (btnX, btnText, tooltip) ->
-                    context.drawText(mc.textRenderer, btnText, btnX, y, Colors.WHITE, true)
-                    if (isMouseOver(mouseX, mouseY, actualX, actualY, btnX, y, 18, 10))
-                        hoveredButton = ButtonInfo(tooltip, btnX, y, 18, 10)
-                }
-            }
-        } else {
-            carrycounter.carryees.forEachIndexed { i, carryee ->
-                val y = 12 + i * 12
-                val text = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-                val x = mc.textRenderer.getWidth(text) + 4
-
-                context.drawText(mc.textRenderer, text, 0, y, Colors.WHITE, true)
-
-                val buttons = listOf(
-                    Triple(x, "§a[+]", "§aIncrease"),
-                    Triple(x + 20, "§c[-]", "§cDecrease"),
-                    Triple(x + 40, "§4[×]", "§4Remove")
-                )
-
-                buttons.forEach { (btnX, btnText, tooltip) ->
-                    context.drawText(mc.textRenderer, btnText, btnX, y, Colors.WHITE, true)
-                    if (isMouseOver(mouseX, mouseY, actualX, actualY, btnX, y, 18, 10))
-                        hoveredButton = ButtonInfo(tooltip, btnX, y, 18, 10)
+        buttons.find {
+            mouseX >= it.x && mouseX <= it.x + it.width &&
+                    mouseY >= it.y && mouseY <= it.y + it.height
+        }?.let { button ->
+            when (button.action) {
+                "add" -> if (button.carryee.count < button.carryee.total) button.carryee.count++
+                "subtract" -> if (button.carryee.count > 0) button.carryee.count--
+                "remove" -> {
+                    carrycounter.removeCarryee(button.carryee.name)
+                    checkRegistration()
                 }
             }
         }
+    }
 
-        context.matrices.pop()
+    private fun buildRenderData() {
+        val x = HUDManager.getX(name)
+        val y = HUDManager.getY(name)
+
+        renderItems.clear()
+        buttons.clear()
+        renderItems.add(RenderItem("§c[Zen] §f§lCarries:", x, y, Colors.WHITE, true))
+
+        carrycounter.carryees.forEachIndexed { i, carryee ->
+            val lineY = y + 12f + i * 12
+            val str = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
+            val textWidth = mc.textRenderer.getWidth(str)
+            val btnX = x + textWidth + 4
+
+            renderItems.add(RenderItem(str, x, lineY, Colors.WHITE, true))
+
+            listOf(
+                "add" to "§a[+]",
+                "subtract" to "§c[-]",
+                "remove" to "§4[×]"
+            ).forEachIndexed { j, (action, text) ->
+                val buttonX = btnX + j * 20
+                buttons.add(Button(
+                    buttonX, lineY, 18f, 10f, action, carryee,
+                    when(action) {
+                        "add" -> "§aIncrease"
+                        "subtract" -> "§cDecrease"
+                        else -> "§4Remove"
+                    }
+                ))
+                renderItems.add(RenderItem(text, buttonX, lineY, 0xAAAAAA, false))
+            }
+        }
+    }
+
+    private fun render(context: DrawContext) {
+        val window = mc.window
+        val mouseX = mc.mouse.x * window.scaledWidth / window.width
+        val mouseY = mc.mouse.y * window.scaledHeight / window.height
+
+        hoveredButton = buttons.find {
+            mouseX >= it.x && mouseX <= it.x + it.width &&
+                    mouseY >= it.y && mouseY <= it.y + it.height
+        }
+
+        renderItems.forEach { item ->
+            val color = if (item.shadow || hoveredButton?.let { btn ->
+                    btn.x == item.x && btn.y == item.y
+                } != true) item.color else Colors.WHITE
+
+            context.drawText(mc.textRenderer, item.text, item.x.toInt(), item.y.toInt(), color, item.shadow)
+        }
+
         renderTooltip(context, mouseX, mouseY)
     }
 
-    private fun renderTooltip(context: DrawContext, mouseX: Int, mouseY: Int) {
+    private fun renderTooltip(context: DrawContext, mouseX: Double, mouseY: Double) {
         hoveredButton?.let { button ->
             val tooltipWidth = mc.textRenderer.getWidth(button.tooltip) + 8
             val tooltipHeight = 16
-            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2, mc.window.scaledWidth - tooltipWidth - 2)
-            val tooltipY = (mouseY - tooltipHeight - 8).coerceAtLeast(2)
+            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (mc.window.scaledWidth - tooltipWidth - 2).toDouble()).toInt()
+            val tooltipY = (mouseY - tooltipHeight - 8).coerceAtLeast(2.0).toInt()
 
-            context.matrices.push()
-            context.matrices.translate(0.0, 0.0, 300.0)
-
-            context.fill(tooltipX, tooltipY, tooltipX + tooltipWidth, tooltipY + tooltipHeight,
-                ColorHelper.getArgb(200, 0, 0, 0))
-
-            val borderColor = ColorHelper.getArgb(255, 100, 100, 100)
-            listOf(
-                Pair(tooltipX - 1 to tooltipY - 1, (tooltipX + tooltipWidth + 1) to tooltipY),
-                Pair(tooltipX - 1 to (tooltipY + tooltipHeight), (tooltipX + tooltipWidth + 1) to (tooltipY + tooltipHeight + 1)),
-                Pair(tooltipX - 1 to tooltipY, tooltipX to (tooltipY + tooltipHeight)),
-                Pair((tooltipX + tooltipWidth) to tooltipY, (tooltipX + tooltipWidth + 1) to (tooltipY + tooltipHeight))
-            ).forEach { (start, end) ->
-                context.fill(start.first, start.second, end.first, end.second, borderColor)
-            }
-
+            context.fill(tooltipX, tooltipY, tooltipX + tooltipWidth, tooltipY + tooltipHeight, 0xC8000000.toInt())
             context.drawText(mc.textRenderer, button.tooltip, tooltipX + 4, tooltipY + 4, Colors.WHITE, false)
-            context.matrices.pop()
         }
     }
-
-    private fun isMouseOver(mouseX: Int, mouseY: Int, actualX: Float, actualY: Float, btnX: Int, btnY: Int, width: Int, height: Int): Boolean {
-        return mouseX >= actualX + btnX * element.scale && mouseX <= actualX + (btnX + width) * element.scale && mouseY >= actualY + btnY * element.scale && mouseY <= actualY + (btnY + height) * element.scale
-    }
-
-    fun handleClick(mouseX: Double, mouseY: Double): Boolean {
-        if (!HudManager.editMode && carrycounter.carryees.isEmpty()) return false
-        if (HudManager.editMode) return false
-        if (mc.currentScreen !is HandledScreen<*>) return false
-
-        val actualX = element.getActualX(mc.window.scaledWidth)
-        val actualY = element.getActualY(mc.window.scaledHeight)
-        val scaledMouseX = ((mouseX - actualX) / element.scale).toInt()
-        val scaledMouseY = ((mouseY - actualY) / element.scale).toInt()
-
-        return carrycounter.carryees.withIndex().any { (i, carryee) ->
-            val y = 12 + i * 12
-            val text = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-            val x = mc.textRenderer.getWidth(text) + 4
-
-            when {
-                scaledMouseX in x..(x + 18) && scaledMouseY in y..(y + 10) -> {
-                    if (carryee.count < carryee.total) carryee.count++
-                    true
-                }
-                scaledMouseX in (x + 20)..(x + 38) && scaledMouseY in y..(y + 10) -> {
-                    if (carryee.count > 0) carryee.count--
-                    true
-                }
-                scaledMouseX in (x + 40)..(x + 58) && scaledMouseY in y..(y + 10) -> {
-                    carrycounter.removeCarryee(carryee.name)
-                    true
-                }
-                else -> false
-            }
-        }
-    }
-
-    companion object {
-        fun initialize() = CarryHudState.init()
-    }
-}
-
-data class DummyCarryee(
-    val name: String,
-    var count: Int,
-    val total: Int,
-    private val timeSince: String,
-    private val bossPerHour: String
-) {
-    fun getTimeSinceLastBoss() = timeSince
-    fun getBossPerHour() = bossPerHour
 }

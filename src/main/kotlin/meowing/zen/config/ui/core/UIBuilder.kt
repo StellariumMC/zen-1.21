@@ -17,8 +17,7 @@ import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigCategory
 import meowing.zen.config.ui.types.ConfigSection
-import meowing.zen.hud.HudEditorScreen
-import meowing.zen.utils.ChatUtils
+import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.TickUtils
 import java.awt.Color
 
@@ -63,7 +62,7 @@ class UIBuilder(private val theme: ConfigTheme) {
         }.onMouseClick {
             TickUtils.schedule(1) {
                 mc.execute {
-                    mc.setScreen(HudEditorScreen())
+                    mc.setScreen(HUDEditor())
                 }
             }
         }

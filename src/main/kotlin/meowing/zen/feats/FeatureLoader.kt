@@ -1,9 +1,10 @@
 package meowing.zen.feats
 
+import meowing.zen.feats.carrying.CarryHUD
 import meowing.zen.feats.carrying.carrycommand
-import meowing.zen.feats.carrying.carryhud
 import meowing.zen.feats.general.calculator
 import meowing.zen.feats.slayers.slayerstatscommand
+import meowing.zen.hud.HUDCommand
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 
@@ -71,8 +72,9 @@ object FeatureLoader {
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             carrycommand.register(dispatcher)
             slayerstatscommand.register(dispatcher)
+            HUDCommand.register(dispatcher)
         }
-        carryhud.initialize()
+        CarryHUD.initialize()
         loadtime = System.currentTimeMillis() - starttime
     }
 

@@ -9,6 +9,7 @@ import meowing.zen.events.EntityEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.ChatEvent
+import meowing.zen.events.GuiEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
@@ -111,6 +112,8 @@ object carrycounter : Feature("carrycounter") {
                 }
             }
         }
+
+        register<GuiEvent.Hud> { CarryHUD.renderHUD(it.context) }
     }
 
     private fun loadCompletedCarries() {
@@ -140,6 +143,7 @@ object carrycounter : Feature("carrycounter") {
             RenderBossEntity.unregister()
             RenderPlayerEntity.unregister()
         }
+        CarryHUD.checkRegistration()
     }
 
     fun addCarryee(name: String, total: Int): Carryee? {
