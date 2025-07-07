@@ -2,15 +2,16 @@ package meowing.zen.feats.slayers
 
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.feats.Feature
-import meowing.zen.hud.HUDEditor
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.ChatUtils
-import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.GuiEvent
+import meowing.zen.utils.CommandUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
@@ -88,36 +89,24 @@ object slayerstats : Feature("slayerstats") {
     }
 }
 
-object slayerstatscommand {
-    fun register(dispatcher: CommandDispatcher<FabricClientCommandSource>) {
-        dispatcher.register(
-            ClientCommandManager.literal("slayerstats")
-                .then(
-                    ClientCommandManager.argument("action", StringArgumentType.string())
-                        .executes { context ->
-                            val action = StringArgumentType.getString(context, "action")
-                            if (action == "reset") slayerstats.reset()
-                            else ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
-                            1
-                        }
-                )
-                .executes {
-                    ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
+object SlayerStatsCommand : CommandUtils(
+    "slayerstats",
+    listOf("zenslayers")
+) {
+    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
+        ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
+        return 1
+    }
+
+    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
+        builder.then(
+            ClientCommandManager.argument("action", StringArgumentType.string())
+                .executes { context ->
+                    val action = StringArgumentType.getString(context, "action")
+                    if (action == "reset") slayerstats.reset()
+                    else ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
                     1
                 }
-        )
-
-        dispatcher.register(
-            ClientCommandManager.literal("zenslayers")
-                .then(
-                    ClientCommandManager.argument("action", StringArgumentType.string())
-                        .executes { context ->
-                            val action = StringArgumentType.getString(context, "action")
-                            if (action == "reset") slayerstats.reset()
-                            else ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
-                            1
-                        }
-                )
         )
     }
 }

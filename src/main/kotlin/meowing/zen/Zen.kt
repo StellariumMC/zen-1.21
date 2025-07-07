@@ -32,39 +32,13 @@ class Zen : ClientModInitializer {
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
 
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            val configCmd = Command<FabricClientCommandSource> { _ ->
-                openConfig()
-                1
-            }
-
-            val hudCmd = Command<FabricClientCommandSource> { _ ->
-                TickUtils.schedule(1) {
-                    mc.execute {
-                        mc.setScreen(HUDEditor())
-                    }
-                }
-                1
-            }
-
-            dispatcher.register(
-                ClientCommandManager.literal("zen")
-                    .executes(configCmd)
-                    .then(ClientCommandManager.literal("hud").executes(hudCmd))
-            )
-
-            dispatcher.register(ClientCommandManager.literal("ma").executes(configCmd))
-            dispatcher.register(ClientCommandManager.literal("meowaddons").executes(configCmd))
-        }
-
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
 
-            ChatUtils.addMessage(
-                "§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
-                "§c${FeatureLoader.getLoadtime()}ms §8- §c4 commands §7| §c8 utils"
-            )
+            ChatUtils.addMessage("§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures", "§c${FeatureLoader.getLoadtime()}ms §8- §c4 commands §7| §c8 utils")
+
             val data = dataUtils.getData()
+
             if (data.isFirstInstall) {
                 ChatUtils.addMessage("§c[Zen] §fThanks for installing Zen!")
                 ChatUtils.addMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
@@ -72,6 +46,7 @@ class Zen : ClientModInitializer {
                 dataUtils.setData(data.copy(isFirstInstall = false))
                 dataUtils.save()
             }
+
             UpdateChecker.checkForUpdates()
             shown = true
         }

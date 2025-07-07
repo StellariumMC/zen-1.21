@@ -1,12 +1,11 @@
 package meowing.zen.feats
 
+import meowing.zen.config.ConfigCommand
 import meowing.zen.feats.carrying.CarryHUD
 import meowing.zen.feats.carrying.carrycommand
-import meowing.zen.feats.general.calculator
-import meowing.zen.feats.slayers.slayerstatscommand
-import meowing.zen.hud.HUDCommand
+import meowing.zen.feats.general.CalculatorCommand
+import meowing.zen.feats.slayers.SlayerStatsCommand
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 
 object FeatureLoader {
     private val features = arrayOf(
@@ -63,17 +62,17 @@ object FeatureLoader {
             } catch (e: Exception) {
                 System.err.println("[Zen] Error initializing $className: $e")
                 e.printStackTrace()
+                moduleErr++
             }
         }
 
-        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
-            calculator.register(dispatcher)
-        }
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             carrycommand.register(dispatcher)
-            slayerstatscommand.register(dispatcher)
-            HUDCommand.register(dispatcher)
+            SlayerStatsCommand.register(dispatcher)
+            ConfigCommand.register(dispatcher)
+            CalculatorCommand.register(dispatcher)
         }
+
         CarryHUD.initialize()
         loadtime = System.currentTimeMillis() - starttime
     }

@@ -1,30 +1,40 @@
 package meowing.zen.feats.general
 
-import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.context.CommandContext
 import meowing.zen.utils.ChatUtils
-import net.minecraft.server.command.CommandManager
-import net.minecraft.server.command.ServerCommandSource
+import meowing.zen.utils.CommandUtils
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
-object calculator {
-    fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
-        val cmd = CommandManager.argument("equation", StringArgumentType.greedyString()).executes {
-            try {
-                val eq = StringArgumentType.getString(it, "equation")
-                val clean = eq.replace(Regex("[^0-9+\\-*/().\\s]"), "").replace("\\s".toRegex(), "")
-                val result = eval(clean)
-                val display =
-                    if (result == result.toInt().toDouble()) result.toInt().toString()
-                    else "%.10f".format(result).trimEnd('0').trimEnd('.')
-                ChatUtils.addMessage("§c[Zen] §b$eq §f= §b$display")
-                1
-            } catch (e: Exception) {
-                ChatUtils.addMessage("§c[Zen] §fInvalid equation.")
-                0
-            }
+object CalculatorCommand : CommandUtils(
+    "zencalc",
+    listOf("calc")
+) {
+    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
+        return try {
+            val eq = StringArgumentType.getString(context, "equation")
+            val clean = eq.replace(Regex("[^0-9+\\-*/().\\s]"), "").replace("\\s".toRegex(), "")
+            val result = eval(clean)
+            val display =
+                if (result == result.toInt().toDouble()) result.toInt().toString()
+                else "%.10f".format(result).trimEnd('0').trimEnd('.')
+            ChatUtils.addMessage("§c[Zen] §b$eq §f= §b$display")
+            1
+        } catch (e: Exception) {
+            ChatUtils.addMessage("§c[Zen] §fInvalid equation.")
+            0
         }
-        dispatcher.register(CommandManager.literal("zencalc").then(cmd))
-        dispatcher.register(CommandManager.literal("calc").then(cmd))
+    }
+
+    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
+        builder.then(
+            ClientCommandManager.argument("equation", StringArgumentType.greedyString())
+                .executes {
+                    execute(it)
+                }
+        )
     }
 
     private fun eval(s: String): Double {

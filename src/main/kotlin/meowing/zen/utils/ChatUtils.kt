@@ -1,16 +1,56 @@
 package meowing.zen.utils
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.minecraft.client.MinecraftClient
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
+import java.util.concurrent.ConcurrentLinkedQueue
 
 object ChatUtils {
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val queue = ConcurrentLinkedQueue<String>()
+    private var lastSent = 0L
+    private var processing = false
+
     fun chat(message: String) {
         val player = MinecraftClient.getInstance().player ?: return
-        player.networkHandler.sendChatMessage(message)
+        val now = System.currentTimeMillis()
+
+        if (now - lastSent >= 100 && !processing) {
+            player.networkHandler.sendChatMessage(message)
+            lastSent = now
+        } else {
+            queue.offer(message)
+            if (!processing) processQueue()
+        }
+    }
+
+    private fun processQueue() {
+        processing = true
+        scope.launch {
+            while (queue.isNotEmpty()) {
+                val elapsed = System.currentTimeMillis() - lastSent
+                if (elapsed < 100) {
+                    delay(100 - elapsed)
+                }
+
+                queue.poll()?.let { message ->
+                    val player = MinecraftClient.getInstance().player
+                    if (player != null) {
+                        player.networkHandler.sendChatMessage(message)
+                        lastSent = System.currentTimeMillis()
+                    }
+                }
+            }
+            processing = false
+        }
     }
 
     fun clientCommand(command: String) {
