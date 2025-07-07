@@ -7,7 +7,6 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 class HUDEditor : Screen(Text.literal("HUD Editor")) {
@@ -20,10 +19,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private var snapToGrid = true
     private var gridSize = 10
     private var previewMode = false
-    private var scaling: HUDElement? = null
-    private var initialScale = 1f
-    private var scaleStartMouseX = 0
-    private var scaleStartMouseY = 0
+    private var showProperties = true
+    private var showElements = true
     private val undoStack = mutableListOf<Map<String, HUDPosition>>()
     private val redoStack = mutableListOf<Map<String, HUDPosition>>()
     private var dirty = false
@@ -62,8 +59,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
         if (!previewMode) {
             drawToolbar(context, mouseX, mouseY)
-            drawElementList(context, mouseX, mouseY)
-            selected?.let { drawProperties(context, it) }
+            if (showElements) drawElementList(context, mouseX, mouseY)
+            if (showProperties) selected?.let { drawProperties(context, it) }
             drawTooltips(context)
         } else {
             drawPreviewHint(context)
@@ -74,11 +71,13 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     private fun drawGrid(context: DrawContext) {
         val color = Color(60, 60, 80, 100).rgb
+
         for (x in 0 until width step gridSize) {
-            context.fill(x, 0, x + 1, height, color)
+            context.drawVerticalLine(x, 0, height - 1, color)
         }
+
         for (y in 0 until height step gridSize) {
-            context.fill(0, y, width, y + 1, color)
+            context.drawHorizontalLine(0, width - 1, y, color)
         }
     }
 
@@ -96,8 +95,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.fill(0, 0, width, height, Color(20, 20, 30, 220).rgb)
         context.fill(0, height, width, height + 2, Color(70, 130, 180, 255).rgb)
 
-        val buttons = listOf("Grid", "Snap", "Preview", "Reset")
-        val states = listOf(showGrid, snapToGrid, previewMode, false)
+        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements")
+        val states = listOf(showGrid, snapToGrid, previewMode, false, showProperties, showElements)
         var x = 15
 
         val title = "Zen - HUD Editor"
@@ -161,8 +160,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     }
 
     private fun drawProperties(context: DrawContext, element: HUDElement) {
-        val width = 180
-        val height = 90
+        val width = 140
+        val height = 75
         val x = 15
         val y = this.height - height - 15
 
@@ -170,17 +169,14 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         drawHollowRect(context, x, y, x + width, y + height, Color(70, 130, 180, 255).rgb)
 
         context.drawTextWithShadow(textRenderer, "Properties", x + 10, y + 10, Color(100, 180, 255).rgb)
-        context.drawTextWithShadow(textRenderer, "X: ${element.targetX.toInt()}", x + 15, y + 25, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, "Y: ${element.targetY.toInt()}", x + 15, y + 40, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, "Scale: ${"%.1f".format(element.scale)}", x + 15, y + 55, Color.WHITE.rgb)
-        context.drawTextWithShadow(textRenderer, "Enabled: ${element.enabled}", x + 15, y + 70, Color.WHITE.rgb)
+        context.drawTextWithShadow(textRenderer, "Position: ${element.targetX.toInt()}, ${element.targetY.toInt()}", x + 15, y + 25, Color.WHITE.rgb)
+        context.drawTextWithShadow(textRenderer, "Scale: ${"%.1f".format(element.scale)}", x + 15, y + 40, Color.WHITE.rgb)
+        context.drawTextWithShadow(textRenderer, if (element.enabled) "§aEnabled" else "§cDisabled", x + 15, y + 55, Color.WHITE.rgb)
     }
 
     private fun drawTooltips(context: DrawContext) {
         val tooltip = when {
-            scaling != null -> "Left/Right: Fine Scale, Up/Down: Coarse Scale"
-            selected != null && (Screen.hasShiftDown()) -> "Hold Shift + Click to start scaling"
-            selected != null -> "Shift + Click to scale, Arrow keys to move"
+            selected != null -> "Scroll to scale, Arrow keys to move"
             else -> null
         }
 
@@ -192,18 +188,21 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         }
     }
 
+    override fun mouseScrolled(mouseX: Double, mouseY: Double, horizontalAmount: Double, verticalAmount: Double): Boolean {
+        if (selected != null) {
+            saveState()
+            val scaleDelta = if (verticalAmount > 0) 0.1f else -0.1f
+            selected!!.scale = (selected!!.scale + scaleDelta).coerceIn(0.2f, 5f)
+            dirty = true
+            return true
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
+    }
+
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (button == 0) {
-            if (Screen.hasShiftDown() && selected != null) {
-                scaling = selected
-                initialScale = scaling!!.scale
-                scaleStartMouseX = mouseX.toInt()
-                scaleStartMouseY = mouseY.toInt()
-                return true
-            }
-
             if (!handleToolbarClick(mouseX.toInt(), mouseY.toInt()) &&
-                !handleElementListClick(mouseX.toInt(), mouseY.toInt())) {
+                (!showElements || !handleElementListClick(mouseX.toInt(), mouseY.toInt()))) {
                 handleElementDrag(mouseX.toInt(), mouseY.toInt())
             }
         } else if (button == 1) {
@@ -217,7 +216,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun handleToolbarClick(mouseX: Int, mouseY: Int): Boolean {
         if (mouseY > 30) return false
 
-        val buttons = listOf("Grid", "Snap", "Preview", "Reset")
+        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements")
         var x = 15
 
         buttons.forEach { button ->
@@ -228,6 +227,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                     "Snap" -> snapToGrid = !snapToGrid
                     "Preview" -> previewMode = !previewMode
                     "Reset" -> resetAll()
+                    "Properties" -> showProperties = !showProperties
+                    "Elements" -> showElements = !showElements
                 }
                 return true
             }
@@ -271,20 +272,6 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     }
 
     override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
-        scaling?.let { element ->
-            val deltaX = mouseX.toInt() - scaleStartMouseX
-            val deltaY = scaleStartMouseY - mouseY.toInt()
-
-            val scaleFactor = if (abs(deltaX) > abs(deltaY)) {
-                deltaX * 0.005f
-            } else {
-                deltaY * 0.01f
-            }
-
-            element.scale = (initialScale + scaleFactor).coerceIn(0.2f, 5f)
-            return true
-        }
-
         dragging?.let { element ->
             var newX = mouseX - dragOffsetX
             var newY = mouseY - dragOffsetY
@@ -298,35 +285,31 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             newY = newY.coerceIn(0.0, (height - element.height).toDouble())
 
             element.setPosition(newX.toFloat(), newY.toFloat())
+            dirty = true
         }
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
     }
 
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
-        scaling?.let { element ->
-            dirty = true
-            scaling = null
-        }
-
         dragging?.let { element ->
             dragging = null
             dirty = true
         }
-        dragging = null
         return super.mouseReleased(mouseX, mouseY, button)
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         when (keyCode) {
             GLFW.GLFW_KEY_ESCAPE -> {
-                scaling = null
-                close()
+                if (previewMode) previewMode = false
+                else close()
+                return false
             }
             GLFW.GLFW_KEY_G -> showGrid = !showGrid
             GLFW.GLFW_KEY_P -> previewMode = !previewMode
             GLFW.GLFW_KEY_R -> resetAll()
-            GLFW.GLFW_KEY_Z -> if (Screen.hasControlDown()) undo()
-            GLFW.GLFW_KEY_Y -> if (Screen.hasControlDown()) redo()
+            GLFW.GLFW_KEY_Z -> if (hasControlDown()) undo()
+            GLFW.GLFW_KEY_Y -> if (hasControlDown()) redo()
             GLFW.GLFW_KEY_DELETE -> selected?.let { delete(it) }
             GLFW.GLFW_KEY_UP -> selected?.let { move(it, 0, -1) }
             GLFW.GLFW_KEY_DOWN -> selected?.let { move(it, 0, 1) }
@@ -346,7 +329,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     private fun move(element: HUDElement, deltaX: Int, deltaY: Int) {
         saveState()
-        val moveAmount = if (Screen.hasShiftDown()) 10 else 1
+        val moveAmount = if (hasShiftDown()) 10 else 1
         val newX = element.targetX + deltaX * moveAmount
         val newY = element.targetY + deltaY * moveAmount
 
@@ -360,14 +343,14 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun delete(element: HUDElement) {
         saveState()
         element.enabled = false
-        dirty = true
         selected = null
+        dirty = true
     }
 
     private fun resetAll() {
         saveState()
         elements.forEach { element ->
-            element.setPosition(10f, 10f)
+            element.setPosition(50f, 50f)
             element.enabled = true
             element.scale = 1f
         }
