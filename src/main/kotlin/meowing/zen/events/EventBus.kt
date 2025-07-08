@@ -29,7 +29,7 @@ object EventBus {
             post(EntityEvent.Leave(entity))
         }
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { mc, world ->
-            post(WorldEvent.Change(mc, world))
+            post(WorldEvent.Change(world))
         }
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
             !post(ChatEvent.Receive(msg, show))

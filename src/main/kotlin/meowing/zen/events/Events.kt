@@ -63,7 +63,7 @@ abstract class ChatEvent {
 }
 
 abstract class WorldEvent {
-    class Change(val mc: MinecraftClient?, val world: ClientWorld) : Event()
+    class Change(val world: ClientWorld) : Event()
 }
 
 abstract class PacketEvent {

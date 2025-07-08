@@ -21,6 +21,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private var previewMode = false
     private var showProperties = true
     private var showElements = true
+    private var showToolbar = true
     private val undoStack = mutableListOf<Map<String, HUDPosition>>()
     private val redoStack = mutableListOf<Map<String, HUDPosition>>()
     private var dirty = false
@@ -58,7 +59,11 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         elements.forEach { it.render(context, mouseX.toFloat(), mouseY.toFloat(), delta, previewMode) }
 
         if (!previewMode) {
-            drawToolbar(context, mouseX, mouseY)
+            if (showToolbar) {
+                drawToolbar(context, mouseX, mouseY)
+            } else {
+                drawToolbarToggleTooltip(context)
+            }
             if (showElements) drawElementList(context, mouseX, mouseY)
             if (showProperties) selected?.let { drawProperties(context, it) }
             drawTooltips(context)
@@ -90,13 +95,22 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.drawTextWithShadow(textRenderer, text, x, y, Color.WHITE.rgb)
     }
 
+    private fun drawToolbarToggleTooltip(context: DrawContext) {
+        val text = "Press T to enable toolbar"
+        val textWidth = textRenderer.getWidth(text)
+        val x = 15
+        val y = 10
+        context.fill(x - 5, y - 3, x + textWidth + 5, y + 13, Color(0, 0, 0, 180).rgb)
+        context.drawTextWithShadow(textRenderer, text, x, y, Color(100, 180, 255).rgb)
+    }
+
     private fun drawToolbar(context: DrawContext, mouseX: Int, mouseY: Int) {
         val height = 30
         context.fill(0, 0, width, height, Color(20, 20, 30, 220).rgb)
         context.fill(0, height, width, height + 2, Color(70, 130, 180, 255).rgb)
 
-        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements")
-        val states = listOf(showGrid, snapToGrid, previewMode, false, showProperties, showElements)
+        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements", "Toolbar")
+        val states = listOf(showGrid, snapToGrid, previewMode, false, showProperties, showElements, showToolbar)
         var x = 15
 
         val title = "Zen - HUD Editor"
@@ -126,7 +140,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val padding = 10
         val listHeight = minOf(elements.size * elementHeight + headerHeight + padding, height - 100)
         val listX = width - listWidth - 15
-        val listY = 40
+        val listY = if (showToolbar) 40 else 15
 
         context.fill(listX, listY, listX + listWidth, listY + listHeight, Color(20, 20, 30, 180).rgb)
         drawHollowRect(context, listX, listY, listX + listWidth, listY + listHeight, Color(70, 130, 180, 255).rgb)
@@ -201,10 +215,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (button == 0) {
-            if (!handleToolbarClick(mouseX.toInt(), mouseY.toInt()) &&
-                (!showElements || !handleElementListClick(mouseX.toInt(), mouseY.toInt()))) {
+            if ((!showToolbar || !handleToolbarClick(mouseX.toInt(), mouseY.toInt())) && (!showElements || !handleElementListClick(mouseX.toInt(), mouseY.toInt())))
                 handleElementDrag(mouseX.toInt(), mouseY.toInt())
-            }
         } else if (button == 1) {
             elements.reversed().find { it.isMouseOver(mouseX.toFloat(), mouseY.toFloat()) }?.let {
                 selected = it
@@ -216,7 +228,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun handleToolbarClick(mouseX: Int, mouseY: Int): Boolean {
         if (mouseY > 30) return false
 
-        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements")
+        val buttons = listOf("Grid", "Snap", "Preview", "Reset", "Properties", "Elements", "Toolbar")
         var x = 15
 
         buttons.forEach { button ->
@@ -229,6 +241,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                     "Reset" -> resetAll()
                     "Properties" -> showProperties = !showProperties
                     "Elements" -> showElements = !showElements
+                    "Toolbar" -> showToolbar = !showToolbar
                 }
                 return true
             }
@@ -240,7 +253,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private fun handleElementListClick(mouseX: Int, mouseY: Int): Boolean {
         val listWidth = 200
         val listX = width - listWidth - 15
-        val listY = 40
+        val listY = if (showToolbar) 40 else 15
         val elementHeight = 16
         val headerHeight = 25
 
@@ -308,6 +321,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             GLFW.GLFW_KEY_G -> showGrid = !showGrid
             GLFW.GLFW_KEY_P -> previewMode = !previewMode
             GLFW.GLFW_KEY_R -> resetAll()
+            GLFW.GLFW_KEY_T -> showToolbar = !showToolbar
             GLFW.GLFW_KEY_Z -> if (hasControlDown()) undo()
             GLFW.GLFW_KEY_Y -> if (hasControlDown()) redo()
             GLFW.GLFW_KEY_DELETE -> selected?.let { delete(it) }

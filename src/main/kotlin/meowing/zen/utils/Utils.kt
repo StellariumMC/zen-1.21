@@ -1,5 +1,6 @@
 package meowing.zen.utils
 
+import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.SimpleParticleType
@@ -19,12 +20,10 @@ object Utils {
     }
 
     fun spawnParticle(particle: SimpleParticleType?, x: Double, y: Double, z: Double, velocityX: Double, velocityY: Double, velocityZ: Double) {
-        val mc = MinecraftClient.getInstance()
         mc.world?.addParticleClient(ParticleTypes.FLAME, x, y, z, velocityX, velocityY, velocityZ)
     }
 
     fun spawnParticleAtPlayer(particle: SimpleParticleType?, velocityX: Double, velocityY: Double, velocityZ: Double) {
-        val mc = MinecraftClient.getInstance()
         mc.player?.let { player ->
             spawnParticle(
                 particle,
@@ -37,13 +36,11 @@ object Utils {
     }
 
     fun showTitle(title: String?, subtitle: String?, duration: Int) {
-        val mc = MinecraftClient.getInstance()
         mc.inGameHud.setTitle(title?.let { Text.literal(it) })
         mc.inGameHud.setSubtitle(subtitle?.let { Text.literal(it) })
     }
 
     fun showTitle(title: String, subtitle: String, fadeIn: Int, stay: Int, fadeOut: Int) {
-        val mc = MinecraftClient.getInstance()
         mc.inGameHud.setTitleTicks(fadeIn, stay, fadeOut)
         mc.inGameHud.setTitle(Text.literal(title))
         mc.inGameHud.setSubtitle(Text.literal(subtitle))

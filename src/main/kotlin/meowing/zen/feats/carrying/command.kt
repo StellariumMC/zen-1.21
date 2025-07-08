@@ -62,7 +62,6 @@ object carrycommand {
     }
 
     private val playerSuggestions = SuggestionProvider<FabricClientCommandSource> { _, builder ->
-        val mc = Zen.mc
         mc.world?.players?.forEach { player ->
             if (player.name.string.isNotBlank() && player.uuid.version() == 4) builder.suggest(player.name.string)
         }
