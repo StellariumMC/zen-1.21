@@ -65,14 +65,10 @@ object Utils {
 
     fun Map<*, *>.toColorFromMap(): Color? {
         return try {
-            val rgbValue = (this["value"] as? Number)?.toInt() ?: return null
-            val alpha = ((this["falpha"] as? Number)?.toDouble() ?: 1.0).coerceIn(0.0, 1.0)
-
-            val r = (rgbValue shr 16) and 0xFF
-            val g = (rgbValue shr 8) and 0xFF
-            val b = rgbValue and 0xFF
-            val a = (alpha * 255).toInt()
-
+            val r = (get("r") as? Number)?.toInt() ?: 255
+            val g = (get("g") as? Number)?.toInt() ?: 255
+            val b = (get("b") as? Number)?.toInt() ?: 255
+            val a = (get("a") as? Number)?.toInt() ?: 255
             Color(r, g, b, a)
         } catch (e: Exception) {
             null

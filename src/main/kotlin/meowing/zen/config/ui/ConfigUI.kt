@@ -10,7 +10,10 @@ import gg.essential.universal.UKeyboard
 import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.types.*
 import meowing.zen.config.ui.core.*
+import meowing.zen.config.ui.elements.Colorpicker
 import meowing.zen.utils.DataUtils
+import meowing.zen.utils.Utils.toColorFromList
+import meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
 
 typealias ConfigData = Map<String, Any>
@@ -220,11 +223,10 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             x = if (element.type is ElementType.TextParagraph) CenterConstraint() else 2.5.percent()
             y = CenterConstraint()
             width = when (element.type) {
-                is ElementType.ColorPicker, is ElementType.TextParagraph -> 96.percent()
+                is ElementType.TextParagraph -> 96.percent()
                 else -> 75.pixels()
             }
             height = when (element.type) {
-                is ElementType.ColorPicker -> 42.pixels()
                 is ElementType.TextParagraph -> 22.pixels()
                 is ElementType.Slider -> 14.pixels()
                 else -> 24.pixels()
@@ -265,6 +267,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         activePopup?.let { popup ->
             popup.parent.removeChild(popup)
             activePopup = null
+            Colorpicker.closePicker()
         }
     }
 
@@ -287,6 +290,10 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
     override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
         if (keyCode == 256 && activePopup != null) {
+            if (Colorpicker.isPickerOpen) {
+                Colorpicker.closePicker()
+                return
+            }
             closePopup()
             return
         }
@@ -344,31 +351,27 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         configListeners.getOrPut(configKey) { mutableListOf() }.add(listener)
         (config[configKey] ?: getDefaultValue(elementRefs[configKey]?.type))?.let { currentValue ->
             val resolvedValue = when (currentValue) {
-                is Map<*, *> -> currentValue.toColor()
+                is Map<*, *> -> currentValue.toColorFromMap()
                 else -> currentValue
             }
-            listener(resolvedValue)
+            listener(resolvedValue!!)
         }
         return this
     }
 
-    fun getConfigValue(configKey: String): Any? {
-        val value = config[configKey] ?: return null
-        return when (value) {
-            is Map<*, *> -> value.toColor()
-            else -> value
+    // Only in temporarily to ensure backwards compat
+    fun getColorValue(configKey: String): Color? {
+        val configValue = config[configKey] ?: return null
+        return when (configValue) {
+            is Color -> configValue
+            is Map<*, *> -> configValue.toColorFromMap()
+            is List<*> -> configValue.toColorFromList()
+            is Number -> Color(configValue.toInt(), true)
+            else -> null
         }
     }
 
-    fun saveConfig() = dataUtils.save()
-}
+    fun getConfigValue(configKey: String): Any? = config[configKey]
 
-private fun Map<*, *>.toColor(): Color {
-    val map = this as Map<String, Any>
-    val packedValue = (map["value"] as? Number)?.toInt() ?: 0
-    val alpha = ((map["falpha"] as? Number)?.toDouble() ?: 1.0) * 255
-    val r = (packedValue shr 16) and 0xFF
-    val g = (packedValue shr 8) and 0xFF
-    val b = packedValue and 0xFF
-    return Color(r, g, b, alpha.toInt())
+    fun saveConfig() = dataUtils.save()
 }

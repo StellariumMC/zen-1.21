@@ -1,63 +1,60 @@
 package meowing.zen.utils
 
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonSerializer
+import com.google.gson.JsonPrimitive
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonSerializationContext
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import net.fabricmc.loader.api.FabricLoader
-import java.io.File
-import java.util.concurrent.ConcurrentHashMap
-import com.google.gson.*
 import java.awt.Color
+import java.io.File
 import java.lang.reflect.Type
-
-class ColorTypeAdapter : JsonSerializer<Color>, JsonDeserializer<Color> {
-    override fun serialize(src: Color, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
-        val jsonObject = JsonObject()
-        val value = (src.red shl 16) or (src.green shl 8) or src.blue
-        val falpha = src.alpha.toDouble() / 255.0
-        jsonObject.addProperty("value", value)
-        jsonObject.addProperty("falpha", falpha)
-        return jsonObject
-    }
-
-    override fun deserialize(json: JsonElement, typeOfT: Type, context: JsonDeserializationContext): Color {
-        val jsonObject = json.asJsonObject
-
-        return when {
-            jsonObject.has("value") && jsonObject.has("falpha") -> {
-                val value = jsonObject.get("value").asInt
-                val falpha = jsonObject.get("falpha").asDouble
-                val r = (value shr 16) and 0xFF
-                val g = (value shr 8) and 0xFF
-                val b = value and 0xFF
-                val a = (falpha * 255).toInt().coerceIn(0, 255)
-                Color(r, g, b, a)
-            }
-
-            // backwards compat
-            jsonObject.has("r") && jsonObject.has("g") && jsonObject.has("b") -> {
-                val r = jsonObject.get("r")?.asInt ?: 255
-                val g = jsonObject.get("g")?.asInt ?: 255
-                val b = jsonObject.get("b")?.asInt ?: 255
-                val a = jsonObject.get("a")?.asInt ?: 255
-                Color(r, g, b, a)
-            }
-
-            else -> Color(255, 255, 255, 255)
-        }
-    }
-}
+import java.util.concurrent.ConcurrentHashMap
 
 class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
     companion object {
         private val gson = GsonBuilder()
-            .registerTypeAdapter(Color::class.java, ColorTypeAdapter())
             .setPrettyPrinting()
+            .registerTypeAdapter(Color::class.java, object : JsonSerializer<Color>, JsonDeserializer<Color> {
+                override fun serialize(
+                    src: Color,
+                    typeOfSrc: Type,
+                    context: JsonSerializationContext
+                ): JsonElement {
+                    val obj = JsonObject()
+                    obj.addProperty("r", src.red.toDouble())
+                    obj.addProperty("g", src.green.toDouble())
+                    obj.addProperty("b", src.blue.toDouble())
+                    obj.addProperty("a", src.alpha.toDouble())
+                    return obj
+                }
+
+                override fun deserialize(
+                    json: JsonElement,
+                    typeOfT: Type,
+                    context: JsonDeserializationContext
+                ): Color {
+                    val obj = json.asJsonObject
+                    val r = obj.get("r").asFloat.toInt()
+                    val g = obj.get("g").asFloat.toInt()
+                    val b = obj.get("b").asFloat.toInt()
+                    val a = obj.get("a").asFloat.toInt()
+                    return Color(r, g, b, a)
+                }
+            })
             .create()
 
         private val autosaveIntervals = ConcurrentHashMap<DataUtils<*>, Long>()
         private var loopStarted = false
     }
 
-    private val dataFile = File(FabricLoader.getInstance().configDir.toFile(), "Zen-1.21/${fileName}.json")
+    private val dataFile = File(
+        FabricLoader.getInstance().configDir.toFile(),
+        "Zen-1.21/${fileName}.json"
+    )
     private var data: T = loadData()
     private var lastSavedTime = System.currentTimeMillis()
 
@@ -73,7 +70,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
                 gson.fromJson(dataFile.readText(), defaultObject::class.java) ?: defaultObject
             } else defaultObject
         } catch (e: Exception) {
-            println("Error loading data from ${dataFile.absolutePath}: ${e.message}")
+            println("Error loading data from ${'$'}{dataFile.absolutePath}: ${'$'}{e.message}")
             defaultObject
         }
     }
@@ -83,7 +80,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         try {
             dataFile.writeText(gson.toJson(data))
         } catch (e: Exception) {
-            println("Error saving data to ${dataFile.absolutePath}: ${e.message}")
+            println("Error saving data to ${'$'}{dataFile.absolutePath}: ${'$'}{e.message}")
             e.printStackTrace()
         }
     }

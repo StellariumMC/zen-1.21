@@ -7,9 +7,9 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val carrycounter: Boolean get() = configUI.getConfigValue("carrycounter") as? Boolean ?: false
     val carryvalue: String get() = configUI.getConfigValue("carryvalue") as? String ?: "1.3"
     val carrybosshighlight: Boolean get() = configUI.getConfigValue("carrybosshighlight") as? Boolean ?: false
-    val carrybosshighlightcolor: Color get() = configUI.getConfigValue("carrybosshighlightcolor") as? Color ?: Color(0, 255, 255, 127)
+    val carrybosshighlightcolor: Color get() = configUI.getColorValue("carrybosshighlightcolor") ?: Color(0, 255, 255, 127)
     val carryclienthighlight: Boolean get() = configUI.getConfigValue("carryclienthighlight") as? Boolean ?: false
-    val carryclienthighlightcolor: Color get() = configUI.getConfigValue("carryclienthighlightcolor") as? Color ?: Color(0, 255, 255, 127)
+    val carryclienthighlightcolor: Color get() = configUI.getColorValue("carryclienthighlightcolor") ?: Color(0, 255, 255, 127)
     val slayertimer: Boolean get() = configUI.getConfigValue("slayertimer") as? Boolean ?: false
     val vengdmg: Boolean get() = configUI.getConfigValue("vengdmg") as? Boolean ?: false
     val lasertimer: Boolean get() = configUI.getConfigValue("lasertimer") as? Boolean ?: false
