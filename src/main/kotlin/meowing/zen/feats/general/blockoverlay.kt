@@ -1,6 +1,6 @@
 package meowing.zen.feats.general
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -33,12 +33,6 @@ object blockoverlay : Feature("blockoverlay") {
     }
 
     override fun initialize() {
-        var color = Color(255, 255, 255, 255)
-
-        Zen.registerCallback("blockoverlaycolor") { newval ->
-            color = newval as Color
-        }
-
         register<RenderEvent.BlockOutline> { event ->
             val blockPos = event.blockContext.blockPos()
             val consumers = event.worldContext.consumers() ?: return@register
@@ -55,7 +49,7 @@ object blockoverlay : Feature("blockoverlay") {
                 blockPos.x - camPos.x,
                 blockPos.y - camPos.y,
                 blockPos.z - camPos.z,
-                color.toColorInt()
+                config.blockoverlaycolor.toColorInt()
             )
         }
     }
