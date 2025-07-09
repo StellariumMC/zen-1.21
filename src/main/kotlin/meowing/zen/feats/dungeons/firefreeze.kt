@@ -18,7 +18,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
 import net.minecraft.util.Colors
 
-object firefreeze : Feature("firefreeze") {
+object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
     private var servertickcall: EventBus.EventCall? = null
 

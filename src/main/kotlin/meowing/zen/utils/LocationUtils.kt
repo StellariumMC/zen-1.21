@@ -13,7 +13,6 @@ import kotlin.compareTo
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
-    private val teamRegex = "^team_\\d+$".toRegex()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
     var area: String? = null

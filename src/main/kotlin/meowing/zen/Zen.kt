@@ -2,9 +2,6 @@ package meowing.zen
 
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.MinecraftClient
 import meowing.zen.config.ConfigAccessor
 import meowing.zen.config.ZenConfig
@@ -12,13 +9,11 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.DataUtils
-import com.mojang.brigadier.Command
 import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
 import meowing.zen.feats.FeatureLoader
-import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
@@ -52,9 +47,9 @@ class Zen : ClientModInitializer {
         }
 
         EventBus.register<GameEvent.Load> ({
-            FeatureLoader.init()
             configUI = ZenConfig()
             config = ConfigAccessor(configUI)
+            FeatureLoader.init()
             executePendingCallbacks()
         })
 
@@ -110,6 +105,7 @@ class Zen : ClientModInitializer {
 
         fun addFeature(feature: Feature) {
             features.add(feature)
+            feature.addConfig(configUI)
         }
 
         fun openConfig() {
