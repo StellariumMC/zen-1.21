@@ -1,6 +1,6 @@
 package meowing.zen.feats.general
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -47,26 +47,8 @@ object customsize : Feature("customsize") {
     }
 
     override fun initialize() {
-        var customX = 1.0f
-        var customY = 1.0f
-        var customZ = 1.0f
-        var customself = false
-
-        Zen.registerCallback("customX") { newval ->
-            customX = (newval as Double).toFloat()
-        }
-        Zen.registerCallback("customY") { newval ->
-            customY = (newval as Double).toFloat()
-        }
-        Zen.registerCallback("customZ") { newval ->
-            customZ = (newval as Double).toFloat()
-        }
-        Zen.registerCallback("customself") { newval ->
-            customself = newval as Boolean
-        }
-
         register<RenderEvent.PlayerPre> { event ->
-            if (!customself || event.entity.id == mc.player?.id) event.matrices.scale(customX, customY, customZ)
+            if (!config.customself || event.entity.id == mc.player?.id) event.matrices.scale(config.customX, config.customY, config.customZ)
         }
     }
 }

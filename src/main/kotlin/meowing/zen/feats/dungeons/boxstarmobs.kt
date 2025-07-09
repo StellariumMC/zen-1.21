@@ -1,6 +1,6 @@
 package meowing.zen.feats.dungeons
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -43,12 +43,6 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
     }
 
     override fun initialize() {
-        var color = Color(0, 255, 255, 127)
-
-        Zen.registerCallback("boxstarmobscolor") { newval ->
-            color = newval as Color
-        }
-
         register<EntityEvent.Join> { event ->
             if (event.entity !is ArmorStandEntity) return@register
             val ent = event.entity
@@ -79,6 +73,7 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
             val x = entityPos.x - cam.pos.x
             val y = entityPos.y - cam.pos.y
             val z = entityPos.z - cam.pos.z
+            val color = config.boxstarmobscolor
             RenderUtils.renderEntityOutline(
                 matrices,
                 vertex,

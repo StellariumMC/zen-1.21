@@ -1,6 +1,6 @@
 package meowing.zen.feats.slayers
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -10,7 +10,6 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorFloat
-import java.awt.Color
 
 object slayerhighlight : Feature("slayerhighlight") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -24,17 +23,6 @@ object slayerhighlight : Feature("slayerhighlight") {
     }
 
     override fun initialize() {
-        var color = Color(0, 255, 255, 127)
-        var filled = false
-
-        Zen.registerCallback("slayerhighlightfilled") { newval ->
-            filled = newval as Boolean
-        }
-
-        Zen.registerCallback("slayerhighlightcolor") { newval ->
-            color = newval as Color
-        }
-
         register<RenderEvent.EntityPre> { event ->
             if (!slayertimer.isFighting || slayertimer.BossId == -1 || event.entity.id != slayertimer.BossId) return@register
             val entity = event.entity
@@ -45,8 +33,8 @@ object slayerhighlight : Feature("slayerhighlight") {
             val x = entityPos.x - cam.pos.x
             val y = entityPos.y - cam.pos.y
             val z = entityPos.z - cam.pos.z
-
-            if (filled) {
+            val color = config.slayerhighlightcolor
+            if (config.slayerhighlightfilled) {
                 RenderUtils.renderEntityFilled(
                     event.matrices,
                     event.vertex,

@@ -1,6 +1,6 @@
 package meowing.zen.feats.dungeons
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -37,17 +37,12 @@ object keyhighlight : Feature("keyhighlight", area = "catacombs") {
     }
 
     override fun initialize() {
-        var color = Color(0, 255, 255, 127)
-
-        Zen.registerCallback("keyhighlightcolor") { newval ->
-            color = newval as Color
-        }
-
         register<RenderEvent.EntityPre> { event ->
             if (event.entity !is ArmorStandEntity) return@register
             val name = event.entity.name.string.removeFormatting()
             if (name == "Wither Key" || name == "Blood Key") {
                 val entity = event.entity
+                val color = config.keyhighlightcolor
                 RenderUtils.renderEntityFilled(
                     event.matrices,
                     event.vertex,
