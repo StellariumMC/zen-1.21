@@ -53,12 +53,6 @@ object ChatUtils {
         }
     }
 
-    fun clientCommand(command: String) {
-        val player = MinecraftClient.getInstance().player ?: return
-        val cmd = if (command.startsWith("/")) command else "/$command"
-        player.networkHandler.sendChatCommand(cmd)
-    }
-
     fun command(command: String) {
         val player = MinecraftClient.getInstance().player ?: return
         val cmd = if (command.startsWith("/")) command else "/$command"

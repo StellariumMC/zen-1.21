@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
@@ -33,6 +34,16 @@ object EventBus {
         }
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
             !post(ChatEvent.Receive(msg, show))
+        }
+        ClientSendMessageEvents.ALLOW_CHAT.register { string ->
+            !post(ChatEvent.Send(string))
+        }
+        ClientSendMessageEvents.ALLOW_COMMAND.register { string ->
+            val command = string.split(" ")[0].lowercase()
+            when (command) {
+                "gc", "pc", "ac", "msg", "tell", "r", "say", "w", "reply" -> !post(ChatEvent.Send("/$string"))
+                else -> true
+            }
         }
         WorldRenderEvents.LAST.register { context ->
             post(RenderEvent.World(context))

@@ -9,7 +9,7 @@ object ModMenuCompat {
 }
 
 fun ZenConfig(): ConfigUI {
-    var configUI = ConfigUI("ZenConfig")
+    var configUI = ConfigUI("config")
     Zen.features.forEach { feature ->
         configUI = feature.addConfig(configUI)
     }
