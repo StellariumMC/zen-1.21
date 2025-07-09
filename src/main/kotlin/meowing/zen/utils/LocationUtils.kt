@@ -4,12 +4,16 @@ import meowing.zen.events.AreaEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.PacketEvent
 import meowing.zen.utils.Utils.removeEmotes
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
+import net.minecraft.scoreboard.Scoreboard
+import kotlin.compareTo
 
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
+    private val teamRegex = "^team_\\d+$".toRegex()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
     var area: String? = null
@@ -41,6 +45,7 @@ object LocationUtils {
 
                     val line = prefix + suffix
                     if (!subAreaRegex.matches(line)) return@register
+                    if (line.endsWith("cth") || line.endsWith("ch")) return@register
                     if (line.lowercase() != subarea) {
                         EventBus.post(AreaEvent.Sub(line))
                         subarea = line.lowercase()
