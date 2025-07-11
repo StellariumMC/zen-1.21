@@ -23,6 +23,8 @@ object FeatureLoader {
         "general.blockoverlay",
         "general.customsize",
         "general.serveralert",
+        "general.entityhighlight",
+        "general.arrowpoison",
         "slayers.MetadataHandler",
         "slayers.slayertimer",
         "slayers.slayerhighlight",

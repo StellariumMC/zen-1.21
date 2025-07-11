@@ -1,6 +1,6 @@
 package meowing.zen.feats.carrying
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -15,9 +15,8 @@ import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.utils.LoopUtils
-import meowing.zen.utils.RenderUtils
 import meowing.zen.utils.Utils
-import meowing.zen.utils.Utils.toColorFloat
+import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.Text
@@ -113,7 +112,7 @@ object carrycounter : Feature("carrycounter") {
             }
         }
 
-        register<GuiEvent.Hud> { CarryHUD.renderHUD(it.context) }
+        register<GuiEvent.HUD> { CarryHUD.renderHUD(it.context) }
     }
 
     private fun loadCompletedCarries() {
@@ -226,24 +225,11 @@ object carrycounter : Feature("carrycounter") {
         private val events = mutableListOf<EventBus.EventCall>()
 
         fun register() {
-            if (registered || !Zen.config.carrybosshighlight) return
-            events.add(EventBus.register<RenderEvent.WorldPostEntities> ({ event ->
-                val world = mc.world ?: return@register
-                carryeesByBossId.forEach { bossId, _ ->
-                    val entity = world.getEntityById(bossId)
-                    if (entity != null && !entity.isRemoved) {
-                        val entityPos = entity.getLerpedPos(event.context!!.tickCounter().getTickProgress(true))
-                        val x = entityPos.x - mc.gameRenderer.camera.pos.x
-                        val y = entityPos.y - mc.gameRenderer.camera.pos.y
-                        val z = entityPos.z - mc.gameRenderer.camera.pos.z
-                        val color = Zen.config.carrybosshighlightcolor
-                        RenderUtils.renderEntityFilled(
-                            event.context.matrixStack(),
-                            event.context.consumers(),
-                            x, y, z, entity.width + 0.5f, entity.height  + 0.25f,
-                            color.red.toColorFloat(), color.green.toColorFloat(), color.blue.toColorFloat(), color.alpha.toColorFloat()
-                        )
-                    }
+            if (registered || !config.carrybosshighlight) return
+            events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
+                if (carryeesByBossId.contains(event.entity.id)) {
+                    event.shouldGlow = true
+                    event.glowColor = config.carrybosshighlightcolor.toColorInt()
                 }
             }))
             registered = true
@@ -262,25 +248,12 @@ object carrycounter : Feature("carrycounter") {
         private val events = mutableListOf<EventBus.EventCall>()
 
         fun register() {
-            if (registered || !Zen.config.carryclienthighlight) return
-            events.add(EventBus.register<RenderEvent.WorldPostEntities> ({ event ->
-                val world = mc.world ?: return@register
-
-                world.players.forEach { player ->
-                    val cleanName = player.name.string.removeFormatting()
-                    carryeesByName[cleanName]?.let {
-                        val entityPos = player.getLerpedPos(event.context!!.tickCounter().getTickProgress(true))
-                        val x = entityPos.x - mc.gameRenderer.camera.pos.x
-                        val y = entityPos.y - mc.gameRenderer.camera.pos.y
-                        val z = entityPos.z - mc.gameRenderer.camera.pos.z
-                        val color = Zen.config.carryclienthighlightcolor
-                        RenderUtils.renderEntityFilled(
-                            event.context.matrixStack(),
-                            event.context.consumers(),
-                            x, y, z, player.width, player.height,
-                            color.red.toColorFloat(), color.green.toColorFloat(), color.blue.toColorFloat(), color.alpha.toColorFloat()
-                        )
-                    }
+            if (registered || !config.carryclienthighlight) return
+            events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
+                val cleanName = event.entity.name.string.removeFormatting()
+                carryeesByName[cleanName]?.let {
+                    event.shouldGlow = true
+                    event.glowColor = config.carryclienthighlightcolor.toColorInt()
                 }
             }))
             registered = true
@@ -306,7 +279,7 @@ object carrycounter : Feature("carrycounter") {
                 tradeComp.matcher(text).let { matcher ->
                     if (matcher.matches()) {
                         val coins = matcher.group(1).toDoubleOrNull() ?: return@let
-                        val carry = Zen.config.carryvalue.split(',')
+                        val carry = config.carryvalue.split(',')
                             .mapNotNull { it.trim().toDoubleOrNull() }
                             .find { abs(coins / it - round(coins / it)) < 1e-6 } ?: return@let
                         val count = round(coins / carry).toInt()
@@ -382,7 +355,7 @@ object carrycounter : Feature("carrycounter") {
             startTime?.let { bossTimes.add(System.currentTimeMillis() - it) }
             cleanup()
             if (++count >= total) complete()
-            if (Zen.config.carrycountsend) ChatUtils.command("/pc $name: $count/$total")
+            if (config.carrycountsend) ChatUtils.command("/pc $name: $count/$total")
         }
 
         fun reset() {

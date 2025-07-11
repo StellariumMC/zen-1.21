@@ -28,6 +28,10 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _customself = false
     private var _slayerhighlightcolor = Color(0, 255, 255, 127)
     private var _slayerhighlightfilled = false
+    private var _entityhighlightplayercolor = Color(0, 255, 255, 255)
+    private var _entityhighlightmobcolor = Color(255, 0, 0, 255)
+    private var _entityhighlightanimalcolor = Color(0, 255, 0, 255)
+    private var _entityhighlightothercolor = Color(255, 255, 255, 255)
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -53,6 +57,10 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val customself get() = _customself
     val slayerhighlightcolor get() = _slayerhighlightcolor
     val slayerhighlightfilled get() = _slayerhighlightfilled
+    val entityhighlightplayercolor get() = _entityhighlightplayercolor
+    val entityhighlightmobcolor get() = _entityhighlightmobcolor
+    val entityhighlightanimalcolor get() = _entityhighlightanimalcolor
+    val entityhighlightothercolor get() = _entityhighlightothercolor
 
     init {
         configUI.registerListener("carrycounter") { _carrycounter = it as Boolean }
@@ -79,6 +87,10 @@ class ConfigAccessor(val configUI: ConfigUI) {
         configUI.registerListener("customself") { _customself = it as Boolean }
         configUI.registerListener("slayerhighlightcolor") { _slayerhighlightcolor = it as Color }
         configUI.registerListener("slayerhighlightfilled") { _slayerhighlightfilled = it as Boolean }
+        configUI.registerListener("entityhighlightplayercolor") { _entityhighlightplayercolor = it as Color }
+        configUI.registerListener("entityhighlightmobcolor") { _entityhighlightmobcolor = it as Color }
+        configUI.registerListener("entityhighlightanimalcolor") { _entityhighlightanimalcolor = it as Color }
+        configUI.registerListener("entityhighlightothercolor") { _entityhighlightothercolor = it as Color }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

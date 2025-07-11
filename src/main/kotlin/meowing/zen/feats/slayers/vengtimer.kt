@@ -6,8 +6,8 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.*
 import meowing.zen.feats.Feature
-import meowing.zen.hud.HUDEditor
 import meowing.zen.hud.HUDManager
+import meowing.zen.utils.Render2D
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
@@ -84,7 +84,7 @@ object vengtimer : Feature("vengtimer") {
             }
         }
 
-        register<GuiEvent.Hud> { renderHUD(it.context) }
+        register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
     private fun cleanup() {
@@ -93,7 +93,7 @@ object vengtimer : Feature("vengtimer") {
         if (starttime > 0) starttime = 0
     }
 
-    fun renderHUD(context: DrawContext) {
+    private fun renderHUD(context: DrawContext) {
         if (!HUDManager.isEnabled("vengtimer")) return
 
         val text = getDisplayText()
@@ -103,11 +103,7 @@ object vengtimer : Feature("vengtimer") {
         val y = HUDManager.getY("vengtimer")
         val scale = HUDManager.getScale("vengtimer")
 
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
-        context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, false)
-        context.matrices.pop()
+        Render2D.renderString(context, text, x, y, scale)
     }
 
     private fun getDisplayText(): String {

@@ -1,6 +1,5 @@
 package meowing.zen.feats.dungeons
 
-import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -9,14 +8,13 @@ import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.feats.Feature
-import meowing.zen.hud.HUDEditor
 import meowing.zen.hud.HUDManager
+import meowing.zen.utils.Render2D
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
-import net.minecraft.util.Colors
 
 object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
@@ -50,7 +48,7 @@ object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("
             }
         }
 
-        register<GuiEvent.Hud> { renderHUD(it.context) }
+        register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
     override fun onRegister() {
@@ -62,7 +60,7 @@ object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("
         servertickcall?.unregister()
     }
 
-    fun renderHUD(context: DrawContext) {
+    private fun renderHUD(context: DrawContext) {
         if (!HUDManager.isEnabled("firefreeze") || ticks <= 0) return
 
         val text = "§bFire freeze: §c${"%.1f".format(ticks / 20.0)}s"
@@ -70,10 +68,6 @@ object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("
         val y = HUDManager.getY("firefreeze")
         val scale = HUDManager.getScale("firefreeze")
 
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
-        context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, false)
-        context.matrices.pop()
+        Render2D.renderString(context, text, x, y, scale)
     }
 }

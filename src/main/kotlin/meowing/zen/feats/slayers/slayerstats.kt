@@ -12,10 +12,10 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.GuiEvent
 import meowing.zen.utils.CommandUtils
+import meowing.zen.utils.Render2D.renderString
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.util.Colors
 
 object slayerstats : Feature("slayerstats") {
     private var kills = 0
@@ -35,7 +35,7 @@ object slayerstats : Feature("slayerstats") {
 
     override fun initialize() {
         HUDManager.register(name, "§c[Zen] §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s", "Slayers")
-        register<GuiEvent.Hud> { renderHUD(it.context) }
+        register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
     fun addKill(killtime: Long) {
@@ -43,19 +43,19 @@ object slayerstats : Feature("slayerstats") {
         totalKillTime += killtime
     }
 
-    fun getBPH() = (kills * 3600000 / (System.currentTimeMillis() - sessionStart)).toInt()
-    fun getAVG() = "${(totalKillTime / kills / 1000.0).format(1)}s"
-
     fun reset() {
         kills = 0
         sessionStart = System.currentTimeMillis()
         totalKillTime = 0L
         ChatUtils.addMessage("§c[Zen] §fSlayer stats reset!")
     }
+    
+    private fun getBPH() = (kills * 3600000 / (System.currentTimeMillis() - sessionStart)).toInt()
+    private fun getAVG() = "${(totalKillTime / kills / 1000.0).format(1)}s"
 
     private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)
 
-    fun renderHUD(context: DrawContext) {
+    private fun renderHUD(context: DrawContext) {
         if (!HUDManager.isEnabled(name) || (kills == 0)) return
 
         val lines = if (kills > 0) {
@@ -75,17 +75,11 @@ object slayerstats : Feature("slayerstats") {
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
 
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
-
         val linePadding = 2
         lines.forEachIndexed { index, line ->
             val yOffset = index * (mc.textRenderer.fontHeight + linePadding)
-            context.drawText(mc.textRenderer, line, 0, yOffset.toInt(), Colors.WHITE, false)
+            renderString(context, line, x, y + yOffset / scale, scale)
         }
-
-        context.matrices.pop()
     }
 }
 

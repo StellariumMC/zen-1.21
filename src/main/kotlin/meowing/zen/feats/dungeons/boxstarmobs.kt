@@ -9,10 +9,8 @@ import meowing.zen.events.EntityEvent
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
-import meowing.zen.utils.RenderUtils
 import meowing.zen.utils.TickUtils
-import meowing.zen.utils.Utils
-import meowing.zen.utils.Utils.toColorFloat
+import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
 import java.awt.Color
 
@@ -60,33 +58,15 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
             entities.clear()
         }
 
-        register<RenderEvent.EntityPre> { event ->
+        register<RenderEvent.EntityGlow> { event ->
             val ent = event.entity
             if (!entities.contains(ent.id)) return@register
-            val matrices = event.matrices
-            val vertex = event.vertex
-
-            val cam = mc.gameRenderer.camera
-            val width = ent.width + 0.2
-            val height = ent.height
-            val entityPos = ent.getLerpedPos(Utils.getPartialTicks())
-            val x = entityPos.x - cam.pos.x
-            val y = entityPos.y - cam.pos.y
-            val z = entityPos.z - cam.pos.z
+            val player = mc.player ?: return@register
             val color = config.boxstarmobscolor
-            RenderUtils.renderEntityOutline(
-                matrices,
-                vertex,
-                x,
-                y,
-                z,
-                width,
-                height,
-                color.red.toColorFloat(),
-                color.green.toColorFloat(),
-                color.blue.toColorFloat(),
-                color.alpha.toColorFloat()
-            )
+            if (player.canSee(event.entity)) {
+                event.shouldGlow = true
+                event.glowColor = color.toColorInt()
+            }
         }
     }
 }

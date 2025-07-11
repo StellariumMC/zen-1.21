@@ -1,12 +1,9 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.Tessellator
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.debug.DebugRenderer
@@ -73,7 +70,7 @@ object RenderUtils {
         )
     }
 
-    fun renderString(
+    fun drawString(
         text: String,
         pos: Vec3d,
         color: Int,

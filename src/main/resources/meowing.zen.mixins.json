@@ -12,7 +12,8 @@
     "MixinRenderHud",
     "MixinRenderLightning",
     "MixinRenderPlayerEntity",
-    "MixinRenderStatusEffects"
+    "MixinRenderStatusEffects",
+    "MixinRenderWorld"
   ],
   "injectors": {
     "defaultRequire": 1

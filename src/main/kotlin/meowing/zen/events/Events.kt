@@ -1,7 +1,6 @@
 package meowing.zen.events
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.render.VertexConsumerProvider
@@ -39,6 +38,7 @@ abstract class RenderEvent {
     class EntityPost(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
     class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : Event()
     class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
+    class EntityGlow(val entity: Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
 }
 
 abstract class EntityEvent {
@@ -51,7 +51,7 @@ abstract class EntityEvent {
 
 abstract class GuiEvent {
     class AfterRender(val screen: Screen, val context: DrawContext) : Event()
-    class Hud(val context: DrawContext) : Event()
+    class HUD(val context: DrawContext) : Event()
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen) : Event()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
