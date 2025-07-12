@@ -37,7 +37,6 @@ object arrowpoison : Feature("arrowpoison") {
         HUDManager.register(name, "<I> 64 | <I> 32")
 
         register<PacketEvent.Received> { event ->
-            ChatUtils.addMessage("packet received: ${event.packet.packetType} | ${event.packet.packetType.id}")
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()
         }
 

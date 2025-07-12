@@ -45,6 +45,8 @@ object FeatureLoader {
         "dungeons.architectdraft",
         "dungeons.boxstarmobs",
         "dungeons.leapannounce",
+        "dungeons.scarfspawntimers",
+        "dungeons.highlightlivid",
         "noclutter.hidefallingblocks",
         "noclutter.hidefireoverlay",
         "noclutter.hidestatuseffects",

@@ -4,19 +4,19 @@ import meowing.zen.events.AreaEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.PacketEvent
 import meowing.zen.utils.Utils.removeEmotes
-import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
-import net.minecraft.scoreboard.Scoreboard
-import kotlin.compareTo
 
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
+    private val lock = Any()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
     var area: String? = null
+        private set
     var subarea: String? = null
+        private set
 
     init {
         EventBus.register<PacketEvent.Received> ({ event ->
@@ -31,45 +31,57 @@ object LocationUtils {
                         val match = areaRegex.find(line) ?: return@forEach
                         val newArea = match.groupValues[1]
                         if (newArea.lowercase() != area) {
-                            EventBus.post(AreaEvent.Main(newArea))
-                            area = newArea.lowercase()
+                            synchronized(lock) {
+                                EventBus.post(AreaEvent.Main(newArea))
+                                area = newArea.lowercase()
+                            }
                         }
                     }
                 }
                 is TeamS2CPacket -> {
-                    val teamData = packet.team.orElse(null) ?: return@register
-                    val prefix = teamData.prefix?.string ?: ""
-                    val suffix = teamData.suffix?.string ?: ""
+                    val prefix = packet.team.orElse(null)?.prefix?.string ?: ""
+                    val suffix = packet.team.orElse(null)?.suffix?.string ?: ""
                     if (prefix.isEmpty() || suffix.isEmpty()) return@register
 
                     val line = prefix + suffix
                     if (!subAreaRegex.matches(line)) return@register
                     if (line.endsWith("cth") || line.endsWith("ch")) return@register
                     if (line.lowercase() != subarea) {
-                        EventBus.post(AreaEvent.Sub(line))
-                        subarea = line.lowercase()
+                        synchronized(lock) {
+                            EventBus.post(AreaEvent.Sub(line))
+                            subarea = line.lowercase()
+                        }
                     }
                 }
             }
         })
 
         EventBus.register<AreaEvent.Main> ({
-            cachedAreas.clear()
+            synchronized(lock) {
+                cachedAreas.clear()
+            }
         })
+
         EventBus.register<AreaEvent.Sub> ({
-            cachedSubareas.clear()
+            synchronized(lock) {
+                cachedSubareas.clear()
+            }
         })
     }
 
     fun checkArea(areaLower: String?): Boolean {
-        return cachedAreas.getOrPut(areaLower) {
-            areaLower?.let { area == it } ?: true
+        return synchronized(lock) {
+            cachedAreas.getOrPut(areaLower) {
+                areaLower?.let { area == it } ?: true
+            }
         }
     }
 
     fun checkSubarea(subareaLower: String?): Boolean {
-        return cachedSubareas.getOrPut(subareaLower) {
-            subareaLower?.let { subarea?.contains(it) == true } ?: true
+        return synchronized(lock) {
+            cachedSubareas.getOrPut(subareaLower) {
+                subareaLower?.let { subarea?.contains(it) == true } ?: true
+            }
         }
     }
 }

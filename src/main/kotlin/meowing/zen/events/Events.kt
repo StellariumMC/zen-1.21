@@ -36,7 +36,7 @@ abstract class RenderEvent {
     class WorldPostEntities(val context: WorldRenderContext?) : Event()
     class EntityPre(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
     class EntityPost(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
-    class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : Event()
+    class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
     class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
     class EntityGlow(val entity: Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
 }

@@ -63,6 +63,10 @@ object Utils {
         return this / 255f
     }
 
+    fun Color.toFloatArray(): FloatArray {
+        return floatArrayOf(red / 255f, green / 255f, blue / 255f)
+    }
+
     fun Map<*, *>.toColorFromMap(): Color? {
         return try {
             val r = (get("r") as? Number)?.toInt() ?: 255

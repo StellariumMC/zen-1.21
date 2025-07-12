@@ -63,8 +63,16 @@ class Zen : ClientModInitializer {
             isInInventory = false
         })
 
-        EventBus.register<AreaEvent.Main> ({ updateFeatures() })
-        EventBus.register<AreaEvent.Sub> ({ updateFeatures() })
+        EventBus.register<AreaEvent.Main> ({
+            TickUtils.scheduleServer(1) {
+                updateFeatures()
+            }
+        })
+        EventBus.register<AreaEvent.Sub> ({
+            TickUtils.scheduleServer(1) {
+                updateFeatures()
+            }
+        })
     }
 
     companion object {

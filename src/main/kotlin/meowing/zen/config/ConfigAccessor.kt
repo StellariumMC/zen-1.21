@@ -32,6 +32,9 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _entityhighlightmobcolor = Color(255, 0, 0, 255)
     private var _entityhighlightanimalcolor = Color(0, 255, 0, 255)
     private var _entityhighlightothercolor = Color(255, 255, 255, 255)
+    private var _highlightlividcolor = Color(0, 255, 255, 127)
+    private var _hidewronglivid = false
+    private var _highlightlividline = false
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -56,11 +59,13 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val customZ get() = _customZ
     val customself get() = _customself
     val slayerhighlightcolor get() = _slayerhighlightcolor
-    val slayerhighlightfilled get() = _slayerhighlightfilled
     val entityhighlightplayercolor get() = _entityhighlightplayercolor
     val entityhighlightmobcolor get() = _entityhighlightmobcolor
     val entityhighlightanimalcolor get() = _entityhighlightanimalcolor
     val entityhighlightothercolor get() = _entityhighlightothercolor
+    val highlightlividcolor get() = _highlightlividcolor
+    val hidewronglivid get() = _hidewronglivid
+    val highlightlividline get() = _highlightlividline
 
     init {
         configUI.registerListener("carrycounter") { _carrycounter = it as Boolean }
@@ -91,6 +96,9 @@ class ConfigAccessor(val configUI: ConfigUI) {
         configUI.registerListener("entityhighlightmobcolor") { _entityhighlightmobcolor = it as Color }
         configUI.registerListener("entityhighlightanimalcolor") { _entityhighlightanimalcolor = it as Color }
         configUI.registerListener("entityhighlightothercolor") { _entityhighlightothercolor = it as Color }
+        configUI.registerListener("highlightlividcolor") { _highlightlividcolor = it as Color }
+        configUI.registerListener("hidewronglivid") { _hidewronglivid = it as Boolean }
+        configUI.registerListener("highlightlividline") { _highlightlividline = it as Boolean }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

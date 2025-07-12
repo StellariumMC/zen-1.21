@@ -9,6 +9,7 @@ import meowing.zen.events.GuiEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.feats.Feature
 import meowing.zen.hud.HUDManager
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Render2D
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
@@ -18,7 +19,9 @@ import net.minecraft.sound.SoundEvents
 
 object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
-    private var servertickcall: EventBus.EventCall? = null
+    private var servertickcall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({
+        if (ticks > 0) ticks--
+    })
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -36,14 +39,11 @@ object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
                 ticks = 100
-                servertickcall?.unregister()
-                servertickcall = EventBus.register<TickEvent.Server> ({
-                    if (ticks > 0) ticks--
-                })
+                servertickcall.unregister()
                 TickUtils.scheduleServer(105) {
                     Utils.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1f, 0.5f)
                     ticks = 0
-                    servertickcall?.unregister()
+                    servertickcall.unregister()
                 }
             }
         }
@@ -57,7 +57,6 @@ object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("
 
     override fun onUnregister() {
         ticks = 0
-        servertickcall?.unregister()
     }
 
     private fun renderHUD(context: DrawContext) {

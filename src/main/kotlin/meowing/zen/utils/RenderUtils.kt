@@ -1,6 +1,7 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
@@ -9,8 +10,11 @@ import net.minecraft.client.render.VertexRendering
 import net.minecraft.client.render.debug.DebugRenderer
 import net.minecraft.client.util.BufferAllocator
 import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.entity.Entity
+import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.RaycastContext
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
 
@@ -115,5 +119,51 @@ object RenderUtils {
 
         GL11.glDepthFunc(depthFunc)
         if (!depthTest) GL11.glDisable(GL11.GL_DEPTH_TEST)
+    }
+    fun drawLineToEntity(entity: Entity, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
+        val player = mc.player ?: return
+        if (!player.canSee(entity)) return
+
+        val entityPos = entity.pos.add(0.0, entity.standingEyeHeight.toDouble(), 0.0)
+        drawLineToPos(entityPos, context, colorComponents, alpha)
+    }
+
+    fun drawLineToPos(pos: Vec3d, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
+        val player = mc.player ?: return
+        val playerPos = player.getCameraPosVec(context.tickCounter().getTickProgress(false))
+        val toTarget = pos.subtract(playerPos).normalize()
+        val lookVec = player.getRotationVec(context.tickCounter().getTickProgress(false)).normalize()
+
+        if (toTarget.dotProduct(lookVec) < 0.3) return
+
+        val result = player.world.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
+        if (result.type == HitResult.Type.BLOCK) return
+
+        renderLineFromCursor(context, pos, colorComponents, alpha)
+    }
+
+    fun renderLineFromCursor(context: WorldRenderContext, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
+        val camera = context.camera().pos
+        val matrices = context.matrixStack()
+        matrices?.push()
+        matrices?.translate(-camera.x, -camera.y, -camera.z)
+        val entry = matrices?.peek()
+        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val layer = RenderLayer.getLines()
+        val buffer = consumers.getBuffer(layer)
+
+        val cameraPoint = camera.add(Vec3d.fromPolar(context.camera().pitch, context.camera().yaw))
+        val normal = point.toVector3f().sub(cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat()).normalize()
+
+        buffer.vertex(entry, cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat())
+            .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .normal(entry, normal)
+
+        buffer.vertex(entry, point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+            .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .normal(entry, normal)
+
+        consumers.draw(layer)
+        matrices?.pop()
     }
 }
