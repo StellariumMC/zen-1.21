@@ -8,6 +8,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.Utils.toColorInt
+import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.passive.PassiveEntity
 import net.minecraft.entity.player.PlayerEntity
@@ -56,19 +57,27 @@ object entityhighlight : Feature("entityhighlight") {
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->
             val entity = event.entity
-            if (entity == mc.player || entity.isInvisible) return@register
+            val player = mc.player ?: return@register
 
-            val entityHitResult = mc.crosshairTarget as? EntityHitResult ?: return@register
-            if (entityHitResult.entity != entity) return@register
+            if (entity == player || entity.isInvisible || !isEntityUnderCrosshair(entity)) return@register
 
-            val color = when (entity) {
-                is PlayerEntity -> config.entityhighlightplayercolor
-                is PassiveEntity -> config.entityhighlightanimalcolor
-                is MobEntity -> config.entityhighlightmobcolor
-                else -> config.entityhighlightothercolor
-            }
+            val color = getEntityColor(entity)
             event.shouldGlow = true
             event.glowColor = color.toColorInt()
+        }
+    }
+
+    private fun isEntityUnderCrosshair(entity: Entity): Boolean {
+        val crosshairTarget = mc.crosshairTarget as? EntityHitResult ?: return false
+        return crosshairTarget.entity == entity
+    }
+
+    private fun getEntityColor(entity: Entity): Color {
+        return when (entity) {
+            is PlayerEntity -> config.entityhighlightplayercolor
+            is PassiveEntity -> config.entityhighlightanimalcolor
+            is MobEntity -> config.entityhighlightmobcolor
+            else -> config.entityhighlightothercolor
         }
     }
 }

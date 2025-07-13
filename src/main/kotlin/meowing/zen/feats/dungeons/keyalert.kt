@@ -6,11 +6,10 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.TickUtils
-import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.events.EntityEvent
+import meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.entity.decoration.ArmorStandEntity
-import java.awt.Color
 
 object keyalert : Feature("keyalert", area = "catacombs") {
     private var bloodOpen = false
@@ -37,8 +36,8 @@ object keyalert : Feature("keyalert", area = "catacombs") {
             TickUtils.scheduleServer(2) {
                 val name = event.entity.name?.string?.removeFormatting() ?: return@scheduleServer
                 when {
-                    name.contains("Wither Key") -> Utils.showTitle("§8Wither §fkey spawned!", "", 40)
-                    name.contains("Blood Key") -> Utils.showTitle("§cBlood §fkey spawned!", "", 40)
+                    name.contains("Wither Key") -> showTitle("§8Wither §fkey spawned!", null, 2000)
+                    name.contains("Blood Key") -> showTitle("§cBlood §fkey spawned!", null, 2000)
                 }
             }
         }

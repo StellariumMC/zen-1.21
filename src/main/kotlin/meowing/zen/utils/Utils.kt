@@ -35,17 +35,6 @@ object Utils {
         }
     }
 
-    fun showTitle(title: String?, subtitle: String?, duration: Int) {
-        mc.inGameHud.setTitle(title?.let { Text.literal(it) })
-        mc.inGameHud.setSubtitle(subtitle?.let { Text.literal(it) })
-    }
-
-    fun showTitle(title: String, subtitle: String, fadeIn: Int, stay: Int, fadeOut: Int) {
-        mc.inGameHud.setTitleTicks(fadeIn, stay, fadeOut)
-        mc.inGameHud.setTitle(Text.literal(title))
-        mc.inGameHud.setSubtitle(Text.literal(subtitle))
-    }
-
     fun String?.removeFormatting(): String {
         if (this == null) return ""
         return this.replace(Regex("[§&][0-9a-fk-or]", RegexOption.IGNORE_CASE), "")
