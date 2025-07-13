@@ -1,5 +1,6 @@
 package meowing.zen
 
+import meowing.zen.compat.OldConfig
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
@@ -15,6 +16,7 @@ import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
+import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
 
@@ -26,7 +28,6 @@ class Zen : ClientModInitializer {
 
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
-
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
 
@@ -47,6 +48,7 @@ class Zen : ClientModInitializer {
         }
 
         EventBus.register<GameEvent.Load> ({
+            OldConfig.convertConfig(FabricLoader.getInstance().configDir.toFile())
             configUI = ZenConfig()
             config = ConfigAccessor(configUI)
             FeatureLoader.init()

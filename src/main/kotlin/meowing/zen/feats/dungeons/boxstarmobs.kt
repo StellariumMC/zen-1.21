@@ -32,12 +32,6 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
                 ElementType.ColorPicker(Color(0, 255, 255, 127)),
                 { config -> config["boxstarmobs"] as? Boolean == true }
             ))
-            .addElement("Dungeons", "Box star mobs", ConfigElement(
-                "boxstarmobsfilled",
-                "Filled outline",
-                "Enable to render a filled color highlight.",
-                ElementType.Switch(false)
-            ))
     }
 
     override fun initialize() {
