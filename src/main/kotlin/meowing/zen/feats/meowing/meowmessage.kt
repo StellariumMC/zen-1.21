@@ -29,8 +29,8 @@ object meowmessage : Feature("meowmessage") {
             try {
                 if (event.message.startsWith("/")) {
                     val parts = event.message.split(" ")
-                    if (parts.size > 1) ChatUtils.chat("${parts[0]} ${transform(parts.drop(1).joinToString(" "))}")
-                    else ChatUtils.chat(event.message)
+                    if (parts.size > 1) ChatUtils.command("${parts[0]} ${transform(parts.drop(1).joinToString(" "))}")
+                    else ChatUtils.command(event.message)
                 } else {
                     ChatUtils.chat(transform(event.message))
                 }

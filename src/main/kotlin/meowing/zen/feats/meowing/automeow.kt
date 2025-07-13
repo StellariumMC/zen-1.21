@@ -1,5 +1,6 @@
 package meowing.zen.feats.meowing
 
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -9,10 +10,9 @@ import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
-import net.minecraft.client.MinecraftClient
 
 object automeow : Feature("automeow") {
-    private val regex = "^(?:(Guild|Party|Officer|Co-op) > |From )?([A-Za-z0-9_]+)(?:\\s\\[[^]]+])?\\s*[>:]\\s*(?:[A-Za-z0-9_]+\\s*[>:]\\s*)?meow$".toRegex(RegexOption.IGNORE_CASE)
+    private val regex = "^(?:\\w+(?:-\\w+)?\\s>\\s)?(?:\\[[^]]+]\\s)?(?:\\S+\\s)?(?:\\[[^]]+]\\s)?([A-Za-z0-9_.-]+)(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?:\\s(?:[A-Za-z0-9_.-]+(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?\\s?(?:[»>]|:)\\s)?meow$".toRegex(RegexOption.IGNORE_CASE)
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
     private val channels = mapOf(
         "Guild >" to "gc",
@@ -33,16 +33,11 @@ object automeow : Feature("automeow") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            if (event.overlay) return@register
             val content = event.message.string.removeFormatting()
-
             val matchResult = regex.find(content) ?: return@register
+            val username = matchResult.groupValues[1]
 
-            val playerName = MinecraftClient.getInstance().player?.name?.string ?: return@register
-            val username = matchResult.groupValues[2]
-
-            if (content.contains("To ") || username == playerName) return@register
-            if (content.startsWith("G >") || content.startsWith("P >")) return@register
+            if (content.contains("To ") || username == mc.player?.name?.string) return@register
             TickUtils.schedule(Random.nextLong(10, 50)) {
                 val cmd = when {
                     content.startsWith("From ") -> {

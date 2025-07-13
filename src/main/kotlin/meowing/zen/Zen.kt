@@ -11,10 +11,8 @@ import meowing.zen.utils.TickUtils
 import meowing.zen.utils.DataUtils
 import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
-import meowing.zen.events.EntityEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
-import meowing.zen.events.RenderEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import net.minecraft.client.gui.screen.ingame.InventoryScreen

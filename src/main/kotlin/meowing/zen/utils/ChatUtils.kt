@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraft.client.MinecraftClient
+import meowing.zen.Zen.Companion.mc
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.MutableText
@@ -20,7 +20,7 @@ object ChatUtils {
     private var processing = false
 
     fun chat(message: String) {
-        val player = MinecraftClient.getInstance().player ?: return
+        val player = mc.player ?: return
         val now = System.currentTimeMillis()
 
         if (now - lastSent >= 100 && !processing) {
@@ -42,7 +42,7 @@ object ChatUtils {
                 }
 
                 queue.poll()?.let { message ->
-                    val player = MinecraftClient.getInstance().player
+                    val player = mc.player
                     if (player != null) {
                         player.networkHandler.sendChatMessage(message)
                         lastSent = System.currentTimeMillis()
@@ -54,7 +54,7 @@ object ChatUtils {
     }
 
     fun command(command: String) {
-        val player = MinecraftClient.getInstance().player ?: return
+        val player = mc.player ?: return
         val cmd = if (command.startsWith("/")) command else "/$command"
         player.networkHandler.sendChatCommand(cmd.substring(1))
     }
@@ -64,10 +64,8 @@ object ChatUtils {
         hover: String? = null,
         clickAction: ClickEvent.Action? = null,
         clickValue: String? = null,
-        siblingText: String? = null,
-        actionbar: Boolean = false
+        siblingText: String? = null
     ) {
-        val player = MinecraftClient.getInstance().player ?: return
         val component = Text.literal(message) as MutableText
 
         siblingText?.let { text ->
@@ -79,7 +77,7 @@ object ChatUtils {
             component.style = createStyle(hover, clickAction, clickValue)
         }
 
-        player.sendMessage(component, actionbar)
+        mc.inGameHud.chatHud.addMessage(component)
     }
 
     fun createStyle(hover: String?, clickAction: ClickEvent.Action?, clickValue: String?): Style {

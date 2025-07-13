@@ -23,7 +23,6 @@ object guildjoinleave : Feature("guildjoinleave") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            if (event.overlay) return@register
             val m = guildPattern.matcher(event.message.string)
             if (m.matches()) {
                 event.cancel()
@@ -56,7 +55,6 @@ object friendjoinleave : Feature("friendjoinleave") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            if (event.overlay) return@register
             val m = friendPattern.matcher(event.message.string)
             if (m.matches()) {
                 event.cancel()
