@@ -26,12 +26,12 @@ object TitleUtils {
     }
 
     fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 2.0f) {
-        titleQueue.offer(TitleData(title, subtitle, 500, duration, 500, scale))
+        titleQueue.offer(TitleData(title, subtitle, 10, duration / 50, 10, scale))
         if (currentTitle == null) nextTitle()
     }
 
     fun showTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int, scale: Float = 2.0f) {
-        titleQueue.offer(TitleData(title, subtitle, fadeIn, stay, fadeOut, scale))
+        titleQueue.offer(TitleData(title, subtitle, fadeIn / 50, stay / 50, fadeOut / 50, scale))
         if (currentTitle == null) nextTitle()
     }
 

@@ -35,6 +35,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _highlightlividcolor = Color(0, 255, 255, 127)
     private var _hidewronglivid = false
     private var _highlightlividline = false
+    private var _ragparty = false
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -66,6 +67,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val highlightlividcolor get() = _highlightlividcolor
     val hidewronglivid get() = _hidewronglivid
     val highlightlividline get() = _highlightlividline
+    val ragparty get() = _ragparty
 
     init {
         configUI.registerListener("carrycounter") { _carrycounter = it as Boolean }
@@ -99,6 +101,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
         configUI.registerListener("highlightlividcolor") { _highlightlividcolor = it as Color }
         configUI.registerListener("hidewronglivid") { _hidewronglivid = it as Boolean }
         configUI.registerListener("highlightlividline") { _highlightlividline = it as Boolean }
+        configUI.registerListener("ragparty") { _ragparty = it as Boolean }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

@@ -14,11 +14,7 @@ object ItemUtils {
     val abilityRegex = Regex("Ability:.*RIGHT CLICK")
 
     inline val ItemStack?.extraAttributes: NbtCompound?
-        get() = this?.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)
-            ?.copyNbt()?.let { nbt ->
-                if (nbt.contains("ExtraAttributes")) nbt.getCompound("ExtraAttributes").orElse(null)
-                else null
-            }
+        get() = this?.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)?.copyNbt()
 
     inline val ItemStack?.skyblockID: String get() = this?.extraAttributes?.getString("id")?.orElse("") ?: ""
 
