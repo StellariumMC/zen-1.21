@@ -57,7 +57,9 @@ object CarryHUD {
         if (shouldRegister != isRegistered) {
             try {
                 if (shouldRegister) {
-                    guiClickHandler = EventBus.register<GuiEvent.Click> ({ onMouseInput() })
+                    guiClickHandler = EventBus.register<GuiEvent.Click> ({
+                        if (it.state) onMouseInput()
+                    })
                     guiDrawHandler = EventBus.register<GuiEvent.AfterRender> ({ onGuiRender(it.context) })
                 } else {
                     guiClickHandler?.unregister()
@@ -84,8 +86,7 @@ object CarryHUD {
         val mouseY = mc.mouse.y * window.scaledHeight / window.height
 
         buttons.find {
-            mouseX >= it.x && mouseX <= it.x + it.width &&
-                    mouseY >= it.y && mouseY <= it.y + it.height
+            mouseX >= it.x && mouseX <= it.x + it.width && mouseY >= it.y && mouseY <= it.y + it.height
         }?.let { button ->
             when (button.action) {
                 "add" -> if (button.carryee.count < button.carryee.total) button.carryee.count++

@@ -38,9 +38,10 @@ class UIBuilder(private val theme: ConfigTheme) {
             }.onMouseClick { onClick() }
         }
 
-        UIText(category.name).constrain {
+        UIWrappedText(category.name, centered = true).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
+            width = 90.percent()
             textScale = 1.3.pixels()
         }.setColor(if (isActive) theme.accent else theme.accent2) childOf button
 
