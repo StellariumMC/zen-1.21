@@ -9,12 +9,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Taken from devonian
+// https://github.com/Synnerz/devonian/blob/main/src/main/java/com/github/synnerz/devonian/mixin/PerspectiveMixin.java
 @Mixin(Perspective.class)
 public class MixinCamera {
     @Shadow @Final private boolean firstPerson;
 
     @Inject(method = "next", at = @At("HEAD"), cancellable = true)
-    private void devonian$onPerspectiveChange(CallbackInfoReturnable<Perspective> cir) {
+    private void onPrespectiveChange(CallbackInfoReturnable<Perspective> cir) {
         if (removeselfiecam.INSTANCE.isEnabled()) cir.setReturnValue(this.firstPerson ? Perspective.THIRD_PERSON_BACK : Perspective.FIRST_PERSON);
     }
 }

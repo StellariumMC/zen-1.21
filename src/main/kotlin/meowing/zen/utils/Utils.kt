@@ -1,11 +1,14 @@
 package meowing.zen.utils
 
+import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIBlock
+import gg.essential.elementa.components.UIRoundedRectangle
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.SimpleParticleType
 import net.minecraft.sound.SoundEvent
-import net.minecraft.text.Text
+import org.apache.commons.lang3.SystemUtils
 import java.awt.Color
 
 object Utils {
@@ -21,18 +24,6 @@ object Utils {
 
     fun spawnParticle(particle: SimpleParticleType?, x: Double, y: Double, z: Double, velocityX: Double, velocityY: Double, velocityZ: Double) {
         mc.world?.addParticleClient(ParticleTypes.FLAME, x, y, z, velocityX, velocityY, velocityZ)
-    }
-
-    fun spawnParticleAtPlayer(particle: SimpleParticleType?, velocityX: Double, velocityY: Double, velocityZ: Double) {
-        mc.player?.let { player ->
-            spawnParticle(
-                particle,
-                player.x,
-                player.y + 1.0,
-                player.z,
-                velocityX, velocityY, velocityZ
-            )
-        }
     }
 
     fun String?.removeFormatting(): String {
@@ -80,6 +71,10 @@ object Utils {
         } catch (e: Exception) {
             null
         }
+    }
+
+    fun createBlock(radius: Float = 0f): UIComponent {
+        return if (SystemUtils.IS_OS_MAC_OSX) UIBlock() else UIRoundedRectangle(radius)
     }
 
     inline fun <reified R> Any.getField(name: String): R = javaClass.getDeclaredField(name).apply { isAccessible = true }[this] as R

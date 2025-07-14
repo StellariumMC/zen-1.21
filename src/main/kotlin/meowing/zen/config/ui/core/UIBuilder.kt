@@ -1,7 +1,6 @@
 package meowing.zen.config.ui.core
 
 import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.UIWrappedText
 import gg.essential.elementa.constraints.AdditiveConstraint
@@ -19,11 +18,12 @@ import meowing.zen.config.ui.types.ConfigCategory
 import meowing.zen.config.ui.types.ConfigSection
 import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.TickUtils
+import meowing.zen.utils.Utils.createBlock
 import java.awt.Color
 
 class UIBuilder(private val theme: ConfigTheme) {
     fun createCategoryButton(category: ConfigCategory, isActive: Boolean, onClick: () -> Unit): UIComponent {
-        val button = UIRoundedRectangle(5f).constrain {
+        val button = createBlock(5f).constrain {
             x = 0.percent()
             y = CramSiblingConstraint(5f)
             width = 100.percent()
@@ -49,7 +49,7 @@ class UIBuilder(private val theme: ConfigTheme) {
     }
 
     fun createHudButton(): UIComponent {
-        val button = UIRoundedRectangle(5f).constrain {
+        val button = createBlock(5f).constrain {
             x = CenterConstraint()
             y = 5.pixels(true)
             width = 90.percent()
@@ -78,14 +78,14 @@ class UIBuilder(private val theme: ConfigTheme) {
     }
 
     fun createSectionCard(section: ConfigSection, onClick: () -> Unit): UIComponent {
-        val card = UIRoundedRectangle(5f).constrain {
+        val card = createBlock(5f).constrain {
             x = CramSiblingConstraint(15f)
             y = CramSiblingConstraint(15f)
             width = 23.percent()
             height = 80.pixels()
         }.setColor(Color(theme.element.red + 20, theme.element.green + 20, theme.element.blue + 20, 255))
 
-        val innerCard = UIRoundedRectangle(5f).constrain {
+        val innerCard = createBlock(5f).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
             width = 99.2.percent()
@@ -117,7 +117,7 @@ class UIBuilder(private val theme: ConfigTheme) {
     }
 
     fun createPopupOverlay(onClose: () -> Unit): UIComponent {
-        return UIRoundedRectangle(0f).constrain {
+        return createBlock(0f).constrain {
             x = 0.percent()
             y = 0.percent()
             width = 100.percent()
@@ -126,7 +126,7 @@ class UIBuilder(private val theme: ConfigTheme) {
     }
 
     fun createPopup(): UIComponent {
-        return UIRoundedRectangle(8f).constrain {
+        return createBlock(8f).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
             width = 90.percent()
@@ -135,7 +135,7 @@ class UIBuilder(private val theme: ConfigTheme) {
     }
 
     fun createPopupHeader(title: String): UIComponent {
-        val header = UIRoundedRectangle(5f).constrain {
+        val header = createBlock(5f).constrain {
             x = CenterConstraint()
             y = 0.percent()
             width = 100.percent()
