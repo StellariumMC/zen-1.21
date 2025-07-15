@@ -39,14 +39,14 @@ object ragalert : Feature("ragalert") {
                 val packet = event.packet
                 if (!packet.sound.toString().contains("minecraft:entity.wolf.death") || packet.pitch != 1.4920635f || !isHolding("RAGNAROCK_AXE")) return@register
                 val strengthGain = ((mc.player?.getStackInHand(Hand.MAIN_HAND)?.getSBStrength ?: return@register) * 1.5).toInt()
-                showTitle("§cRag §fCasted!", "§c❁ Strength:§b $strengthGain", 3500, 4f)
+                showTitle("§cRag §fCasted!", "§c❁ Strength:§b $strengthGain", 3500)
                 if (config.ragparty) ChatUtils.command("pc Strength from Ragnarok: $strengthGain")
             }
         }
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "Ragnarock was cancelled due to taking damage!") {
-                showTitle("§cRag §4Cancelled!", null, 2000, 3f)
+                showTitle("§cRag §4Cancelled!", null, 2000)
             }
         }
     }

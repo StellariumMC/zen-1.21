@@ -2,6 +2,7 @@ package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
 
 object Render2D {
@@ -19,5 +20,14 @@ object Render2D {
         context.matrices.scale(scale, scale, 1.0f)
         context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, true)
         context.matrices.pop()
+    }
+
+    fun renderItem(context: DrawContext, item: ItemStack, x: Float, y: Float, scale: Float) {
+        val matrixStack = context.matrices
+        matrixStack.push()
+        matrixStack.translate(x, y, 0.0f)
+        matrixStack.scale(scale, scale, 1f)
+        context.drawItem(item, 0, 0)
+        matrixStack.pop()
     }
 }

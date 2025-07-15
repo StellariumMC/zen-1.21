@@ -56,8 +56,7 @@ object carrycounter : Feature("carrycounter") {
                 "Send count",
                 "Sends the count in party chat",
                 ElementType.Switch(true)
-            )
-            )
+            ))
             .addElement("Slayers", "Carrying", ConfigElement(
                 "carrybosshighlight",
                 "Carry boss highlight",
@@ -74,7 +73,7 @@ object carrycounter : Feature("carrycounter") {
             .addElement("Slayers", "Carrying", ConfigElement(
                 "carryclienthighlight",
                 "Carry client highlight",
-                "Highlights your client's boss.",
+                "Highlights your client.",
                 ElementType.Switch(false)
             ))
             .addElement("Slayers", "Carrying", ConfigElement(
@@ -228,7 +227,8 @@ object carrycounter : Feature("carrycounter") {
         fun register() {
             if (registered || !config.carrybosshighlight) return
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
-                if (carryeesByBossId.contains(event.entity.id)) {
+                carryeesByBossId[event.entity.id]?.let {
+                    if (mc.player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
                     event.glowColor = config.carrybosshighlightcolor.toColorInt()
                 }
@@ -253,6 +253,7 @@ object carrycounter : Feature("carrycounter") {
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
                 val cleanName = event.entity.name.string.removeFormatting()
                 carryeesByName[cleanName]?.let {
+                    if (mc.player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
                     event.glowColor = config.carryclienthighlightcolor.toColorInt()
                 }
@@ -346,7 +347,7 @@ object carrycounter : Feature("carrycounter") {
                 bossID = id
                 carryeesByBossId[id] = this
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
-                showTitle("§bBoss spawned", "§bby §c$name", 1000)
+                showTitle("§bBoss spawned", "§bby §c$name", 2500)
             }
         }
 
@@ -416,7 +417,7 @@ object carrycounter : Feature("carrycounter") {
             dataUtils.save()
             ChatUtils.addMessage("§c[Zen] §fCarries completed for §b$name §fin §b${sessionTime / 1000}s")
             Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
-            showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000, 3f)
+            showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000)
 
             carryeesByName.remove(name)
             bossID?.let { carryeesByBossId.remove(it) }

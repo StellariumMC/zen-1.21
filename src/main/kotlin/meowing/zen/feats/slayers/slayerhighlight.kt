@@ -16,15 +16,15 @@ object slayerhighlight : Feature("slayerhighlight") {
                 "slayerhighlight",
                 "Slayer highlight",
                 "Highlights your slayer boss.",
-                ElementType.Switch(false)
+                ElementType.Switch(false),
+                { config -> config["slayertimer"] as? Boolean == true}
             ))
     }
 
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->
             if (!slayertimer.isFighting || slayertimer.BossId == -1 || event.entity.id != slayertimer.BossId) return@register
-            val player = mc.player ?: return@register
-            if (player.canSee(event.entity)) {
+            if (mc.player?.canSee(event.entity) == true) {
                 event.shouldGlow = true
                 event.glowColor = config.slayerhighlightcolor.toColorInt()
             }

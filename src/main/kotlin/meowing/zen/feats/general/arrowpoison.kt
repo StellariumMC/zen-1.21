@@ -71,31 +71,23 @@ object arrowpoison : Feature("arrowpoison") {
         val twilightPotion = ItemStack(Items.PURPLE_DYE)
         val toxicPotion = ItemStack(Items.LIME_DYE)
         val fontRenderer = mc.textRenderer
-
-        val matrixStack = drawContext.matrices
-        matrixStack.push()
-        matrixStack.scale(scale, scale, 1f)
-        val scaledX = (x / scale).toInt()
-        val scaledY = (y / scale).toInt()
-
-        drawContext.drawItem(twilightPotion, scaledX, scaledY)
-        matrixStack.pop()
-
         val twilightStr = twilight.toString()
+        val toxicStr = toxic.toString()
         val textY = y + (iconSize - 8f * scale) / 2f
-        val twilightTextX = x + iconSize + spacing
-        Render2D.renderStringWithShadow(drawContext, twilightStr, twilightTextX, textY, scale)
+        var currentX = x
 
-        val separatorX = twilightTextX + fontRenderer.getWidth(twilightStr) * scale + spacing * 2
-        Render2D.renderStringWithShadow(drawContext, "§7|", separatorX, textY, scale)
+        Render2D.renderItem(drawContext, twilightPotion, currentX, y, scale)
 
-        val toxicIconX = separatorX + fontRenderer.getWidth("|") * scale + spacing
-        matrixStack.push()
-        matrixStack.scale(scale, scale, 1f)
-        drawContext.drawItem(toxicPotion, (toxicIconX / scale).toInt(), scaledY)
-        matrixStack.pop()
+        currentX += iconSize + spacing
+        Render2D.renderStringWithShadow(drawContext, twilightStr, currentX, textY, scale)
 
-        val toxicTextX = toxicIconX + iconSize + spacing
-        Render2D.renderStringWithShadow(drawContext, toxic.toString(), toxicTextX, textY, scale)
+        currentX += fontRenderer.getWidth(twilightStr) * scale + spacing * 2
+        Render2D.renderStringWithShadow(drawContext, "§7|", currentX, textY, scale)
+
+        currentX += fontRenderer.getWidth("|") * scale + spacing
+        Render2D.renderItem(drawContext, toxicPotion, currentX, y, scale)
+
+        currentX += iconSize + spacing
+        Render2D.renderStringWithShadow(drawContext, toxicStr, currentX, textY, scale)
     }
 }

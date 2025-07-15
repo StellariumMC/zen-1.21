@@ -37,7 +37,7 @@ object cryptreminder : Feature("cryptreminder") {
                 setTimeout(1000 * 60 * Zen.config.cryptreminderdelay.toLong()) {
                     if (DungeonUtils.getCryptCount() == 5 || !LocationUtils.checkArea("catacombs")) return@setTimeout
                     ChatUtils.command("/pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")
-                    showTitle("§c${DungeonUtils.getCryptCount()}§7/§c5 §fcrypts", null, 60, 3f)
+                    showTitle("§c${DungeonUtils.getCryptCount()}§7/§c5 §fcrypts", null, 3000)
                 }
             }
         }

@@ -13,7 +13,7 @@ object TitleUtils {
         val fadeIn: Int,
         val stay: Int,
         val fadeOut: Int,
-        val scale: Float = 2.0f
+        val scale: Float = 4.0f
     )
 
     private val titleQueue = LinkedList<TitleData>()
@@ -25,12 +25,12 @@ object TitleUtils {
         EventBus.register<GuiEvent.HUD> ({ render(it.context) })
     }
 
-    fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 2.0f) {
+    fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 4.0f) {
         titleQueue.offer(TitleData(title, subtitle, 10, duration / 50, 10, scale))
         if (currentTitle == null) nextTitle()
     }
 
-    fun showTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int, scale: Float = 2.0f) {
+    fun showTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int, scale: Float = 4.0f) {
         titleQueue.offer(TitleData(title, subtitle, fadeIn / 50, stay / 50, fadeOut / 50, scale))
         if (currentTitle == null) nextTitle()
     }
