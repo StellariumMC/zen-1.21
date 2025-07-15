@@ -8,6 +8,7 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.text.Text
 import java.util.Optional
 
+@Zen.Module
 object MetadataHandler {
     init {
         EventBus.register<EntityEvent.Metadata> ({ event ->

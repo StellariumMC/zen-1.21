@@ -1,5 +1,6 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -11,6 +12,7 @@ import meowing.zen.events.EntityEvent
 import meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.entity.decoration.ArmorStandEntity
 
+@Zen.Module
 object keyalert : Feature("keyalert", area = "catacombs") {
     private var bloodOpen = false
 

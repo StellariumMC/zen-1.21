@@ -1,5 +1,6 @@
 package meowing.zen.feats.general
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -14,6 +15,7 @@ import net.minecraft.world.EmptyBlockView
 import meowing.zen.events.RenderEvent
 import java.awt.Color
 
+@Zen.Module
 object blockoverlay : Feature("blockoverlay") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

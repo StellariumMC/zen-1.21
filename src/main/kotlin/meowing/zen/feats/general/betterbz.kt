@@ -1,5 +1,6 @@
 package meowing.zen.feats.general
 
+import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -8,8 +9,8 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils.addMessage
 import meowing.zen.utils.ChatUtils.formatNumber
 import meowing.zen.utils.Utils.removeFormatting
-import java.awt.Color
 
+@Zen.Module
 object betterbz : Feature("betterbz") {
     private val patterns = mapOf(
         "instaBuy" to Regex("\\[Bazaar] Bought ([\\d,]+)x (.+) for ([\\d,]+) coins!"),

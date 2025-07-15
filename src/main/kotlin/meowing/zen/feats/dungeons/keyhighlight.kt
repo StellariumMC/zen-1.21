@@ -1,5 +1,6 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -12,6 +13,7 @@ import meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.entity.decoration.ArmorStandEntity
 import java.awt.Color
 
+@Zen.Module
 object keyhighlight : Feature("keyhighlight", area = "catacombs") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

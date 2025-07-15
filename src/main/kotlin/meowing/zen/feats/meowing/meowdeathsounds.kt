@@ -1,5 +1,6 @@
 package meowing.zen.feats.meowing
 
+import meowing.zen.Zen
 import meowing.zen.feats.Feature
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -12,6 +13,7 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.sound.SoundEvents
 import kotlin.random.Random
 
+@Zen.Module
 object meowdeathsounds : Feature("meowdeathsounds") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

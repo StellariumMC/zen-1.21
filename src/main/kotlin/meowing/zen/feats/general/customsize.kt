@@ -1,5 +1,6 @@
 package meowing.zen.feats.general
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -8,6 +9,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 
+@Zen.Module
 object customsize : Feature("customsize") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

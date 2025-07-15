@@ -18,46 +18,46 @@ object TitleUtils {
 
     private val titleQueue = LinkedList<TitleData>()
     private var currentTitle: TitleData? = null
-    private var currentTime = 0
-    private var totalDuration = 0
+    private var startTime = 0L
 
     init {
         EventBus.register<GuiEvent.HUD> ({ render(it.context) })
     }
 
     fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 4.0f) {
-        titleQueue.offer(TitleData(title, subtitle, 10, duration / 50, 10, scale))
+        titleQueue.offer(TitleData(title, subtitle, 200, duration, 200, scale))
         if (currentTitle == null) nextTitle()
     }
 
     fun showTitle(title: String?, subtitle: String?, fadeIn: Int, stay: Int, fadeOut: Int, scale: Float = 4.0f) {
-        titleQueue.offer(TitleData(title, subtitle, fadeIn / 50, stay / 50, fadeOut / 50, scale))
+        titleQueue.offer(TitleData(title, subtitle, fadeIn, stay, fadeOut, scale))
         if (currentTitle == null) nextTitle()
     }
 
     private fun nextTitle() {
         currentTitle = titleQueue.poll()
-        currentTime = 0
-        totalDuration = currentTitle?.let { it.fadeIn + it.stay + it.fadeOut } ?: 0
+        startTime = System.currentTimeMillis()
     }
 
     private fun render(context: DrawContext) {
         val title = currentTitle ?: return
+        val elapsed = System.currentTimeMillis() - startTime
+        val totalDuration = title.fadeIn + title.stay + title.fadeOut
 
-        if (currentTime >= totalDuration) {
+        if (elapsed >= totalDuration) {
             nextTitle()
             return
         }
 
         val alpha = when {
-            currentTime < title.fadeIn -> currentTime.toFloat() / title.fadeIn
-            currentTime < title.fadeIn + title.stay -> 1.0f
-            else -> 1.0f - ((currentTime - title.fadeIn - title.stay).toFloat() / title.fadeOut)
+            elapsed < title.fadeIn -> elapsed.toFloat() / title.fadeIn
+            elapsed < title.fadeIn + title.stay -> 1.0f
+            else -> 1.0f - ((elapsed - title.fadeIn - title.stay).toFloat() / title.fadeOut)
         }
 
         val scale = title.scale * (0.8f + 0.2f * alpha)
-        val centerX = mc.window.width / 4f
-        val centerY = mc.window.height / 4f
+        val centerX = mc.window.scaledWidth / 2f
+        val centerY = mc.window.scaledHeight / 2f
 
         val hasTitle = title.title != null
         val hasSubtitle = title.subtitle != null
@@ -89,7 +89,5 @@ object TitleUtils {
                 Render2D.renderStringWithShadow(context, title.subtitle, subtitleX, subtitleY, subScale)
             }
         }
-
-        currentTime++
     }
 }

@@ -1,5 +1,6 @@
 package meowing.zen.feats.carrying
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -28,6 +29,7 @@ import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.math.round
 
+@Zen.Module
 object carrycounter : Feature("carrycounter") {
     private val tradeInit = Pattern.compile("^Trade completed with (?:\\[.*?] )?(\\w+)!$")
     private val tradeComp = Pattern.compile("^ \\+ (\\d+\\.?\\d*)M coins$")
@@ -347,7 +349,7 @@ object carrycounter : Feature("carrycounter") {
                 bossID = id
                 carryeesByBossId[id] = this
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
-                showTitle("§bBoss spawned", "§bby §c$name", 2500)
+                showTitle("§bBoss spawned", "§bby §c$name", 1000)
             }
         }
 

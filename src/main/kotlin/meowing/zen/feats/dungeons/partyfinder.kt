@@ -1,5 +1,6 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -13,6 +14,7 @@ import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Style
 
+@Zen.Module
 object partyfinder : Feature("partyfindermsgs") {
     private val playerName get() = mc.player?.name?.string ?: ""
     private val joinedPattern = Regex("^Party Finder > (.+?) joined the dungeon group! \\((\\w+) Level (\\d+)\\)$")

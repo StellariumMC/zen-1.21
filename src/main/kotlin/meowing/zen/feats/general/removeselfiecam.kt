@@ -1,10 +1,12 @@
 package meowing.zen.feats.general
 
+import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.feats.Feature
 
+@Zen.Module
 object removeselfiecam : Feature("removeselfiecam") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

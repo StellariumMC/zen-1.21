@@ -26,6 +26,9 @@ class Zen : ClientModInitializer {
     private var shown = false
     private lateinit var dataUtils: DataUtils<firstInstall>
 
+    @Target(AnnotationTarget.CLASS)
+    annotation class Module
+
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->

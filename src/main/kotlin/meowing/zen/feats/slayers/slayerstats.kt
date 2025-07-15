@@ -7,6 +7,7 @@ import meowing.zen.utils.ChatUtils
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
 
+@Zen.Module
 object slayerstats : Feature("slayerstats") {
     private var kills = 0
     private var sessionStart = System.currentTimeMillis()

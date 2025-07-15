@@ -1,5 +1,6 @@
 package meowing.zen.feats.slayers
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -11,6 +12,7 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.RenderUtils
 import java.awt.Color
 
+@Zen.Module
 object lasertimer : Feature("lasertimer") {
     private var bossID = 0
     private val totaltime = 8.2

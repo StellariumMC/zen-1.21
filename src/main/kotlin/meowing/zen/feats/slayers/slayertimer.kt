@@ -13,6 +13,7 @@ import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.feats.Feature
 import net.minecraft.entity.LivingEntity
 
+@Zen.Module
 object slayertimer : Feature("slayertimer") {
     @JvmField var BossId = -1
     @JvmField var isFighting = false

@@ -1,5 +1,6 @@
 package meowing.zen.feats.general
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -14,6 +15,7 @@ import meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 
+@Zen.Module
 object armorhud : Feature("armorhud") {
     private var armor = emptyList<ItemStack>()
     private var armorloop: Long = 0

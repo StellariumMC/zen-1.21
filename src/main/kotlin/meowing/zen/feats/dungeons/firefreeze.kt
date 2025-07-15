@@ -1,5 +1,6 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -17,6 +18,7 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
 
+@Zen.Module
 object firefreeze : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
     private var servertickcall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({

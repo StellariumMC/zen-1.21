@@ -26,6 +26,10 @@ dependencies {
 	include "gg.essential:elementa:710"
 	modImplementation "gg.essential:universalcraft-1.21.5-fabric:415"
 	include "gg.essential:universalcraft-1.21.5-fabric:415"
+	modImplementation "org.reflections:reflections:0.10.2"
+	include "org.reflections:reflections:0.10.2"
+	modImplementation "org.javassist:javassist:3.30.2-GA"
+	include "org.javassist:javassist:3.30.2-GA"
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"

@@ -1,5 +1,6 @@
 package meowing.zen.feats.dungeons
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -14,6 +15,7 @@ import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
 import java.awt.Color
 
+@Zen.Module
 object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
     private val entities = mutableListOf<Int>()
 

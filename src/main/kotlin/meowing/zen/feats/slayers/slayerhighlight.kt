@@ -1,5 +1,6 @@
 package meowing.zen.feats.slayers
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
@@ -9,6 +10,7 @@ import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.Utils.toColorInt
 
+@Zen.Module
 object slayerhighlight : Feature("slayerhighlight") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI

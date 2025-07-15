@@ -1,5 +1,6 @@
 package meowing.zen.feats.slayers
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -16,6 +17,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Colors
 import java.util.regex.Pattern
 
+@Zen.Module
 object vengtimer : Feature("vengtimer") {
     var starttime: Long = 0
     var hit = false

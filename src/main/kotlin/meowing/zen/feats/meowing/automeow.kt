@@ -1,5 +1,6 @@
 package meowing.zen.feats.meowing
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -11,6 +12,7 @@ import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
 
+@Zen.Module
 object automeow : Feature("automeow") {
     private val regex = "^(?:\\w+(?:-\\w+)?\\s>\\s)?(?:\\[[^]]+]\\s)?(?:\\S+\\s)?(?:\\[[^]]+]\\s)?([A-Za-z0-9_.-]+)(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?:\\s(?:[A-Za-z0-9_.-]+(?:\\s[^\\s\\[\\]:]+)?(?:\\s\\[[^]]+])?\\s?(?:[»>]|:)\\s)?meow$".toRegex(RegexOption.IGNORE_CASE)
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
