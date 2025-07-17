@@ -5,7 +5,11 @@
 # Credits
 
 Devonian
-Skytils
+
+Skytils 
+
 Firmament
+
 SkyblockTweaks 1.8.9
+
 Skyhanni
