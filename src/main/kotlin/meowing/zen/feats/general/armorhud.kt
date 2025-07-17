@@ -66,7 +66,8 @@ object armorhud : Feature("armorhud") {
         var currentY = y
 
         armor.forEach { item ->
-            Render2D.renderItem(context, item, currentX, currentY, scale)
+            @Suppress("SENSELESS_COMPARISON")
+            if (item != null) Render2D.renderItem(context, item, currentX, currentY, scale)
             if (config.armorhudvert) currentY += iconSize + spacing
             else currentX += iconSize + spacing
         }
@@ -74,5 +75,6 @@ object armorhud : Feature("armorhud") {
 
     override fun onUnregister() {
         if (armorloop != 0L) removeLoop(armorloop.toString())
+        super.onUnregister()
     }
 }

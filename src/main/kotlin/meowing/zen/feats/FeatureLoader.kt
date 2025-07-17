@@ -1,11 +1,7 @@
 package meowing.zen.feats
 
 import meowing.zen.Zen
-import meowing.zen.config.ConfigCommand
 import meowing.zen.feats.carrying.CarryHUD
-import meowing.zen.feats.carrying.carrycommand
-import meowing.zen.feats.general.CalculatorCommand
-import meowing.zen.feats.slayers.SlayerStatsCommand
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import org.reflections.Reflections
 
@@ -14,7 +10,8 @@ object FeatureLoader {
     private var loadtime: Long = 0
 
     fun init() {
-        val features = Reflections("meowing.zen").getTypesAnnotatedWith(Zen.Module::class.java)
+        val reflections = Reflections("meowing.zen")
+        val features = reflections.getTypesAnnotatedWith(Zen.Module::class.java)
         val starttime = System.currentTimeMillis()
         val categoryOrder = listOf("general", "slayers", "dungeons", "meowing", "noclutter")
 
@@ -33,11 +30,18 @@ object FeatureLoader {
             }
         }
 
+        val commands = reflections.getTypesAnnotatedWith(Zen.Command::class.java)
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            carrycommand.register(dispatcher)
-            SlayerStatsCommand.register(dispatcher)
-            ConfigCommand.register(dispatcher)
-            CalculatorCommand.register(dispatcher)
+            commands.forEach { commandClass ->
+                try {
+                    val commandInstance = commandClass.getDeclaredField("INSTANCE").get(null)
+                    val registerMethod = commandClass.methods.find { it.name == "register" } // a bit eh but it works
+                    registerMethod?.invoke(commandInstance, dispatcher)
+                } catch (e: Exception) {
+                    System.err.println("[Zen] Error initializing ${commandClass.name}: $e")
+                    e.printStackTrace()
+                }
+            }
         }
 
         CarryHUD.initialize()

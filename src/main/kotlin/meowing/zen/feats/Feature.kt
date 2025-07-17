@@ -4,6 +4,7 @@ import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.events.Event
 import meowing.zen.events.EventBus
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.LocationUtils
 
 open class Feature(
@@ -36,9 +37,13 @@ open class Feature(
 
     open fun initialize() {}
 
-    open fun onRegister() {}
+    open fun onRegister() {
+        if (Debug.debugmode) ChatUtils.addMessage("§c[Zen-Dev] §fRegistering §b$configKey")
+    }
 
-    open fun onUnregister() {}
+    open fun onUnregister() {
+        if (Debug.debugmode) ChatUtils.addMessage("§c[Zen-Dev] §fUnregistering §b$configKey")
+    }
 
     open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
 

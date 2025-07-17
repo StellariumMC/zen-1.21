@@ -86,6 +86,7 @@ object slayerstats : Feature("slayerstats") {
     }
 }
 
+@Zen.Command
 object SlayerStatsCommand : CommandUtils(
     "slayerstats",
     listOf("zenslayers")

@@ -19,6 +19,7 @@ import net.minecraft.text.Text
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Zen.Command
 object carrycommand {
     private var currentLogPage = 1
 

@@ -3,11 +3,13 @@ package meowing.zen.feats.general
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import meowing.zen.Zen
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
+@Zen.Command
 object CalculatorCommand : CommandUtils(
     "zencalc",
     listOf("calc")

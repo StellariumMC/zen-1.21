@@ -2,6 +2,7 @@ package meowing.zen.config
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.Zen.Companion.openConfig
 import meowing.zen.hud.HUDEditor
@@ -10,6 +11,7 @@ import meowing.zen.utils.TickUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
+@Zen.Command
 object ConfigCommand : CommandUtils(
     "zen",
     listOf("ma", "meowaddons")

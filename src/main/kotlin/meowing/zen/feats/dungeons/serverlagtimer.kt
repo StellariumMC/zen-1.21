@@ -63,6 +63,7 @@ object serverlagtimer : Feature("serverlagtimer", area = "catacombs") {
         clienttick = 0
         servertick = 0
         ticking = false
+        super.onRegister()
     }
 
     override fun onUnregister() {
@@ -70,5 +71,6 @@ object serverlagtimer : Feature("serverlagtimer", area = "catacombs") {
         clienttick = 0
         servertick = 0
         ticking = false
+        super.onUnregister()
     }
 }

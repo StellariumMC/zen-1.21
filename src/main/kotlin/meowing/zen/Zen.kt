@@ -29,6 +29,9 @@ class Zen : ClientModInitializer {
     @Target(AnnotationTarget.CLASS)
     annotation class Module
 
+    @Target(AnnotationTarget.CLASS)
+    annotation class Command
+
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
