@@ -12,7 +12,7 @@ import java.util.List;
  * Under GPL 3.0 License
  */
 @Mixin(ChatHud.class)
-public class MixinChatHistory {
+public class MixinChatHud {
     @Redirect(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
     private int removeMessageLimit(List<?> instance) {
         if (removechatlimit.INSTANCE.isEnabled()) return instance.size() < 100 ? instance.size() : 99;

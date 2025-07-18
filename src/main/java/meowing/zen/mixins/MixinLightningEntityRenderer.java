@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * Under GPL 3.0 License
  */
 @Mixin(LightningEntityRenderer.class)
-public class MixinRenderLightning {
+public class MixinLightningEntityRenderer {
     @Inject(method = "render(Lnet/minecraft/client/render/entity/state/LightningEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void onRenderLightning(LightningEntityRenderState lightningEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int meow, CallbackInfo callbackInfo) {
         if (nothunder.INSTANCE.isEnabled()) callbackInfo.cancel();

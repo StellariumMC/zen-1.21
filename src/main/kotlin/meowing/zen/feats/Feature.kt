@@ -39,6 +39,22 @@ open class Feature(
         update()
     }
 
+    private fun INTERNAL_isEnabled(): Boolean {
+        return try {
+            val configEnabled = configKey?.let {
+                Zen.config.getValue(it, false)
+            } ?: true
+            configEnabled && variable()
+        } catch (_: Exception) {
+            variable()
+        }
+    }
+
+    protected val mc = Zen.mc
+    protected val config get() = Zen.config
+    protected val player get() = mc.player
+    protected val world get() = mc.world
+
     open fun initialize() {}
 
     open fun onRegister() {
@@ -50,17 +66,6 @@ open class Feature(
     }
 
     open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
-
-    private fun INTERNAL_isEnabled(): Boolean {
-        return try {
-            val configEnabled = configKey?.let {
-                Zen.config.getValue(it, false)
-            } ?: true
-            configEnabled && variable()
-        } catch (_: Exception) {
-            variable()
-        }
-    }
 
     fun isEnabled(): Boolean = INTERNAL_isEnabled() && inArea() && inSubarea()
 

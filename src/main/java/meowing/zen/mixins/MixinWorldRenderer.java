@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(WorldRenderer.class)
-public class MixinRenderWorld {
+public class MixinWorldRenderer {
     @ModifyExpressionValue(method = {"getEntitiesToRender", "renderEntities"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;hasOutline(Lnet/minecraft/entity/Entity;)Z"), require = 2)
     private boolean onEntityGlow(boolean original, @Local Entity entity) {
         RenderEvent.EntityGlow event = new RenderEvent.EntityGlow(entity, original, -1);

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Under GPL 3.0 License
  */
 @Mixin(Perspective.class)
-public class MixinCamera {
+public class MixinPerspective {
     @Shadow @Final private boolean firstPerson;
 
     @Inject(method = "next", at = @At("HEAD"), cancellable = true)

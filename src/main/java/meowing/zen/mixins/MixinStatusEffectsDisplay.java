@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(StatusEffectsDisplay.class)
-public class MixinRenderStatusEffects {
+public class MixinStatusEffectsDisplay {
     @Inject(method = "drawStatusEffects(Lnet/minecraft/client/gui/DrawContext;II)V", at = @At("HEAD"), cancellable = true)
     private void onDrawEffect(DrawContext context, int mx, int my, CallbackInfo callbackInfo) {
         if (hidestatuseffects.INSTANCE.isEnabled()) callbackInfo.cancel();

@@ -1,6 +1,7 @@
 package meowing.zen.config
 
 import meowing.zen.config.ui.ConfigUI
+import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
 class ConfigAccessor(val configUI: ConfigUI) {
@@ -37,6 +38,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _highlightlividline = false
     private var _ragparty = false
     private var _armorhudvert = false
+    private var _chatcleanerkey = GLFW.GLFW_KEY_H
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -70,41 +72,44 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val highlightlividline get() = _highlightlividline
     val ragparty get() = _ragparty
     val armorhudvert get() = _armorhudvert
+    val chatcleanerkey get () = _chatcleanerkey
 
     init {
-        configUI.registerListener("carrycounter") { _carrycounter = it as Boolean }
-        configUI.registerListener("carryvalue") { _carryvalue = it as String }
-        configUI.registerListener("carrybosshighlight") { _carrybosshighlight = it as Boolean }
-        configUI.registerListener("carrybosshighlightcolor") { _carrybosshighlightcolor = it as Color }
-        configUI.registerListener("carryclienthighlight") { _carryclienthighlight = it as Boolean }
-        configUI.registerListener("carryclienthighlightcolor") { _carryclienthighlightcolor = it as Color }
-        configUI.registerListener("slayertimer") { _slayertimer = it as Boolean }
-        configUI.registerListener("vengdmg") { _vengdmg = it as Boolean }
-        configUI.registerListener("lasertimer") { _lasertimer = it as Boolean }
-        configUI.registerListener("slayerstats") { _slayerstats = it as Boolean }
-        configUI.registerListener("cryptreminderdelay") { _cryptreminderdelay = it as Double }
-        configUI.registerListener("carrycountsend") { _carrycountsend = it as Boolean }
-        configUI.registerListener("draftself") { _draftself = it as Boolean }
-        configUI.registerListener("autogetdraft") { _autogetdraft = it as Boolean }
-        configUI.registerListener("leapmessage") { _leapmessage = it as String }
-        configUI.registerListener("boxstarmobscolor") { _boxstarmobscolor = it as Color }
-        configUI.registerListener("keyhighlightcolor") { _keyhighlightcolor = it as Color }
-        configUI.registerListener("blockoverlaycolor") { _blockoverlaycolor = it as Color }
-        configUI.registerListener("customX") { _customX = (it as Double).toFloat() }
-        configUI.registerListener("customY") { _customY = (it as Double).toFloat() }
-        configUI.registerListener("customZ") { _customZ = (it as Double).toFloat() }
-        configUI.registerListener("customself") { _customself = it as Boolean }
-        configUI.registerListener("slayerhighlightcolor") { _slayerhighlightcolor = it as Color }
-        configUI.registerListener("slayerhighlightfilled") { _slayerhighlightfilled = it as Boolean }
-        configUI.registerListener("entityhighlightplayercolor") { _entityhighlightplayercolor = it as Color }
-        configUI.registerListener("entityhighlightmobcolor") { _entityhighlightmobcolor = it as Color }
-        configUI.registerListener("entityhighlightanimalcolor") { _entityhighlightanimalcolor = it as Color }
-        configUI.registerListener("entityhighlightothercolor") { _entityhighlightothercolor = it as Color }
-        configUI.registerListener("highlightlividcolor") { _highlightlividcolor = it as Color }
-        configUI.registerListener("hidewronglivid") { _hidewronglivid = it as Boolean }
-        configUI.registerListener("highlightlividline") { _highlightlividline = it as Boolean }
-        configUI.registerListener("ragparty") { _ragparty = it as Boolean }
-        configUI.registerListener("armorhudvert") { _armorhudvert = it as Boolean }
+        configUI
+            .registerListener("carrycounter") { _carrycounter = it as Boolean }
+            .registerListener("carryvalue") { _carryvalue = it as String }
+            .registerListener("carrybosshighlight") { _carrybosshighlight = it as Boolean }
+            .registerListener("carrybosshighlightcolor") { _carrybosshighlightcolor = it as Color }
+            .registerListener("carryclienthighlight") { _carryclienthighlight = it as Boolean }
+            .registerListener("carryclienthighlightcolor") { _carryclienthighlightcolor = it as Color }
+            .registerListener("slayertimer") { _slayertimer = it as Boolean }
+            .registerListener("vengdmg") { _vengdmg = it as Boolean }
+            .registerListener("lasertimer") { _lasertimer = it as Boolean }
+            .registerListener("slayerstats") { _slayerstats = it as Boolean }
+            .registerListener("cryptreminderdelay") { _cryptreminderdelay = it as Double }
+            .registerListener("carrycountsend") { _carrycountsend = it as Boolean }
+            .registerListener("draftself") { _draftself = it as Boolean }
+            .registerListener("autogetdraft") { _autogetdraft = it as Boolean }
+            .registerListener("leapmessage") { _leapmessage = it as String }
+            .registerListener("boxstarmobscolor") { _boxstarmobscolor = it as Color }
+            .registerListener("keyhighlightcolor") { _keyhighlightcolor = it as Color }
+            .registerListener("blockoverlaycolor") { _blockoverlaycolor = it as Color }
+            .registerListener("customX") { _customX = (it as Double).toFloat() }
+            .registerListener("customY") { _customY = (it as Double).toFloat() }
+            .registerListener("customZ") { _customZ = (it as Double).toFloat() }
+            .registerListener("customself") { _customself = it as Boolean }
+            .registerListener("slayerhighlightcolor") { _slayerhighlightcolor = it as Color }
+            .registerListener("slayerhighlightfilled") { _slayerhighlightfilled = it as Boolean }
+            .registerListener("entityhighlightplayercolor") { _entityhighlightplayercolor = it as Color }
+            .registerListener("entityhighlightmobcolor") { _entityhighlightmobcolor = it as Color }
+            .registerListener("entityhighlightanimalcolor") { _entityhighlightanimalcolor = it as Color }
+            .registerListener("entityhighlightothercolor") { _entityhighlightothercolor = it as Color }
+            .registerListener("highlightlividcolor") { _highlightlividcolor = it as Color }
+            .registerListener("hidewronglivid") { _hidewronglivid = it as Boolean }
+            .registerListener("highlightlividline") { _highlightlividline = it as Boolean }
+            .registerListener("ragparty") { _ragparty = it as Boolean }
+            .registerListener("armorhudvert") { _armorhudvert = it as Boolean }
+            .registerListener("chatcleanerkey") { _chatcleanerkey = (it as Number).toInt() }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)
