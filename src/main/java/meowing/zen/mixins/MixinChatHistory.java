@@ -7,6 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.List;
 
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 @Mixin(ChatHud.class)
 public class MixinChatHistory {
     @Redirect(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))

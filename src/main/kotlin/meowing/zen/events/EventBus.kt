@@ -118,6 +118,10 @@ object EventBus {
         }
     }
 
+    /*
+     * Modified from Devonian code
+     * Under GPL 3.0 License
+     */
     inline fun <reified T : Event> register(noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
         val eventClass = T::class.java
         val handlers = listeners.getOrPut(eventClass) { ConcurrentHashMap.newKeySet() }

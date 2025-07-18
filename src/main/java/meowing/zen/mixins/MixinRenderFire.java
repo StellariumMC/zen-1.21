@@ -9,6 +9,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 @Mixin(InGameOverlayRenderer.class)
 public class MixinRenderFire {
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)

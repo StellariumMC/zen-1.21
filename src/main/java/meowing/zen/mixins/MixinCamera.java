@@ -9,8 +9,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-// Taken from devonian
-// https://github.com/Synnerz/devonian/blob/main/src/main/java/com/github/synnerz/devonian/mixin/PerspectiveMixin.java
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 @Mixin(Perspective.class)
 public class MixinCamera {
     @Shadow @Final private boolean firstPerson;

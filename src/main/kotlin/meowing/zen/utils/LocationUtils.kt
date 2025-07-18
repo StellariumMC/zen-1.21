@@ -7,6 +7,10 @@ import meowing.zen.utils.Utils.removeEmotes
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()

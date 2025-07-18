@@ -6,6 +6,10 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.feats.Feature
 
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 @Zen.Module
 object hidefallingblocks : Feature("hidefallingblocks") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {

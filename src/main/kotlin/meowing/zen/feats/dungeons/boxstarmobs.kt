@@ -41,6 +41,10 @@ object boxstarmobs : Feature("boxstarmobs", area = "catacombs") {
             if (event.entity !is ArmorStandEntity) return@register
             val ent = event.entity
 
+            /*
+             * Modified from Devonian code
+             * Under GPL 3.0 License
+             */
             TickUtils.scheduleServer(2) {
                 val name = ent.name.string
                 if (!name.contains("✯ ")) return@scheduleServer

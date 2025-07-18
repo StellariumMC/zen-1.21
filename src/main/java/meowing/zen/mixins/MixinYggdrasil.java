@@ -6,7 +6,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-// Fixes console spam - from https://github.com/Synnerz/devonian/blob/main/src/main/java/com/github/synnerz/devonian/mixin/YggdrasilMinecraftSessionServiceMixin.java
+/*
+ * Modified from Devonian code
+ * Under GPL 3.0 License
+ */
 @Mixin(YggdrasilMinecraftSessionService.class)
 public class MixinYggdrasil {
     @Redirect(method = "getPropertySignatureState", at = @At(value = "INVOKE", target = "Lcom/mojang/authlib/properties/Property;hasSignature()Z"), remap = false)
