@@ -18,7 +18,7 @@ public class MixinPerspective {
     @Shadow @Final private boolean firstPerson;
 
     @Inject(method = "next", at = @At("HEAD"), cancellable = true)
-    private void onPrespectiveChange(CallbackInfoReturnable<Perspective> cir) {
+    private void zen$onPrespectiveChange(CallbackInfoReturnable<Perspective> cir) {
         if (removeselfiecam.INSTANCE.isEnabled()) cir.setReturnValue(this.firstPerson ? Perspective.THIRD_PERSON_BACK : Perspective.FIRST_PERSON);
     }
 }

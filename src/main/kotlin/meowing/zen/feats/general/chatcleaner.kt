@@ -75,17 +75,16 @@ object chatcleaner : Feature("chatcleaner") {
         register<GuiEvent.Key> { event ->
             if (event.screen !is ChatScreen || GLFW.glfwGetKey(mc.window.handle, config.chatcleanerkey) != GLFW.GLFW_PRESS) return@register
 
-            val window = mc.window
-            val mouseX = mc.mouse.x * window.scaledWidth / window.width
-            val mouseY = mc.mouse.y * window.scaledWidth / window.width
-
             val chat = mc.inGameHud.chatHud as AccessorChatHud
-            val line = chat.getMessageLineIdx(chat.toChatLineMX(mouseX), chat.toChatLineMY(mouseY)).coerceIn(0..<chat.visibleMessages.size)
-            val text = chat.messages[line].content().string.removeFormatting()
+            val line = chat.getMessageLineIdx(chat.toChatLineMX(MouseX), chat.toChatLineMY(MouseY))
 
-            if (text.isNotEmpty()) {
-                addPattern(text)
-                ChatUtils.addMessage("§c[Zen] §fAdded §7\"§c$text§7\" §fto filter.")
+            if (line >= 0 && line < chat.visibleMessages.size && line < chat.messages.size) {
+                val text = chat.messages[line].content().string.removeFormatting()
+
+                if (text.isNotEmpty()) {
+                    addPattern(text)
+                    ChatUtils.addMessage("§c[Zen] §fAdded §7\"§c$text§7\" §fto filter.")
+                }
             }
         }
     }

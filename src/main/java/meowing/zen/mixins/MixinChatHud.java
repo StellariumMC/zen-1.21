@@ -14,13 +14,13 @@ import java.util.List;
 @Mixin(ChatHud.class)
 public class MixinChatHud {
     @Redirect(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    private int removeMessageLimit(List<?> instance) {
+    private int zen$removeMessageLimit(List<?> instance) {
         if (removechatlimit.INSTANCE.isEnabled()) return instance.size() < 100 ? instance.size() : 99;
         return instance.size();
     }
 
     @Redirect(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    private int removeVisibleMessageLimit(List<?> instance) {
+    private int zen$removeVisibleMessageLimit(List<?> instance) {
         if (removechatlimit.INSTANCE.isEnabled()) return instance.size() < 100 ? instance.size() : 99;
         return instance.size();
     }

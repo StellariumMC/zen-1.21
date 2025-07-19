@@ -203,8 +203,7 @@ object carrycounter : Feature("carrycounter") {
                 }
             }))
 
-            events.add(EventBus.register<EntityEvent.Leave> ({ event ->
-                if (event.entity.isAlive) return@register
+            events.add(EventBus.register<EntityEvent.Death> ({ event ->
                 carryeesByBossId[event.entity.id]?.let {
                     val ms = System.currentTimeMillis() - (it.startTime ?: 0L)
                     ChatUtils.addMessage("§c[Zen] §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(ms / 1000.0)}s")

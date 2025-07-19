@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
     @Inject(method = "channelRead0*", at = @At("HEAD"))
-    private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
+    private void zen$onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
         EventBus.INSTANCE.onPacketReceived(packet);
     }
 }

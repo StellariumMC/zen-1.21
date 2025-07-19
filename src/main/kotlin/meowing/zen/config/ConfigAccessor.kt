@@ -39,6 +39,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _ragparty = false
     private var _armorhudvert = false
     private var _chatcleanerkey = GLFW.GLFW_KEY_H
+    private var _customtintcolor = Color(0, 255, 255, 127)
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -72,7 +73,8 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val highlightlividline get() = _highlightlividline
     val ragparty get() = _ragparty
     val armorhudvert get() = _armorhudvert
-    val chatcleanerkey get () = _chatcleanerkey
+    val chatcleanerkey get() = _chatcleanerkey
+    val customtintcolor get() = _customtintcolor
 
     init {
         configUI
@@ -110,6 +112,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
             .registerListener("ragparty") { _ragparty = it as Boolean }
             .registerListener("armorhudvert") { _armorhudvert = it as Boolean }
             .registerListener("chatcleanerkey") { _chatcleanerkey = (it as Number).toInt() }
+            .registerListener("customtintcolor") { _customtintcolor = it as Color }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

@@ -4,15 +4,15 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AccessorChatHud",
-    "MixinClientPlayerInteraction",
-    "MixinPerspective",
     "MixinChatHud",
     "MixinClientConnection",
+    "MixinClientPlayerInteraction",
     "MixinEntityRenderDispatcher",
     "MixinFallingBlockEntityRenderer",
-    "MixinInGameOverlayRenderer",
     "MixinGameRenderer",
+    "MixinInGameOverlayRenderer",
     "MixinLightningEntityRenderer",
+    "MixinPerspective",
     "MixinPlayerEntityRenderer",
     "MixinStatusEffectsDisplay",
     "MixinWorldRenderer"
@@ -21,6 +21,7 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "MixinLivingEntity",
     "MixinYggdrasil"
   ]
 }

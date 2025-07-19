@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(YggdrasilMinecraftSessionService.class)
 public class MixinYggdrasil {
     @Redirect(method = "getPropertySignatureState", at = @At(value = "INVOKE", target = "Lcom/mojang/authlib/properties/Property;hasSignature()Z"), remap = false)
-    private boolean devonian$hasSignature(Property instance) {
+    private boolean zen$hasSignature(Property instance) {
         boolean hasSig = instance.hasSignature();
         try {
             if (hasSig && instance.signature().isEmpty()) return false;

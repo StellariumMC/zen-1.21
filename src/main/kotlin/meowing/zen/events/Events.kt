@@ -44,6 +44,7 @@ abstract class RenderEvent {
 abstract class EntityEvent {
     class Join(val entity: Entity) : Event()
     class Leave(val entity: Entity) : Event()
+    class Death(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
     class Spawn(val packet: EntitySpawnS2CPacket) : Event()

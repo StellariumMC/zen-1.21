@@ -54,6 +54,9 @@ open class Feature(
     protected val config get() = Zen.config
     protected val player get() = mc.player
     protected val world get() = mc.world
+    protected val window get() = mc.window
+    protected val MouseX get() = mc.mouse.x * window.scaledWidth / window.width
+    protected val MouseY get() = mc.mouse.y * window.scaledWidth / window.width
 
     open fun initialize() {}
 

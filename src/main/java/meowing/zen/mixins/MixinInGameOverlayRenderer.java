@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InGameOverlayRenderer.class)
 public class MixinInGameOverlayRenderer {
     @Inject(method = "renderFireOverlay", at = @At("HEAD"), cancellable = true)
-    private static void renderFireOverlay(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, CallbackInfo callbackInfo) {
+    private static void zen$renderFireOverlay(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, CallbackInfo callbackInfo) {
         if (hidefireoverlay.INSTANCE.isEnabled()) callbackInfo.cancel();
     }
 }
