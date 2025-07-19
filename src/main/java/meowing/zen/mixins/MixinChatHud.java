@@ -1,5 +1,7 @@
 package meowing.zen.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import meowing.zen.feats.general.removechatlimit;
 import net.minecraft.client.gui.hud.ChatHud;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,17 +13,17 @@ import java.util.List;
  * Modified from Devonian code
  * Under GPL 3.0 License
  */
-@Mixin(ChatHud.class)
+@Mixin(value = ChatHud.class)
 public class MixinChatHud {
-    @Redirect(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    private int zen$removeMessageLimit(List<?> instance) {
-        if (removechatlimit.INSTANCE.isEnabled()) return instance.size() < 100 ? instance.size() : 99;
-        return instance.size();
+    @WrapOperation(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
+    private int zen$removeMessageLimit(List<?> instance, Operation<Integer> original) {
+        if (removechatlimit.INSTANCE.isEnabled()) return original.call(instance) < 100 ? original.call(instance) : 99;
+        return original.call(instance);
     }
 
-    @Redirect(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
-    private int zen$removeVisibleMessageLimit(List<?> instance) {
-        if (removechatlimit.INSTANCE.isEnabled()) return instance.size() < 100 ? instance.size() : 99;
-        return instance.size();
+    @WrapOperation(method = "addVisibleMessage", at = @At(value = "INVOKE", target = "Ljava/util/List;size()I"))
+    private int zen$removeVisibleMessageLimit(List<?> instance, Operation<Integer> original) {
+        if (removechatlimit.INSTANCE.isEnabled()) return original.call(instance) < 100 ? original.call(instance) : 99;
+        return original.call(instance);
     }
 }
