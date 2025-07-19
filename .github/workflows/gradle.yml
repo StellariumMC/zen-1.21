@@ -32,7 +32,7 @@ jobs:
 
       - name: Rename built JAR
         run: |
-          ORIGINAL_JAR=$(find build/libs -name "*.jar" | head -n 1)
+          ORIGINAL_JAR=$(find build/libs -name "*.jar" ! -name "*sources*" | head -n 1)
           TARGET_JAR="build/libs/zen-1.21.5-fabric-dev-${BUILD_NUMBER}.jar"
           mv "$ORIGINAL_JAR" "$TARGET_JAR"
 
