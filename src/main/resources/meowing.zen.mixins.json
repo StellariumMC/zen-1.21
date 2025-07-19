@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AccessorChatHud",
+    "MixinBackgroundRenderer",
     "MixinChatHud",
     "MixinClientConnection",
     "MixinClientPlayerInteraction",

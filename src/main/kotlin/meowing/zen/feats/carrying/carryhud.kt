@@ -4,7 +4,8 @@ import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
-import meowing.zen.hud.HUDEditor
+import meowing.zen.utils.Utils.MouseX
+import meowing.zen.utils.Utils.MouseY
 import meowing.zen.hud.HUDManager
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Colors
@@ -81,12 +82,8 @@ object CarryHUD {
     private fun onMouseInput() {
         if (carrycounter.carryees.isEmpty() || !Zen.isInInventory) return
 
-        val window = mc.window
-        val mouseX = mc.mouse.x * window.scaledWidth / window.width
-        val mouseY = mc.mouse.y * window.scaledHeight / window.height
-
         buttons.find {
-            mouseX >= it.x && mouseX <= it.x + it.width && mouseY >= it.y && mouseY <= it.y + it.height
+            MouseX >= it.x && MouseX <= it.x + it.width && MouseY >= it.y && MouseY <= it.y + it.height
         }?.let { button ->
             when (button.action) {
                 "add" -> if (button.carryee.count < button.carryee.total) button.carryee.count++
@@ -135,13 +132,8 @@ object CarryHUD {
     }
 
     private fun render(context: DrawContext) {
-        val window = mc.window
-        val mouseX = mc.mouse.x * window.scaledWidth / window.width
-        val mouseY = mc.mouse.y * window.scaledHeight / window.height
-
         hoveredButton = buttons.find {
-            mouseX >= it.x && mouseX <= it.x + it.width &&
-                    mouseY >= it.y && mouseY <= it.y + it.height
+            MouseX >= it.x && MouseX <= it.x + it.width && MouseY >= it.y && MouseY <= it.y + it.height
         }
 
         renderItems.forEach { item ->
@@ -152,7 +144,7 @@ object CarryHUD {
             context.drawText(mc.textRenderer, item.text, item.x.toInt(), item.y.toInt(), color, item.shadow)
         }
 
-        renderTooltip(context, mouseX, mouseY)
+        renderTooltip(context, MouseY, MouseY)
     }
 
     private fun renderTooltip(context: DrawContext, mouseX: Double, mouseY: Double) {

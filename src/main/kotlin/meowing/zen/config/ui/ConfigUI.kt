@@ -76,7 +76,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             x = CenterConstraint()
             y = 40.pixels()
             width = 92.percent()
-            height = RelativeConstraint(1f) - 36.pixels()
+            height = RelativeConstraint(1f) - 90.pixels()
         } childOf leftPanel
 
         uiBuilder.createHudButton() childOf leftPanel
