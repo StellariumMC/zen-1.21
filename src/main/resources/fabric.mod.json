@@ -21,7 +21,7 @@
 		],
 		"modmenu": [
 			{
-				"value": "meowing.zen.compat.zenmodmenu",
+				"value": "meowing.zen.compat.ModMenu",
 				"adapter": "kotlin"
 			}
 		]
