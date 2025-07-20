@@ -36,7 +36,7 @@ object slayerstats : Feature("slayerstats") {
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§c[Zen] §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s", "Slayers")
+        HUDManager.register(name, "§c[Zen] §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
         register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 

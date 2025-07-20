@@ -1,7 +1,7 @@
 package meowing.zen.hud
 
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawContext
 import java.awt.Color
 import kotlin.math.pow
@@ -52,20 +52,52 @@ class HUDElement(
         val isHovered = isMouseOver(mouseX, mouseY)
 
         context.matrices.push()
-        context.matrices.translate(renderX + width / 2, renderY + height / 2, 0f)
+        context.matrices.translate(renderX, renderY, 0f)
         context.matrices.scale(scale, scale, 1f)
-        context.matrices.translate(-width / 2.0, -height / 2.0, 0.0)
 
-        if (!previewMode) {
-            val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
-            val borderColor = when {
-                !enabled -> Color(200, 60, 60).rgb
-                isHovered -> Color(100, 180, 255).rgb
-                else -> Color(100, 100, 120).rgb
+        val customRenderer = HUDManager.getCustomRenderer(name)
+        if (customRenderer != null) {
+            val customDims = HUDManager.getCustomDimensions(name)
+            val renderWidth = customDims?.first ?: width
+            val renderHeight = customDims?.second ?: height
+            if (!previewMode) {
+                renderCustomBackground(context, isHovered, renderWidth, renderHeight)
             }
+            customRenderer.invoke(context, 0f, 0f, renderWidth, renderHeight, scale, partialTicks, previewMode)
+        } else {
+            renderDefault(context, previewMode, isHovered)
+        }
 
-            context.fill(0, 0, width, height, Color(30, 35, 45, alpha).rgb)
-            drawHollowRect(context, 0, 0, width, height, borderColor)
+        context.matrices.pop()
+    }
+
+    private fun renderCustomBackground(context: DrawContext, isHovered: Boolean, customWidth: Int, customHeight: Int) {
+        val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
+        val borderColor = when {
+            !enabled -> Color(200, 60, 60).rgb
+            isHovered -> Color(100, 180, 255).rgb
+            else -> Color(100, 100, 120).rgb
+        }
+
+        context.fill(0, 0, customWidth, customHeight, Color(30, 35, 45, alpha).rgb)
+        drawHollowRect(context, 0, 0, customWidth, customHeight, borderColor)
+    }
+
+    private fun renderBackground(context: DrawContext, isHovered: Boolean) {
+        val alpha = if (!enabled) 40 else if (isHovered) 140 else 90
+        val borderColor = when {
+            !enabled -> Color(200, 60, 60).rgb
+            isHovered -> Color(100, 180, 255).rgb
+            else -> Color(100, 100, 120).rgb
+        }
+
+        context.fill(0, 0, width, height, Color(30, 35, 45, alpha).rgb)
+        drawHollowRect(context, 0, 0, width, height, borderColor)
+    }
+
+    private fun renderDefault(context: DrawContext, previewMode: Boolean, isHovered: Boolean) {
+        if (!previewMode) {
+            renderBackground(context, isHovered)
         }
 
         val lines = exampleText.split("\n")
@@ -73,23 +105,23 @@ class HUDElement(
         val textColor = Color(220, 240, 255, textAlpha).rgb
 
         lines.forEachIndexed { index, line ->
-            val textY = 5f + (index * MinecraftClient.getInstance().textRenderer.fontHeight)
-            context.drawTextWithShadow(MinecraftClient.getInstance().textRenderer, line, 5, textY.toInt(), textColor)
+            val textY = 5f + (index * mc.textRenderer.fontHeight)
+            context.drawTextWithShadow(mc.textRenderer, line, 5, textY.toInt(), textColor)
         }
-
-        context.matrices.pop()
     }
 
     fun isMouseOver(mouseX: Float, mouseY: Float): Boolean {
         val renderX = getRenderX(Utils.getPartialTicks())
         val renderY = getRenderY(Utils.getPartialTicks())
-        val scaledWidth = width * scale
-        val scaledHeight = height * scale
-        val offsetX = (width - scaledWidth) / 2
-        val offsetY = (height - scaledHeight) / 2
 
-        return mouseX >= renderX + offsetX && mouseX <= renderX + offsetX + scaledWidth &&
-                mouseY >= renderY + offsetY && mouseY <= renderY + offsetY + scaledHeight
+        val customDims = HUDManager.getCustomDimensions(name)
+        val actualWidth = customDims?.first ?: width
+        val actualHeight = customDims?.second ?: height
+
+        val scaledWidth = actualWidth * scale
+        val scaledHeight = actualHeight * scale
+
+        return mouseX >= renderX && mouseX <= renderX + scaledWidth && mouseY >= renderY && mouseY <= renderY + scaledHeight
     }
 
     private fun drawHollowRect(context: DrawContext, x1: Int, y1: Int, x2: Int, y2: Int, color: Int) {

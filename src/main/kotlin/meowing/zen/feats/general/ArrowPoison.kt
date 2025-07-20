@@ -34,7 +34,7 @@ object ArrowPoison : Feature("arrowpoison") {
     }
 
     override fun initialize() {
-        HUDManager.register(name, "<I> 64 | <I> 32")
+        HUDManager.registerWithCustomRenderer(name, 87, 17, this::HUDEditorRender)
 
         register<PacketEvent.Received> { event ->
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()
@@ -70,7 +70,6 @@ object ArrowPoison : Feature("arrowpoison") {
         val spacing = 4f * scale
         val twilightPotion = ItemStack(Items.PURPLE_DYE)
         val toxicPotion = ItemStack(Items.LIME_DYE)
-        val fontRenderer = mc.textRenderer
         val twilightStr = twilight.toString()
         val toxicStr = toxic.toString()
         val textY = y + (iconSize - 8f * scale) / 2f
@@ -89,5 +88,31 @@ object ArrowPoison : Feature("arrowpoison") {
 
         currentX += iconSize + spacing
         Render2D.renderStringWithShadow(drawContext, toxicStr, currentX, textY, scale)
+    }
+
+    @Suppress("UNUSED")
+    private fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
+        val iconSize = 16f
+        val spacing = 4f
+        val twilightPotion = ItemStack(Items.PURPLE_DYE)
+        val toxicPotion = ItemStack(Items.LIME_DYE)
+        val twilightStr = twilight.toString()
+        val toxicStr = toxic.toString()
+        val textY = y + (iconSize - 8f) / 2f
+        var currentX = x
+
+        Render2D.renderItem(context, twilightPotion, currentX, y, 1f)
+
+        currentX += iconSize + spacing
+        Render2D.renderStringWithShadow(context, twilightStr, currentX, textY, 1f)
+
+        currentX += fontRenderer.getWidth(twilightStr) * scale + spacing * 2
+        Render2D.renderStringWithShadow(context, "§7|", currentX, textY, 1f)
+
+        currentX += fontRenderer.getWidth("|") * scale + spacing
+        Render2D.renderItem(context, toxicPotion, currentX, y, 1f)
+
+        currentX += iconSize + spacing
+        Render2D.renderStringWithShadow(context, toxicStr, currentX, textY, 1f)
     }
 }

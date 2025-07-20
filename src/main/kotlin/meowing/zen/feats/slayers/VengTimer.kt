@@ -34,7 +34,7 @@ object VengTimer : Feature("vengtimer") {
     }
 
     override fun initialize() {
-        HUDManager.register("vengtimer", "§bVeng proc: §c4.3s", "Slayers")
+        HUDManager.register("vengtimer", "§bVeng proc: §c4.3s")
 
         register<ScoreboardEvent.Update> { event ->
             val world = mc.world ?: return@register

@@ -1,23 +1,37 @@
 package meowing.zen.hud
 
 import meowing.zen.utils.DataUtils
+import net.minecraft.client.gui.DrawContext
 
 data class HUDPosition(var x: Float, var y: Float, var scale: Float = 1f, var enabled: Boolean = true)
 data class HUDPositions(val positions: MutableMap<String, HUDPosition> = mutableMapOf())
 
 object HUDManager {
     private val elements = mutableMapOf<String, String>()
-    private val categories = mutableMapOf<String, String>()
+    private val customRenderers = mutableMapOf<String, (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit>()
+    private val customDimensions = mutableMapOf<String, Pair<Int, Int>>()
     private val hudData = DataUtils("hud_positions", HUDPositions())
 
-    fun register(name: String, exampleText: String, category: String = "General") {
+    fun register(name: String, exampleText: String) {
         elements[name] = exampleText
-        categories[name] = category
+    }
+
+    fun registerWithCustomRenderer(
+        name: String,
+        width: Int,
+        height: Int,
+        customRenderer: (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit
+    ) {
+        elements[name] = ""
+        customRenderers[name] = customRenderer
+        customDimensions[name] = Pair(width, height)
     }
 
     fun getElements(): Map<String, String> = elements
-    fun getCategory(name: String): String = categories[name] ?: "General"
-    fun getCategories(): Set<String> = categories.values.toSet()
+
+    fun getCustomRenderer(name: String): ((DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit)? = customRenderers[name]
+
+    fun getCustomDimensions(name: String): Pair<Int, Int>? = customDimensions[name]
 
     fun getX(name: String): Float = hudData.getData().positions[name]?.x ?: 50f
     fun getY(name: String): Float = hudData.getData().positions[name]?.y ?: 50f

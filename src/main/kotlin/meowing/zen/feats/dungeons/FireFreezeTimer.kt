@@ -35,7 +35,7 @@ object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = lis
     }
 
     override fun initialize() {
-        HUDManager.register("firefreeze", "§bFire freeze: §c4.3s", "Dungeons")
+        HUDManager.register("firefreeze", "§bFire freeze: §c4.3s")
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
