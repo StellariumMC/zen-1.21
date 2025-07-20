@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.noclutter.hidefallingblocks;
+import meowing.zen.feats.noclutter.HideFallingBlocks;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.FallingBlockEntityRenderer;
 import net.minecraft.client.render.entity.state.FallingBlockEntityRenderState;
@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinFallingBlockEntityRenderer {
     @Inject(method = "render(Lnet/minecraft/client/render/entity/state/FallingBlockEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void zen$onRenderFallingBlocks(FallingBlockEntityRenderState fallingBlockEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo callbackInfo) {
-        if (hidefallingblocks.INSTANCE.isEnabled()) callbackInfo.cancel();
+        if (HideFallingBlocks.INSTANCE.isEnabled()) callbackInfo.cancel();
     }
 }

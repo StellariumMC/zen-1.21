@@ -1,5 +1,6 @@
 package meowing.zen.events
 
+import meowing.zen.api.ItemAbility
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
@@ -12,6 +13,8 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.text.Text
+import net.minecraft.util.Hand
+import net.minecraft.world.World
 
 abstract class Event
 
@@ -19,6 +22,17 @@ abstract class CancellableEvent : Event() {
     private var cancelled = false
     fun cancel() { cancelled = true }
     fun isCancelled() = cancelled
+}
+
+abstract class SkyblockEvent {
+    class ItemAbilityUsed(val ability: ItemAbility.ItemAbility) : Event()
+}
+
+abstract class MouseEvent {
+    class Click(val button: Int) : Event()
+    class Release(val button: Int) : Event()
+    class Scroll(val event: MouseEvent) : Event()
+    class Move(val event: MouseEvent) : Event()
 }
 
 abstract class TickEvent {
@@ -48,6 +62,7 @@ abstract class EntityEvent {
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
     class Spawn(val packet: EntitySpawnS2CPacket) : Event()
+    class Interact(val player: PlayerEntity, world: World, hand: Hand) : Event()
 }
 
 abstract class GuiEvent {

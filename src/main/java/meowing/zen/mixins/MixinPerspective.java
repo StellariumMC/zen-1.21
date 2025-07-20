@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.general.removeselfiecam;
+import meowing.zen.feats.general.RemoveSelfieCam;
 import net.minecraft.client.option.Perspective;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +19,6 @@ public class MixinPerspective {
 
     @Inject(method = "next", at = @At("HEAD"), cancellable = true)
     private void zen$onPrespectiveChange(CallbackInfoReturnable<Perspective> cir) {
-        if (removeselfiecam.INSTANCE.isEnabled()) cir.setReturnValue(this.firstPerson ? Perspective.THIRD_PERSON_BACK : Perspective.FIRST_PERSON);
+        if (RemoveSelfieCam.INSTANCE.isEnabled()) cir.setReturnValue(this.firstPerson ? Perspective.THIRD_PERSON_BACK : Perspective.FIRST_PERSON);
     }
 }

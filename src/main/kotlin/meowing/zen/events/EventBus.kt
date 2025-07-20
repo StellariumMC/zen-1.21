@@ -10,9 +10,15 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback
+import net.fabricmc.fabric.api.event.player.UseBlockCallback
+import net.fabricmc.fabric.api.event.player.UseEntityCallback
+import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
 
@@ -81,6 +87,30 @@ object EventBus {
         }
         ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
             post(GameEvent.Unload())
+        }
+        UseItemCallback.EVENT.register { player, world, hand ->
+            post(EntityEvent.Interact(player, world, hand))
+            ActionResult.PASS
+        }
+
+        UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
+            post(EntityEvent.Interact(player, world, hand))
+            ActionResult.PASS
+        }
+
+        UseEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
+            post(EntityEvent.Interact(player, world, hand))
+            ActionResult.PASS
+        }
+
+        AttackBlockCallback.EVENT.register { player, world, hand, pos, direction ->
+            post(EntityEvent.Interact(player, world, hand))
+            ActionResult.PASS
+        }
+
+        AttackEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
+            post(EntityEvent.Interact(player, world, hand))
+            ActionResult.PASS
         }
     }
 

@@ -30,9 +30,9 @@ object MetadataHandler {
                     } ?: false
 
                     if (hasBlackhole) return@register
-                    if (Zen.config.slayertimer) slayertimer.handleBossSpawn(packet.id)
-                    if (Zen.config.vengdmg) vengdmg.handleNametagUpdate(packet.id)
-                    if (Zen.config.lasertimer) lasertimer.handleSpawn(packet.id)
+                    if (Zen.config.slayertimer) SlayerTimer.handleBossSpawn(packet.id)
+                    if (Zen.config.vengdmg) VengDamage.handleNametagUpdate(packet.id)
+                    if (Zen.config.lasertimer) LaserTimer.handleSpawn(packet.id)
                 }
             }
         })

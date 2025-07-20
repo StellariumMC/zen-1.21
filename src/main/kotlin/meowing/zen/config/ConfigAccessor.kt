@@ -38,6 +38,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _highlightlividline = false
     private var _ragparty = false
     private var _armorhudvert = false
+    private var _firefreezeoverlaycolor = Color(0, 255, 255, 127)
     private var _chatcleanerkey = GLFW.GLFW_KEY_H
     private var _customtintcolor = Color(0, 255, 255, 127)
 
@@ -73,6 +74,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val highlightlividline get() = _highlightlividline
     val ragparty get() = _ragparty
     val armorhudvert get() = _armorhudvert
+    val firefreezeoverlaycolor get() = _firefreezeoverlaycolor
     val chatcleanerkey get() = _chatcleanerkey
     val customtintcolor get() = _customtintcolor
 
@@ -111,6 +113,7 @@ class ConfigAccessor(val configUI: ConfigUI) {
             .registerListener("highlightlividline") { _highlightlividline = it as Boolean }
             .registerListener("ragparty") { _ragparty = it as Boolean }
             .registerListener("armorhudvert") { _armorhudvert = it as Boolean }
+            .registerListener("firefreezeoverlaycolor") { _firefreezeoverlaycolor = it as Color }
             .registerListener("chatcleanerkey") { _chatcleanerkey = (it as Number).toInt() }
             .registerListener("customtintcolor") { _customtintcolor = it as Color }
     }

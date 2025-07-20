@@ -23,11 +23,11 @@ Skyhanni
 - Better Auction House messages
 - Better Bazaar messages
 - Chat cleaner
-- Chat History
 - Calculator
 - Custom entity damage tint
 - Custom model size
 - Entity Highlight
+- Fire freeze overlay
 - Guild message formatter
 - Party message formatter
 - Ragnarock alert
@@ -36,6 +36,7 @@ Skyhanni
 - Vanilla HP Hud
 - World age message
 - Hide fire overlay
+- Hide fog
 - Hide falling blocks
 - Hide status effects
 - Hide thunder

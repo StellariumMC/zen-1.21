@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.noclutter.nothunder;
+import meowing.zen.feats.noclutter.HideThunder;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LightningEntityRenderer;
 import net.minecraft.client.render.entity.state.LightningEntityRenderState;
@@ -18,6 +18,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinLightningEntityRenderer {
     @Inject(method = "render(Lnet/minecraft/client/render/entity/state/LightningEntityRenderState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void zen$onRenderLightning(LightningEntityRenderState lightningEntityRenderState, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int meow, CallbackInfo callbackInfo) {
-        if (nothunder.INSTANCE.isEnabled()) callbackInfo.cancel();
+        if (HideThunder.INSTANCE.isEnabled()) callbackInfo.cancel();
     }
 }
