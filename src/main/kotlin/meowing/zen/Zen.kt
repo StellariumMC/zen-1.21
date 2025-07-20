@@ -101,16 +101,14 @@ class Zen : ClientModInitializer {
         }
 
         fun registerListener(configKey: String, instance: Any) {
+            val callback: (Any) -> Unit = { _ ->
+                if (instance is Feature) instance.update()
+            }
+
             if (::configUI.isInitialized) {
-                configUI.registerListener(configKey) { newValue ->
-                    val isEnabled = newValue as? Boolean ?: false
-                    if (instance is Feature) instance.onToggle(isEnabled)
-                }
+                configUI.registerListener(configKey, callback)
             } else {
-                pendingCallbacks.add(configKey to { newValue ->
-                    val isEnabled = newValue as? Boolean ?: false
-                    if (instance is Feature) instance.onToggle(isEnabled)
-                })
+                pendingCallbacks.add(configKey to callback)
             }
         }
 
