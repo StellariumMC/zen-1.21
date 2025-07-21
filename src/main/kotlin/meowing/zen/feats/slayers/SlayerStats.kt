@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -36,7 +37,7 @@ object slayerstats : Feature("slayerstats") {
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§c[Zen] §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
+        HUDManager.register(name, "$prefix §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
         register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
@@ -49,7 +50,7 @@ object slayerstats : Feature("slayerstats") {
         kills = 0
         sessionStart = System.currentTimeMillis()
         totalKillTime = 0L
-        ChatUtils.addMessage("§c[Zen] §fSlayer stats reset!")
+        ChatUtils.addMessage("$prefix §fSlayer stats reset!")
     }
     
     private fun getBPH() = (kills * 3600000 / (System.currentTimeMillis() - sessionStart)).toInt()
@@ -62,7 +63,7 @@ object slayerstats : Feature("slayerstats") {
 
         val lines = if (kills > 0) {
             listOf(
-                "§c[Zen] §f§lSlayer Stats: ",
+                "$prefix §f§lSlayer Stats: ",
                 "§7> §bTotal bosses§f: §c${kills}",
                 "§7> §bBosses/hr§f: §c${getBPH()}",
                 "§7> §bAvg. kill§f: §c${getAVG()}"
@@ -91,7 +92,7 @@ object SlayerStatsCommand : CommandUtils(
     listOf("zenslayers")
 ) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
+        ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
         return 1
     }
 
@@ -101,7 +102,7 @@ object SlayerStatsCommand : CommandUtils(
                 .executes { context ->
                     val action = StringArgumentType.getString(context, "action")
                     if (action == "reset") slayerstats.reset()
-                    else ChatUtils.addMessage("§c[Zen] §fPlease use §c/slayerstats reset")
+                    else ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
                     1
                 }
         )

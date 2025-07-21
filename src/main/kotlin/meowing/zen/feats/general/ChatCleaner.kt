@@ -16,6 +16,7 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UKeyboard
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.types.ConfigElement
@@ -83,7 +84,7 @@ object chatcleaner : Feature("chatcleaner") {
 
                 if (text.isNotEmpty()) {
                     addPattern(text)
-                    ChatUtils.addMessage("§c[Zen] §fAdded §7\"§c$text§7\" §fto filter.")
+                    ChatUtils.addMessage("$prefix §fAdded §7\"§c$text§7\" §fto filter.")
                 }
             }
         }

@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.api.PlayerStats
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
@@ -18,7 +19,7 @@ object Debug {
 @Zen.Command
 object DebugCommand : CommandUtils("zendebug") {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("§c[Zen] §fUsage: §7/§bzendebug §c<toggle|stats>")
+        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats>")
         return 1
     }
 
@@ -30,7 +31,7 @@ object DebugCommand : CommandUtils("zendebug") {
                     when (action.lowercase()) {
                         "toggle" -> {
                             Debug.debugmode = !Debug.debugmode
-                            ChatUtils.addMessage("§c[Zen] §fToggled dev mode.")
+                            ChatUtils.addMessage("$prefix §fToggled dev mode.")
                         }
                         "stats" -> {
                             ChatUtils.addMessage(
@@ -48,7 +49,7 @@ object DebugCommand : CommandUtils("zendebug") {
                             )
                         }
                         else -> {
-                            ChatUtils.addMessage("§c[Zen] §fUsage: §7/§bzendebug §c<toggle|stats|dgutils>")
+                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils>")
                         }
                     }
                     1

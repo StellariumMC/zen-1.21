@@ -2,6 +2,7 @@ package meowing.zen.feats.carrying
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
 import meowing.zen.utils.Utils.MouseX
@@ -23,7 +24,7 @@ object CarryHUD {
     private const val name = "CarryHud"
 
     fun initialize() {
-        HUDManager.register(name, "§c[Zen] §f§lCarries:\n§7> §bPlayer1§f: §b5§f/§b10 §7(2.3s | 45/hr)\n§7> §bPlayer2§f: §b1§f/§b3 §7(15.7s | 32/hr)")
+        HUDManager.register(name, "$prefix §f§lCarries:\n§7> §bPlayer1§f: §b5§f/§b10 §7(2.3s | 45/hr)\n§7> §bPlayer2§f: §b1§f/§b3 §7(15.7s | 32/hr)")
     }
 
     fun renderHUD(context: DrawContext) {
@@ -46,7 +47,7 @@ object CarryHUD {
         if (CarryCounter.carryees.isEmpty() || Zen.isInInventory) return emptyList()
 
         val lines = mutableListOf<String>()
-        lines.add("§c[Zen] §f§lCarries:")
+        lines.add("$prefix §f§lCarries:")
         CarryCounter.carryees.mapTo(lines) {
             "§7> §b${it.name}§f: §b${it.count}§f/§b${it.total} §7(${it.getTimeSinceLastBoss()} | ${it.getBossPerHour()}§7)"
         }
@@ -102,7 +103,7 @@ object CarryHUD {
 
         renderItems.clear()
         buttons.clear()
-        renderItems.add(RenderItem("§c[Zen] §f§lCarries:", x, y, Colors.WHITE, true))
+        renderItems.add(RenderItem("$prefix §f§lCarries:", x, y, Colors.WHITE, true))
 
         CarryCounter.carryees.forEachIndexed { i, carryee ->
             val lineY = y + 12f + i * 12

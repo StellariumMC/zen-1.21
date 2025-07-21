@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
@@ -22,10 +23,10 @@ object CalculatorCommand : CommandUtils(
             val display =
                 if (result == result.toInt().toDouble()) result.toInt().toString()
                 else "%.10f".format(result).trimEnd('0').trimEnd('.')
-            ChatUtils.addMessage("§c[Zen] §b$eq §f= §b$display")
+            ChatUtils.addMessage("$prefix §b$eq §f= §b$display")
             1
         } catch (e: Exception) {
-            ChatUtils.addMessage("§c[Zen] §fInvalid equation.")
+            ChatUtils.addMessage("$prefix §fInvalid equation.")
             0
         }
     }

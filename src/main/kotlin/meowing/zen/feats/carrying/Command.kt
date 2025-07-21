@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.Zen.Companion.prefix
 import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.TickUtils
@@ -76,7 +77,7 @@ object carrycommand {
     private fun checkEnabled(): Boolean {
         if (!Zen.config.carrycounter) {
             ChatUtils.addMessage(
-                "§c[Zen] §fPlease enable carry counter first!",
+                "$prefix §fPlease enable carry counter first!",
                 "§cClick to open settings GUI",
                 ClickEvent.Action.RUN_COMMAND,
                 "/zen"
@@ -94,8 +95,8 @@ object carrycommand {
 
         val carryee = CarryCounter.addCarryee(playerName, count)
         if (carryee != null) {
-            if (carryee.total == count) ChatUtils.addMessage("§c[Zen] §fAdded §b$playerName§f for §b$count§f carries.")
-            else ChatUtils.addMessage("§c[Zen] §fUpdated §b$playerName§f to §b${carryee.total}§f total (§b${carryee.count}§f/§b${carryee.total}§f)")
+            if (carryee.total == count) ChatUtils.addMessage("$prefix §fAdded §b$playerName§f for §b$count§f carries.")
+            else ChatUtils.addMessage("$prefix §fUpdated §b$playerName§f to §b${carryee.total}§f total (§b${carryee.count}§f/§b${carryee.total}§f)")
         }
         return 1
     }
@@ -105,7 +106,7 @@ object carrycommand {
 
         val playerName = StringArgumentType.getString(ctx, "player")
         val removed = CarryCounter.removeCarryee(playerName)
-        ChatUtils.addMessage("§c[Zen] §f${if (removed) "Removed" else "Player not found:"} §b$playerName")
+        ChatUtils.addMessage("$prefix §f${if (removed) "Removed" else "Player not found:"} §b$playerName")
         return 1
     }
 
@@ -118,8 +119,8 @@ object carrycommand {
         val carryee = CarryCounter.findCarryee(playerName)
         if (carryee != null) {
             carryee.total = total
-            ChatUtils.addMessage("§c[Zen] §fSet §b$playerName§f total to §b$total§f (§b${carryee.count}§f/§b$total§f)")
-        } else ChatUtils.addMessage("§c[Zen] §fPlayer §b$playerName§f not found!")
+            ChatUtils.addMessage("$prefix §fSet §b$playerName§f total to §b$total§f (§b${carryee.count}§f/§b$total§f)")
+        } else ChatUtils.addMessage("$prefix §fPlayer §b$playerName§f not found!")
         return 1
     }
 
@@ -132,9 +133,9 @@ object carrycommand {
         val carryee = CarryCounter.findCarryee(playerName)
         if (carryee != null) {
             carryee.count = count
-            ChatUtils.addMessage("§c[Zen] §fSet §b$playerName§f count to §b$count§f (§b$count§f/§b${carryee.total}§f)")
+            ChatUtils.addMessage("$prefix §fSet §b$playerName§f count to §b$count§f (§b$count§f/§b${carryee.total}§f)")
             if (count >= carryee.total) carryee.complete()
-        } else ChatUtils.addMessage("§c[Zen] §fPlayer §b$playerName§f not found!")
+        } else ChatUtils.addMessage("$prefix §fPlayer §b$playerName§f not found!")
         return 1
     }
 
@@ -143,7 +144,7 @@ object carrycommand {
 
         val count = CarryCounter.carryees.size
         CarryCounter.clearCarryees()
-        ChatUtils.addMessage("§c[Zen] §fCleared §b$count§f carries.")
+        ChatUtils.addMessage("$prefix §fCleared §b$count§f carries.")
         return 1
     }
 
@@ -151,11 +152,11 @@ object carrycommand {
         if (!checkEnabled()) return 0
 
         if (CarryCounter.carryees.isEmpty()) {
-            ChatUtils.addMessage("§c[Zen] §fNo active carries.")
+            ChatUtils.addMessage("$prefix §fNo active carries.")
             return 1
         }
 
-        ChatUtils.addMessage("§c[Zen] §fActive Carries:")
+        ChatUtils.addMessage("$prefix §fActive Carries:")
         CarryCounter.carryees.forEach { carryee ->
             val progress = "§b${carryee.count}§f/§b${carryee.total}"
             val lastBoss = if (carryee.count > 0) "§7(${carryee.getTimeSinceLastBoss()} ago)" else ""
@@ -169,7 +170,7 @@ object carrycommand {
 
         val logs = CarryCounter.dataUtils.getData().completedCarries.sortedByDescending { it.timestamp }
         if (logs.isEmpty()) {
-            ChatUtils.addMessage("§c[Zen] §fNo carry logs found.")
+            ChatUtils.addMessage("$prefix §fNo carry logs found.")
             return 1
         }
 
@@ -185,7 +186,7 @@ object carrycommand {
         val prevPage = if (currentLogPage > 1) "§b[<]" else "§7[<]"
         val nextPage = if (currentLogPage < totalPages) "§b[>]" else "§7[>]"
 
-        val headerText = Text.literal("§c[Zen] §fCarry Logs - §fPage §b$currentLogPage§f/§b$totalPages ")
+        val headerText = Text.literal("$prefix §fCarry Logs - §fPage §b$currentLogPage§f/§b$totalPages ")
             .append(Text.literal(prevPage).styled {
                 if (currentLogPage > 1) it.withClickEvent(ClickEvent.RunCommand("/carry log ${currentLogPage - 1}"))
                 else it
@@ -217,12 +218,12 @@ object carrycommand {
                 mc.setScreen(HUDEditor())
             }
         }
-        ChatUtils.addMessage("§c[Zen] §fOpened HUD editor.")
+        ChatUtils.addMessage("$prefix §fOpened HUD editor.")
         return 1
     }
 
     private fun showHelp(ctx: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("§c[Zen] §fCarry Commands:")
+        ChatUtils.addMessage("$prefix §fCarry Commands:")
         listOf(
             "add §c<player> <count>§7 - §fAdd carries",
             "settotal §c<player> <total>§7 - §fSet total carries",

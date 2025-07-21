@@ -37,12 +37,15 @@ class Zen : ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
 
-            ChatUtils.addMessage("§c[Zen] §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures", "§c${FeatureLoader.getLoadtime()}ms §8- §c4 commands §7| §c8 utils")
+            ChatUtils.addMessage(
+                "$prefix §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
+                "§c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
+            )
 
             val data = dataUtils.getData()
 
             if (data.isFirstInstall) {
-                ChatUtils.addMessage("§c[Zen] §fThanks for installing Zen!")
+                ChatUtils.addMessage("$prefix §fThanks for installing Zen!")
                 ChatUtils.addMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
                 ChatUtils.addMessage("§7> §cDiscord:§b [Discord]", "Discord server", ClickEvent.Action.OPEN_URL, "https://discord.gg/KPmHQUC97G")
                 dataUtils.setData(data.copy(isFirstInstall = false))
@@ -82,6 +85,7 @@ class Zen : ClientModInitializer {
     }
 
     companion object {
+        const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
         val mc = MinecraftClient.getInstance()
         var isInInventory = false

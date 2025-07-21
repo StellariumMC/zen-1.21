@@ -3,6 +3,7 @@ package meowing.zen
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.Zen.Companion.prefix
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
@@ -32,9 +33,9 @@ object UpdateChecker {
 
             if (compareVersions(latest, current) > 0) {
                 isMessageShown = true
-                val message = Text.literal("§c[Zen] §fUpdate available! §c$current §f-> §c$latest")
+                val message = Text.literal("$prefix §fUpdate available! §c$current §f-> §c$latest")
 
-                val downloadMsg = Text.literal("§c[Zen] §fDownload: ")
+                val downloadMsg = Text.literal("$prefix §fDownload: ")
 
                 modrinth?.second?.let { url ->
                     val modrinthBtn = Text.literal("§a[Modrinth]")
