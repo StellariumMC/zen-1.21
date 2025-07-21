@@ -11,6 +11,7 @@
     "MixinEntityRenderDispatcher",
     "MixinFallingBlockEntityRenderer",
     "MixinGameRenderer",
+    "MixinInGameHud",
     "MixinInGameOverlayRenderer",
     "MixinLightningEntityRenderer",
     "MixinMouse",

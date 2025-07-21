@@ -6,6 +6,7 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
+import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils
@@ -49,5 +50,9 @@ object MinibossSpawn : Feature("minibossspawn") {
                 }
             }
         }
+
+        register<WorldEvent.Change> ({
+            entities.clear()
+        })
     }
 }
