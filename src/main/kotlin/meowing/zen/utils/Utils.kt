@@ -77,6 +77,20 @@ object Utils {
         }
     }
 
+    fun decodeRoman(roman: String): Int {
+        val values = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
+        var result = 0
+        var prev = 0
+
+        for (char in roman.reversed()) {
+            val current = values[char] ?: 0
+            if (current < prev) result -= current
+            else result += current
+            prev = current
+        }
+        return result
+    }
+
     fun createBlock(radius: Float = 0f): UIComponent {
         return if (SystemUtils.IS_OS_MAC_OSX) UIBlock() else UIRoundedRectangle(radius)
     }

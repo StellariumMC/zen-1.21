@@ -7,6 +7,7 @@ import meowing.zen.Zen
 import meowing.zen.api.PlayerStats
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
+import meowing.zen.utils.DungeonUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
@@ -39,7 +40,16 @@ object DebugCommand : CommandUtils("zendebug") {
                                         "§aDefense: ${PlayerStats.defense} | Effective: ${PlayerStats.effectiveHealth} | Effective Max: ${PlayerStats.maxEffectiveHealth}"
                             )
                         }
-                        else -> ChatUtils.addMessage("§c[Zen] §fUsage: /zendebug <toggle|stats>")
+                        "dgutils" -> {
+                            ChatUtils.addMessage(
+                                "Crypt Count: ${DungeonUtils.getCryptCount()}\n" +
+                                        "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
+                                        "isMage: ${DungeonUtils.isMage()}"
+                            )
+                        }
+                        else -> {
+                            ChatUtils.addMessage("§c[Zen] §fUsage: §7/§bzendebug §c<toggle|stats|dgutils>")
+                        }
                     }
                     1
                 }
