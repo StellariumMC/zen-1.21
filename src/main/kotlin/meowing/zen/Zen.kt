@@ -89,7 +89,6 @@ class Zen : ClientModInitializer {
         EventBus.register<WorldEvent.Change> ({
             TickUtils.scheduleServer(1) {
                 skyblockFeatures.forEach { it.update() }
-                ChatUtils.addMessage("${LocationUtils.inSkyblock}")
             }
         })
     }
@@ -99,7 +98,7 @@ class Zen : ClientModInitializer {
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
         private val skyblockFeatures = mutableListOf<Feature>()
-        private lateinit var configUI: ConfigUI
+        lateinit var configUI: ConfigUI
         lateinit var config: ConfigAccessor
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()

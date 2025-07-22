@@ -42,6 +42,8 @@ class ConfigAccessor(val configUI: ConfigUI) {
     private var _chatcleanerkey = GLFW.GLFW_KEY_H
     private var _customtintcolor = Color(0, 255, 255, 127)
     private var _carrysendmsg = false
+    private var _berberishelpercolor = Color(0, 255, 255, 127)
+    private var _effectiveareaoverlaycolor = Color(0, 255, 255, 127)
 
     val carrycounter get() = _carrycounter
     val carryvalue get() = _carryvalue
@@ -79,6 +81,8 @@ class ConfigAccessor(val configUI: ConfigUI) {
     val chatcleanerkey get() = _chatcleanerkey
     val customtintcolor get() = _customtintcolor
     val carrysendmsg get() = _carrysendmsg
+    val berberishelpercolor get() = _berberishelpercolor
+    val effectiveareaoverlaycolor get() = _effectiveareaoverlaycolor
 
     init {
         configUI
@@ -119,6 +123,8 @@ class ConfigAccessor(val configUI: ConfigUI) {
             .registerListener("chatcleanerkey") { _chatcleanerkey = (it as Number).toInt() }
             .registerListener("customtintcolor") { _customtintcolor = it as Color }
             .registerListener("carrysendmsg") { _carrysendmsg = it as Boolean }
+            .registerListener("berberishelpercolor") { _berberishelpercolor = it as Color }
+            .registerListener("effectiveareaoverlaycolor") { _effectiveareaoverlaycolor = it as Color }
     }
 
     fun getValue(key: String): Any? = configUI.getConfigValue(key)

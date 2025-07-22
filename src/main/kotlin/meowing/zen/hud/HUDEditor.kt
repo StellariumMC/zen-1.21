@@ -278,8 +278,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         elements.reversed().find { it.isMouseOver(mouseX.toFloat(), mouseY.toFloat()) }?.let { element ->
             dragging = element
             selected = element
-            dragOffsetX = mouseX - element.getRenderX(Utils.getPartialTicks())
-            dragOffsetY = mouseY - element.getRenderY(Utils.getPartialTicks())
+            dragOffsetX = mouseX - element.getRenderX()
+            dragOffsetY = mouseY - element.getRenderY()
             saveState()
         }
     }

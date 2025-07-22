@@ -14,9 +14,10 @@ import java.awt.Color
 object Utils {
     private val emoteRegex = "[^\\u0000-\\u007F]".toRegex()
 
-    val window get() = mc.window
-    val MouseX get() = mc.mouse.x * window.scaledWidth / window.width
-    val MouseY get() = mc.mouse.y * window.scaledWidth / window.width
+    inline val partialTicks get() = mc.renderTickCounter.getTickProgress(true)
+    inline val window get() = mc.window
+    inline val MouseX get() = mc.mouse.x * window.scaledWidth / window.width
+    inline val MouseY get() = mc.mouse.y * window.scaledWidth / window.width
 
     fun playSound(sound: SoundEvent, volume: Float, pitch: Float) {
         MinecraftClient.getInstance().player?.playSound(sound, volume, pitch)
@@ -36,8 +37,6 @@ object Utils {
     }
 
     fun String.removeEmotes() = replace(emoteRegex, "")
-
-    fun getPartialTicks(): Float = MinecraftClient.getInstance().renderTickCounter.getTickProgress(true)
 
     fun Color.toColorInt(): Int {
         return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
