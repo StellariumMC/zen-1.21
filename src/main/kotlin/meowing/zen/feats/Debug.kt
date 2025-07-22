@@ -9,6 +9,7 @@ import meowing.zen.api.PlayerStats
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.DungeonUtils
+import meowing.zen.utils.LocationUtils.inSkyblock
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
@@ -48,8 +49,11 @@ object DebugCommand : CommandUtils("zendebug") {
                                         "isMage: ${DungeonUtils.isMage()}"
                             )
                         }
+                        "info" -> {
+                            ChatUtils.addMessage("inSkyblock: $inSkyblock")
+                        }
                         else -> {
-                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils>")
+                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|info>")
                         }
                     }
                     1

@@ -19,7 +19,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
 
 @Zen.Module
-object slayerstats : Feature("slayerstats") {
+object slayerstats : Feature("slayerstats", true) {
     private var kills = 0
     private var sessionStart = System.currentTimeMillis()
     private var totalKillTime = 0L

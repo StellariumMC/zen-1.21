@@ -13,7 +13,7 @@ import net.minecraft.text.Text
 import java.util.Optional
 
 @Zen.Module
-object DamageTracker : Feature("damagetracker") {
+object DamageTracker : Feature("damagetracker", true) {
     private val entities = mutableListOf<Int>()
     private val regex = Regex("\\s|^§\\w\\D$")
 

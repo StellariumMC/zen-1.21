@@ -16,7 +16,7 @@ import net.minecraft.text.Text
 import java.util.regex.Pattern
 
 @Zen.Module
-object VengTimer : Feature("vengtimer") {
+object VengTimer : Feature("vengtimer", true) {
     var starttime: Long = 0
     var hit = false
     private val fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$")

@@ -16,7 +16,7 @@ import net.minecraft.text.Text
 import java.util.Optional
 
 @Zen.Module
-object MinibossSpawn : Feature("minibossspawn") {
+object MinibossSpawn : Feature("minibossspawn", true) {
     private val entities = mutableListOf<Int>()
     private val names = listOf(
         "Atoned Revenant ", "Atoned Champion ", "Deformed Revenant ", "Revenant Champion ", "Revenant Sycophant ",

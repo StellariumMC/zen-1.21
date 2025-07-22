@@ -9,7 +9,7 @@ import meowing.zen.feats.Feature
 import meowing.zen.utils.Utils.toColorInt
 
 @Zen.Module
-object SlayerHighlight : Feature("slayerhighlight") {
+object SlayerHighlight : Feature("slayerhighlight", true) {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("Slayers", "General", ConfigElement(

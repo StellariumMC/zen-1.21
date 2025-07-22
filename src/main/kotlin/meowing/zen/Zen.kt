@@ -14,8 +14,10 @@ import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
+import meowing.zen.events.WorldEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.LocationUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
@@ -74,24 +76,35 @@ class Zen : ClientModInitializer {
 
         EventBus.register<AreaEvent.Main> ({
             TickUtils.scheduleServer(1) {
-                updateFeatures()
+                areaFeatures.forEach { it.update() }
             }
         })
+
         EventBus.register<AreaEvent.Sub> ({
             TickUtils.scheduleServer(1) {
-                updateFeatures()
+                subareaFeatures.forEach { it.update() }
+            }
+        })
+
+        EventBus.register<WorldEvent.Change> ({
+            TickUtils.scheduleServer(1) {
+                skyblockFeatures.forEach { it.update() }
+                ChatUtils.addMessage("${LocationUtils.inSkyblock}")
             }
         })
     }
 
     companion object {
+        private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
+        private val areaFeatures = mutableListOf<Feature>()
+        private val subareaFeatures = mutableListOf<Feature>()
+        private val skyblockFeatures = mutableListOf<Feature>()
+        private lateinit var configUI: ConfigUI
+        lateinit var config: ConfigAccessor
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
         val mc = MinecraftClient.getInstance()
         var isInInventory = false
-        lateinit var configUI: ConfigUI
-        lateinit var config: ConfigAccessor
-        private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
 
         private fun updateFeatures() {
             features.forEach { it.update() }
@@ -123,6 +136,11 @@ class Zen : ClientModInitializer {
 
         fun addFeature(feature: Feature) {
             features.add(feature)
+
+            if (feature.hasAreas()) areaFeatures.add(feature)
+            if (feature.hasSubareas()) subareaFeatures.add(feature)
+            if (feature.checksSkyblock()) skyblockFeatures.add(feature)
+
             feature.addConfig(configUI)
         }
 

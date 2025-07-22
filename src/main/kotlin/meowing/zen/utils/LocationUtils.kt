@@ -88,4 +88,6 @@ object LocationUtils {
             }
         }
     }
+
+    inline val inSkyblock: Boolean get() = ScoreboardUtils.getScoreboardTitle(true)?.contains("skyblock", true) == true
 }

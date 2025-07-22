@@ -1,13 +1,11 @@
 package meowing.zen.utils
 
-import net.minecraft.client.MinecraftClient
+import meowing.zen.Zen.Companion.mc
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 object ScoreboardUtils {
-    private val mc = MinecraftClient.getInstance()
-
     fun getSidebarLines(cleanColor: Boolean): List<String> {
         val scoreboard = mc.world?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
@@ -24,6 +22,15 @@ object ScoreboardUtils {
                 }
             }
             .reversed()
+    }
+
+    fun getScoreboardTitle(cleanColor: Boolean = true): String? {
+        val scoreboard = mc.world?.scoreboard ?: return null
+        val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return null
+
+        return objective.displayName?.string?.let {
+            if (cleanColor) it.removeFormatting() else it
+        }
     }
 
     /**
