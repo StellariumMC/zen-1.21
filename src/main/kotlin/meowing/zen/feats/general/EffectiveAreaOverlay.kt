@@ -30,7 +30,7 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
         return configUI
             .addElement("General", "Effective Area Overlay", ConfigElement(
                 "effectiveareaoverlay",
-                "Custom tint",
+                "Effective Area Overlay",
                 "Renders a filled circle its effective area.",
                 ElementType.Switch(false)
             ))

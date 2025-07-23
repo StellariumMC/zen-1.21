@@ -38,7 +38,7 @@ object RagnarockAlert : Feature("ragalert", true) {
             if (event.packet is PlaySoundS2CPacket) {
                 val packet = event.packet
                 if (!packet.sound.toString().contains("minecraft:entity.wolf.death") || packet.pitch != 1.4920635f || !isHolding("RAGNAROCK_AXE")) return@register
-                val strengthGain = ((mc.player?.getStackInHand(Hand.MAIN_HAND)?.getSBStrength ?: return@register) * 1.5).toInt()
+                val strengthGain = ((player?.getStackInHand(Hand.MAIN_HAND)?.getSBStrength ?: return@register) * 1.5).toInt()
                 showTitle("§cRag §fCasted!", "§c❁ Strength:§b $strengthGain", 2000)
                 if (config.ragparty) ChatUtils.command("pc Strength from Ragnarok: $strengthGain")
             }

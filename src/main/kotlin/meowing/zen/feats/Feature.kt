@@ -13,8 +13,8 @@ import meowing.zen.utils.LocationUtils
  * Under GPL 3.0 License
  */
 open class Feature(
-    private val configKey: String? = null,
-    private val checkSB: Boolean = false,
+    val configKey: String? = null,
+    val checkSB: Boolean = false,
     area: Any? = null,
     subarea: Any? = null
 ) {

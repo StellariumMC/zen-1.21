@@ -24,7 +24,7 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->
             if (!SlayerTimer.isFighting || SlayerTimer.BossId == -1 || event.entity.id != SlayerTimer.BossId) return@register
-            if (mc.player?.canSee(event.entity) == true) {
+            if (player?.canSee(event.entity) == true) {
                 event.shouldGlow = true
                 event.glowColor = config.slayerhighlightcolor.toColorInt()
             }

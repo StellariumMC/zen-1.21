@@ -34,18 +34,18 @@ object AutoMeow : Feature("automeow") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val content = event.message.string.removeFormatting()
-            val matchResult = regex.find(content) ?: return@register
+            val text = event.message.string.removeFormatting()
+            val matchResult = regex.find(text) ?: return@register
             val username = matchResult.groupValues[1]
 
-            if (content.contains("To ") || username == mc.player?.name?.string) return@register
+            if (text.contains("To ") || username == player?.name?.string) return@register
+
+            val cmd = when {
+                text.startsWith("From ") -> "msg $username"
+                else -> channels.entries.find { text.startsWith(it.key) }?.value ?: "ac"
+            }
+
             TickUtils.schedule(Random.nextLong(10, 50)) {
-                val cmd = when {
-                    content.startsWith("From ") -> {
-                        "msg $username"
-                    }
-                    else -> channels.entries.find { content.startsWith(it.key) }?.value ?: "ac"
-                }
                 ChatUtils.command("$cmd ${meows.random()}")
             }
         }

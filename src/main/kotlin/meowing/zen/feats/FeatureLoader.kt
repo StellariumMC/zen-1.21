@@ -47,7 +47,6 @@ object FeatureLoader {
             }
         }
 
-        CarryHUD.initialize()
         loadtime = System.currentTimeMillis() - starttime
     }
 

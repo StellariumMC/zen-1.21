@@ -31,13 +31,14 @@ object VengDamage : Feature("vengdmg", true) {
     override fun initialize() {
         register<EntityEvent.Join> { event ->
             if (nametagID == -1) return@register
+
             TickUtils.scheduleServer(2) {
                 val entityName = event.entity.name.string?.removeFormatting() ?: return@scheduleServer
                 val vengMatch = veng.matcher(entityName)
                 if (!vengMatch.matches()) return@scheduleServer
 
-                val spawnedEntity = mc.world?.getEntityById(event.entity.id) ?: return@scheduleServer
-                val nametagEntity = mc.world?.getEntityById(nametagID) ?: return@scheduleServer
+                val spawnedEntity = world?.getEntityById(event.entity.id) ?: return@scheduleServer
+                val nametagEntity = world?.getEntityById(nametagID) ?: return@scheduleServer
 
                 if (spawnedEntity.distanceTo(nametagEntity) > 5) return@scheduleServer
 

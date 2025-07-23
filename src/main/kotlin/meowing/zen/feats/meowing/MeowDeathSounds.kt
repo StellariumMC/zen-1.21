@@ -17,36 +17,18 @@ object MeowDeathSounds : Feature("meowdeathsounds") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("Meowing", "Meow Sounds", ConfigElement(
-                "meowsounds",
-                "Meow Sounds",
-                "Plays a cat sound whenever someone sends \"meow\" in chat",
+                "meowdeathsounds",
+                "Meow Death Sounds",
+                "Plays a cat sound whenever an entity dies",
                 ElementType.Switch(false)
             ))
     }
 
     override fun initialize() {
-        register<EntityEvent.Leave> {
-            val entity = it.entity
-            if (entity is ArmorStandEntity || entity.isInvisible || entity.isAlive) return@register
-
-            val pos = entity.pos
-            mc.world?.playSound(
-                null,
-                pos.x, pos.y, pos.z,
-                SoundEvents.ENTITY_CAT_AMBIENT,
-                net.minecraft.sound.SoundCategory.AMBIENT,
-                0.8f, 1.0f
-            )
-
-            repeat(5) {
-                Utils.spawnParticle(
-                    ParticleTypes.NOTE,
-                    pos.x + (Random.nextDouble() - 0.5),
-                    pos.y + 1.0 + Random.nextDouble() * 0.5,
-                    pos.z + (Random.nextDouble() - 0.5),
-                    0.0, 0.2, 0.0
-                )
-            }
+        register<EntityEvent.Death> { event ->
+            val entity = event.entity
+            if (entity is ArmorStandEntity || entity.isInvisible) return@register
+            Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 0.8f, 1.0f)
         }
     }
 }

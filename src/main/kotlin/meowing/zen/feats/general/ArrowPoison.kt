@@ -46,8 +46,8 @@ object ArrowPoison : Feature("arrowpoison", true) {
     private fun updateCount() {
         twilight = 0
         toxic = 0
-        if (mc.player == null || mc?.player?.inventory == null) return
-        mc.player!!.inventory.mainStacks.forEach { item ->
+        val inventory = player?.inventory?.mainStacks ?: return
+        inventory.forEach { item ->
             if (item == null) return@forEach
             val name = item.name.string.removeFormatting()
             if (name.contains("Twilight Arrow Poison")) twilight += item.count

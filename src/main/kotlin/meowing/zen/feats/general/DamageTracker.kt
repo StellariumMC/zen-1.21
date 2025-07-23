@@ -9,6 +9,7 @@ import meowing.zen.events.EntityEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.removeFormatting
 import net.minecraft.text.Text
 import java.util.Optional
 
@@ -32,7 +33,7 @@ object DamageTracker : Feature("damagetracker", true) {
             if (entities.contains(event.packet.id)) return@register
             event.packet.trackedValues?.find { it.id == 2 && it.value is Optional<*> }?.let { obj ->
                 val optional = obj.value as Optional<*>
-                val name = (optional.orElse(null) as? Text)?.string ?: return@let
+                val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
                 if (name.isNotBlank() && !name.matches(regex)) ChatUtils.addMessage("$prefix $name")
             }
         }

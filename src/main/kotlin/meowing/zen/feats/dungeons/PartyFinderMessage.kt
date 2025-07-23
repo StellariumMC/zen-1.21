@@ -15,7 +15,7 @@ import net.minecraft.text.Style
 
 @Zen.Module
 object PartyFinderMessage : Feature("partyfindermsgs") {
-    private val playerName get() = mc.player?.name?.string ?: ""
+    private val playerName get() = player?.name?.string ?: ""
     private val joinedPattern = Regex("^Party Finder > (.+?) joined the dungeon group! \\((\\w+) Level (\\d+)\\)$")
     private val classSetPattern = Regex("^Party Finder > (.+?) set their class to (\\w+) Level (\\d+)!$")
 
@@ -51,7 +51,7 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
                     if (user == playerName) {
                         ChatUtils.addMessage("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
                     } else {
-                        val player = mc.player ?: return@register
+                        val player = player ?: return@register
 
                         val base = Text.literal("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
 

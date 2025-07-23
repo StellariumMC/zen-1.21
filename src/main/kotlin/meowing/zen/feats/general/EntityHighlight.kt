@@ -57,7 +57,7 @@ object EntityHighlight : Feature("entityhighlight") {
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->
             val entity = event.entity
-            val player = mc.player ?: return@register
+            val player = player ?: return@register
 
             if (entity == player || entity.isInvisible || !isEntityUnderCrosshair(entity)) return@register
 

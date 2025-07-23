@@ -24,7 +24,7 @@ object SlayerTimer : Feature("slayertimer", true) {
     private var startTime = 0L
     private var spawnTime = 0L
     private var serverTicks = 0
-    private var servertickcall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({ serverTicks++ }, false)
+    private var serverTickCall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({ serverTicks++ }, false)
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -49,7 +49,7 @@ object SlayerTimer : Feature("slayertimer", true) {
             if (event.entity is LivingEntity && event.entity.id == BossId && isFighting) {
                 val timeTaken = System.currentTimeMillis() - startTime
                 sendTimerMessage("You killed your boss", timeTaken, serverTicks)
-                if (Zen.config.slayerstats) slayerstats.addKill(timeTaken)
+                if (config.slayerstats) slayerstats.addKill(timeTaken)
                 resetBossTracker()
             }
         }
@@ -61,7 +61,7 @@ object SlayerTimer : Feature("slayertimer", true) {
         startTime = System.currentTimeMillis()
         isFighting = true
         serverTicks = 0
-        servertickcall.register()
+        serverTickCall.register()
         resetSpawnTimer()
     }
 
@@ -85,7 +85,7 @@ object SlayerTimer : Feature("slayertimer", true) {
         startTime = 0
         isFighting = false
         serverTicks = 0
-        servertickcall.unregister()
+        serverTickCall.unregister()
     }
 
     private fun resetSpawnTimer() {

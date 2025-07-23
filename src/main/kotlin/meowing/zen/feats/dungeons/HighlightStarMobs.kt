@@ -59,11 +59,10 @@ object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
         register<RenderEvent.EntityGlow> { event ->
             val ent = event.entity
             if (!entities.contains(ent.id)) return@register
-            val player = mc.player ?: return@register
-            val color = config.boxstarmobscolor
-            if (player.canSee(event.entity)) {
+
+            if (player?.canSee(event.entity) == true) {
                 event.shouldGlow = true
-                event.glowColor = color.toColorInt()
+                event.glowColor = config.boxstarmobscolor.toColorInt()
             }
         }
     }

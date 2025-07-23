@@ -119,6 +119,8 @@ object CarryCounter : Feature("carrycounter") {
             }
         }
 
+        CarryHUD.initialize()
+
         register<GuiEvent.HUD> { CarryHUD.renderHUD(it.context) }
     }
 
@@ -194,9 +196,9 @@ object CarryCounter : Feature("carrycounter") {
                     val optional = obj.value as Optional<*>
                     val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
                     if (name.contains("Spawned by")) {
-                        val targetEntity = mc.world!!.getEntityById(packet.id)
+                        val targetEntity = world?.getEntityById(packet.id)
                         val hasBlackhole = targetEntity?.let { entity ->
-                            mc.world!!.entities.any { Entity ->
+                            world?.entities?.any { Entity ->
                                 entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
                             }
                         } ?: false
@@ -234,7 +236,7 @@ object CarryCounter : Feature("carrycounter") {
             if (registered || !config.carrybosshighlight) return
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
                 carryeesByBossId[event.entity.id]?.let {
-                    if (mc.player?.canSee(event.entity) == false) return@let
+                    if (player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
                     event.glowColor = config.carrybosshighlightcolor.toColorInt()
                 }
@@ -259,7 +261,7 @@ object CarryCounter : Feature("carrycounter") {
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
                 val cleanName = event.entity.name.string.removeFormatting()
                 carryeesByName[cleanName]?.let {
-                    if (mc.player?.canSee(event.entity) == false) return@let
+                    if (player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
                     event.glowColor = config.carryclienthighlightcolor.toColorInt()
                 }

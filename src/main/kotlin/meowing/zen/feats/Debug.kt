@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.features
 import meowing.zen.Zen.Companion.prefix
 import meowing.zen.api.PlayerStats
 import meowing.zen.utils.ChatUtils
@@ -51,6 +52,12 @@ object DebugCommand : CommandUtils("zendebug") {
                         }
                         "info" -> {
                             ChatUtils.addMessage("inSkyblock: $inSkyblock")
+                        }
+                        "regfeats" -> {
+                            ChatUtils.addMessage("Features registered:")
+                            features.forEach { it ->
+                                if (it.isEnabled()) ChatUtils.addMessage("§f> §c${it.configKey}")
+                            }
                         }
                         else -> {
                             ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|info>")

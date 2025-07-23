@@ -1,62 +1,45 @@
 package meowing.zen.utils
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.Zen.Companion.prefix
+import meowing.zen.feats.Debug
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
-import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.math.ceil
 
 object ChatUtils {
-    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private val queue = ConcurrentLinkedQueue<String>()
-    private var lastSent = 0L
-    private var processing = false
+    private var nextAvailableTime = 0L
+
+    private fun schedule(action: () -> Unit) {
+        val now = System.currentTimeMillis()
+        nextAvailableTime = maxOf(now, nextAvailableTime)
+        val delay = (nextAvailableTime - now) / 50.0
+
+        TickUtils.schedule(ceil(delay).toLong()) {
+            action()
+        }
+
+        nextAvailableTime += 100
+    }
 
     fun chat(message: String) {
         val player = mc.player ?: return
-        val now = System.currentTimeMillis()
-
-        if (now - lastSent >= 100 && !processing) {
-            player.networkHandler.sendChatMessage(message)
-            lastSent = now
-        } else {
-            queue.offer(message)
-            if (!processing) processQueue()
-        }
-    }
-
-    private fun processQueue() {
-        processing = true
-        scope.launch {
-            while (queue.isNotEmpty()) {
-                val elapsed = System.currentTimeMillis() - lastSent
-                if (elapsed < 100) {
-                    delay(100 - elapsed)
-                }
-
-                queue.poll()?.let { message ->
-                    val player = mc.player
-                    if (player != null) {
-                        player.networkHandler.sendChatMessage(message)
-                        lastSent = System.currentTimeMillis()
-                    }
-                }
-            }
-            processing = false
+        schedule {
+            player.networkHandler?.sendChatMessage(message)
+            if (Debug.debugmode) addMessage("$prefix §fSent message \"$message\"")
         }
     }
 
     fun command(command: String) {
         val player = mc.player ?: return
         val cmd = if (command.startsWith("/")) command else "/$command"
-        player.networkHandler.sendChatCommand(cmd.substring(1))
+        if (Debug.debugmode) addMessage("$prefix §fSent command \"$cmd\"")
+        schedule {
+            player.networkHandler?.sendChatCommand(cmd.substring(1))
+        }
     }
 
     fun addMessage(

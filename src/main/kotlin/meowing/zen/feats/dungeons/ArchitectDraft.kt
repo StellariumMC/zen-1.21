@@ -42,35 +42,20 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             val text = event.message.string.removeFormatting()
+            val matchResult = puzzlefail.find(text) ?: quizfail.find(text) ?: return@register
 
-            puzzlefail.find(text)?.let { matchResult ->
-                if (matchResult.groupValues[1] != Zen.mc.player!!.name.toString() && Zen.config.draftself) return@register
-                if (Zen.config.autogetdraft) {
-                    TickUtils.schedule(40) {
-                        ChatUtils.command("/gfs architect's first draft 1")
-                    }
-                } else {
-                    ChatUtils.addMessage(
-                        "$prefix §bClick to get Architect's First Draft from Sack.",
-                        clickAction = ClickEvent.Action.RUN_COMMAND,
-                        clickValue = "/gfs architect's first draft 1"
-                    )
-                }
-            }
+            if (matchResult.groupValues[1] != player?.name?.string && config.draftself) return@register
 
-            quizfail.find(text)?.let { matchResult ->
-                if (matchResult.groupValues[1] != Zen.mc.player!!.name.toString() && Zen.config.draftself) return@register
-                if (Zen.config.autogetdraft) {
-                    TickUtils.schedule(40) {
-                        ChatUtils.command("/gfs architect's first draft 1")
-                    }
-                } else {
-                    ChatUtils.addMessage(
-                        "$prefix §bClick to get Architect's First Draft from Sack.",
-                        clickAction = ClickEvent.Action.RUN_COMMAND,
-                        clickValue = "/gfs architect's first draft 1"
-                    )
+            if (config.autogetdraft) {
+                TickUtils.schedule(40) {
+                    ChatUtils.command("/gfs architect's first draft 1")
                 }
+            } else {
+                ChatUtils.addMessage(
+                    "$prefix §bClick to get Architect's First Draft from Sack.",
+                    clickAction = ClickEvent.Action.RUN_COMMAND,
+                    clickValue = "/gfs architect's first draft 1"
+                )
             }
         }
     }

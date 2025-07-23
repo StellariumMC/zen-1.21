@@ -1,6 +1,7 @@
 package meowing.zen.feats.slayers
 
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.config
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.EventBus
@@ -12,7 +13,7 @@ import java.util.Optional
 object MetadataHandler {
     init {
         EventBus.register<EntityEvent.Metadata> ({ event ->
-            if (!Zen.config.slayertimer && !Zen.config.vengdmg && !Zen.config.lasertimer) return@register
+            if (!config.slayertimer && !config.vengdmg && !config.lasertimer) return@register
             val world = mc.world ?: return@register
             val player = mc.player ?: return@register
 
@@ -30,9 +31,9 @@ object MetadataHandler {
                     } ?: false
 
                     if (hasBlackhole) return@register
-                    if (Zen.config.slayertimer) SlayerTimer.handleBossSpawn(packet.id)
-                    if (Zen.config.vengdmg) VengDamage.handleNametagUpdate(packet.id)
-                    if (Zen.config.lasertimer) LaserTimer.handleSpawn(packet.id)
+                    if (config.slayertimer) SlayerTimer.handleBossSpawn(packet.id)
+                    if (config.vengdmg) VengDamage.handleNametagUpdate(packet.id)
+                    if (config.lasertimer) LaserTimer.handleSpawn(packet.id)
                 }
             }
         })
