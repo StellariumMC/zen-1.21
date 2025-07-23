@@ -14,6 +14,7 @@ import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.text.Text
 import net.minecraft.util.Hand
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
 abstract class Event
@@ -62,7 +63,7 @@ abstract class EntityEvent {
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
     class Spawn(val packet: EntitySpawnS2CPacket) : Event()
-    class Interact(val player: PlayerEntity, world: World, hand: Hand) : Event()
+    class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
 }
 
 abstract class GuiEvent {

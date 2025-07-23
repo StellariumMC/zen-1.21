@@ -38,7 +38,7 @@ object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
             if (name == "Wither Key" || name == "Blood Key") {
                 val entity = event.entity
                 val color = config.keyhighlightcolor
-                Render3D.renderEntityFilled(
+                Render3D.drawEntityFilled(
                     event.matrices,
                     event.vertex,
                     entity.x,

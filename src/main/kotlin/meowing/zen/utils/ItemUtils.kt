@@ -4,8 +4,12 @@ import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.component.DataComponentTypes
 import net.minecraft.component.type.NbtComponent
+import net.minecraft.component.type.ProfileComponent
 import net.minecraft.item.ItemStack
+import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
+import java.util.UUID
+import kotlin.random.Random
 
 // Modified from Odin 1.8.9
 // https://github.com/odtheking/Odin/blob/main/src/main/kotlin/me/odinmain/utils/skyblock/ItemUtils.kt
@@ -35,4 +39,16 @@ object ItemUtils {
     fun isHolding(vararg id: String): Boolean = mc.player?.mainHandStack?.skyblockID in id
 
     fun ItemStack.displayName(): String = this.get(DataComponentTypes.CUSTOM_NAME)?.string ?: this.name.string
+
+
+    fun createSkull(texture: String): ItemStack {
+        val uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".replace("x".toRegex()) {
+            Random.nextInt(16).toString(16)
+        }
+        val profile = com.mojang.authlib.GameProfile(UUID.fromString(uuid), uuid)
+        profile.properties.put("textures", com.mojang.authlib.properties.Property("textures", texture))
+        return ItemStack(Items.PLAYER_HEAD).apply {
+            set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+        }
+    }
 }

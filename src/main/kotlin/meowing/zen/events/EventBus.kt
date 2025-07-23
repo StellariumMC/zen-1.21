@@ -29,21 +29,27 @@ object EventBus {
         ClientTickEvents.END_CLIENT_TICK.register { client ->
             post(TickEvent.Client())
         }
+
         ClientEntityEvents.ENTITY_LOAD.register { entity, _ ->
             post(EntityEvent.Join(entity))
         }
+
         ClientEntityEvents.ENTITY_UNLOAD.register { entity, _ ->
             post(EntityEvent.Leave(entity))
         }
+
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { mc, world ->
             post(WorldEvent.Change(world))
         }
+
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
             !post(ChatEvent.Receive(msg, show))
         }
+
         ClientSendMessageEvents.ALLOW_CHAT.register { string ->
             !post(ChatEvent.Send(string))
         }
+
         ClientSendMessageEvents.ALLOW_COMMAND.register { string ->
             val command = string.split(" ")[0].lowercase()
             when (command) {
@@ -51,12 +57,15 @@ object EventBus {
                 else -> true
             }
         }
+
         WorldRenderEvents.LAST.register { context ->
             post(RenderEvent.World(context))
         }
+
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
             post(RenderEvent.WorldPostEntities(context))
         }
+
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mbtn ->
                 !post(GuiEvent.Click(mx, my, mbtn, true, screen))
@@ -76,40 +85,45 @@ object EventBus {
                 post(GuiEvent.AfterRender(screen, context))
             }
         }
+
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (screen != null) post(GuiEvent.Open(screen))
         }
+
         WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
             !post(RenderEvent.BlockOutline(worldContext, blockContext))
         }
+
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
             post(GameEvent.Load())
         }
+
         ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
             post(GameEvent.Unload())
         }
+
         UseItemCallback.EVENT.register { player, world, hand ->
-            post(EntityEvent.Interact(player, world, hand))
+            post(EntityEvent.Interact(player, world, hand, "USE_ITEM"))
             ActionResult.PASS
         }
 
         UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
-            post(EntityEvent.Interact(player, world, hand))
+            post(EntityEvent.Interact(player, world, hand, "USE_BLOCK", hitResult.blockPos))
             ActionResult.PASS
         }
 
         UseEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
-            post(EntityEvent.Interact(player, world, hand))
+            post(EntityEvent.Interact(player, world, hand, "USE_ENTITY"))
             ActionResult.PASS
         }
 
         AttackBlockCallback.EVENT.register { player, world, hand, pos, direction ->
-            post(EntityEvent.Interact(player, world, hand))
+            post(EntityEvent.Interact(player, world, hand, "ATTACK_BLOCK", pos))
             ActionResult.PASS
         }
 
         AttackEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
-            post(EntityEvent.Interact(player, world, hand))
+            post(EntityEvent.Interact(player, world, hand, "ATTACK_ENTITY"))
             ActionResult.PASS
         }
     }

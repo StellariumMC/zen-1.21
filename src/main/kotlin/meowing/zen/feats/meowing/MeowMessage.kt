@@ -12,7 +12,6 @@ import kotlin.random.Random
 @Zen.Module
 object MeowMessage : Feature("meowmessage") {
     private val variants = listOf("meow", "mew", "mrow", "nyaa", "purr", "mrrp", "meoww", "nya")
-    private var isTransforming = false
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI.addElement("Meowing", "Meow chat", ConfigElement(
@@ -25,19 +24,14 @@ object MeowMessage : Feature("meowmessage") {
 
     override fun initialize() {
         register<ChatEvent.Send> { event ->
-            if (isTransforming) return@register
+            if (variants.any { it in event.message }) return@register
             event.cancel()
-            isTransforming = true
-            try {
-                if (event.message.startsWith("/")) {
-                    val parts = event.message.split(" ")
-                    if (parts.size > 1) ChatUtils.command("${parts[0]} ${transform(parts.drop(1).joinToString(" "))}")
-                    else ChatUtils.command(event.message)
-                } else {
-                    ChatUtils.chat(transform(event.message))
-                }
-            } finally {
-                isTransforming = false
+            if (event.message.startsWith("/")) {
+                val parts = event.message.split(" ")
+                if (parts.size > 1) ChatUtils.command("${parts[0]} ${transform(parts.drop(1).joinToString(" "))}")
+                else ChatUtils.command(event.message)
+            } else {
+                ChatUtils.chat(transform(event.message))
             }
         }
     }

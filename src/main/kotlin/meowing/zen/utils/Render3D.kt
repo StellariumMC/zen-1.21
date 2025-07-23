@@ -12,14 +12,19 @@ import net.minecraft.client.util.BufferAllocator
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.RaycastContext
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
+import java.awt.Color
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
 
 object Render3D {
-    fun renderEntityFilled(matrices: MatrixStack?, vertexConsumers: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Float, height: Float, r: Float, g: Float, b: Float, a: Float) {
+    fun drawEntityFilled(matrices: MatrixStack?, vertexConsumers: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Float, height: Float, r: Float, g: Float, b: Float, a: Float) {
         val box = Box(x - width / 2, y, z - width / 2, x + width / 2, y + height, z + width / 2)
         DebugRenderer.drawBox(
             matrices,
@@ -32,7 +37,7 @@ object Render3D {
         )
     }
 
-    fun renderEntityOutline(matrices: MatrixStack?, vertex: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Double, height: Float, r: Float, g: Float, b: Float, a: Float) {
+    fun drawEntityOutline(matrices: MatrixStack?, vertex: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Double, height: Float, r: Float, g: Float, b: Float, a: Float) {
         val halfWidth = width / 2
         VertexRendering.drawBox(
             matrices,
@@ -90,6 +95,7 @@ object Render3D {
         GL11.glDepthFunc(depthFunc)
         if (!depthTest) GL11.glDisable(GL11.GL_DEPTH_TEST)
     }
+
     fun drawLineToEntity(entity: Entity, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
         val player = mc.player ?: return
         if (!player.canSee(entity)) return
@@ -109,10 +115,40 @@ object Render3D {
         val result = player.world.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
         if (result.type == HitResult.Type.BLOCK) return
 
-        renderLineFromCursor(context, pos, colorComponents, alpha)
+        drawLineFromCursor(context, pos, colorComponents, alpha)
     }
 
-    fun renderLineFromCursor(context: WorldRenderContext, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
+    fun drawLine(start: Vec3d, finish: Vec3d, thickness: Float, color: Color, context: WorldRenderContext) {
+        val camera = context.camera().pos
+        val matrices = context.matrixStack() ?: return
+        matrices.push()
+        matrices.translate(-camera.x, -camera.y, -camera.z)
+        val entry = matrices.peek()
+        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val buffer = consumers.getBuffer(RenderLayer.getLines())
+
+        GL11.glLineWidth(thickness)
+
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
+        val a = color.alpha / 255f
+
+        val direction = finish.subtract(start).normalize().toVector3f()
+
+        buffer.vertex(entry, start.x.toFloat(), start.y.toFloat(), start.z.toFloat())
+            .color(r, g, b, a)
+            .normal(entry, direction)
+
+        buffer.vertex(entry, finish.x.toFloat(), finish.y.toFloat(), finish.z.toFloat())
+            .color(r, g, b, a)
+            .normal(entry, direction)
+
+        consumers.draw(RenderLayer.getLines())
+        matrices.pop()
+    }
+
+    fun drawLineFromCursor(context: WorldRenderContext, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
         val camera = context.camera().pos
         val matrices = context.matrixStack()
         matrices?.push()
@@ -164,14 +200,14 @@ object Render3D {
 
         for (i in 0..segments) {
             val angle = Math.PI * 2 * i / segments
-            val x = centerX + radius * kotlin.math.cos(angle).toFloat()
-            val z = centerZ + radius * kotlin.math.sin(angle).toFloat()
+            val x = centerX + radius * cos(angle).toFloat()
+            val z = centerZ + radius * sin(angle).toFloat()
             triangleBuffer.vertex(entry, x, centerY, z).color(fillR, fillG, fillB, fillA)
 
             if (i > 0) {
                 val prevAngle = Math.PI * 2 * (i - 1) / segments
-                val prevX = centerX + radius * kotlin.math.cos(prevAngle).toFloat()
-                val prevZ = centerZ + radius * kotlin.math.sin(prevAngle).toFloat()
+                val prevX = centerX + radius * cos(prevAngle).toFloat()
+                val prevZ = centerZ + radius * sin(prevAngle).toFloat()
 
                 triangleBuffer.vertex(entry, centerX, centerY, centerZ).color(fillR, fillG, fillB, fillA)
                 triangleBuffer.vertex(entry, prevX, centerY, prevZ).color(fillR, fillG, fillB, fillA)
@@ -184,10 +220,10 @@ object Render3D {
             val angle = Math.PI * 2 * i / segments
             val nextAngle = Math.PI * 2 * ((i + 1) % segments) / segments
 
-            val x1 = centerX + radius * kotlin.math.cos(angle).toFloat()
-            val z1 = centerZ + radius * kotlin.math.sin(angle).toFloat()
-            val x2 = centerX + radius * kotlin.math.cos(nextAngle).toFloat()
-            val z2 = centerZ + radius * kotlin.math.sin(nextAngle).toFloat()
+            val x1 = centerX + radius * cos(angle).toFloat()
+            val z1 = centerZ + radius * sin(angle).toFloat()
+            val x2 = centerX + radius * cos(nextAngle).toFloat()
+            val z2 = centerZ + radius * sin(nextAngle).toFloat()
 
             val normal = Vec3d((x2 - x1).toDouble(), 0.0, (z2 - z1).toDouble()).normalize().toVector3f()
 
@@ -202,4 +238,126 @@ object Render3D {
         consumers.draw()
         matrices?.pop()
     }
+
+    fun drawSpecialBB(pos: BlockPos, fillColor: Color, context: WorldRenderContext) {
+        val bb = Box(pos).expand(0.002, 0.002, 0.002)
+        drawSpecialBB(bb, fillColor, context)
+    }
+
+    fun drawSpecialBB(bb: Box, fillColor: Color, context: WorldRenderContext) {
+        val player = mc.player ?: return
+        val width = max(1.0 - (player.distanceTo(Vec3d(bb.minX, bb.minY, bb.minZ)) / 10 - 2), 2.0).toFloat()
+        drawFilledBB(bb, fillColor.withAlpha(0.6f), context)
+        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), width, context)
+    }
+
+    fun drawOutlinedBB(bb: Box, color: Color, width: Float, context: WorldRenderContext) {
+        val camera = context.camera().pos
+        val matrices = context.matrixStack() ?: return
+        matrices.push()
+        matrices.translate(-camera.x, -camera.y, -camera.z)
+        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val buffer = consumers.getBuffer(RenderLayer.getLines())
+
+        GL11.glLineWidth(width)
+
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
+        val a = color.alpha / 255f
+
+        VertexRendering.drawBox(
+            matrices, buffer,
+            bb.minX, bb.minY, bb.minZ,
+            bb.maxX, bb.maxY, bb.maxZ,
+            r, g, b, a
+        )
+
+        consumers.draw(RenderLayer.getLines())
+        matrices.pop()
+    }
+
+    fun drawFilledBB(bb: Box, color: Color, context: WorldRenderContext, customAlpha: Float = 0.15f) {
+        val aabb = bb.expand(0.004, 0.005, 0.004)
+        val camera = context.camera().pos
+        val matrices = context.matrixStack() ?: return
+        matrices.push()
+        matrices.translate(-camera.x, -camera.y, -camera.z)
+        val entry = matrices.peek()
+        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val buffer = consumers.getBuffer(RenderLayer.getDebugFilledBox())
+
+        val a = (color.alpha / 255f * customAlpha)
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
+
+        val minX = aabb.minX.toFloat()
+        val minY = aabb.minY.toFloat()
+        val minZ = aabb.minZ.toFloat()
+        val maxX = aabb.maxX.toFloat()
+        val maxY = aabb.maxY.toFloat()
+        val maxZ = aabb.maxZ.toFloat()
+
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+
+        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+
+        consumers.draw(RenderLayer.getDebugFilledBox())
+        matrices.pop()
+    }
+
+    private fun Color.withAlpha(alpha: Float) = Color(red, green, blue, (alpha * 255).toInt())
+
+    private fun Entity.distanceTo(pos: Vec3d) = this.pos.distanceTo(pos).toFloat()
 }

@@ -34,13 +34,15 @@ object ArrowPoison : Feature("arrowpoison", true) {
     }
 
     override fun initialize() {
-        HUDManager.registerWithCustomRenderer(name, 87, 17, this::HUDEditorRender)
+        HUDManager.registerWithCustomRenderer(name, 85, 17, this::HUDEditorRender)
 
         register<PacketEvent.Received> { event ->
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()
         }
 
-        register<GuiEvent.HUD> { render(it.context) }
+        register<GuiEvent.HUD> { event ->
+            if (HUDManager.isEnabled(name)) render(event.context)
+        }
     }
 
     private fun updateCount() {
@@ -57,26 +59,28 @@ object ArrowPoison : Feature("arrowpoison", true) {
 
     private fun render(drawContext: DrawContext) {
         if (twilight == 0 && toxic == 0) return
-
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
-
-        drawHUD(drawContext, x, y, scale)
+        drawHUD(drawContext, x, y, scale, false)
     }
 
-    private fun drawHUD(drawContext: DrawContext, x: Float, y: Float, scale: Float) {
+    @Suppress("UNUSED")
+    private fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
+        drawHUD(context, x, y, 1f, true)
+    }
+
+    private fun drawHUD(drawContext: DrawContext, x: Float, y: Float, scale: Float, preview: Boolean) {
         val iconSize = 16f * scale
         val spacing = 4f * scale
         val twilightPotion = ItemStack(Items.PURPLE_DYE)
         val toxicPotion = ItemStack(Items.LIME_DYE)
-        val twilightStr = twilight.toString()
-        val toxicStr = toxic.toString()
-        val textY = y + (iconSize - 8f * scale) / 2f
+        val twilightStr = if (preview) "128" else twilight.toString()
+        val toxicStr = if (preview) "92" else toxic.toString()
+        val textY = y + (iconSize - 8f) / 2f
         var currentX = x
 
         Render2D.renderItem(drawContext, twilightPotion, currentX, y, scale)
-
         currentX += iconSize + spacing
         Render2D.renderStringWithShadow(drawContext, twilightStr, currentX, textY, scale)
 
@@ -88,31 +92,5 @@ object ArrowPoison : Feature("arrowpoison", true) {
 
         currentX += iconSize + spacing
         Render2D.renderStringWithShadow(drawContext, toxicStr, currentX, textY, scale)
-    }
-
-    @Suppress("UNUSED")
-    private fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
-        val iconSize = 16f
-        val spacing = 4f
-        val twilightPotion = ItemStack(Items.PURPLE_DYE)
-        val toxicPotion = ItemStack(Items.LIME_DYE)
-        val twilightStr = twilight.toString()
-        val toxicStr = toxic.toString()
-        val textY = y + (iconSize - 8f) / 2f
-        var currentX = x
-
-        Render2D.renderItem(context, twilightPotion, currentX, y, 1f)
-
-        currentX += iconSize + spacing
-        Render2D.renderStringWithShadow(context, twilightStr, currentX, textY, 1f)
-
-        currentX += fontRenderer.getWidth(twilightStr) * scale + spacing * 2
-        Render2D.renderStringWithShadow(context, "§7|", currentX, textY, 1f)
-
-        currentX += fontRenderer.getWidth("|") * scale + spacing
-        Render2D.renderItem(context, toxicPotion, currentX, y, 1f)
-
-        currentX += iconSize + spacing
-        Render2D.renderStringWithShadow(context, toxicStr, currentX, textY, 1f)
     }
 }
