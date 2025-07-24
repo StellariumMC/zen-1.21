@@ -31,8 +31,7 @@ object slayerstats : Feature("slayerstats", true) {
                 "slayerstats",
                 "Slayer stats",
                 "Shows stats about your kill times",
-                ElementType.Switch(false),
-                { config -> config["slayertimer"] as? Boolean == true}
+                ElementType.Switch(false)
             ))
     }
 

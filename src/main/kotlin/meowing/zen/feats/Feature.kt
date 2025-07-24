@@ -53,12 +53,12 @@ open class Feature(
 
     protected val mc = Zen.mc
     protected val fontRenderer = mc.textRenderer
-    protected val config get() = Zen.config
-    protected val player get() = mc.player
-    protected val world get() = mc.world
-    protected val window get() = mc.window
-    protected val MouseX get() = mc.mouse.x * window.scaledWidth / window.width
-    protected val MouseY get() = mc.mouse.y * window.scaledWidth / window.width
+    protected inline val config get() = Zen.config
+    protected inline val player get() = mc.player
+    protected inline val world get() = mc.world
+    protected inline val window get() = mc.window
+    protected inline val mouseX get() = mc.mouse.x * window.scaledWidth / window.width
+    protected inline val mouseY get() = mc.mouse.y * window.scaledWidth / window.width
 
     open fun initialize() {}
 

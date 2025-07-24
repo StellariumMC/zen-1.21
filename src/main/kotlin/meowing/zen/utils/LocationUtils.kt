@@ -4,7 +4,9 @@ import meowing.zen.events.AreaEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.PacketEvent
 import meowing.zen.utils.Utils.removeEmotes
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
+import net.minecraft.network.packet.s2c.play.ScoreboardDisplayS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 
 /*
@@ -17,6 +19,8 @@ object LocationUtils {
     private val lock = Any()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
+    var inSkyblock = false
+        private set
     var area: String? = null
         private set
     var subarea: String? = null
@@ -41,6 +45,11 @@ object LocationUtils {
                             }
                         }
                     }
+                }
+                is ScoreboardDisplayS2CPacket -> {
+                    val title = packet.name?.removeFormatting() ?: ""
+                    inSkyblock = title.equals("sbscoreboard", true)
+                    if (title.equals("health", true) && inSkyblock) return@register
                 }
                 is TeamS2CPacket -> {
                     val prefix = packet.team.orElse(null)?.prefix?.string ?: ""
@@ -88,6 +97,4 @@ object LocationUtils {
             }
         }
     }
-
-    inline val inSkyblock: Boolean get() = ScoreboardUtils.getScoreboardTitle(true)?.contains("skyblock", true) == true
 }

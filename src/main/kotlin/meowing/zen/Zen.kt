@@ -87,6 +87,7 @@ class Zen : ClientModInitializer {
         })
 
         EventBus.register<WorldEvent.Change> ({
+            if (mc.world == null) return@register
             TickUtils.scheduleServer(1) {
                 skyblockFeatures.forEach { it.update() }
             }

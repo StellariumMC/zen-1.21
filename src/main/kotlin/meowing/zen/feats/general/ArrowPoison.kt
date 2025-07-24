@@ -34,7 +34,7 @@ object ArrowPoison : Feature("arrowpoison", true) {
     }
 
     override fun initialize() {
-        HUDManager.registerWithCustomRenderer(name, 85, 17, this::HUDEditorRender)
+        HUDManager.registerCustom(name, 85, 17, this::HUDEditorRender)
 
         register<PacketEvent.Received> { event ->
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()

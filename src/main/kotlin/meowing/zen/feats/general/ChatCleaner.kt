@@ -75,7 +75,7 @@ object chatcleaner : Feature("chatcleaner") {
             if (event.screen !is ChatScreen || GLFW.glfwGetKey(mc.window.handle, config.chatcleanerkey) != GLFW.GLFW_PRESS) return@register
 
             val chat = mc.inGameHud.chatHud as AccessorChatHud
-            val line = chat.getMessageLineIdx(chat.toChatLineMX(MouseX), chat.toChatLineMY(MouseY))
+            val line = chat.getMessageLineIdx(chat.toChatLineMX(mouseX), chat.toChatLineMY(mouseY))
 
             if (line >= 0 && line < chat.visibleMessages.size && line < chat.messages.size) {
                 val text = chat.messages[line].content().string.removeFormatting()

@@ -10,10 +10,12 @@ import kotlin.math.floor
 
 object DungeonUtils {
     private val cryptsRegex = "^ Crypts: (\\d+)$".toRegex()
+    private val cataRegex = "^ Catacombs (\\d+):".toRegex()
     private val playerInfoRegex = "^[^\\x00-\\x7F]?(?:\\[\\d+] )?(?:\\[\\w+] )?(\\w{1,16})(?: [^\\x00-\\x7F]+)? \\((\\w+) ?(([IVXLCDM]+))?\\)$".toRegex()
     private var crypts = 0
     private var currentClass: String? = null
     private var currentLevel = 0
+    private var cataLevel = 0
     private val players = mutableMapOf<String, PlayerData>()
     private var cryptsTab: EventBus.EventCall? = null
 
@@ -56,6 +58,16 @@ object DungeonUtils {
             }
         })
 
+        EventBus.register<TablistEvent.Update> ({ event ->
+            event.packet.entries.forEach { entry ->
+                val text = entry.displayName?.string?.removeFormatting() ?: return@forEach
+                cataRegex.find(text)?.let { match ->
+                    val cata = match.groupValues[1].toIntOrNull()
+                    if (cata != null) cataLevel = cata
+                }
+            }
+        })
+
         EventBus.register<WorldEvent.Change> ({
             cryptsTab?.unregister()
             cryptsTab = null
@@ -88,4 +100,7 @@ object DungeonUtils {
         val multiplier = if (isDuplicate("mage")) 1 else 2
         return cooldown * (0.75 - (floor(currentLevel / 2.0) / 100.0) * multiplier)
     }
+
+    // TODO: Use api for cata level and calc
+    fun getCurrentCata(): Int = cataLevel
 }

@@ -7,6 +7,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.Utils.toColorInt
+import java.awt.Color
 
 @Zen.Module
 object SlayerHighlight : Feature("slayerhighlight", true) {
@@ -16,8 +17,13 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
                 "slayerhighlight",
                 "Slayer highlight",
                 "Highlights your slayer boss.",
-                ElementType.Switch(false),
-                { config -> config["slayertimer"] as? Boolean == true}
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "General", ConfigElement(
+                "slayerhighlightcolor",
+                "Slayer highlight color",
+                "Slayer highlight color",
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
 

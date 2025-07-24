@@ -45,7 +45,7 @@ object ArmorHUD : Feature("armorhud") {
     }
 
     override fun initialize() {
-        HUDManager.registerWithCustomRenderer(name, if (config.armorhudvert) 16 else 70, if (config.armorhudvert) 70 else 16, this::HUDEditorRender)
+        HUDManager.registerCustom(name, if (config.armorhudvert) 16 else 70, if (config.armorhudvert) 70 else 16, this::HUDEditorRender)
 
         armorloop = loop(20) {
             val player = player ?: return@loop
