@@ -9,14 +9,18 @@ import meowing.zen.events.SkyblockEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.ItemUtils.isHolding
 import meowing.zen.utils.Render3D
+import meowing.zen.utils.SimpleTimeMark
+import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.millis
 import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.util.math.Vec3d
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
 object FireFreezeOverlay : Feature("firefreezeoverlay") {
     private var activatedPos: Vec3d? = null
-    private var activatedAt: Long = 0
+    private var activatedAt: SimpleTimeMark = TimeUtils.now
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -39,14 +43,14 @@ object FireFreezeOverlay : Feature("firefreezeoverlay") {
         register<SkyblockEvent.ItemAbilityUsed> { event ->
             if (isHolding("FIRE_FREEZE_STAFF")) {
                 activatedPos = mc.player?.pos
-                activatedAt = System.currentTimeMillis()
+                activatedAt = TimeUtils.now
             }
         }
 
         register<RenderEvent.World> { event ->
-            if (activatedAt == 0L || activatedPos == null) return@register
+            if (activatedAt.isZero || activatedPos == null) return@register
             val pos = activatedPos!!
-            val remainingTime = (5000 - (System.currentTimeMillis() - activatedAt))
+            val remainingTime = (activatedAt + 5.seconds).until.millis
             if (remainingTime < 0) return@register
             val text = "§b${"%.2f".format(remainingTime / 1000.0)}s"
             val context = event.context ?: return@register

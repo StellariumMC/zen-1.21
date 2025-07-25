@@ -1,7 +1,8 @@
 package meowing.zen.feats
 
 import meowing.zen.Zen
-import meowing.zen.feats.carrying.CarryHUD
+import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import org.reflections.Reflections
 
@@ -14,7 +15,7 @@ object FeatureLoader {
         val reflections = Reflections("meowing.zen")
 
         val features = reflections.getTypesAnnotatedWith(Zen.Module::class.java)
-        val starttime = System.currentTimeMillis()
+        val starttime = TimeUtils.now
         val categoryOrder = listOf("general", "slayers", "dungeons", "meowing", "noclutter")
 
         features.sortedWith(compareBy<Class<*>> { clazz ->
@@ -47,7 +48,7 @@ object FeatureLoader {
             }
         }
 
-        loadtime = System.currentTimeMillis() - starttime
+        loadtime = starttime.since.millis
     }
 
     fun getFeatCount(): Int = moduleCount

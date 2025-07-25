@@ -85,6 +85,10 @@ class Zen : ClientModInitializer {
                 subareaFeatures.forEach { it.update() }
             }
         })
+
+        TickUtils.loop(20) {
+            ChatUtils.addMessage(" §a> shikiimori is §csHort")
+        }
     }
 
     companion object {
@@ -97,10 +101,6 @@ class Zen : ClientModInitializer {
         val features = mutableListOf<Feature>()
         val mc = MinecraftClient.getInstance()
         var isInInventory = false
-
-        private fun updateFeatures() {
-            features.forEach { it.update() }
-        }
 
         private fun executePendingCallbacks() {
             pendingCallbacks.forEach { (configKey, callback) ->

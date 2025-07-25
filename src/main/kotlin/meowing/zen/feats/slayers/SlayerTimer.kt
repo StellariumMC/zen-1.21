@@ -12,18 +12,22 @@ import meowing.zen.events.TickEvent
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.feats.Feature
+import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.millis
 import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.mob.SpiderEntity
 
 @Zen.Module
 object SlayerTimer : Feature("slayertimer") {
     @JvmField var BossId = -1
     @JvmField var isFighting = false
 
-    private val fail = Regex("^ {2}SLAYER QUEST FAILED!$")
-    private val questStart = Regex("^ {2}SLAYER QUEST STARTED!$")
-    private var startTime = 0L
-    private var spawnTime = 0L
+    private val fail = "^ {2}SLAYER QUEST FAILED!$".toRegex()
+    private val questStart = "^ {2}SLAYER QUEST STARTED!$".toRegex()
+    private var startTime = TimeUtils.zero
+    private var spawnTime = TimeUtils.zero
     private var serverTicks = 0
+    private var isSpider = false
     private var serverTickCall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({ serverTicks++ }, false)
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -41,14 +45,18 @@ object SlayerTimer : Feature("slayertimer") {
             val text = event.message.string.removeFormatting()
             when {
                 fail.matches(text) -> onSlayerFailed()
-                questStart.matches(text) -> spawnTime = System.currentTimeMillis()
+                questStart.matches(text) -> spawnTime = TimeUtils.now
             }
         }
 
         register<EntityEvent.Death> { event ->
             if (event.entity is LivingEntity && event.entity.id == BossId && isFighting) {
-                val timeTaken = System.currentTimeMillis() - startTime
-                sendTimerMessage("You killed your boss", timeTaken, serverTicks)
+                if (event.entity is SpiderEntity && !isSpider) {
+                    isSpider = true
+                    return@register
+                }
+                val timeTaken = startTime.since
+                sendTimerMessage("You killed your boss", timeTaken.millis, serverTicks)
                 if (config.slayerstats) slayerstats.addKill(timeTaken)
                 resetBossTracker()
             }
@@ -56,18 +64,21 @@ object SlayerTimer : Feature("slayertimer") {
     }
 
     fun handleBossSpawn(entityId: Int) {
-        if (isFighting) return
-        BossId = entityId - 3
-        startTime = System.currentTimeMillis()
-        isFighting = true
-        serverTicks = 0
-        serverTickCall.register()
-        resetSpawnTimer()
+        if (!isFighting) {
+            BossId = entityId - 3
+            if (!isSpider) {
+                startTime = TimeUtils.now
+                isFighting = true
+                serverTicks = 0
+                serverTickCall.register()
+                resetSpawnTimer()
+            }
+        }
     }
 
     private fun onSlayerFailed() {
         if (!isFighting) return
-        val timeTaken = System.currentTimeMillis() - startTime
+        val timeTaken = startTime.since.millis
         sendTimerMessage("Your boss killed you", timeTaken, serverTicks)
         resetBossTracker()
     }
@@ -82,17 +93,17 @@ object SlayerTimer : Feature("slayertimer") {
 
     private fun resetBossTracker() {
         BossId = -1
-        startTime = 0
+        startTime = TimeUtils.zero
         isFighting = false
         serverTicks = 0
         serverTickCall.unregister()
     }
 
     private fun resetSpawnTimer() {
-        if (spawnTime == 0L) return
-        val spawnSeconds = (System.currentTimeMillis() - spawnTime) / 1000.0
+        if (spawnTime.isZero) return
+        val spawnSeconds = spawnTime.since.millis / 1000.0
         val content = "$prefix §fYour boss spawned in §b${"%.2f".format(spawnSeconds)}s"
         ChatUtils.addMessage(content)
-        spawnTime = 0
+        spawnTime = TimeUtils.zero
     }
 }

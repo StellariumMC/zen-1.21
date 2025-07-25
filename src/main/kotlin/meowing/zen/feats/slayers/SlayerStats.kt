@@ -14,15 +14,18 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.GuiEvent
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.Render2D.renderString
+import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
+import kotlin.time.Duration
 
 @Zen.Module
 object slayerstats : Feature("slayerstats") {
     private var kills = 0
-    private var sessionStart = System.currentTimeMillis()
-    private var totalKillTime = 0L
+    private var sessionStart = TimeUtils.now
+    private var totalKillTime = Duration.ZERO
     private const val name = "SlayerStats"
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -40,20 +43,23 @@ object slayerstats : Feature("slayerstats") {
         register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
-    fun addKill(killtime: Long) {
+    fun addKill(killtime: Duration) {
         kills++
         totalKillTime += killtime
     }
 
     fun reset() {
         kills = 0
-        sessionStart = System.currentTimeMillis()
-        totalKillTime = 0L
+        sessionStart = TimeUtils.now
+        totalKillTime = Duration.ZERO
         ChatUtils.addMessage("$prefix §fSlayer stats reset!")
     }
-    
-    private fun getBPH() = (kills * 3600000 / (System.currentTimeMillis() - sessionStart)).toInt()
-    private fun getAVG() = "${(totalKillTime / kills / 1000.0).format(1)}s"
+
+    private fun getBPH(): Int {
+        val sessionDuration = sessionStart.since
+        return if (sessionDuration.millis > 0) (kills * 3600000 / sessionDuration.millis).toInt() else 0
+    }
+    private fun getAVG() = "${(totalKillTime.millis / kills / 1000.0).format(1)}s"
 
     private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)
 
@@ -79,7 +85,7 @@ object slayerstats : Feature("slayerstats") {
 
         val linePadding = 2
         lines.forEachIndexed { index, line ->
-            val yOffset = index * (mc.textRenderer.fontHeight + linePadding)
+            val yOffset = index * (fontRenderer.fontHeight + linePadding)
             renderString(context, line, x, y + yOffset / scale, scale)
         }
     }

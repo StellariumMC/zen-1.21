@@ -3,6 +3,7 @@ package meowing.zen.utils
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
+import meowing.zen.utils.TimeUtils.millis
 import net.minecraft.client.gui.DrawContext
 import java.util.*
 
@@ -18,7 +19,7 @@ object TitleUtils {
 
     private val titleQueue = LinkedList<TitleData>()
     private var currentTitle: TitleData? = null
-    private var startTime = 0L
+    private var startTime = TimeUtils.zero
 
     init {
         EventBus.register<GuiEvent.HUD> ({ render(it.context) })
@@ -36,12 +37,12 @@ object TitleUtils {
 
     private fun nextTitle() {
         currentTitle = titleQueue.poll()
-        startTime = System.currentTimeMillis()
+        startTime = TimeUtils.now
     }
 
     private fun render(context: DrawContext) {
         val title = currentTitle ?: return
-        val elapsed = System.currentTimeMillis() - startTime
+        val elapsed = startTime.since.millis.toInt()
         val totalDuration = title.fadeIn + title.stay + title.fadeOut
 
         if (elapsed >= totalDuration) {

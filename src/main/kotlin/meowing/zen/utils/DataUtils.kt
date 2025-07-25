@@ -8,6 +8,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
 import java.io.File
@@ -56,7 +57,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         "Zen-1.21/${fileName}.json"
     )
     private var data: T = loadData()
-    private var lastSavedTime = System.currentTimeMillis()
+    private var lastSavedTime = TimeUtils.now
 
     init {
         dataFile.parentFile.mkdirs()
@@ -99,15 +100,14 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         if (loopStarted) return
         loopStarted = true
         LoopUtils.loop(10000) {
-            val currentTime = System.currentTimeMillis()
             autosaveIntervals.forEach { (dataUtils, interval) ->
-                if (currentTime - dataUtils.lastSavedTime < interval) return@forEach
+                if (dataUtils.lastSavedTime.since.millis < interval) return@forEach
                 try {
                     val currentData = dataUtils.loadData()
                     if (currentData == dataUtils.data) return@forEach
                 } catch (ignored: Exception) {}
                 dataUtils.save()
-                dataUtils.lastSavedTime = currentTime
+                dataUtils.lastSavedTime = TimeUtils.now
             }
         }
     }

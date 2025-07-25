@@ -10,19 +10,23 @@ import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
 import meowing.zen.utils.ScoreboardUtils
 import meowing.zen.utils.TickUtils
+import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.fromNow
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
+import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.text.Text
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
 object VengTimer : Feature("vengtimer") {
-    var starttime: Long = 0
-    var hit = false
+    private var starttime = TimeUtils.zero
+    private var hit = false
     private val fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$")
     private var isFighting = false
-    private var cachedNametag: net.minecraft.entity.Entity? = null
+    private var cachedNametag: Entity? = null
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -58,8 +62,7 @@ object VengTimer : Feature("vengtimer") {
             val player = player ?: return@register
             val heldItem = player.mainHandStack ?: return@register
 
-            if (event.player.name?.string != player.name?.string ||
-                !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
+            if (event.player.name?.string != player.name?.string || !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
 
             val nametagEntity = cachedNametag ?: world?.entities?.find { entity ->
                 val name = entity.name?.string?.removeFormatting() ?: return@find false
@@ -67,10 +70,10 @@ object VengTimer : Feature("vengtimer") {
             }?.also { cachedNametag = it }
 
             if (nametagEntity != null && event.target.id == (nametagEntity.id - 3)) {
-                starttime = System.currentTimeMillis() + 6000
+                starttime = 6.seconds.fromNow
                 hit = true
                 TickUtils.schedule(119) {
-                    starttime = 0
+                    starttime = TimeUtils.zero
                     hit = false
                 }
             }
@@ -82,7 +85,7 @@ object VengTimer : Feature("vengtimer") {
     private fun cleanup() {
         isFighting = false
         cachedNametag = null
-        if (starttime > 0) starttime = 0
+        starttime = TimeUtils.zero
     }
 
     private fun renderHUD(context: DrawContext) {
@@ -99,9 +102,9 @@ object VengTimer : Feature("vengtimer") {
     }
 
     private fun getDisplayText(): String {
-        if (hit && starttime > 0) {
-            val timeLeft = (starttime - System.currentTimeMillis()) / 1000.0
-            if (timeLeft > 0) return "§bVeng proc: §c${"%.1f".format(timeLeft)}s"
+        if (hit && starttime.isInFuture) {
+            val timeLeft = starttime.until
+            return "§bVeng proc: §c${"%.1f".format(timeLeft)}s"
         }
         return ""
     }

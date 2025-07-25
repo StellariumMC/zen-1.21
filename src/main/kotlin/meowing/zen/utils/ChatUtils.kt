@@ -3,26 +3,28 @@ package meowing.zen.utils
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.Zen.Companion.prefix
 import meowing.zen.feats.Debug
+import meowing.zen.utils.TimeUtils.millis
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.MutableText
 import net.minecraft.text.Style
 import net.minecraft.text.Text
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 
 object ChatUtils {
-    private var nextAvailableTime = 0L
+    private var nextAvailableTime = TimeUtils.zero
 
     private fun schedule(action: () -> Unit) {
-        val now = System.currentTimeMillis()
+        val now = TimeUtils.now
         nextAvailableTime = maxOf(now, nextAvailableTime)
-        val delay = (nextAvailableTime - now) / 50.0
+        val delay = nextAvailableTime.until.millis / 50.0
 
         TickUtils.schedule(ceil(delay).toLong()) {
             action()
         }
 
-        nextAvailableTime += 100
+        nextAvailableTime += 100.milliseconds
     }
 
     fun chat(message: String) {
