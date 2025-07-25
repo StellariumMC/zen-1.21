@@ -15,7 +15,7 @@ import meowing.zen.feats.Feature
 import net.minecraft.entity.LivingEntity
 
 @Zen.Module
-object SlayerTimer : Feature("slayertimer", true) {
+object SlayerTimer : Feature("slayertimer") {
     @JvmField var BossId = -1
     @JvmField var isFighting = false
 

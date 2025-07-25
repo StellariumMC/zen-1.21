@@ -11,7 +11,7 @@ import meowing.zen.utils.ChatUtils.formatNumber
 import meowing.zen.utils.Utils.removeFormatting
 
 @Zen.Module
-object BetterBZ : Feature("betterbz", true) {
+object BetterBZ : Feature("betterbz") {
     private val patterns = mapOf(
         "instaBuy" to Regex("\\[Bazaar] Bought ([\\d,]+)x (.+) for ([\\d,]+) coins!"),
         "buyOrderSetup" to Regex("\\[Bazaar] Buy Order Setup! ([\\d,]+)x (.+) for ([\\d,]+) coins\\."),

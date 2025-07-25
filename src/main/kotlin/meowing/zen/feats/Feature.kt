@@ -14,7 +14,6 @@ import meowing.zen.utils.LocationUtils
  */
 open class Feature(
     val configKey: String? = null,
-    val checkSB: Boolean = false,
     area: Any? = null,
     subarea: Any? = null
 ) {
@@ -72,7 +71,7 @@ open class Feature(
 
     open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
 
-    fun isEnabled(): Boolean = checkConfig() && (!checkSB || LocationUtils.inSkyblock) && inArea() && inSubarea()
+    fun isEnabled(): Boolean = checkConfig() && inArea() && inSubarea()
 
     fun update() = onToggle(isEnabled())
 
@@ -101,5 +100,4 @@ open class Feature(
 
     fun hasAreas(): Boolean = areas.isNotEmpty()
     fun hasSubareas(): Boolean = subareas.isNotEmpty()
-    fun checksSkyblock(): Boolean = checkSB
 }

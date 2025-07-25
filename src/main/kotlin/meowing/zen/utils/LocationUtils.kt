@@ -19,8 +19,6 @@ object LocationUtils {
     private val lock = Any()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
-    var inSkyblock = false
-        private set
     var area: String? = null
         private set
     var subarea: String? = null
@@ -45,11 +43,6 @@ object LocationUtils {
                             }
                         }
                     }
-                }
-                is ScoreboardDisplayS2CPacket -> {
-                    val title = packet.name?.removeFormatting() ?: ""
-                    inSkyblock = title.equals("sbscoreboard", true)
-                    if (title.equals("health", true) && inSkyblock) return@register
                 }
                 is TeamS2CPacket -> {
                     val prefix = packet.team.orElse(null)?.prefix?.string ?: ""

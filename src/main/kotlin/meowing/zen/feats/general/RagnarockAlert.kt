@@ -16,7 +16,7 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.util.Hand
 
 @Zen.Module
-object RagnarockAlert : Feature("ragalert", true) {
+object RagnarockAlert : Feature("ragalert") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("General", "Ragnarok alert", ConfigElement(

@@ -85,20 +85,12 @@ class Zen : ClientModInitializer {
                 subareaFeatures.forEach { it.update() }
             }
         })
-
-        EventBus.register<WorldEvent.Change> ({
-            if (mc.world == null) return@register
-            TickUtils.scheduleServer(1) {
-                skyblockFeatures.forEach { it.update() }
-            }
-        })
     }
 
     companion object {
         private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
-        private val skyblockFeatures = mutableListOf<Feature>()
         lateinit var configUI: ConfigUI
         lateinit var config: ConfigAccessor
         const val prefix = "§7[§bZen§7]"
@@ -139,7 +131,6 @@ class Zen : ClientModInitializer {
 
             if (feature.hasAreas()) areaFeatures.add(feature)
             if (feature.hasSubareas()) subareaFeatures.add(feature)
-            if (feature.checksSkyblock()) skyblockFeatures.add(feature)
 
             feature.addConfig(configUI)
         }

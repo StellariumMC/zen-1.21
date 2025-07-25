@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d
 import java.awt.Color
 
 @Zen.Module
-object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
+object FireFreezeOverlay : Feature("firefreezeoverlay") {
     private var activatedPos: Vec3d? = null
     private var activatedAt: Long = 0
 
