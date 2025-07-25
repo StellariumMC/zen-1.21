@@ -10,7 +10,6 @@ import meowing.zen.api.PlayerStats
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.DungeonUtils
-import meowing.zen.utils.LocationUtils.inSkyblock
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
@@ -49,9 +48,6 @@ object DebugCommand : CommandUtils("zendebug") {
                                         "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
                                         "isMage: ${DungeonUtils.isMage()}"
                             )
-                        }
-                        "info" -> {
-                            ChatUtils.addMessage("inSkyblock: $inSkyblock")
                         }
                         "regfeats" -> {
                             ChatUtils.addMessage("Features registered:")
