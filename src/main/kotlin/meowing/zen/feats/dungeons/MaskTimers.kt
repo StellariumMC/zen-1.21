@@ -8,6 +8,7 @@ import meowing.zen.events.ChatEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
 import meowing.zen.events.TickEvent
+import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.DataUtils
@@ -92,6 +93,11 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
 
         register<GuiEvent.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
+        }
+
+        register<WorldEvent.Change> {
+            BonzoTicks = 0.0
+            SpiritTicks = 0.0
         }
     }
 
