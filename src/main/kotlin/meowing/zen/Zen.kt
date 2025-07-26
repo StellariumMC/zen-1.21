@@ -85,10 +85,6 @@ class Zen : ClientModInitializer {
                 subareaFeatures.forEach { it.update() }
             }
         })
-
-        TickUtils.loop(20) {
-            ChatUtils.addMessage(" §a> shikiimori is §csHort")
-        }
     }
 
     companion object {
