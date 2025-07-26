@@ -216,8 +216,8 @@ object CarryCounter : Feature("carrycounter") {
 
             events.add(EventBus.register<EntityEvent.Death> ({ event ->
                 carryeesByBossId[event.entity.id]?.let {
-                    val ms = it.startTime.since.millis
-                    ChatUtils.addMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(ms / 1000.0)}s")
+                    val seconds = (it.startTime.since.millis / 1000.0)
+                    ChatUtils.addMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(seconds)}s")
                     it.onDeath()
                 }
             }))
@@ -388,7 +388,9 @@ object CarryCounter : Feature("carrycounter") {
             bossID = null
         }
 
-        fun getTimeSinceLastBoss(): String = String.format("%.1fs", lastBossTime.since.millis / 1000.0)
+        fun getTimeSinceLastBoss(): String =
+            if (lastBossTime.isZero) "§7N/A"
+            else String.format("%.1fs", lastBossTime.since.millis / 1000.0)
 
         fun getBossPerHour(): String {
             if (count <= 2) return "N/A"
