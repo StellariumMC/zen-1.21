@@ -1,12 +1,19 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.mc
+import meowing.zen.events.EventBus
+import meowing.zen.events.RenderEvent
 import meowing.zen.utils.NetworkUtils
+import meowing.zen.utils.Utils.removeFormatting
+import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.text.Text
+import java.awt.Color
 
 @Zen.Module
 object ContributorColor {
     private var map: Map<String, String>? = null
+    private val glowColor = Color(0, 255, 255, 127).toColorInt()
     private val color = "§[0-9a-fklmnor]".toRegex()
 
     init {
@@ -23,6 +30,13 @@ object ContributorColor {
                 )
             }
         )
+
+        EventBus.register<RenderEvent.EntityGlow> ({ event ->
+            if (mc.player?.canSee(event.entity) == true && map?.containsKey(event.entity.name?.string?.removeFormatting()) == true) {
+                event.shouldGlow = true
+                event.glowColor = glowColor
+            }
+        })
     }
 
     @JvmStatic
