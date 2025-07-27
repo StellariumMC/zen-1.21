@@ -1,12 +1,15 @@
 package meowing.zen.feats
 
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.configUI
 import meowing.zen.Zen.Companion.prefix
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.events.Event
 import meowing.zen.events.EventBus
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.LocationUtils
+import meowing.zen.utils.LoopUtils
+import meowing.zen.utils.TickUtils
 
 /*
  * Modified from Devonian code
@@ -18,6 +21,8 @@ open class Feature(
     subarea: Any? = null
 ) {
     val events = mutableListOf<EventBus.EventCall>()
+    val tickLoopIds = mutableSetOf<Long>()
+    val timerLoopIds = mutableSetOf<String>()
     private var isRegistered = false
     private val areas = when (area) {
         is String -> listOf(area.lowercase())
@@ -31,18 +36,13 @@ open class Feature(
     }
 
     init {
-        initialize()
-        configKey?.let {
-            Zen.registerListener(it, this)
-        }
         Zen.addFeature(this)
-        update()
     }
 
     private fun checkConfig(): Boolean {
         return try {
             val configEnabled = configKey?.let {
-                config.getValue(it, false)
+                configUI.getConfigValue(it) as? Boolean ?: false
             } ?: true
             configEnabled
         } catch (_: Exception) {
@@ -52,7 +52,6 @@ open class Feature(
 
     protected val mc = Zen.mc
     protected val fontRenderer = mc.textRenderer
-    protected inline val config get() = Zen.config
     protected inline val player get() = mc.player
     protected inline val world get() = mc.world
     protected inline val window get() = mc.window
@@ -67,6 +66,7 @@ open class Feature(
 
     open fun onUnregister() {
         if (Debug.debugmode) ChatUtils.addMessage("$prefix §fUnregistering §b$configKey")
+        cancelLoops()
     }
 
     open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
@@ -98,6 +98,59 @@ open class Feature(
         events.add(EventBus.register<T>(cb, false))
     }
 
+    inline fun <reified T> loop(intervalTicks: Long, noinline action: () -> Unit): Long {
+        return when (T::class) {
+            ClientTick::class -> {
+                val id = TickUtils.loop(intervalTicks, action)
+                tickLoopIds.add(id)
+                id
+            }
+            ServerTick::class -> {
+                val id = TickUtils.loopServer(intervalTicks, action)
+                tickLoopIds.add(id)
+                id
+            }
+            else -> throw IllegalArgumentException("Unsupported loop type: ${T::class}")
+        }
+    }
+
+    inline fun <reified T> loop(delay: Long, noinline stop: () -> Boolean = { false }, noinline action: () -> Unit): String {
+        return when (T::class) {
+            Timer::class -> {
+                val id = LoopUtils.loop(delay, stop, action)
+                timerLoopIds.add(id)
+                id
+            }
+            else -> throw IllegalArgumentException("Unsupported loop type: ${T::class}")
+        }
+    }
+
+    inline fun <reified T> loop(noinline delay: () -> Number, noinline stop: () -> Boolean = { false }, noinline action: () -> Unit): String {
+        return when (T::class) {
+            Timer::class -> {
+                val id = LoopUtils.loop(delay, stop, action)
+                timerLoopIds.add(id)
+                id
+            }
+            else -> throw IllegalArgumentException("Unsupported loop type: ${T::class}")
+        }
+    }
+
+    private fun cancelLoops() {
+        tickLoopIds.forEach {
+            TickUtils.cancelLoop(it)
+        }
+        timerLoopIds.forEach {
+            LoopUtils.removeLoop(it)
+        }
+        tickLoopIds.clear()
+        timerLoopIds.clear()
+    }
     fun hasAreas(): Boolean = areas.isNotEmpty()
     fun hasSubareas(): Boolean = subareas.isNotEmpty()
 }
+
+
+class ClientTick
+class ServerTick
+class Timer

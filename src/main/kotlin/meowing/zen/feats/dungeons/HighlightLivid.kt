@@ -1,6 +1,7 @@
 package meowing.zen.feats.dungeons
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -57,22 +58,25 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
         Blocks.BLACK_STAINED_GLASS to DyeColor.BLACK,
         Blocks.BROWN_STAINED_GLASS to DyeColor.BROWN
     )
+    private val highlightlividline by ConfigDelegate<Boolean>("highlightlividline")
+    private val hidewronglivid by ConfigDelegate<Boolean>("hidewronglivid")
+    private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
 
     private val renderLividCall: EventBus.EventCall = EventBus.register<RenderEvent.EntityGlow> ({ event ->
         if (lividEntity == event.entity) {
             event.shouldGlow = true
-            event.glowColor = config.highlightlividcolor.toColorInt()
+            event.glowColor = highlightlividcolor.toColorInt()
         }
     }, false)
 
     private val renderLineCall: EventBus.EventCall = EventBus.register<RenderEvent.World> ({ event ->
         lividEntity?.let { entity ->
-            if (mc.player?.canSee(entity) == true) {
+            if (player?.canSee(entity) == true) {
                 Render3D.drawLineToEntity(
                     entity,
                     event.context!!,
-                    config.highlightlividcolor.toFloatArray(),
-                    config.highlightlividcolor.alpha.toFloat()
+                    highlightlividcolor.toFloatArray(),
+                    highlightlividcolor.alpha.toFloat()
                 )
             }
         }
@@ -142,8 +146,8 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
 
     private fun registerRender() {
         renderLividCall.register()
-        if (config.hidewronglivid) renderWrongCall.register()
-        if (config.highlightlividline) renderLineCall.register()
+        if (hidewronglivid) renderWrongCall.register()
+        if (highlightlividline) renderLineCall.register()
     }
 
     private fun unregisterRender() {

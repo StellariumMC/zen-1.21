@@ -1,6 +1,7 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -17,6 +18,8 @@ import net.minecraft.util.Hand
 
 @Zen.Module
 object RagnarockAlert : Feature("ragalert") {
+    private val ragparty by ConfigDelegate<Boolean>("ragparty")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("General", "Ragnarok alert", ConfigElement(
@@ -40,7 +43,7 @@ object RagnarockAlert : Feature("ragalert") {
                 if (!packet.sound.toString().contains("minecraft:entity.wolf.death") || packet.pitch != 1.4920635f || !isHolding("RAGNAROCK_AXE")) return@register
                 val strengthGain = ((player?.getStackInHand(Hand.MAIN_HAND)?.getSBStrength ?: return@register) * 1.5).toInt()
                 showTitle("§cRag §fCasted!", "§c❁ Strength:§b $strengthGain", 2000)
-                if (config.ragparty) ChatUtils.command("pc Strength from Ragnarok: $strengthGain")
+                if (ragparty) ChatUtils.command("pc Strength from Ragnarok: $strengthGain")
             }
         }
 

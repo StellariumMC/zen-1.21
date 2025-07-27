@@ -1,6 +1,7 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -9,6 +10,10 @@ import meowing.zen.feats.Feature
 
 @Zen.Module
 object CustomSize : Feature("customsize") {
+    private val customX by ConfigDelegate<Double>("customX")
+    private val customY by ConfigDelegate<Double>("customY")
+    private val customZ by ConfigDelegate<Double>("customZ")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("General", "Custom model", ConfigElement(
@@ -48,7 +53,7 @@ object CustomSize : Feature("customsize") {
 
     override fun initialize() {
         register<RenderEvent.PlayerPre> { event ->
-            if (!config.customself || event.entity.id == mc.player?.id) event.matrices.scale(config.customX, config.customY, config.customZ)
+            if (event.entity.id == mc.player?.id) event.matrices.scale(customX.toFloat(), customY.toFloat(), customZ.toFloat())
         }
     }
 }

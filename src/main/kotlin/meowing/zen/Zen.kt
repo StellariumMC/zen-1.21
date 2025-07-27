@@ -4,7 +4,6 @@ import meowing.zen.compat.OldConfig
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.minecraft.client.MinecraftClient
-import meowing.zen.config.ConfigAccessor
 import meowing.zen.config.ZenConfig
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.feats.Feature
@@ -14,10 +13,8 @@ import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
-import meowing.zen.events.WorldEvent
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
-import meowing.zen.utils.LocationUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
@@ -61,9 +58,8 @@ class Zen : ClientModInitializer {
         EventBus.register<GameEvent.Load> ({
             OldConfig.convertConfig(FabricLoader.getInstance().configDir.toFile())
             configUI = ZenConfig()
-            config = ConfigAccessor(configUI)
             FeatureLoader.init()
-            executePendingCallbacks()
+            executePending()
         })
 
         EventBus.register<GuiEvent.Open> ({ event ->
@@ -89,16 +85,16 @@ class Zen : ClientModInitializer {
 
     companion object {
         private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
+        private val pendingFeatures = mutableListOf<Feature>()
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
         lateinit var configUI: ConfigUI
-        lateinit var config: ConfigAccessor
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
         val mc = MinecraftClient.getInstance()
         var isInInventory = false
 
-        private fun executePendingCallbacks() {
+        private fun executePending() {
             pendingCallbacks.forEach { (configKey, callback) ->
                 configUI.registerListener(configKey, callback)
             }
@@ -110,25 +106,22 @@ class Zen : ClientModInitializer {
                 if (instance is Feature) instance.update()
             }
 
-            if (::configUI.isInitialized) {
-                configUI.registerListener(configKey, callback)
-            } else {
-                pendingCallbacks.add(configKey to callback)
+            if (::configUI.isInitialized) configUI.registerListener(configKey, callback) else pendingCallbacks.add(configKey to callback)
+        }
+
+        fun addFeature(feature: Feature) = pendingFeatures.add(feature)
+
+        fun initializeFeatures() {
+            pendingFeatures.forEach { feature ->
+                features.add(feature)
+                if (feature.hasAreas()) areaFeatures.add(feature)
+                if (feature.hasSubareas()) subareaFeatures.add(feature)
+                feature.addConfig(configUI)
+                feature.initialize()
+                feature.configKey?.let { registerListener(it, feature) }
+                feature.update()
             }
-        }
-
-        fun registerCallback(configKey: String, callback: (Any) -> Unit) {
-            if (::configUI.isInitialized) configUI.registerListener(configKey, callback)
-            else pendingCallbacks.add(configKey to callback)
-        }
-
-        fun addFeature(feature: Feature) {
-            features.add(feature)
-
-            if (feature.hasAreas()) areaFeatures.add(feature)
-            if (feature.hasSubareas()) subareaFeatures.add(feature)
-
-            feature.addConfig(configUI)
+            pendingFeatures.clear()
         }
 
         fun openConfig() {

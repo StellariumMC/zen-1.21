@@ -1,6 +1,7 @@
 package meowing.zen.feats.dungeons
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -15,6 +16,7 @@ import java.awt.Color
 
 @Zen.Module
 object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
+    private val boxstarmobscolor by ConfigDelegate<Color>("boxstarmobscolor")
     private val entities = mutableListOf<Int>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -62,7 +64,7 @@ object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
 
             if (player?.canSee(event.entity) == true) {
                 event.shouldGlow = true
-                event.glowColor = config.boxstarmobscolor.toColorInt()
+                event.glowColor = boxstarmobscolor.toColorInt()
             }
         }
     }

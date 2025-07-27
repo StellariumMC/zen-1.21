@@ -1,6 +1,7 @@
 package meowing.zen.feats.dungeons
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -14,6 +15,8 @@ import java.awt.Color
 
 @Zen.Module
 object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
+    private val keyhighlightcolor by ConfigDelegate<Color>("keyhighlightcolor")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("Dungeons", "Keys", ConfigElement(
@@ -37,7 +40,7 @@ object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
             val name = event.entity.name.string.removeFormatting()
             if (name == "Wither Key" || name == "Blood Key") {
                 val entity = event.entity
-                val color = config.keyhighlightcolor
+                val color = keyhighlightcolor
                 Render3D.drawEntityFilled(
                     event.matrices,
                     event.vertex,

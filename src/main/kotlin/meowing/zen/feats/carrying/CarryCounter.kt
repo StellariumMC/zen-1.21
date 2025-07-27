@@ -2,6 +2,7 @@ package meowing.zen.feats.carrying
 
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.prefix
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -38,15 +39,21 @@ object CarryCounter : Feature("carrycounter") {
     private val tradeComp = Pattern.compile("^ \\+ (\\d+\\.?\\d*)M coins$")
     private val playerDead = Pattern.compile("^ ☠ (\\w+) was killed by (.+)\\.$")
     private val bossNames = setOf("Voidgloom Seraph", "Revenant Horror", "Tarantula Broodfather", "Sven Packmaster", "Inferno Demonlord")
-
-    private var lasttradeuser: String? = null
-    private val carryeesByName = ConcurrentHashMap<String, Carryee>()
     private val carryeesByBossId = ConcurrentHashMap<Int, Carryee>()
     private val completedCarriesMap = ConcurrentHashMap<String, CompletedCarry>()
     private val bossPerHourCache = ConcurrentHashMap<String, Pair<String, SimpleTimeMark>>()
-
-    val carryees get() = carryeesByName.values.toList()
+    private var lasttradeuser: String? = null
+    inline val carryees get() = carryeesByName.values.toList()
     val dataUtils = DataUtils("carrylogs", CarryLogs())
+    val carryeesByName = ConcurrentHashMap<String, Carryee>()
+
+    private val carrycountsend by ConfigDelegate<Boolean>("carrycountsend")
+    private val carrysendmsg by ConfigDelegate<Boolean>("carrysendmsg")
+    private val carryvalue by ConfigDelegate<String>("carryvalue")
+    private val carrybosshighlight by ConfigDelegate<Boolean>("carrybosshighlight")
+    private val carrybosscolor by ConfigDelegate<Color>("carrybosscolor")
+    private val carryclienthighlight by ConfigDelegate<Boolean>("carryclienthighlight")
+    private val carryclientcolor by ConfigDelegate<Color>("carryclientcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -237,12 +244,12 @@ object CarryCounter : Feature("carrycounter") {
         private val events = mutableListOf<EventBus.EventCall>()
 
         fun register() {
-            if (registered || !config.carrybosshighlight) return
+            if (registered || !carrybosshighlight) return
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
                 carryeesByBossId[event.entity.id]?.let {
                     if (player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
-                    event.glowColor = config.carrybosshighlightcolor.toColorInt()
+                    event.glowColor = carrybosscolor.toColorInt()
                 }
             }))
             registered = true
@@ -261,13 +268,13 @@ object CarryCounter : Feature("carrycounter") {
         private val events = mutableListOf<EventBus.EventCall>()
 
         fun register() {
-            if (registered || !config.carryclienthighlight) return
+            if (registered || !carryclienthighlight) return
             events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
                 val cleanName = event.entity.name.string.removeFormatting()
                 carryeesByName[cleanName]?.let {
                     if (player?.canSee(event.entity) == false) return@let
                     event.shouldGlow = true
-                    event.glowColor = config.carryclienthighlightcolor.toColorInt()
+                    event.glowColor = carryclientcolor.toColorInt()
                 }
             }))
             registered = true
@@ -293,7 +300,7 @@ object CarryCounter : Feature("carrycounter") {
                 tradeComp.matcher(text).let { matcher ->
                     if (matcher.matches()) {
                         val coins = matcher.group(1).toDoubleOrNull() ?: return@let
-                        val carry = config.carryvalue.split(',')
+                        val carry = carryvalue.split(',')
                             .mapNotNull { it.trim().toDoubleOrNull() }
                             .find { abs(coins / it - round(coins / it)) < 1e-6 } ?: return@let
                         val count = round(coins / carry).toInt()
@@ -360,7 +367,7 @@ object CarryCounter : Feature("carrycounter") {
                 carryeesByBossId[id] = this
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
                 showTitle("§bBoss spawned", "§bby §c$name", 1000)
-                if (config.carrysendmsg) ChatUtils.addMessage("$prefix §fBoss spawned by §c$name")
+                if (carrysendmsg) ChatUtils.addMessage("$prefix §fBoss spawned by §c$name")
             }
         }
 
@@ -370,7 +377,7 @@ object CarryCounter : Feature("carrycounter") {
             bossTimes.add(startTime.since.millis)
             cleanup()
             if (++count >= total) complete()
-            if (config.carrycountsend) ChatUtils.command("/pc $name: $count/$total")
+            if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")
         }
 
         fun reset() {

@@ -1,14 +1,14 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.GuiEvent
+import meowing.zen.feats.ClientTick
 import meowing.zen.feats.Feature
 import meowing.zen.hud.HUDManager
-import meowing.zen.utils.LoopUtils.removeLoop
-import meowing.zen.utils.TickUtils.loop
 import meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
@@ -18,8 +18,7 @@ import net.minecraft.item.Items
 object ArmorHUD : Feature("armorhud") {
     private const val name = "Armor HUD"
     private var armor = emptyList<ItemStack>()
-    private var armorloop: Long = 0
-
+    private val armorhudvert by ConfigDelegate<Boolean>("armorhudvert")
     private val exampleArmor = listOf(
         ItemStack(Items.DIAMOND_HELMET),
         ItemStack(Items.DIAMOND_CHESTPLATE),
@@ -45,9 +44,9 @@ object ArmorHUD : Feature("armorhud") {
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(name, if (config.armorhudvert) 16 else 70, if (config.armorhudvert) 70 else 16, this::HUDEditorRender)
+        HUDManager.registerCustom(name, if (armorhudvert) 16 else 70, if (armorhudvert) 70 else 16, this::HUDEditorRender)
 
-        armorloop = loop(20) {
+        loop<ClientTick>(20) {
             val player = player ?: return@loop
             armor = (0..3).map { slot ->
                 player.inventory.getStack(36 + slot)
@@ -81,13 +80,8 @@ object ArmorHUD : Feature("armorhud") {
         armorToRender.forEach { item ->
             @Suppress("SENSELESS_COMPARISON")
             if (item != null) Render2D.renderItem(context, item, currentX, currentY, scale)
-            if (config.armorhudvert) currentY += iconSize + spacing
+            if (armorhudvert) currentY += iconSize + spacing
             else currentX += iconSize + spacing
         }
-    }
-
-    override fun onUnregister() {
-        if (armorloop != 0L) removeLoop(armorloop.toString())
-        super.onUnregister()
     }
 }

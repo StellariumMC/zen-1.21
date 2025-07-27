@@ -1,6 +1,7 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -15,6 +16,8 @@ import java.awt.Color
 
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
+    private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("General", "Block overlay", ConfigElement(
@@ -49,7 +52,7 @@ object BlockOverlay : Feature("blockoverlay") {
                 blockPos.x - camPos.x,
                 blockPos.y - camPos.y,
                 blockPos.z - camPos.z,
-                config.blockoverlaycolor.toColorInt()
+                blockoverlaycolor.toColorInt()
             )
         }
     }

@@ -8,6 +8,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.Zen.Companion.prefix
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.TickUtils
@@ -20,6 +21,7 @@ import java.util.*
 
 @Zen.Command
 object carrycommand {
+    private val carrycounter by ConfigDelegate<Boolean>("carrycounter")
     private var currentLogPage = 1
 
     fun register(dispatcher: CommandDispatcher<FabricClientCommandSource>) {
@@ -75,7 +77,7 @@ object carrycommand {
     }
 
     private fun checkEnabled(): Boolean {
-        if (!Zen.config.carrycounter) {
+        if (!carrycounter) {
             ChatUtils.addMessage(
                 "$prefix §fPlease enable carry counter first!",
                 "§cClick to open settings GUI",

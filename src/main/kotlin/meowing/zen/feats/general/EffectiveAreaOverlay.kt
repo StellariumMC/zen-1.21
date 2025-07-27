@@ -1,6 +1,7 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -17,7 +18,7 @@ import java.awt.Color
 
 @Zen.Module
 object EffectiveAreaOverlay : Feature("effectiveareaoverlay") {
-    val items = listOf(
+    private val items = listOf(
         "BAT_WAND",
         "STARRED_BAT_WAND",
         "HYPERION",
@@ -25,6 +26,7 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay") {
         "SCYLLA",
         "VALKYRIE"
     )
+    private val effectiveareaoverlaycolor by ConfigDelegate<Color>("effectiveareaoverlaycolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -55,8 +57,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay") {
                         Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                         7f,
                         72,
-                        config.effectiveareaoverlaycolor.darker().toColorInt(),
-                        config.effectiveareaoverlaycolor.toColorInt()
+                        effectiveareaoverlaycolor.darker().toColorInt(),
+                        effectiveareaoverlaycolor.toColorInt(),
                     )
                 }
             }

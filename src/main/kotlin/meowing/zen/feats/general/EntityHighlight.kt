@@ -1,6 +1,7 @@
 package meowing.zen.feats.general
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -16,6 +17,11 @@ import java.awt.Color
 
 @Zen.Module
 object EntityHighlight : Feature("entityhighlight") {
+    private val entityhighlightplayercolor by ConfigDelegate<Color>("entityhighlightplayercolor")
+    private val entityhighlightmobcolor by ConfigDelegate<Color>("entityhighlightmobcolor")
+    private val entityhighlightanimalcolor by ConfigDelegate<Color>("entityhighlightanimalcolor")
+    private val entityhighlightothercolor by ConfigDelegate<Color>("entityhighlightothercolor")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("General", "Entity highlight", ConfigElement(
@@ -74,10 +80,10 @@ object EntityHighlight : Feature("entityhighlight") {
 
     private fun getEntityColor(entity: Entity): Color {
         return when (entity) {
-            is PlayerEntity -> config.entityhighlightplayercolor
-            is PassiveEntity -> config.entityhighlightanimalcolor
-            is MobEntity -> config.entityhighlightmobcolor
-            else -> config.entityhighlightothercolor
+            is PlayerEntity -> entityhighlightplayercolor
+            is PassiveEntity -> entityhighlightanimalcolor
+            is MobEntity -> entityhighlightmobcolor
+            else -> entityhighlightothercolor
         }
     }
 }

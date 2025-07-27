@@ -22,7 +22,7 @@ import net.minecraft.client.gui.DrawContext
 import kotlin.time.Duration
 
 @Zen.Module
-object slayerstats : Feature("slayerstats") {
+object SlayerStats : Feature("slayerstats") {
     private var kills = 0
     private var sessionStart = TimeUtils.now
     private var totalKillTime = Duration.ZERO
@@ -106,7 +106,7 @@ object SlayerStatsCommand : CommandUtils(
             ClientCommandManager.argument("action", StringArgumentType.string())
                 .executes { context ->
                     val action = StringArgumentType.getString(context, "action")
-                    if (action == "reset") slayerstats.reset()
+                    if (action == "reset") SlayerStats.reset()
                     else ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
                     1
                 }

@@ -1,6 +1,7 @@
 package meowing.zen.feats.slayers
 
 import meowing.zen.Zen
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -11,6 +12,8 @@ import java.awt.Color
 
 @Zen.Module
 object SlayerHighlight : Feature("slayerhighlight") {
+    private val slayerhighlightcolor by ConfigDelegate<Color>("slayerhighlightcolor")
+
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
             .addElement("Slayers", "General", ConfigElement(
@@ -32,7 +35,7 @@ object SlayerHighlight : Feature("slayerhighlight") {
             if (!SlayerTimer.isFighting || SlayerTimer.BossId == -1 || event.entity.id != SlayerTimer.BossId) return@register
             if (player?.canSee(event.entity) == true) {
                 event.shouldGlow = true
-                event.glowColor = config.slayerhighlightcolor.toColorInt()
+                event.glowColor = slayerhighlightcolor.toColorInt()
             }
         }
     }

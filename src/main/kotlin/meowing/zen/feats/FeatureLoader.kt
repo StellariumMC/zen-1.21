@@ -48,6 +48,7 @@ object FeatureLoader {
             }
         }
 
+        Zen.initializeFeatures()
         loadtime = starttime.since.millis
     }
 

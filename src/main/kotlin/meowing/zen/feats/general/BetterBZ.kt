@@ -13,16 +13,16 @@ import meowing.zen.utils.Utils.removeFormatting
 @Zen.Module
 object BetterBZ : Feature("betterbz") {
     private val patterns = mapOf(
-        "instaBuy" to Regex("\\[Bazaar] Bought ([\\d,]+)x (.+) for ([\\d,]+) coins!"),
-        "buyOrderSetup" to Regex("\\[Bazaar] Buy Order Setup! ([\\d,]+)x (.+) for ([\\d,]+) coins\\."),
-        "buyOrderFilled" to Regex("\\[Bazaar] Your Buy Order for ([\\d,]+)x (.+) was filled!"),
-        "buyOrderCancelled" to Regex("\\[Bazaar] Cancelled! Refunded ([\\d,]+) coins from cancelling Buy Order!"),
-        "buyOrderClaimed" to Regex("\\[Bazaar] Claimed ([\\d,]+)x (.+) worth ([\\d,]+) coins bought for ([\\d,]+) each!"),
-        "instaSell" to Regex("\\[Bazaar] Sold ([\\d,]+)x (.+) for ([\\d,]+) coins!"),
-        "sellOfferSetup" to Regex("\\[Bazaar] Sell Offer Setup! ([\\d,]+)x (.+) for ([\\d,]+) coins\\."),
-        "sellOfferFilled" to Regex("\\[Bazaar] Your Sell Offer for ([\\d,]+)x (.+) was filled!"),
-        "sellOfferCancelled" to Regex("\\[Bazaar] Cancelled! Refunded ([\\d,]+)x (.+) from cancelling Sell Offer!"),
-        "sellOrderClaimed" to Regex("\\[Bazaar] Claimed ([\\d,]+)x (.+) worth ([\\d,]+) coins sold for ([\\d,]+) each!")
+        "instaBuy" to Regex("^\\[Bazaar] Bought ([\\d,]+(?:\\.\\d+)?)x (.+) for ([\\d,]+(?:\\.\\d+)?) coins!"),
+        "buyOrderSetup" to Regex("^\\[Bazaar] Buy Order Setup! ([\\d,]+(?:\\.\\d+)?)x (.+) for ([\\d,]+(?:\\.\\d+)?) coins\\."),
+        "buyOrderFilled" to Regex("^\\[Bazaar] Your Buy Order for ([\\d,]+(?:\\.\\d+)?)x (.+) was filled!"),
+        "buyOrderCancelled" to Regex("^\\[Bazaar] Cancelled! Refunded ([\\d,]+(?:\\.\\d+)?) coins from cancelling Buy Order!"),
+        "buyOrderClaimed" to Regex("^\\[Bazaar] Claimed ([\\d,]+(?:\\.\\d+)?)x (.+) worth ([\\d,]+(?:\\.\\d+)?) coins bought for ([\\d,]+(?:\\.\\d+)?) each!"),
+        "instaSell" to Regex("^\\[Bazaar] Sold ([\\d,]+(?:\\.\\d+)?)x (.+) for ([\\d,]+(?:\\.\\d+)?) coins!"),
+        "sellOfferSetup" to Regex("^\\[Bazaar] Sell Offer Setup! ([\\d,]+(?:\\.\\d+)?)x (.+) for ([\\d,]+(?:\\.\\d+)?) coins\\."),
+        "sellOfferFilled" to Regex("^\\[Bazaar] Your Sell Offer for ([\\d,]+(?:\\.\\d+)?)x (.+) was filled!"),
+        "sellOfferCancelled" to Regex("^\\[Bazaar] Cancelled! Refunded ([\\d,]+(?:\\.\\d+)?)x (.+) from cancelling Sell Offer!"),
+        "sellOrderClaimed" to Regex("^\\[Bazaar] Claimed ([\\d,]+(?:\\.\\d+)?)x (.+) worth ([\\d,]+(?:\\.\\d+)?) coins sold for ([\\d,]+(?:\\.\\d+)?) each!")
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -41,12 +41,12 @@ object BetterBZ : Feature("betterbz") {
             var cancelled = false
 
             patterns["instaBuy"]?.find(text)?.let {
-                bzMessage("§a§lInsta-Bought! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
+                bzMessage("§c§lInsta-Bought! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
                 cancelled = true
             }
 
             patterns["buyOrderSetup"]?.find(text)?.let {
-                bzMessage("§e§lBuy Order Setup! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
+                bzMessage("§c§lBuy Order Setup! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
                 cancelled = true
             }
 
@@ -56,25 +56,25 @@ object BetterBZ : Feature("betterbz") {
             }
 
             patterns["buyOrderCancelled"]?.find(text)?.let {
-                bzMessage("§c§lOrder Cancelled! §rRefunded §6${formatNumber(it.groups[1]?.value ?: "")}§r coins!")
+                bzMessage("§c§lCancelled Order!§r Refunded §6${formatNumber(it.groups[1]?.value ?: "")}§r coins!")
                 cancelled = true
             }
 
             patterns["buyOrderClaimed"]?.find(text)?.let {
                 val total = formatNumber(it.groups[3]?.value ?: "")
                 val per = formatNumber(it.groups[4]?.value ?: "")
-                val each = if (total != per) "(§6${per}§r each)" else ""
-                bzMessage("§a§lBuy Order Claimed! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${total}§r coins! ${each}")
+                val each = if (total != per) "(§6${per}§r each!)" else ""
+                bzMessage("Buy Order Claimed! §c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${total}§r coins! ${each}")
                 cancelled = true
             }
 
             patterns["instaSell"]?.find(text)?.let {
-                bzMessage("§a§lInsta-Sold! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
+                bzMessage("§c§lInsta-Sold! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
                 cancelled = true
             }
 
             patterns["sellOfferSetup"]?.find(text)?.let {
-                bzMessage("§e§lSell Offer Setup! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
+                bzMessage("§c§lSell Offer Setup! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${formatNumber(it.groups[3]?.value ?: "")}§r coins!")
                 cancelled = true
             }
 
@@ -84,15 +84,15 @@ object BetterBZ : Feature("betterbz") {
             }
 
             patterns["sellOfferCancelled"]?.find(text)?.let {
-                bzMessage("§c§lOrder Cancelled! §rRefunded §c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r!")
+                bzMessage("§c§lCancelled Order!§r Refunded §6${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r!")
                 cancelled = true
             }
 
             patterns["sellOrderClaimed"]?.find(text)?.let {
                 val total = formatNumber(it.groups[3]?.value ?: "")
                 val per = formatNumber(it.groups[4]?.value ?: "")
-                val each = if (total != per) "(§6${per}§r each)" else ""
-                bzMessage("§a§lSell Order Claimed! §r§c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${total}§r coins! ${each}")
+                val each = if (total != per) "(§6${per}§r each!)" else ""
+                bzMessage("Sell Order Claimed! §c${it.groups[1]?.value}x §c${clean(it.groups[2]?.value ?: "")}§r for §6${total}§r coins! ${each}")
                 cancelled = true
             }
 
