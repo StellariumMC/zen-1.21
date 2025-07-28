@@ -8,6 +8,8 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import meowing.zen.events.EventBus
+import meowing.zen.events.GameEvent
 import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
@@ -63,6 +65,9 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         dataFile.parentFile.mkdirs()
         autosave(5)
         startAutosaveLoop()
+        EventBus.register<GameEvent.Unload> ({
+            save()
+        })
     }
 
     private fun loadData(): T {

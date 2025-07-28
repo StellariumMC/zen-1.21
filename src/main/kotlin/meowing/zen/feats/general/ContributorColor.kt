@@ -25,7 +25,7 @@ object ContributorColor {
             "https://raw.githubusercontent.com/kiwidotzip/zen-data/refs/heads/main/assets/ContributorColor.json",
             onSuccess = { data ->
                 contributorData = data.mapValues { (_, info) ->
-                    val colorList = (info["glowColor"] as? List<*>)?.mapNotNull { it as? Int }
+                    val colorList = (info["highlightColor"] as? List<Int>)
                     val glowColor = if (colorList?.size == 4) {
                         val (r, g, b, a) = colorList
                         Color(r, g, b, a).toColorInt()
@@ -44,7 +44,7 @@ object ContributorColor {
                     "shikiimori" to ContributorInfo("§dKiwi§r", Color(255, 0, 255, 127).toColorInt()),
                     "cheattriggers" to ContributorInfo("§cCheater§r", Color(255, 0, 0, 127).toColorInt()),
                     "Aur0raDye" to ContributorInfo("§5Mango 6 7§r", Color(170, 0, 170, 127).toColorInt()),
-                    "Skyblock_Lobby" to ContributorInfo("§9Skyblock_Lobby§r", Color(170, 0, 170, 127).toColorInt())
+                    "Skyblock_Lobby" to ContributorInfo("§9Skyblock_Lobby§r", Color(85, 85, 255, 127).toColorInt())
                 )
             }
         )
