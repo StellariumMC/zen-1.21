@@ -46,11 +46,13 @@ object ArmorHUD : Feature("armorhud") {
     override fun initialize() {
         HUDManager.registerCustom(name, if (armorhudvert) 16 else 70, if (armorhudvert) 70 else 16, this::HUDEditorRender)
 
-        loop<ClientTick>(20) {
-            val player = player ?: return@loop
-            armor = (0..3).map { slot ->
-                player.inventory.getStack(36 + slot)
-            }.reversed()
+        setupLoops {
+            loop<ClientTick>(20) {
+                val player = player ?: return@loop
+                armor = (0..3).map { slot ->
+                    player.inventory.getStack(36 + slot)
+                }.reversed()
+            }
         }
 
         register<GuiEvent.HUD> { event ->
