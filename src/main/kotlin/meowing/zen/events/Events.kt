@@ -1,5 +1,6 @@
 package meowing.zen.events
 
+import meowing.zen.api.EntityDetection
 import meowing.zen.api.ItemAbility
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.DrawContext
@@ -27,6 +28,7 @@ abstract class CancellableEvent : Event() {
 
 abstract class SkyblockEvent {
     class ItemAbilityUsed(val ability: ItemAbility.ItemAbility) : Event()
+    class EntitySpawn(val skyblockMob: EntityDetection.SkyblockMob) : Event()
 }
 
 abstract class MouseEvent {

@@ -21,9 +21,16 @@ import org.lwjgl.opengl.GL11
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 object Render3D {
+    private fun getValidLineWidth(width: Float): Float {
+        val range = FloatArray(2)
+        GL11.glGetFloatv(GL11.GL_LINE_WIDTH_RANGE, range)
+        return min(max(width, range[0]), range[1])
+    }
+
     fun drawEntityFilled(matrices: MatrixStack?, vertexConsumers: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Float, height: Float, r: Float, g: Float, b: Float, a: Float) {
         val box = Box(x - width / 2, y, z - width / 2, x + width / 2, y + height, z + width / 2)
         DebugRenderer.drawBox(
@@ -127,7 +134,8 @@ object Render3D {
         val consumers = context.consumers() as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getLines())
 
-        GL11.glLineWidth(thickness)
+        val validThickness = getValidLineWidth(thickness)
+        GL11.glLineWidth(validThickness)
 
         val r = color.red / 255f
         val g = color.green / 255f
@@ -246,9 +254,12 @@ object Render3D {
 
     fun drawSpecialBB(bb: Box, fillColor: Color, context: WorldRenderContext) {
         val player = mc.player ?: return
-        val width = max(1.0 - (player.distanceTo(Vec3d(bb.minX, bb.minY, bb.minZ)) / 10 - 2), 2.0).toFloat()
+        val distance = player.distanceTo(Vec3d(bb.minX, bb.minY, bb.minZ))
+        val width = max(1.0 - (distance / 10 - 2), 0.5).toFloat()
+        val validWidth = getValidLineWidth(width)
+
         drawFilledBB(bb, fillColor.withAlpha(0.6f), context)
-        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), width, context)
+        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), validWidth, context)
     }
 
     fun drawOutlinedBB(bb: Box, color: Color, width: Float, context: WorldRenderContext) {
@@ -259,7 +270,8 @@ object Render3D {
         val consumers = context.consumers() as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getLines())
 
-        GL11.glLineWidth(width)
+        val validWidth = getValidLineWidth(width)
+        GL11.glLineWidth(validWidth)
 
         val r = color.red / 255f
         val g = color.green / 255f

@@ -16,6 +16,7 @@ import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 object LocationUtils {
     private val areaRegex = "^(?:Area|Dungeon): ([\\w ]+)$".toRegex()
     private val subAreaRegex = "^ ([⏣ф]) .*".toRegex()
+    private val uselessRegex = "^[⏣ф] ".toRegex()
     private val lock = Any()
     private var cachedAreas = mutableMapOf<String?, Boolean>()
     private var cachedSubareas = mutableMapOf<String?, Boolean>()
@@ -52,10 +53,11 @@ object LocationUtils {
                     val line = prefix + suffix
                     if (!subAreaRegex.matches(line)) return@register
                     if (line.endsWith("cth") || line.endsWith("ch")) return@register
-                    if (line.lowercase() != subarea) {
+                    val cleanSubarea = line.removeFormatting().replace(uselessRegex, "").trim().lowercase()
+                    if (cleanSubarea != subarea) {
                         synchronized(lock) {
-                            EventBus.post(AreaEvent.Sub(line))
-                            subarea = line.lowercase()
+                            EventBus.post(AreaEvent.Sub(cleanSubarea))
+                            subarea = cleanSubarea
                         }
                     }
                 }
