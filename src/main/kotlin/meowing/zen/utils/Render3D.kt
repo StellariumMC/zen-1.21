@@ -253,25 +253,17 @@ object Render3D {
     }
 
     fun drawSpecialBB(bb: Box, fillColor: Color, context: WorldRenderContext) {
-        val player = mc.player ?: return
-        val distance = player.distanceTo(Vec3d(bb.minX, bb.minY, bb.minZ))
-        val width = max(1.0 - (distance / 10 - 2), 0.5).toFloat()
-        val validWidth = getValidLineWidth(width)
-
         drawFilledBB(bb, fillColor.withAlpha(0.6f), context)
-        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), validWidth, context)
+        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), context)
     }
 
-    fun drawOutlinedBB(bb: Box, color: Color, width: Float, context: WorldRenderContext) {
+    fun drawOutlinedBB(bb: Box, color: Color, context: WorldRenderContext) {
         val camera = context.camera().pos
         val matrices = context.matrixStack() ?: return
         matrices.push()
         matrices.translate(-camera.x, -camera.y, -camera.z)
         val consumers = context.consumers() as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getLines())
-
-        val validWidth = getValidLineWidth(width)
-        GL11.glLineWidth(validWidth)
 
         val r = color.red / 255f
         val g = color.green / 255f
