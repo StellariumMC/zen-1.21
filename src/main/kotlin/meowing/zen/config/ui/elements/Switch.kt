@@ -25,8 +25,6 @@ class Switch(
     private val handle: UIComponent
 
     init {
-        setColor(bgColor)
-
         val bg = createBlock(6f).constrain {
             x = 0.pixels()
             y = 0.pixels()

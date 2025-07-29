@@ -1,6 +1,7 @@
 package meowing.zen.config.ui.elements
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.animation.Animations
@@ -19,7 +20,7 @@ class Keybind(
     private var keyCode: Int = 0,
     private val onKeyChange: ((Int) -> Unit)? = null,
     private val theme: ConfigTheme = ConfigTheme()
-) : UIComponent() {
+) : UIContainer() {
 
     private var listening = false
     private var keyDisplay: UIText

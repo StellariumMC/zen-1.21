@@ -1,6 +1,7 @@
 package meowing.zen.config.ui.elements
 
 import gg.essential.elementa.UIComponent
+import gg.essential.elementa.components.UIContainer
 import meowing.zen.Zen.Companion.mc
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
@@ -23,7 +24,7 @@ class Slider(
     initialValue: Double = 50.0,
     private val showDouble: Boolean = false,
     private val onChange: ((Double) -> Unit)? = null
-) : UIComponent() {
+) : UIContainer() {
     private var value: Double = max(min, min(max, initialValue))
     private val sliderContainer: UIComponent
     private val textContainer: UIComponent

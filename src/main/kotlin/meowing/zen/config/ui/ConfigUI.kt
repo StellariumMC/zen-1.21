@@ -325,6 +325,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             if (!config.containsKey(element.configKey)) {
                 config[element.configKey] = defaultValue
                 dataUtils.setData(config)
+                configListeners[element.configKey]?.forEach { listener ->
+                    listener(defaultValue)
+                }
             }
         }
 

@@ -11,6 +11,7 @@ import meowing.zen.utils.LocationUtils
 import meowing.zen.utils.LoopUtils
 import meowing.zen.utils.TickUtils
 
+//TODO: Add inSkyblock check
 /*
  * Modified from Devonian code
  * Under GPL 3.0 License

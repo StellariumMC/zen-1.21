@@ -16,7 +16,7 @@ import java.util.Optional
 @Zen.Module
 object DamageTracker : Feature("damagetracker") {
     private val entities = mutableListOf<Int>()
-    private val regex = Regex("\\s|^§\\w\\D$")
+    private val regex =  "[✧✯]?(\\d{1,3}(?:,\\d{3})*[⚔+✧❤♞☄✷ﬗ✯]*)".toRegex()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -33,8 +33,9 @@ object DamageTracker : Feature("damagetracker") {
             if (entities.contains(event.packet.id)) return@register
             event.packet.trackedValues?.find { it.id == 2 && it.value is Optional<*> }?.let { obj ->
                 val optional = obj.value as Optional<*>
-                val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
-                if (name.isNotBlank() && !name.matches(regex)) ChatUtils.addMessage("$prefix $name")
+                val name = (optional.orElse(null) as? Text)?.string
+                val clean = name?.removeFormatting() ?: return@let
+                if (regex.matches(clean)) ChatUtils.addMessage("$prefix $name")
             }
         }
 

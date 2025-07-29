@@ -8,12 +8,12 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
+import meowing.zen.feats.carrying.CarryCounter
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.Text
-import java.util.Optional
 
 @Zen.Module
 object MinibossSpawn : Feature("minibossspawn") {
@@ -37,22 +37,23 @@ object MinibossSpawn : Feature("minibossspawn") {
     }
 
     override fun initialize() {
-        register<EntityEvent.Metadata> { event ->
-            if (entities.contains(event.packet.id)) return@register
-            event.packet.trackedValues?.find { it.id == 2 && it.value is Optional<*> }?.let { obj ->
-                val optional = obj.value as Optional<*>
-                val name = (optional.orElse(null) as? Text)?.string ?: return@let
-                val clean = name.removeFormatting().replace(regex, "")
-                if (names.contains(clean)) {
+        register<EntityEvent.Join> { event ->
+            if (entities.contains(event.entity.id)) return@register
+            if (CarryCounter.carryees.isEmpty() && SlayerTimer.spawnTime.isZero) return@register
+            if (event.entity.distanceTo(player) > 10) return@register
+            TickUtils.scheduleServer(2) {
+                val entity = event.entity
+                val name = entity.name?.string?.removeFormatting()?.replace(regex, "") ?: return@scheduleServer
+                if (names.contains(name)) {
                     Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 1f, 1f)
-                    ChatUtils.addMessage("$prefix §b$clean§fspawned.")
-                    entities.add(event.packet.id)
+                    ChatUtils.addMessage("$prefix §b$name§fspawned.")
+                    entities.add(entity.id)
                 }
             }
         }
 
-        register<WorldEvent.Change> ({
+        register<WorldEvent.Change> {
             entities.clear()
-        })
+        }
     }
 }

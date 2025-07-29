@@ -13,6 +13,7 @@ import java.awt.Color
 
 object Utils {
     private val emoteRegex = "[^\\u0000-\\u007F]".toRegex()
+    private val formatRegex = "[§&][0-9a-fk-or]".toRegex()
 
     inline val partialTicks get() = mc.renderTickCounter.getTickProgress(true)
     inline val window get() = mc.window
@@ -23,17 +24,9 @@ object Utils {
         MinecraftClient.getInstance().player?.playSound(sound, volume, pitch)
     }
 
-    fun spawnParticle(particle: SimpleParticleType?, x: Double, y: Double, z: Double) {
-        spawnParticle(particle, x, y, z, 0.0, 0.0, 0.0)
-    }
-
-    fun spawnParticle(particle: SimpleParticleType?, x: Double, y: Double, z: Double, velocityX: Double, velocityY: Double, velocityZ: Double) {
-        mc.world?.addParticleClient(ParticleTypes.FLAME, x, y, z, velocityX, velocityY, velocityZ)
-    }
-
     fun String?.removeFormatting(): String {
         if (this == null) return ""
-        return this.replace(Regex("[§&][0-9a-fk-or]", RegexOption.IGNORE_CASE), "")
+        return this.replace(formatRegex, "")
     }
 
     fun String.removeEmotes() = replace(emoteRegex, "")
@@ -117,6 +110,4 @@ object Utils {
     fun createBlock(radius: Float = 0f): UIComponent {
         return if (SystemUtils.IS_OS_MAC_OSX) UIBlock() else UIRoundedRectangle(radius)
     }
-
-    inline fun <reified R> Any.getField(name: String): R = javaClass.getDeclaredField(name).apply { isAccessible = true }[this] as R
 }
