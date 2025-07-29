@@ -21,12 +21,11 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Party finder", ConfigElement(
+            .addElement("Dungeons", "Custom PF Messages", ConfigElement(
                 "partyfindermsgs",
-                "Party finder messages",
-                "Custom party finder messages.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

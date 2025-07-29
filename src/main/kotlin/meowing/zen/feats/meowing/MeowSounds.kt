@@ -19,9 +19,8 @@ object MeowSounds : Feature("meowsounds") {
             .addElement("Meowing", "Meow Sounds", ConfigElement(
                 "meowsounds",
                 "Meow Sounds",
-                "Plays a cat sound whenever someone sends \"meow\" in chat",
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

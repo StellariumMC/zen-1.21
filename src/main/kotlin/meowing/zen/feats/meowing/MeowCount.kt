@@ -24,9 +24,8 @@ object meowcount : Feature("meowcount") {
             .addElement("Meowing", "Meow count", ConfigElement(
                 "meowcount",
                 "Meow count",
-                "Counts how many times you've sent a message with \"meow\" in it",
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

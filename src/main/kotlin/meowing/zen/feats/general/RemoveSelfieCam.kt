@@ -12,9 +12,8 @@ object RemoveSelfieCam : Feature("removeselfiecam") {
         return configUI
             .addElement("General", "Remove selfie camera", ConfigElement(
                 "removeselfiecam",
-                "Remove selfie camera",
-                "Disables the selfie camera.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 }

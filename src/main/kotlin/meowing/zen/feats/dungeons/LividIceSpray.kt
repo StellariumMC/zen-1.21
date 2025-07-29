@@ -25,12 +25,11 @@ object LividIceSpray : Feature("lividicespray", area = "catacombs", subarea = li
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Livid", ConfigElement(
+            .addElement("Dungeons", "Livid Ice Spray Timer", ConfigElement(
                 "lividicespray",
-                "Livid ice spray timer",
-                "Shows the time until you can ice spray livid.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

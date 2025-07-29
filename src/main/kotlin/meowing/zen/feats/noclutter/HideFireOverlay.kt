@@ -14,11 +14,10 @@ import meowing.zen.feats.Feature
 object HideFireOverlay : Feature("hidefireoverlay") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("No clutter", "General", ConfigElement(
+            .addElement("No clutter", "Hide Fire Overlay", ConfigElement(
                 "hidefireoverlay",
-                "Hide fire overlay",
-                "Cancels the fire overlay rendering on your screen.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 }

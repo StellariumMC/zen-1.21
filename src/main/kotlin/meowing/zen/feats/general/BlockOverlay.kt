@@ -22,16 +22,13 @@ object BlockOverlay : Feature("blockoverlay") {
         return configUI
             .addElement("General", "Block overlay", ConfigElement(
                 "blockoverlay",
-                "Block overlay",
-                "Custom block highlighting",
+                null,
                 ElementType.Switch(false)
-            ))
-            .addElement("General", "Block overlay", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("General", "Block overlay", "Options", ConfigElement(
                 "blockoverlaycolor",
                 "Block overlay color",
-                "The color for Block overlay",
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["blockoverlay"] as? Boolean == true }
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
 

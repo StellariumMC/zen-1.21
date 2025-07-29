@@ -15,10 +15,9 @@ object guildjoinleave : Feature("guildjoinleave") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Clean Chat", ConfigElement(
+            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
                 "guildjoinleave",
                 "Clean guild join/leave",
-                "Replaces the guild and friend join messages with a cleaner version of them.",
                 ElementType.Switch(false)
             ))
     }
@@ -48,10 +47,9 @@ object friendjoinleave : Feature("friendjoinleave") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Clean Chat", ConfigElement(
+            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
                 "friendjoinleave",
                 "Clean friend join/leave",
-                "Replaces the guild and friend join messages with a cleaner version of them.",
                 ElementType.Switch(false)
             ))
     }

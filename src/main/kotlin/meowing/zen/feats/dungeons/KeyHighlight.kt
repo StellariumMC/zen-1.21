@@ -19,18 +19,15 @@ object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Keys", ConfigElement(
+            .addElement("Dungeons", "Key Highlight", ConfigElement(
                 "keyhighlight",
-                "Key highlight",
-                "Highlights the wither/blood key",
+                null,
                 ElementType.Switch(false)
-            ))
-            .addElement("Dungeons", "Keys", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("Dungeons", "Key Highlight", "Color", ConfigElement(
                 "keyhighlightcolor",
                 "Key highlight color",
-                null,
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["keyhighlight"] as? Boolean == true }
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
 

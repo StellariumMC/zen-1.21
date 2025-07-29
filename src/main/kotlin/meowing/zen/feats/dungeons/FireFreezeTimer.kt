@@ -5,13 +5,10 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
-import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
-import meowing.zen.events.TickEvent
 import meowing.zen.feats.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
-import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
@@ -20,18 +17,14 @@ import net.minecraft.sound.SoundEvents
 @Zen.Module
 object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
-    private var servertickcall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({
-        if (ticks > 0) ticks--
-    })
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Fire freeze", ConfigElement(
+            .addElement("Dungeons", "Fire Freeze Timer", ConfigElement(
                 "firefreeze",
-                "Fire freeze timer",
-                "Time until you should activate fire freeze",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {
@@ -39,13 +32,16 @@ object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = lis
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
+                createTimer(105,
+                    onTick = {
+                        if (ticks > 0) ticks--
+                    },
+                    onComplete = {
+                        Utils.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1f, 0.5f)
+                        ticks = 0
+                    }
+                )
                 ticks = 100
-                servertickcall.unregister()
-                TickUtils.scheduleServer(105) {
-                    Utils.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1f, 0.5f)
-                    ticks = 0
-                    servertickcall.unregister()
-                }
             }
         }
 

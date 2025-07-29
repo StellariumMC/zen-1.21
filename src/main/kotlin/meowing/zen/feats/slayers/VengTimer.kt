@@ -30,12 +30,11 @@ object VengTimer : Feature("vengtimer") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Slayers", "Blaze", ConfigElement(
+            .addElement("Slayers", "Vengeance proc timer", ConfigElement(
                 "vengtimer",
                 "Vengeance proc timer",
-                "Time until vengeance procs.",
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

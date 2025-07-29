@@ -6,7 +6,6 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
-import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
@@ -62,79 +61,74 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
     private val hidewronglivid by ConfigDelegate<Boolean>("hidewronglivid")
     private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
 
-    private val renderLividCall: EventBus.EventCall = EventBus.register<RenderEvent.EntityGlow> ({ event ->
-        if (lividEntity == event.entity) {
-            event.shouldGlow = true
-            event.glowColor = highlightlividcolor.toColorInt()
-        }
-    }, false)
-
-    private val renderLineCall: EventBus.EventCall = EventBus.register<RenderEvent.World> ({ event ->
-        lividEntity?.let { entity ->
-            if (player?.canSee(entity) == true) {
-                Render3D.drawLineToEntity(
-                    entity,
-                    event.context!!,
-                    highlightlividcolor.toFloatArray(),
-                    highlightlividcolor.alpha.toFloat()
-                )
-            }
-        }
-    }, false)
-
-    private val renderWrongCall: EventBus.EventCall = EventBus.register<RenderEvent.PlayerPre> ({ event ->
-        if (event.entity != lividEntity && event.entity.name.removeFormatting().contains(" Livid"))
-            event.cancel()
-    }, false)
-
-    private val tickCall: EventBus.EventCall = EventBus.register<TickEvent.Server>({
-        val state: BlockState = mc.world?.getBlockState(lividPos) ?: return@register
-        val color = stainedGlassBlocks[state.block] ?: return@register
-        val lividType = lividTypes[color] ?: return@register
-
-        mc.world!!.players.find { it.name.contains(Text.literal(lividType)) }?.let {
-            lividEntity = it
-            registerRender()
-            tickCall.unregister()
-        }
-    }, false)
-
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Livid", ConfigElement(
+            .addElement("Dungeons", "Highlight Livid", ConfigElement(
                 "highlightlivid",
                 "Highlight correct livid",
-                "Highlights the correct livid.",
                 ElementType.Switch(false)
-            ))
-            .addElement("Dungeons", "Livid", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("Dungeons", "Highlight Livid", "Color", ConfigElement(
                 "highlightlividcolor",
                 "Highlight correct livid color",
-                "Color for the correct livid's outline",
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["highlightlivid"] as? Boolean == true }
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addElement("Dungeons", "Livid", ConfigElement(
+            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
                 "hidewronglivid",
                 "Hide incorrect livid entity",
-                "Cancels the rendering of incorrect livid entities",
-                ElementType.Switch(false),
-                { config -> config["highlightlivid"] as? Boolean == true }
+                ElementType.Switch(false)
             ))
-            .addElement("Dungeons", "Livid", ConfigElement(
+            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
                 "highlightlividline",
                 "Line to correct livid entity",
-                "Renders a line to the correct livid entity",
-                ElementType.Switch(false),
-                { config -> config["highlightlivid"] as? Boolean == true }
+                ElementType.Switch(false)
             ))
     }
 
     override fun initialize() {
+        createCustomEvent<RenderEvent.EntityGlow>("renderLivid") { event ->
+            if (lividEntity == event.entity) {
+                event.shouldGlow = true
+                event.glowColor = highlightlividcolor.toColorInt()
+            }
+        }
+
+        createCustomEvent<RenderEvent.World>("renderLine") { event ->
+            lividEntity?.let { entity ->
+                if (player?.canSee(entity) == true && event.context != null) {
+                    Render3D.drawLineToEntity(
+                        entity,
+                        event.context,
+                        highlightlividcolor.toFloatArray(),
+                        highlightlividcolor.alpha.toFloat()
+                    )
+                }
+            }
+        }
+
+        createCustomEvent<RenderEvent.PlayerPre>("renderWrong") { event ->
+            if (event.entity != lividEntity && event.entity.name.contains(" Livid")) {
+                event.cancel()
+            }
+        }
+
+        createCustomEvent<TickEvent.Server>("tick") {
+            val world = world ?: return@createCustomEvent
+            val state: BlockState = mc.world?.getBlockState(lividPos) ?: return@createCustomEvent
+            val color = stainedGlassBlocks[state.block] ?: return@createCustomEvent
+            val lividType = lividTypes[color] ?: return@createCustomEvent
+
+            world.players.find { it.name.contains(Text.literal(lividType)) }?.let {
+                lividEntity = it
+                registerRender()
+                unregisterEvent("tick")
+            }
+        }
+
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] Livid: I respect you for making it to here, but I'll be your undoing.") {
                 TickUtils.scheduleServer(80) {
-                    tickCall.register()
+                    registerEvent("tick")
                 }
             }
         }
@@ -145,15 +139,15 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
     }
 
     private fun registerRender() {
-        renderLividCall.register()
-        if (hidewronglivid) renderWrongCall.register()
-        if (highlightlividline) renderLineCall.register()
+        registerEvent("renderLivid")
+        if (hidewronglivid) registerEvent("renderWrong")
+        if (highlightlividline) registerEvent("renderLine")
     }
 
     private fun unregisterRender() {
-        renderLividCall.unregister()
-        renderWrongCall.unregister()
-        renderLineCall.unregister()
+        unregisterEvent("renderLivid")
+        unregisterEvent("renderWrong")
+        unregisterEvent("renderLine")
         lividEntity = null
     }
 }

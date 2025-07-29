@@ -33,12 +33,11 @@ object SlayerTimer : Feature("slayertimer") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Slayers", "General", ConfigElement(
+            .addElement("Slayers", "Slayer timer", ConfigElement(
                 "slayertimer",
                 "Slayer timer",
-                "Sends a message in your chat telling you how long it took to kill your boss.",
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

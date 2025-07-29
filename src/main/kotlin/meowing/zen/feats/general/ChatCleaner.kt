@@ -50,14 +50,12 @@ object chatcleaner : Feature("chatcleaner") {
         return configUI
             .addElement("General", "Chat Cleaner", ConfigElement(
                 "chatcleaner",
-                "Chat cleaner",
-                "Removes a TON of useless messages from your chat.",
+                null,
                 ElementType.Switch(false)
-            ))
-            .addElement("General", "Chat Cleaner", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("General", "Chat Cleaner", "Options", ConfigElement(
                 "chatcleanerkey",
-                "Keybind",
-                "Key to add the hovered message to the filter.",
+                "Keybind to add message to filter",
                 ElementType.Keybind(GLFW.GLFW_KEY_H)
             ))
     }

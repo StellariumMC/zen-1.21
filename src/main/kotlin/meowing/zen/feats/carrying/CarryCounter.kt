@@ -60,52 +60,42 @@ object CarryCounter : Feature("carrycounter") {
             .addElement("Slayers", "Carrying", ConfigElement(
                 "carrycounter",
                 "Carry counter",
-                "Counts and sends the carries that you do.",
                 ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "Carrying", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
                 "carrycountsend",
                 "Send count",
-                "Sends the count in party chat",
                 ElementType.Switch(true)
             ))
-            .addElement("Slayers", "Carrying", ConfigElement(
+            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
                 "carrysendmsg",
                 "Send boss spawn message",
-                "Sends the boss spawn message in chat",
                 ElementType.Switch(true)
             ))
-            .addElement("Slayers", "Carrying", ConfigElement(
-                "carrybosshighlight",
-                "Carry boss highlight",
-                "Highlights your client's boss.",
-                ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "Carrying", ConfigElement(
-                "carrybosshighlightcolor",
-                "Carry boss highlight color",
-                "The color for boss highlight",
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["carrybosshighlight"] as? Boolean == true }
-            ))
-            .addElement("Slayers", "Carrying", ConfigElement(
-                "carryclienthighlight",
-                "Carry client highlight",
-                "Highlights your client.",
-                ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "Carrying", ConfigElement(
-                "carryclienthighlightcolor",
-                "Carry client highlight color",
-                "The color for client highlight",
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["carryclienthighlight"] as? Boolean == true }
-            ))
-            .addElement("Slayers", "Carrying", ConfigElement(
+            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
                 "carryvalue",
                 "Carry value",
-                "Carry values for the mod to automatically detect in a trade",
                 ElementType.TextInput("1.3", "1.3")
+            ))
+            .addElement("Slayers", "Carrying", "Carry Boss", ConfigElement(
+                "carrybosshighlight",
+                "Carry boss highlight",
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "Carrying", "Carry Boss", ConfigElement(
+                "carrybosscolor"
+                , "Carry boss highlight color",
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
+            ))
+            .addElement("Slayers", "Carrying", "Carry Client", ConfigElement(
+                "carryclienthighlight",
+                "Carry client highlight",
+                ElementType.Switch(false)
+            ))
+            .addElement("Slayers", "Carrying", "Carry Client", ConfigElement(
+                "carryclientcolor",
+                "Carry client highlight color",
+                ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
 

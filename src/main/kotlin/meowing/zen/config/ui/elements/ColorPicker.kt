@@ -217,7 +217,7 @@ class ColorPickerComponent(val initialColor: Color) : UIContainer() {
             height = 10.pixels()
         }.childOf(this).effect(OutlineEffect(theme.border, 1f)).onMouseClick {
             isChroma = true
-            onValueChange(theme.accent)
+            onValueChange(initialColor)
         }
     }
 

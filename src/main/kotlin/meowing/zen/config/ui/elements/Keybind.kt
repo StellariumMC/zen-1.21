@@ -1,6 +1,5 @@
 package meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.constraints.CenterConstraint
@@ -17,7 +16,7 @@ import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
 class Keybind(
-    private var keyCode: Int = 0,
+    private var code: Int = 0,
     private val onKeyChange: ((Int) -> Unit)? = null,
     private val theme: ConfigTheme = ConfigTheme()
 ) : UIContainer() {
@@ -33,7 +32,7 @@ class Keybind(
             height = 100.percent()
         }.setColor(theme.element) childOf this
 
-        keyDisplay = (UIText(getKeyName(keyCode)).constrain {
+        keyDisplay = (UIText(getKeyName(code)).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
         }.setColor(Color.WHITE) childOf container) as UIText
@@ -50,7 +49,7 @@ class Keybind(
         container.onKeyType { _, keycode ->
             if (listening) {
                 keyDisplay.setText(getKeyName(keycode)).setColor(Color.WHITE)
-                keyCode = keycode
+                code = keycode
                 onKeyChange?.invoke(keycode)
                 listening = false
                 container.animate {
@@ -59,6 +58,18 @@ class Keybind(
                 loseFocus()
             }
         }
+    }
+
+    override fun keyType(typedChar: Char, keyCode: Int) {
+        if (keyCode == 256 && listening) {
+            keyDisplay.setText(getKeyName(keyCode)).setColor(Color.WHITE)
+            code = keyCode
+            onKeyChange?.invoke(code)
+            listening = false
+            loseFocus()
+            return
+        }
+        super.keyType(typedChar, keyCode)
     }
 
     private fun getKeyName(keyCode: Int): String = when (keyCode) {

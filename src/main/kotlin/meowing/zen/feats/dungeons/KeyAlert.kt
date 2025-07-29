@@ -18,12 +18,11 @@ object KeyAlert : Feature("keyalert", area = "catacombs") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Keys", ConfigElement(
+            .addElement("Dungeons", "Key Spawn Alert", ConfigElement(
                 "keyalert",
-                "Key spawn alert",
-                "Displays a title when the wither/blood key spawns",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

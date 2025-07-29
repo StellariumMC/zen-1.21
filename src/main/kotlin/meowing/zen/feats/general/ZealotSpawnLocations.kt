@@ -79,20 +79,17 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", "the end", listOf("Ze
         return configUI
             .addElement("General", "Zealot Spawn Locations", ConfigElement(
                 "zealotspawnvisual",
-                "Zealot Spawn Location",
-                "Draws a timer at the location where the zealots will spawn.",
+                null,
                 ElementType.Switch(false)
-            ))
-            .addElement("General", "Zealot Spawn Locations", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("General", "Zealot Spawn Locations", "Options", ConfigElement(
                 "drawzealotspawnbox",
                 "Zealot Spawn Location Boxes",
-                "Draws boxes around where the zealots will spawn. Disabling this will result in only the string being rendered",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Zealot Spawn Locations", ConfigElement(
+            .addElement("General", "Zealot Spawn Locations", "Options", ConfigElement(
                 "drawzealotspawncolor",
                 "Box color",
-                null,
                 ElementType.ColorPicker(Color(0, 255, 255, 127)),
                 { config -> config["drawzealotspawnbox"] as? Boolean == true }
             ))

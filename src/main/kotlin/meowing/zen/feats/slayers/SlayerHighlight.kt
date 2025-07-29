@@ -16,15 +16,13 @@ object SlayerHighlight : Feature("slayerhighlight") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Slayers", "General", ConfigElement(
+            .addElement("Slayers", "Slayer highlight", ConfigElement(
                 "slayerhighlight",
                 "Slayer highlight",
-                "Highlights your slayer boss.",
                 ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "General", ConfigElement(
+            ), isSectionToggle = true)
+            .addElement("Slayers", "Slayer highlight", "Color", ConfigElement(
                 "slayerhighlightcolor",
-                "Slayer highlight color",
                 "Slayer highlight color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))

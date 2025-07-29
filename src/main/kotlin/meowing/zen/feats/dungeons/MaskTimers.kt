@@ -51,12 +51,11 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Masks", ConfigElement(
+            .addElement("Dungeons", "Mask cooldown display", "Options", ConfigElement(
                 "masktimers",
-                "Mask cooldown display",
-                "Shows the time remaining for each mask's cooldown.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {

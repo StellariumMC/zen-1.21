@@ -5,9 +5,7 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
-import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
-import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.feats.Feature
 import meowing.zen.utils.Render3D
@@ -30,43 +28,35 @@ object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea
 
     private val boss = listOf(TimerData("§6Scarf", 0.4, Vec3d(-7.5, 72.0, -10.5)))
 
-    private val tickCall = EventBus.register<TickEvent.Server>({
-        time -= 0.05
-        if (time <= -5) cleanup()
-    }, false)
-
-    private val renderCall = EventBus.register<RenderEvent.World>({ event ->
-        activeTimers.forEach { timer ->
-            val displayTime = time + timer.offset
-            if (displayTime > 0)
-                Render3D.drawString("${timer.name} §e${"%.1f".format(displayTime)}s", timer.pos, 0x000000)
-        }
-    }, false)
-
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("Dungeons", "Scarf", ConfigElement(
+            .addElement("Dungeons", "Scarf Spawn Timers", ConfigElement(
                 "scarfspawntimers",
-                "Spawn timers",
-                "Spawn timers for Scarf and his minions.",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {
+        createCustomEvent<RenderEvent.World>("render") { event ->
+            activeTimers.forEach { timer ->
+                val displayTime = time + timer.offset
+                if (displayTime > 0)
+                    Render3D.drawString("${timer.name} §e${"%.1f".format(displayTime)}s", timer.pos, 0x000000)
+            }
+        }
+
         register<ChatEvent.Receive> { event ->
             when (event.message.string.removeFormatting()) {
                 "[BOSS] Scarf: If you can beat my Undeads, I'll personally grant you the privilege to replace them." -> {
                     time = 7.75
                     activeTimers = minions
-                    tickCall.register()
-                    renderCall.register()
+                    startTimer()
                 }
                 "[BOSS] Scarf: Those toys are not strong enough I see." -> {
                     time = 10.0
                     activeTimers = boss
-                    tickCall.register()
-                    renderCall.register()
+                    startTimer()
                 }
             }
         }
@@ -74,9 +64,20 @@ object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea
         register<WorldEvent.Change> { cleanup() }
     }
 
+    private fun startTimer() {
+        registerEvent("render")
+        createTimer(((time + 5) / 0.05).toInt(),
+            onTick = {
+                time -= 0.05
+            },
+            onComplete = {
+                cleanup()
+            }
+        )
+    }
+
     private fun cleanup() {
         activeTimers = emptyList()
-        tickCall.unregister()
-        renderCall.unregister()
+        unregisterEvent("render")
     }
 }

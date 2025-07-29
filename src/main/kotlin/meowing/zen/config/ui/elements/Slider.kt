@@ -2,16 +2,12 @@ package meowing.zen.config.ui.elements
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
-import meowing.zen.Zen.Companion.mc
 import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.animate
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.pixels
+import gg.essential.elementa.dsl.*
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.createBlock
 import java.awt.Color
 import kotlin.math.max
@@ -34,16 +30,16 @@ class Slider(
     init {
         sliderContainer = createBlock(3f).constrain {
             x = 0.pixels()
-            y = 0.pixels()
-            width = 70.percent()
-            height = 100.percent()
+            y = CenterConstraint()
+            width = 80.percent()
+            height = 60.percent()
         }.setColor(Color(18, 24, 28, 255)) childOf this
 
         textContainer = createBlock(3f).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 25.percent()
-            height = 100.percent()
+            width = 15.percent()
+            height = 80.percent()
         }.setColor(Color(18, 24, 28, 255)) childOf this
 
         val initialPercent = (value - min).toFloat() / (max - min).toFloat()
@@ -57,7 +53,7 @@ class Slider(
         input = (UITextInput(formatDisplayValue(value)).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth(formatDisplayValue(max)).pixels()
+            width = mc.textRenderer.getWidth(formatDisplayValue(value)).pixels()
         }.setColor(Color(170, 230, 240, 255)) childOf textContainer) as UITextInput
 
         setupMouseHandlers()
@@ -127,6 +123,7 @@ class Slider(
         if (newValue != value) {
             value = newValue
             input.setText(formatDisplayValue(value))
+            input.setWidth(mc.textRenderer.getWidth(formatDisplayValue(value)).pixels())
             onChange?.invoke(value)
         }
 

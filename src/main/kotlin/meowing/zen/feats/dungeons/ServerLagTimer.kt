@@ -25,10 +25,9 @@ object ServerLagTimer : Feature("serverlagtimer", area = "catacombs") {
         return configUI
             .addElement("Dungeons", "Server lag timer", ConfigElement(
                 "serverlagtimer",
-                "Server lag timer",
-                "Amount of difference between the client ticks and the server ticks",
+                null,
                 ElementType.Switch(false)
-            ))
+            ), isSectionToggle = true)
     }
 
     override fun initialize() {
