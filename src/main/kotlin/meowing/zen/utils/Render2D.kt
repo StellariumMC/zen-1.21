@@ -6,11 +6,11 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
 
 object Render2D {
-    fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float) {
+    fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
         context.matrices.push()
         context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
         context.matrices.scale(scale, scale, 1.0f)
-        context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, false)
+        context.drawText(mc.textRenderer, text, 0, 0, colors, shadow)
         context.matrices.pop()
     }
 

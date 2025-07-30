@@ -8,6 +8,7 @@ import meowing.zen.events.GuiEvent
 import meowing.zen.utils.Utils.MouseX
 import meowing.zen.utils.Utils.MouseY
 import meowing.zen.hud.HUDManager
+import meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Colors
 
@@ -32,12 +33,13 @@ object CarryHUD {
 
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
+        val scale = HUDManager.getScale(name)
 
         val lines = getLines()
         if (lines.isNotEmpty()) {
             var currentY = y
             for (line in lines) {
-                context.drawText(mc.textRenderer, line, x.toInt(), currentY.toInt(), Colors.WHITE, false)
+                Render2D.renderString(context, line, x, y, scale)
                 currentY += mc.textRenderer.fontHeight + 2
             }
         }
@@ -138,11 +140,8 @@ object CarryHUD {
         }
 
         renderItems.forEach { item ->
-            val color = if (item.shadow || hoveredButton?.let { btn ->
-                    btn.x == item.x && btn.y == item.y
-                } != true) item.color else Colors.WHITE
-
-            context.drawText(mc.textRenderer, item.text, item.x.toInt(), item.y.toInt(), color, item.shadow)
+            val color = if (item.shadow || hoveredButton?.let { btn -> btn.x == item.x && btn.y == item.y } != true) item.color else Colors.WHITE
+            Render2D.renderString(context, item.text, item.x, item.y, HUDManager.getScale(name), color, item.shadow)
         }
 
         renderTooltip(context, MouseY, MouseY)
@@ -156,7 +155,7 @@ object CarryHUD {
             val tooltipY = (mouseY - tooltipHeight - 8).coerceAtLeast(2.0).toInt()
 
             context.fill(tooltipX, tooltipY, tooltipX + tooltipWidth, tooltipY + tooltipHeight, 0xC8000000.toInt())
-            context.drawText(mc.textRenderer, button.tooltip, tooltipX + 4, tooltipY + 4, Colors.WHITE, false)
+            Render2D.renderString(context, button.tooltip, button.x + 4, button.y + 4, 1f)
         }
     }
 }
