@@ -24,12 +24,12 @@ object guildjoinleave : Feature("guildjoinleave") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val m = guildPattern.matcher(event.message.string)
-            if (m.matches()) {
+            val matcher = guildPattern.matcher(event.message.string)
+            if (matcher.matches()) {
                 event.cancel()
-                val color = m.group(1) ?: ""
-                val user = m.group(2) ?: ""
-                val action = m.group(3) ?: ""
+                val color = matcher.group(1) ?: ""
+                val user = matcher.group(2) ?: ""
+                val action = matcher.group(3) ?: ""
                 val message = when (action) {
                     "joined" -> "§8G §a>> $color$user"
                     "left" -> "§8G §c<< $color$user"
@@ -56,12 +56,12 @@ object friendjoinleave : Feature("friendjoinleave") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val m = friendPattern.matcher(event.message.string)
-            if (m.matches()) {
+            val matcher = friendPattern.matcher(event.message.string)
+            if (matcher.matches()) {
                 event.cancel()
-                val color = m.group(1) ?: ""
-                val user = m.group(2) ?: ""
-                val action = m.group(3) ?: ""
+                val color = matcher.group(1) ?: ""
+                val user = matcher.group(2) ?: ""
+                val action = matcher.group(3) ?: ""
                 val message = when (action) {
                     "joined" -> "§8F §a>> $color$user"
                     "left" -> "§8F §c<< $color$user"

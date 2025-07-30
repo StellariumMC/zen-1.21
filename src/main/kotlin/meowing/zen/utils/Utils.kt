@@ -5,8 +5,10 @@ import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.SimpleParticleType
+import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.sound.SoundEvent
 import org.apache.commons.lang3.SystemUtils
 import java.awt.Color
@@ -27,6 +29,17 @@ object Utils {
     fun String?.removeFormatting(): String {
         if (this == null) return ""
         return this.replace(formatRegex, "")
+    }
+
+    fun String.getRegexGroups(regex: Regex): MatchGroupCollection? {
+        val regexMatchResult = regex.find(this) ?: return null
+        return regexMatchResult.groups
+    }
+
+    inline val HandledScreen<*>.chestName: String get() {
+        val screenHandler = this.screenHandler
+        if (screenHandler !is GenericContainerScreenHandler) return ""
+        return this.title.string.trim()
     }
 
     fun String.removeEmotes() = replace(emoteRegex, "")

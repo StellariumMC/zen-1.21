@@ -43,7 +43,12 @@ object EventBus {
         }
 
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
-            !post(ChatEvent.Receive(msg, show))
+            val customEvent = when (show) {
+                true -> GameEvent.ActionBar(msg)
+                false -> ChatEvent.Receive(msg)
+            }
+
+            !post(customEvent)
         }
 
         ClientSendMessageEvents.ALLOW_CHAT.register { string ->

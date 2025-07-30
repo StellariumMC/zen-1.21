@@ -2,9 +2,11 @@ package meowing.zen.events
 
 import meowing.zen.api.EntityDetection
 import meowing.zen.api.ItemAbility
+import meowing.zen.api.PartyTracker.PartyMember
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState
 import net.minecraft.client.util.math.MatrixStack
@@ -13,6 +15,9 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
+import net.minecraft.screen.ScreenHandler
+import net.minecraft.screen.slot.Slot
+import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
@@ -46,6 +51,15 @@ abstract class TickEvent {
 abstract class GameEvent {
     class Load : Event()
     class Unload : Event()
+    class ActionBar(val message: Text) : CancellableEvent()
+}
+
+abstract class PartyEvent {
+    class Changed(val type: PartyChangeType, val playerName: String? = null, val members: Map<String, PartyMember>) : Event()
+}
+
+enum class PartyChangeType {
+    MEMBER_JOINED, MEMBER_LEFT, PLAYER_JOINED, PLAYER_LEFT, LEADER_CHANGED, DISBANDED
 }
 
 abstract class RenderEvent {
@@ -75,10 +89,11 @@ abstract class GuiEvent {
     class Close(val screen: Screen) : Event()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
     class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
+    class SlotClick(val slot: Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
 }
 
 abstract class ChatEvent {
-    class Receive(val message: Text, val overlay: Boolean) : CancellableEvent()
+    class Receive(val message: Text) : CancellableEvent()
     class Send(val message: String) : CancellableEvent()
 }
 

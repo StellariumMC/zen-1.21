@@ -37,8 +37,8 @@ class Zen : ClientModInitializer {
             if (shown) return@register
 
             ChatUtils.addMessage(
-                "$prefix §fMod loaded - §c${FeatureLoader.getFeatCount()} §ffeatures",
-                "§c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
+                "$prefix §fMod loaded.",
+                "§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
             )
 
             val data = dataUtils.getData()

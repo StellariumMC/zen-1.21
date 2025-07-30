@@ -106,8 +106,7 @@ object ItemAbility {
             }
         })
 
-        EventBus.register<ChatEvent.Receive> ({ event ->
-            if (event.overlay) return@register
+        EventBus.register<GameEvent.ActionBar> ({ event ->
             val clean = event.message.string.removeFormatting()
 
             if (clean.startsWith("Used") && LocationUtils.checkArea("catacombs"))
