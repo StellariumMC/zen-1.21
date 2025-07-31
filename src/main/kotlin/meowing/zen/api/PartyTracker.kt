@@ -162,6 +162,7 @@ object PartyTracker {
                 }
 
                 playerInParty = true
+                EventBus.post(PartyEvent.Changed(PartyChangeType.LIST, members = partyMembers.toMap()))
             }
 
             clean.matches(partyDisconnectRegex) -> {
@@ -188,6 +189,7 @@ object PartyTracker {
                 ChatUtils.command("/p list")
 
                 if (playerName == mc.player?.name?.string) partyMembers[playerName]?.leader = false
+                EventBus.post(PartyEvent.Changed(PartyChangeType.PARTY_FINDER, playerName, partyMembers.toMap()))
             }
 
             clean.matches(partyFinderErrorRegex) -> {
