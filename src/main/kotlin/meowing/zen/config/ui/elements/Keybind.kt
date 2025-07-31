@@ -48,12 +48,18 @@ class Keybind(
 
         container.onKeyType { _, keycode ->
             if (listening) {
-                keyDisplay.setText(getKeyName(keycode)).setColor(Color.WHITE)
-                code = keycode
-                onKeyChange?.invoke(keycode)
+                if (keycode == 256) {
+                    keyDisplay.setText("None").setColor(Color.WHITE)
+                    code = 0
+                    onKeyChange?.invoke(0)
+                } else {
+                    keyDisplay.setText(getKeyName(keycode)).setColor(Color.WHITE)
+                    code = keycode
+                    onKeyChange?.invoke(keycode)
+                }
                 listening = false
                 container.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.2f, theme.element.brighter().toConstraint())
+                    setColorAnimation(Animations.OUT_EXP, 0.2f, theme.element.toConstraint())
                 }
                 loseFocus()
             }
@@ -62,9 +68,9 @@ class Keybind(
 
     override fun keyType(typedChar: Char, keyCode: Int) {
         if (keyCode == 256 && listening) {
-            keyDisplay.setText(getKeyName(keyCode)).setColor(Color.WHITE)
-            code = keyCode
-            onKeyChange?.invoke(code)
+            keyDisplay.setText("None").setColor(Color.WHITE)
+            code = 0
+            onKeyChange?.invoke(0)
             listening = false
             loseFocus()
             return
@@ -80,7 +86,7 @@ class Keybind(
         342 -> "LAlt"
         346 -> "RAlt"
         257 -> "Enter"
-        256 -> "Escape"
+        256 -> "None"
         in 290..301 -> "F${keyCode - 289}"
         else -> GLFW.glfwGetKeyName(keyCode, 0)?.uppercase() ?: "Key $keyCode"
     }

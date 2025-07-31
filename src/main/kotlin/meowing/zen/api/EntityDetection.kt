@@ -84,5 +84,6 @@ object EntityDetection {
 
     inline val Entity.sbMobID: String? get() = getSkyblockMob(this)?.id
 
-    fun getSkyblockMob(entity: Entity): SkyblockMob? = hashMap.values.firstOrNull { it.skyblockMob == entity || it.nameEntity == entity }
+    fun getSkyblockMob(entity: Entity): SkyblockMob? = hashMap.values.firstOrNull { it.skyblockMob == entity }
+    fun getNameTag(entity: Entity): SkyblockMob? = hashMap.values.firstOrNull { it.nameEntity == entity }
 }

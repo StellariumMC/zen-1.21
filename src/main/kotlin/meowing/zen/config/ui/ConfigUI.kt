@@ -14,6 +14,7 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.core.ConfigTheme
 import meowing.zen.config.ui.core.ConfigValidator
@@ -22,7 +23,10 @@ import meowing.zen.config.ui.elements.ColorPicker
 import meowing.zen.config.ui.elements.Dropdown
 import meowing.zen.config.ui.elements.TextInput
 import meowing.zen.config.ui.types.*
+import meowing.zen.hud.HUDEditor
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
+import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.createBlock
 import meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
@@ -62,14 +66,14 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     }
 
     private fun createGUI() {
-        val border = createBlock(8f).constrain {
+        val border = createBlock(4f).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
             width = 70.percent()
             height = 65.percent()
         }.setColor(theme.accent2) childOf window
 
-        val main = createBlock(8f).constrain {
+        val main = createBlock(4f).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
             width = 100.percent() - 2.pixels()
@@ -113,6 +117,8 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             width = 96.percent()
             height = 96.percent()
         } childOf categoryPanel
+
+        createHudEditorButton(categoryPanel)
 
         val searchBarHeader = createBlock(0f).constrain {
             x = 15.percent() + 1.pixels()
@@ -172,6 +178,39 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         } childOf elementPanel
     }
 
+    private fun createHudEditorButton(categoryPanel: UIComponent) {
+        val editLocationsBorder = createBlock(3f).constrain {
+            x = CenterConstraint()
+            y = 2.pixels(true)
+            width = 95.percent()
+            height = 24.pixels()
+        }.setColor(theme.accent2) childOf categoryPanel
+
+        val editLocations = createBlock(3f).constrain {
+            x = CenterConstraint()
+            y = CenterConstraint()
+            width = 100.percent() - 2.pixels()
+            height = 100.percent() - 2.pixels()
+        }.setColor(theme.bg) childOf editLocationsBorder
+
+        UIWrappedText("HUD Editor").constrain {
+            x = CenterConstraint() + 4.pixels
+            y = CenterConstraint()
+            width = mc.textRenderer.getWidth("HUD Editor").pixels
+            textScale = 0.8.pixels()
+        }.setColor(theme.accent2) childOf editLocations
+
+        editLocations.onMouseEnter {
+            animate { setColorAnimation(Animations.OUT_QUAD, 0.2f, theme.bg.withAlpha(200).toConstraint()) }
+        }.onMouseLeave {
+            animate { setColorAnimation(Animations.OUT_QUAD, 0.2f, theme.bg.toConstraint()) }
+        }.onMouseClick {
+            TickUtils.schedule(1) {
+                mc.setScreen(HUDEditor())
+            }
+        }
+    }
+
     private fun performSearch() {
         if (searchQuery.isEmpty()) {
             filteredCategories.clear()
@@ -188,12 +227,15 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
         if (filteredCategories.isNotEmpty() && (activeCategory == null || !filteredCategories.any { it.name == activeCategory })) {
             activeCategory = filteredCategories.first().name
+            activeSection = null
         }
 
         activeCategory?.let { categoryName ->
             val availableSections = filteredSections[categoryName]
             if (availableSections?.isNotEmpty() == true && (activeSection == null || !availableSections.any { it.name == activeSection })) {
                 activeSection = availableSections.first().name
+            } else if (availableSections?.isEmpty() == true) {
+                activeSection = null
             }
         }
 
@@ -226,7 +268,6 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
         return item
     }
-
 
     private fun createSectionWithToggle(section: ConfigSection, isActive: Boolean, onClick: () -> Unit): UIComponent {
         val sectionKey = "${activeCategory}-${section.name}"
@@ -301,9 +342,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         updateCategories()
         updateSections()
         elementScroll.clearChildren()
+        closePopups()
 
-        val availableSections = if (searchQuery.isEmpty()) sections[categoryName] else filteredSections[categoryName]
-
+        val availableSections = filteredSections[categoryName]
         availableSections?.firstOrNull()?.let { firstSection ->
             activeSection = firstSection.name
             updateSections()
@@ -312,22 +353,22 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     }
 
     private fun updateSections() {
+        sectionScroll.clearChildren()
         activeCategory?.let { categoryName ->
-            val sectionsToShow = if (searchQuery.isEmpty()) sections[categoryName] else filteredSections[categoryName]
+            val sectionsToShow = filteredSections[categoryName]
 
-            sectionsToShow?.let { sections ->
-                val container = sectionScroll.children.firstOrNull() as? UIContainer ?: UIContainer().constrain {
-                    width = 100.percent()
-                    height = ChildHeightConstraint(2f)
-                }.also { sectionScroll.addChild(it) }
-
-                container.clearChildren()
-                sections.forEach { section ->
-                    createSectionWithToggle(section, section.name == activeSection) {
-                        switchSection(section.name)
-                    } childOf container
-                }
+            val container = UIContainer().constrain {
+                width = 100.percent()
+                height = ChildHeightConstraint(2f)
             }
+
+            sectionsToShow?.forEach { section ->
+                createSectionWithToggle(section, section.name == activeSection) {
+                    switchSection(section.name)
+                } childOf container
+            }
+
+            container childOf sectionScroll
         }
     }
 
@@ -343,16 +384,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
                     height = ChildHeightConstraint(6f)
                 }.also { container ->
                     subcatList.forEach { subcat ->
-                        val elementsToShow = if (searchQuery.isEmpty()) {
-                            subcat.elements.filter { it.configKey != toggleConfigKey }
-                        } else {
-                            subcat.elements.filter { element ->
-                                element.configKey != toggleConfigKey && (
-                                        element.title?.lowercase()?.contains(searchQuery) == true ||
-                                                element.configKey.lowercase().contains(searchQuery)
-                                        )
-                            }
-                        }
+                        val elementsToShow = subcat.elements.filter { it.configKey != toggleConfigKey }
 
                         if (elementsToShow.isNotEmpty()) {
                             createSubcategoryHeader(container, subcat.name)
@@ -376,20 +408,13 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
             sections[category.name]?.forEach { section ->
                 val sectionMatches = section.name.lowercase().contains(searchQuery)
-                val sectionKey = "${category.name}-${section.name}"
-                val hasMatchingElements = subcategories[sectionKey]?.any { subcategory ->
-                    subcategory.elements.any { element ->
-                        element.title?.lowercase()?.contains(searchQuery) == true ||
-                                element.configKey.lowercase().contains(searchQuery)
-                    }
-                } ?: false
 
-                if (sectionMatches || hasMatchingElements || categoryMatches) {
+                if (sectionMatches || categoryMatches) {
                     matchingSections.add(section)
                 }
             }
 
-            if (categoryMatches || matchingSections.isNotEmpty()) {
+            if (matchingSections.isNotEmpty()) {
                 filteredCategories.add(category)
                 filteredSections[category.name] = matchingSections
             }
@@ -529,6 +554,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         activeSection = sectionName
         updateSections()
         updateElements()
+        closePopups()
     }
 
     private fun getDefaultValue(type: ElementType?): Any? = when (type) {
@@ -539,6 +565,17 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         is ElementType.ColorPicker -> type.default
         is ElementType.Keybind -> type.default
         else -> null
+    }
+
+    private fun closePopups() {
+        if (ColorPicker.isPickerOpen) {
+            ColorPicker.closePicker()
+            return
+        }
+        if (Dropdown.isDropdownOpen) {
+            Dropdown.closeDropdown()
+            return
+        }
     }
 
     override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
@@ -635,7 +672,6 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     }
 
     fun getConfigValue(configKey: String): Any? = config[configKey]
-    fun getDefaultValue(configKey: String): Any? = elementRefs[configKey]?.type?.let { getDefaultValue(it) }
     fun saveConfig() = dataUtils.save()
 
     private fun Color.withAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
