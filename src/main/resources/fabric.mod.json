@@ -6,8 +6,8 @@
 	"description": "QOL Mod",
 	"authors": ["Kiwi"],
 	"contact": {
-		"homepage": "https://meowaddons.top/",
-		"sources": "https://github.com/kiwidotzip/zen"
+		"homepage": "https://meowing.xyz/",
+		"sources": "https://github.com/kiwidotzip/zen-1.21"
 	},
 	"license": "GPL-3.0-or-later",
 	"icon": "assets/zen/icon.png",
