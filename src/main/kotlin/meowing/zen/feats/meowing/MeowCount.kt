@@ -44,7 +44,7 @@ object meowcount : Feature("meowcount") {
 @Zen.Command
 object MeowCommand : CommandUtils("meowcount", aliases = listOf("zenmeow", "zenmeowcount")) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        val count = meowcount.getMeowCount()
+        val count = meowcount.getMeowCount().toInt()
         ChatUtils.addMessage("$prefix §fYou have meowed §b$count §ftimes!")
         return 1
     }

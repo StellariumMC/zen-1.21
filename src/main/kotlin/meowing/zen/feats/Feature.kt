@@ -119,7 +119,6 @@ open class Feature(
 
     fun unregisterEvent(name: String) {
         namedEventCalls[name]?.unregister()
-        namedEventCalls.remove(name)
     }
 
     inline fun <reified T> loop(intervalTicks: Long, noinline action: () -> Unit): Long {

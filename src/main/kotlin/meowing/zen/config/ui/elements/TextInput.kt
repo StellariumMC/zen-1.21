@@ -6,6 +6,7 @@ import gg.essential.elementa.components.input.UITextInput
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.minus
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import meowing.zen.utils.Utils.createBlock
@@ -30,15 +31,15 @@ class TextInput(
         }.setColor(Color(18, 24, 28, 255)) childOf this
 
         input = (UITextInput(text).constrain {
-            x = CenterConstraint()
+            x = 8.pixels()
             y = CenterConstraint()
-            width = 90.percent()
+            width = 100.percent() - 16.pixels()
             height = 10.pixels()
         }.setColor(Color(170, 230, 240, 255)) childOf container) as UITextInput
 
         placeholderText = (if (placeholder.isNotEmpty()) {
             UIText(placeholder).constrain {
-                x = CenterConstraint()
+                x = 8.pixels()
                 y = CenterConstraint()
             }.setColor(Color(70, 120, 140, 255)) childOf container
         } else null) as UIText?

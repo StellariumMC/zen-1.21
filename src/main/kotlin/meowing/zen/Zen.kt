@@ -13,6 +13,7 @@ import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
+import meowing.zen.feats.Debug
 import meowing.zen.feats.FeatureLoader
 import meowing.zen.utils.ChatUtils
 import net.fabricmc.loader.api.FabricLoader
@@ -50,6 +51,7 @@ class Zen : ClientModInitializer {
                 dataUtils.setData(data.copy(isFirstInstall = false))
                 dataUtils.save()
             }
+            if (Debug.debugmode) ChatUtils.addMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
             UpdateChecker.checkForUpdates()
             shown = true

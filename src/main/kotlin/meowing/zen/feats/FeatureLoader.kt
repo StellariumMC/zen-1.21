@@ -16,7 +16,7 @@ object FeatureLoader {
 
         val features = reflections.getTypesAnnotatedWith(Zen.Module::class.java)
         val starttime = TimeUtils.now
-        val categoryOrder = listOf("general", "slayers", "dungeons", "meowing", "noclutter")
+        val categoryOrder = listOf("general", "slayers", "dungeons", "meowing", "noclutter", "rift")
 
         features.sortedWith(compareBy<Class<*>> { clazz ->
             val packageName = clazz.`package`.name
