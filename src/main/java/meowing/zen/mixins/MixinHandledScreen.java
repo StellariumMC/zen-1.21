@@ -1,7 +1,10 @@
 package meowing.zen.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import meowing.zen.events.EventBus;
 import meowing.zen.events.GuiEvent;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -30,6 +33,15 @@ public class MixinHandledScreen {
     )
     private void zen$onSlotClick(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
         HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
-        if (EventBus.INSTANCE.post(new GuiEvent.SlotClick(slot, slotId, button, actionType, handler, screen))) ci.cancel();
+        if (EventBus.INSTANCE.post(new GuiEvent.Slot.Click(slot, slotId, button, actionType, handler, screen))) ci.cancel();
+    }
+
+    @WrapOperation(
+            method = "drawSlots",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlot(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/screen/slot/Slot;)V")
+    )
+    private void zen$drawSlots(HandledScreen instance, DrawContext context, Slot slot, Operation<Void> original) {
+        EventBus.INSTANCE.post(new GuiEvent.Slot.Render(context, slot));
+        original.call(instance, context, slot);
     }
 }

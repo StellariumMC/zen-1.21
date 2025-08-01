@@ -17,7 +17,7 @@ import net.minecraft.util.hit.EntityHitResult
 import java.awt.Color
 
 @Zen.Module
-object BestiaryMobHighlight : Feature("bestiarymobhighlight") {
+object BestiaryMobHighlight : Feature("bestiarymobhighlighter") {
     private val trackedMobs = mutableListOf<String>()
     private val highlightcolor by ConfigDelegate<Color>("highlightcolor")
 

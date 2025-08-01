@@ -404,7 +404,7 @@ object CarryCounter : Feature("carrycounter") {
         }
 
         fun complete() {
-            val sessionTime = sessionStartTime.since
+            val sessionTime = sessionStartTime.since.millis / 1000
 
             ensureDataLoaded()
 
@@ -425,7 +425,7 @@ object CarryCounter : Feature("carrycounter") {
             else carriesList.add(updatedCarry)
 
             dataUtils.save()
-            ChatUtils.addMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime / 1000}s")
+            ChatUtils.addMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime}s")
             Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
             showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000)
 

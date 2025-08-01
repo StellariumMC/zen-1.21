@@ -16,7 +16,6 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.slot.Slot
 import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.text.Text
 import net.minecraft.util.Hand
@@ -89,7 +88,10 @@ abstract class GuiEvent {
     class Close(val screen: Screen) : Event()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
     class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
-    class SlotClick(val slot: Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
+    abstract class Slot {
+        class Click(val slot: net.minecraft.screen.slot.Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
+        class Render(val context: DrawContext, val slot: net.minecraft.screen.slot.Slot) : Event()
+    }
 }
 
 abstract class ChatEvent {

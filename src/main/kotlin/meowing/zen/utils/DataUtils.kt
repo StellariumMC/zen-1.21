@@ -8,6 +8,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import meowing.zen.events.EventBus
 import meowing.zen.events.GameEvent
 import meowing.zen.utils.TimeUtils.millis
@@ -17,7 +18,8 @@ import java.io.File
 import java.lang.reflect.Type
 import java.util.concurrent.ConcurrentHashMap
 
-class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
+class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private val typeToken: TypeToken<T>? = null) {
+    constructor(fileName: String, defaultObject: T) : this(fileName, defaultObject, null)
     companion object {
         private val gson = GsonBuilder()
             .setPrettyPrinting()
@@ -73,10 +75,11 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
     private fun loadData(): T {
         return try {
             if (dataFile.exists()) {
-                gson.fromJson(dataFile.readText(), defaultObject::class.java) ?: defaultObject
+                val type = typeToken?.type ?: defaultObject::class.java
+                gson.fromJson(dataFile.readText(), type) ?: defaultObject
             } else defaultObject
         } catch (e: Exception) {
-            println("Error loading data from ${'$'}{dataFile.absolutePath}: ${'$'}{e.message}")
+            println("Error loading data from ${dataFile.absolutePath}: ${e.message}")
             defaultObject
         }
     }
@@ -86,7 +89,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T) {
         try {
             dataFile.writeText(gson.toJson(data))
         } catch (e: Exception) {
-            println("Error saving data to ${'$'}{dataFile.absolutePath}: ${'$'}{e.message}")
+            println("Error saving data to ${dataFile.absolutePath}: ${e.message}")
             e.printStackTrace()
         }
     }

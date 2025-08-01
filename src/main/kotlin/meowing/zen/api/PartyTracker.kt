@@ -57,7 +57,7 @@ object PartyTracker {
             handlePartyMessage(clean)
         })
 
-        EventBus.register<GuiEvent.SlotClick> ({ event ->
+        EventBus.register<GuiEvent.Slot.Click> ({ event ->
             if (!event.screen.chestName.startsWith("Party Finder")) return@register
 
             val stackName = event.slot?.stack?.name?.string?.removeFormatting() ?: return@register
