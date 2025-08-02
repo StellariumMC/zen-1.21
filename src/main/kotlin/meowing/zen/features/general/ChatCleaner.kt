@@ -103,7 +103,7 @@ object chatcleaner : Feature("chatcleaner") {
                 val text = chat.messages[line].content().string.removeFormatting()
 
                 if (text.isNotEmpty()) {
-                    addPattern(text, ChatFilterType.CONTAINS)
+                    addPattern(text, ChatFilterType.EQUALS)
                     ChatUtils.addMessage("$prefix §fAdded §7\"§c$text§7\" §fto filter.")
                 }
             }
