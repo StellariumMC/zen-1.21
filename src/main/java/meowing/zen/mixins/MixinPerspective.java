@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.general.RemoveSelfieCam;
+import meowing.zen.features.general.RemoveSelfieCam;
 import net.minecraft.client.option.Perspective;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

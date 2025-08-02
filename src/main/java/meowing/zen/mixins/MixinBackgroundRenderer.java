@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.noclutter.HideFog;
+import meowing.zen.features.noclutter.HideFog;
 import net.minecraft.client.render.BackgroundRenderer.FogType;
 import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;

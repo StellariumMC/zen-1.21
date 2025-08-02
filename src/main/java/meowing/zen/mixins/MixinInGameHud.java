@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.feats.noclutter.HideStatusEffects;
+import meowing.zen.features.noclutter.HideStatusEffects;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
