@@ -74,12 +74,12 @@ class TextInput(
         }
     }
 
-    fun getInput(): String {
-        return input.getText()
-    }
-
     fun onKeyInput(callback: (String) -> Unit): TextInput {
         onInputCallback = callback
         return this
+    }
+
+    fun grabFocus() {
+        input.grabWindowFocus()
     }
 }

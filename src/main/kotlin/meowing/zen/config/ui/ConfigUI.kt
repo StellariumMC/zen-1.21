@@ -611,6 +611,11 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         super.onKeyPressed(keyCode, typedChar, modifiers)
     }
 
+    override fun initScreen(width: Int, height: Int) {
+        super.initScreen(width, height)
+        searchInput.grabFocus()
+    }
+
     override fun onScreenClose() {
         super.onScreenClose()
         saveConfig()
