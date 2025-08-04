@@ -46,7 +46,7 @@ object CustomSize : Feature("customsize") {
 
     override fun initialize() {
         register<RenderEvent.PlayerPre> { event ->
-            if (scaleeveryone || event.entity == player) event.matrices.scale(customX.toFloat(), customY.toFloat(), customZ.toFloat())
+            if (scaleeveryone || event.entity.id == player?.id) event.matrices.scale(customX.toFloat(), customY.toFloat(), customZ.toFloat())
         }
     }
 }

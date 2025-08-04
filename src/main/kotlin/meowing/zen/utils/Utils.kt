@@ -3,6 +3,7 @@ package meowing.zen.utils
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -10,6 +11,10 @@ import net.minecraft.particle.ParticleTypes
 import net.minecraft.particle.SimpleParticleType
 import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.sound.SoundEvent
+import net.minecraft.text.MutableText
+import net.minecraft.text.OrderedText
+import net.minecraft.text.Text
+import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.SystemUtils
 import java.awt.Color
 
@@ -122,5 +127,111 @@ object Utils {
 
     fun createBlock(radius: Float = 0f): UIComponent {
         return if (SystemUtils.IS_OS_MAC_OSX) UIBlock() else UIRoundedRectangle(radius)
+    }
+
+    /*
+     * Modified code from Aaron's Mod
+     * https://github.com/AzureAaron/aaron-mod/blob/master/src/main/java/net/azureaaron/mod/utils/TextTransformer.java
+     */
+    fun replaceMultipleEntriesInText(text: Text, replacements: Object2ObjectLinkedOpenHashMap<String, Text>): Text {
+        val stringified = text.string
+        var newText = text as? MutableText ?: Text.empty().append(text) as MutableText
+
+        for ((wantedWord, replacementText) in replacements) {
+            val occurs = stringified.indexOf(wantedWord) != -1
+            if (!occurs) continue
+
+            val occurrences = StringUtils.countMatches(stringified, wantedWord)
+            var indexFrom = 0
+
+            repeat(occurrences) {
+                val currentString = newText.string
+                val startIndex = currentString.indexOf(wantedWord, indexFrom)
+                val endIndex = startIndex + wantedWord.length
+
+                if (startIndex == -1) return@repeat
+
+                val textComponents = newText.siblings
+
+                if (textComponents.size <= startIndex) {
+                    newText = deconstructAllComponents(newText)
+                }
+
+                val components = newText.siblings
+                if (components.size > startIndex) {
+                    components[startIndex] = replacementText
+
+                    for (i in endIndex - 1 downTo startIndex + 1) {
+                        if (i < components.size) {
+                            components.removeAt(i)
+                        }
+                    }
+                }
+
+                newText = deconstructComponents(newText)
+
+                val lengthDiff = newText.string.length - currentString.length
+                indexFrom = endIndex + lengthDiff
+            }
+        }
+
+        return newText
+    }
+
+    fun replaceMultipleEntriesInOrdered(orderedText: OrderedText, replacements: Object2ObjectLinkedOpenHashMap<String, Text>): OrderedText {
+        val text = orderedTextToText(orderedText)
+        return replaceMultipleEntriesInText(text, replacements).asOrderedText()
+    }
+
+    private fun deconstructComponents(text: Text): MutableText {
+        val currentComponents = text.siblings
+        val newText = Text.empty() as MutableText
+        val newComponents = newText.siblings
+
+        for (current in currentComponents) {
+            val currentString = current.string
+
+            if (currentString.length <= 1) {
+                newComponents.add(current)
+                continue
+            }
+
+            current.asOrderedText().accept { _, style, codePoint ->
+                newComponents.add(Text.literal(Character.toString(codePoint)).setStyle(style))
+                true
+            }
+        }
+
+        return newText
+    }
+
+    private fun deconstructAllComponents(text: Text): MutableText {
+        val newText = Text.empty() as MutableText
+        val newComponents = newText.siblings
+
+        text.asOrderedText().accept { _, style, codePoint ->
+            newComponents.add(Text.literal(Character.toString(codePoint)).setStyle(style))
+            true
+        }
+
+        for (sibling in text.siblings) {
+            sibling.asOrderedText().accept { _, style, codePoint ->
+                newComponents.add(Text.literal(Character.toString(codePoint)).setStyle(style))
+                true
+            }
+        }
+
+        return newText
+    }
+
+    private fun orderedTextToText(orderedText: OrderedText): Text {
+        val text = Text.empty() as MutableText
+
+        orderedText.accept { _, style, codePoint ->
+            text.append(Text.literal(Character.toString(codePoint)).setStyle(style))
+            true
+        }
+
+        return text
     }
 }

@@ -26,6 +26,11 @@ object meowcount : Feature("meowcount") {
                 "Meow count",
                 ElementType.Switch(false)
             ), isSectionToggle = true)
+            .addElement("Meowing", "Meow count", "", ConfigElement(
+                "",
+                null,
+                ElementType.TextParagraph("Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.")
+            ))
     }
 
     override fun initialize() {

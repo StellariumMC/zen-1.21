@@ -20,6 +20,7 @@
     "MixinPerspective",
     "MixinPlayerEntityRenderer",
     "MixinStatusEffectsDisplay",
+    "MixinTextRenderer",
     "MixinWorldRenderer"
   ],
   "injectors": {
