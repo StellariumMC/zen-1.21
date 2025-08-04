@@ -22,7 +22,7 @@
 
 <details>
   <summary><strong>General Features</strong></summary>
-
+  
 - Armor HUD
 - Arrow poison tracker
 - Block overlay
@@ -32,8 +32,11 @@
 - Calculator
 - Custom entity damage tint
 - Custom model size
+- Custom model spin
+- Custom model tilt
 - Damage Tracker
 - Entity Highlight
+- Effective Area Overlay
 - Fire freeze overlay
 - Guild message formatter
 - Party message formatter
@@ -50,15 +53,17 @@
 - Hide non-starred mob nametags
 - Hide death animation
 - Hide damage in dungeons
-- Hide fog
+- Party Display
 - Remove chat history limit
 - No hurt cam bob
+- Trash Highlighter 
+- Zealot Spawn Locations
 
 </details>
 
 <details>
   <summary><strong>Slayer Features</strong></summary>
-
+  
 - Slayer timer
 - Slayer highlight
 - Slayer stats
@@ -67,11 +72,12 @@
 - Vengeance proc timer
 - Vengeance damage tracker
 - Carry counter [a LOT of stuff]
+
 </details>
 
 <details>
   <summary><strong>Dungeons</strong></summary>
-
+  
 - Architect draft stuff
 - Blood timer
 - Crypt reminder
@@ -85,16 +91,18 @@
 - Scarf spawn timer and scarf minion spawn timers
 - Server lag timer
 - Terminal tracker
+- Mask Timers
+
 </details>
 
 <details>
   <summary><strong>Silly Features</strong></summary>
 
 - Automeow
-- Meow count
+- Meow counter
 - Meow chat sounds
 - Meow death sounds
-- Meow message translator
+- Cat speak
 </details>
 
 <div align="center"><img src='https://i.imgur.com/0KOjr5l.png'/></div>
@@ -102,9 +110,9 @@
 ### Links
 
 - [GitHub](https://github.com/kiwidotzip/zen)
-    - [Releases](https://github.com/kiwidotzip/zen/releases)
-    - [Pull Requests](https://github.com/kiwidotzip/zen/pulls)
-    - [Issues](https://github.com/kiwidotzip/zen/issues)
+  - [Releases](https://github.com/kiwidotzip/zen/releases)
+  - [Pull Requests](https://github.com/kiwidotzip/zen/pulls)
+  - [Issues](https://github.com/kiwidotzip/zen/issues)
 - [Modrinth](https://modrinth.com/mod/zenmod)
 - [Discord](https://discordapp.com/invite/KPmHQUC97G)
 
@@ -114,6 +122,7 @@
 This mod would not be possible without the following open source projects!
 
 - [Devonian](https://github.com/Synnerz/Devonian)
+- [NoammAddons](https://github.com/Noamm9/NoammAddons)
 - [Firmament/NEU](https://github.com/nea89o/Firmament)
 - [Skyhanni](https://github.com/hannibal002/SkyHanni)
 - [SkyblockTweaks](https://github.com/MrFast-js/Skyblock-Tweaks/)
