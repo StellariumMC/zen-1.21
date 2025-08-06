@@ -1,13 +1,17 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.utils.Utils.getPlayerTexture
+import meowing.zen.utils.Utils.getPlayerUuid
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.component.DataComponentTypes
+import net.minecraft.component.type.LoreComponent
 import net.minecraft.component.type.NbtComponent
 import net.minecraft.component.type.ProfileComponent
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.text.Text
 import java.util.UUID
 import kotlin.random.Random
 
@@ -41,14 +45,44 @@ object ItemUtils {
     fun ItemStack.displayName(): String = this.get(DataComponentTypes.CUSTOM_NAME)?.string ?: this.name.string
 
 
-    fun createSkull(texture: String): ItemStack {
+    fun createSkull(texture: String, displayName: String? = null, lore: List<String> = emptyList()): ItemStack {
         val uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".replace("x".toRegex()) {
             Random.nextInt(16).toString(16)
         }
         val profile = com.mojang.authlib.GameProfile(UUID.fromString(uuid), uuid)
         profile.properties.put("textures", com.mojang.authlib.properties.Property("textures", texture))
+
         return ItemStack(Items.PLAYER_HEAD).apply {
             set(DataComponentTypes.PROFILE, ProfileComponent(profile))
+
+            displayName?.let {
+                set(DataComponentTypes.CUSTOM_NAME, Text.literal(it))
+            }
+
+            if (lore.isNotEmpty()) {
+                set(DataComponentTypes.LORE, LoreComponent(
+                    lore.map { Text.literal(it) }
+                ))
+            }
         }
+    }
+
+    fun createPlayerSkullByName(
+        playerName: String,
+        displayName: String? = null,
+        lore: List<String> = emptyList(),
+        onComplete: (ItemStack?) -> Unit
+    ) {
+        getPlayerUuid(playerName,
+            onSuccess = { uuid ->
+                getPlayerTexture(uuid,
+                    onSuccess = { texture ->
+                        onComplete(createSkull(texture, displayName, lore))
+                    },
+                    onError = { onComplete(null) }
+                )
+            },
+            onError = { onComplete(null) }
+        )
     }
 }

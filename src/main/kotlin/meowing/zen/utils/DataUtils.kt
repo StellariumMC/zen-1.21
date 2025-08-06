@@ -113,10 +113,28 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
                 try {
                     val currentData = dataUtils.loadData()
                     if (currentData == dataUtils.data) return@forEach
-                } catch (ignored: Exception) {}
+                } catch (_: Exception) {}
                 dataUtils.save()
                 dataUtils.lastSavedTime = TimeUtils.now
             }
         }
     }
+}
+
+abstract class Data(fileName: String) {
+    private val dataUtils = DataUtils(fileName, this)
+
+    init {
+        dataUtils.getData().takeIf { it !== this }?.let { loaded ->
+            javaClass.declaredFields.forEach { field ->
+                field.isAccessible = true
+                runCatching {
+                    field.set(this, loaded.javaClass.getDeclaredField(field.name).apply { isAccessible = true }.get(loaded))
+                }
+            }
+        }
+        dataUtils.setData(this)
+    }
+
+    fun save() = dataUtils.save()
 }

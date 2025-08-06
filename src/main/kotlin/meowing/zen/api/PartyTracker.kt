@@ -43,9 +43,9 @@ object PartyTracker {
             val clean = event.message.string.removeFormatting()
 
             when {
-                clean.startsWith("Party Members (") || clean.matches(partyDetailsRegex) || (clean.trim().isEmpty() && hidePartyList) -> {
-                    if (clean.startsWith("Party Members (")) hidePartyList = true
+                clean.trim().matches(partyDetailsRegex) && hidePartyList -> {
                     event.cancel()
+                    handlePartyMessage(clean)
                     return@register
                 }
                 clean == "-----------------------------------------------------" && hidePartyList -> {
@@ -108,6 +108,7 @@ object PartyTracker {
                 partyMembers[playerName] = PartyMember(playerName)
                 addSelfToParty(true)
                 ChatUtils.command("/p list")
+                hidePartyList = true
                 EventBus.post(PartyEvent.Changed(PartyChangeType.MEMBER_JOINED, playerName, partyMembers.toMap()))
             }
 
@@ -187,6 +188,7 @@ object PartyTracker {
 
                 addSelfToParty(false)
                 ChatUtils.command("/p list")
+                hidePartyList = true
 
                 if (playerName == mc.player?.name?.string) partyMembers[playerName]?.leader = false
                 EventBus.post(PartyEvent.Changed(PartyChangeType.PARTY_FINDER, playerName, partyMembers.toMap()))

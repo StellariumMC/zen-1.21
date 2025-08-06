@@ -4,6 +4,9 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -233,5 +236,41 @@ object Utils {
         }
 
         return text
+    }
+
+    fun getPlayerTexture(
+        playerUuid: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit = {}
+    ) {
+        NetworkUtils.getJson(
+            url = "https://sessionserver.mojang.com/session/minecraft/profile/$playerUuid",
+            onSuccess = { json ->
+                val properties = json["properties"]?.jsonArray
+                properties?.forEach { element ->
+                    val property = element.jsonObject
+                    if (property["name"]?.jsonPrimitive?.content == "textures") {
+                        property["value"]?.jsonPrimitive?.content?.let { onSuccess(it) }
+                        return@getJson
+                    }
+                }
+                onError(IllegalArgumentException("No texture found for player UUID: $playerUuid"))
+            },
+            onError = onError
+        )
+    }
+
+    fun getPlayerUuid(
+        playerName: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit = {}
+    ) {
+        NetworkUtils.getJson(
+            url = "https://api.mojang.com/users/profiles/minecraft/$playerName",
+            onSuccess = { json ->
+                json["id"]?.jsonPrimitive?.content?.let { onSuccess(it) } ?: onError(IllegalArgumentException("No UUID found for player: $playerName"))
+            },
+            onError = onError
+        )
     }
 }
