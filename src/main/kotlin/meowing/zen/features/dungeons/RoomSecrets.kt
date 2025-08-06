@@ -1,15 +1,12 @@
 package meowing.zen.features.dungeons
 
 import meowing.zen.Zen
-import meowing.zen.api.PlayerStats
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.ChatEvent
 import meowing.zen.events.GameEvent
 import meowing.zen.events.GuiEvent
 import meowing.zen.features.Feature
-import meowing.zen.features.dungeons.FireFreezeTimer.ticks
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
 import meowing.zen.utils.removeFormatting
