@@ -4,8 +4,10 @@ import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
+import kotlin.math.max
 
 object Render2D {
+
     fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
         context.matrices.push()
         context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
@@ -30,4 +32,27 @@ object Render2D {
         context.drawItem(item, 0, 0)
         matrixStack.pop()
     }
+
+    fun String.width(): Int {
+        val newlines = this.split("\n")
+        if (newlines.size <= 1) return mc.textRenderer.getWidth(this.clearCodes())
+
+        var maxWidth = 0
+
+        for (line in newlines)
+            maxWidth = max(maxWidth, mc.textRenderer.getWidth(line.clearCodes()))
+
+        return maxWidth
+    }
+
+    fun String.height(): Int {
+        val newlines = this.split("\n")
+        if (newlines.size <= 1) return mc.textRenderer.fontHeight
+
+        return mc.textRenderer.fontHeight * (newlines.size + 1)
+    }
+
+    private val removeCodesRegex = "[\\u00a7&][0-9a-fk-or]".toRegex()
+
+    fun String.clearCodes(): String = this.replace(removeCodesRegex, "")
 }
