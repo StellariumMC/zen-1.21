@@ -35,21 +35,12 @@ object Render2D {
     }
 
     fun String.width(): Int {
-        val newlines = this.split("\n")
-        if (newlines.size <= 1) return mc.textRenderer.getWidth(this.removeFormatting())
-
-        var maxWidth = 0
-
-        for (line in newlines)
-            maxWidth = max(maxWidth, mc.textRenderer.getWidth(line.removeFormatting()))
-
-        return maxWidth
+        val lines = split('\n')
+        return lines.maxOf { mc.textRenderer.getWidth(it.removeFormatting()) }
     }
 
     fun String.height(): Int {
-        val newlines = this.split("\n")
-        if (newlines.size <= 1) return mc.textRenderer.fontHeight
-
-        return mc.textRenderer.fontHeight * (newlines.size + 1)
+        val lineCount = count { it == '\n' } + 1
+        return mc.textRenderer.fontHeight * lineCount
     }
 }
