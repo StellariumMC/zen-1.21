@@ -1,6 +1,7 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
@@ -35,12 +36,12 @@ object Render2D {
 
     fun String.width(): Int {
         val newlines = this.split("\n")
-        if (newlines.size <= 1) return mc.textRenderer.getWidth(this.clearCodes())
+        if (newlines.size <= 1) return mc.textRenderer.getWidth(this.removeFormatting())
 
         var maxWidth = 0
 
         for (line in newlines)
-            maxWidth = max(maxWidth, mc.textRenderer.getWidth(line.clearCodes()))
+            maxWidth = max(maxWidth, mc.textRenderer.getWidth(line.removeFormatting()))
 
         return maxWidth
     }
@@ -51,8 +52,4 @@ object Render2D {
 
         return mc.textRenderer.fontHeight * (newlines.size + 1)
     }
-
-    private val removeCodesRegex = "[\\u00a7&][0-9a-fk-or]".toRegex()
-
-    fun String.clearCodes(): String = this.replace(removeCodesRegex, "")
 }

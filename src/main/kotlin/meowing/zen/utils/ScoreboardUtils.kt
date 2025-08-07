@@ -1,9 +1,9 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 
 object ScoreboardUtils {
     fun getSidebarLines(cleanColor: Boolean): List<String> {
@@ -50,8 +50,4 @@ object ScoreboardUtils {
             playerInfo.displayName?.string ?: playerInfo.profile.name
         }
     }
-}
-
-fun String.removeFormatting(): String {
-    return Formatting.strip(this) ?: this
 }

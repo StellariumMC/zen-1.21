@@ -13,6 +13,9 @@ import meowing.zen.utils.Render2D.width
 import net.minecraft.client.gui.DrawContext
 
 @Zen.Module
+/**
+ * @author Eclipse-5214
+ */
 object RoomSecrets : Feature("roomsecrets", "catacombs") {
     private const val name = "Secrets Display"
 
@@ -26,7 +29,7 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 50, 30,this::HUDEditorRender)
+        HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)
 
         register<GuiEvent.HUD> { renderHUD(it.context) }
     }
@@ -76,7 +79,6 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
         Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
 
         matrix.pop()
-        // Eclipse was here :3
     }
 
     private fun getText(): String {
