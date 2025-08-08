@@ -5,7 +5,6 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
-import kotlin.math.max
 
 object Render2D {
 
