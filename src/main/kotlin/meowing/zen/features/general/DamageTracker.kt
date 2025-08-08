@@ -9,7 +9,7 @@ import meowing.zen.events.EntityEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
-import meowing.zen.utils.removeFormatting
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.text.Text
 import java.util.Optional
 

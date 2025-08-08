@@ -1,11 +1,13 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
 
 object Render2D {
+
     fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
         context.matrices.push()
         context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
@@ -29,5 +31,15 @@ object Render2D {
         matrixStack.scale(scale, scale, 1f)
         context.drawItem(item, 0, 0)
         matrixStack.pop()
+    }
+
+    fun String.width(): Int {
+        val lines = split('\n')
+        return lines.maxOf { mc.textRenderer.getWidth(it.removeFormatting()) }
+    }
+
+    fun String.height(): Int {
+        val lineCount = count { it == '\n' } + 1
+        return mc.textRenderer.fontHeight * lineCount
     }
 }
