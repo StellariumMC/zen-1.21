@@ -58,11 +58,32 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
             ), isSectionToggle = true)
     }
 
+    init {
+        EventBus.register<ChatEvent.Receive> ({ event ->
+            val text = event.message.string.removeFormatting()
+
+            when {
+                text == "You despawned your Phoenix!" -> {
+                    updateData { it.pequipped = false }
+                }
+                text.matches(AutopetRegex) -> {
+                    val pet = AutopetRegex.find(text)?.groupValues?.get(1)
+                    updateData { it.pequipped = pet == "Phoenix" }
+                }
+                text.matches(SummonRegex) -> {
+                    val pet = SummonRegex.find(text)?.groupValues?.get(1)
+                    updateData { it.pequipped = pet == "Phoenix" }
+                }
+            }
+        })
+    }
+
     override fun initialize() {
         HUDManager.registerCustom(name, 60, 57, this::HUDEditorRender)
 
         register<ChatEvent.Receive> { event ->
             val text = event.message.string.removeFormatting()
+
             when {
                 text.matches(BonzoRegex) -> {
                     BonzoTicks = (maxOf(180.0, 360.0 - getCurrentCata() * 3.6) * 20)
@@ -75,17 +96,6 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
                 text == "Your Phoenix Pet saved you from certain death!" -> {
                     PhoenixTicks = 1200.0
                     tickCall.register()
-                }
-                text == "You despawned your Phoenix!" -> {
-                    updateData { it.pequipped = false }
-                }
-                text.matches(AutopetRegex) -> {
-                    val pet = AutopetRegex.find(text)?.groupValues?.get(1)
-                    updateData { it.pequipped = pet == "Phoenix" }
-                }
-                text.matches(SummonRegex) -> {
-                    val pet = SummonRegex.find(text)?.groupValues?.get(1)
-                    updateData { it.pequipped = pet == "Phoenix" }
                 }
             }
         }
@@ -153,7 +163,7 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
     }
 
     private fun checkHelmet(name: String): Boolean {
-        return player?.inventory?.getStack(EquipmentSlot.HEAD.index)?.name?.string?.contains(name) == true
+        return player?.inventory?.getStack(39)?.name?.string?.contains(name) == true
     }
 
     private fun drawHUD(context: DrawContext, x: Float, y: Float, scale: Float, preview: Boolean, masks: List<MaskData>) {

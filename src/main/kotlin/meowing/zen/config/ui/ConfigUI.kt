@@ -21,6 +21,7 @@ import meowing.zen.config.ui.core.ConfigValidator
 import meowing.zen.config.ui.core.ElementFactory
 import meowing.zen.config.ui.elements.ColorPickerElement
 import meowing.zen.config.ui.elements.DropdownElement
+import meowing.zen.config.ui.elements.MultiCheckboxElement
 import meowing.zen.config.ui.elements.TextInputElement
 import meowing.zen.config.ui.types.*
 import meowing.zen.hud.HUDEditor
@@ -459,7 +460,8 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
                 element.type is ElementType.TextInput ||
                 element.type is ElementType.TextParagraph ||
                 element.type is ElementType.Button ||
-                element.type is ElementType.Dropdown
+                element.type is ElementType.Dropdown ||
+                element.type is ElementType.MultiCheckbox
 
         val elementHeight = when {
             isFullWidth -> 48.pixels()
@@ -508,6 +510,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         widget.onMouseClick { it ->
             it.stopPropagation()
             DropdownElement.closeAllDropdowns()
+            MultiCheckboxElement.closeAllMultiCheckboxes()
         }
 
         elementContainers[element.configKey] = elementContainer
@@ -525,6 +528,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             is ElementType.TextParagraph -> factory.createTextParagraph(element)
             is ElementType.ColorPicker -> factory.createColorPicker(element, config) { updateConfig(element.configKey, it) }
             is ElementType.Keybind -> factory.createKeybind(element, config) { updateConfig(element.configKey, it) }
+            is ElementType.MultiCheckbox -> factory.createMultiCheckbox(element, config) { updateConfig(element.configKey, it) }
         }
     }
 
@@ -583,6 +587,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         is ElementType.TextInput -> type.default
         is ElementType.ColorPicker -> type.default
         is ElementType.Keybind -> type.default
+        is ElementType.MultiCheckbox -> type.default
         else -> null
     }
 
@@ -682,6 +687,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             is ElementType.TextInput -> ConfigValue.StringValue(type.default, type.maxLength)
             is ElementType.ColorPicker -> ConfigValue.ColorValue(type.default)
             is ElementType.Keybind -> ConfigValue.IntValue(type.default)
+            is ElementType.MultiCheckbox -> ConfigValue.SetValue(type.default, 0, type.options.size - 1)
             else -> null
         }
         configValue?.let { validator.register(element.configKey, it) }
