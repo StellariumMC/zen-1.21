@@ -16,6 +16,7 @@ import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
 import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.utils.LoopUtils
+import meowing.zen.utils.NetworkUtils
 import meowing.zen.utils.SimpleTimeMark
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.millis
@@ -54,6 +55,7 @@ object CarryCounter : Feature("carrycounter") {
     private val carrybosscolor by ConfigDelegate<Color>("carrybosscolor")
     private val carryclienthighlight by ConfigDelegate<Boolean>("carryclienthighlight")
     private val carryclientcolor by ConfigDelegate<Color>("carryclientcolor")
+    private val carrywebhook by ConfigDelegate<String>("carrywebhookurl")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -76,6 +78,11 @@ object CarryCounter : Feature("carrycounter") {
                 "carryvalue",
                 "Carry value",
                 ElementType.TextInput("1.3", "1.3")
+            ))
+            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
+                "carrywebhookurl",
+                "Carry webhook URL",
+                ElementType.TextInput("", "None")
             ))
             .addElement("Slayers", "Carrying", "Carry Boss", ConfigElement(
                 "carrybosshighlight",
@@ -366,7 +373,44 @@ object CarryCounter : Feature("carrycounter") {
             lastBossTime = TimeUtils.now
             bossTimes.add(startTime.since.millis)
             cleanup()
-            if (++count >= total) complete()
+            if (++count >= total) {
+                complete()
+                val completeWebhookData =
+                    """
+                        {
+                            "content": "**Carry completed!**",
+                            "embeds": [{
+                                "title": "Carry Completed!",
+                                "description": "Player: $name\nTotal Bosses: $total\nTotal Time: ${firstBossTime.since}",
+                                "color": 16766720,
+                                "timestamp": "${java.time.Instant.now()}"
+                            }]
+                        }
+                    """.trimIndent()
+                NetworkUtils.postData(
+                    url = carrywebhook,
+                    body = completeWebhookData,
+                    onError = { println("[Zen] Carry-Webhook POST failed: ${it.message}") }
+                )
+            } else {
+                val webhookData =
+                    """
+                        {
+                            "content": "Boss killed by **$name**",
+                            "embeds": [{
+                                "title": "Boss Killed",
+                                "description": "Progress: $count/$total\nmeow :3",
+                                "color": 16711680,
+                                "timestamp": "${java.time.Instant.now()}"
+                            }]
+                        }
+                    """.trimIndent()
+                NetworkUtils.postData(
+                    url = carrywebhook,
+                    body = webhookData,
+                    onError = { println("[Zen] Carry-Webhook POST failed: ${it.message}") }
+                )
+            }
             if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")
         }
 
