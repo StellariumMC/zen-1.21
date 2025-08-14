@@ -14,10 +14,11 @@ object MetadataHandler {
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val vengdmg by ConfigDelegate<Boolean>("vengdmg")
     private val lasertimer by ConfigDelegate<Boolean>("lasertimer")
+    private val slayerhud by ConfigDelegate<Boolean>("slayerhud")
 
     init {
         EventBus.register<EntityEvent.Metadata> ({ event ->
-            if (!slayertimer && !vengdmg && !lasertimer) return@register
+            if (!slayertimer && !vengdmg && !lasertimer && !slayerhud) return@register
             val world = mc.world ?: return@register
             val player = mc.player ?: return@register
 
@@ -36,6 +37,7 @@ object MetadataHandler {
 
                     if (hasBlackhole) return@register
                     if (slayertimer) SlayerTimer.handleBossSpawn(packet.id)
+                    if (slayerhud) SlayerHUD.handleSpawn(packet.id)
                     if (vengdmg) VengDamage.handleNametagUpdate(packet.id)
                     if (lasertimer) LaserTimer.handleSpawn(packet.id)
                 }
