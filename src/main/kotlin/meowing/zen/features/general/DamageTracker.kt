@@ -71,6 +71,11 @@ object DamageTracker : Feature("damagetracker") {
                 "Track damage dealt to mobs",
                 ElementType.Switch(false)
             ), isSectionToggle = true)
+            .addElement("General", "Damage Tracker", "", ConfigElement(
+                "",
+                null,
+                ElementType.TextParagraph("This does not track the damage done by arrows shot using duplex or the extra arrows from Terminator")
+            ))
             .addElement("General", "Damage Tracker", "Options", ConfigElement(
                 "damagetrackertype",
                 "Hit detection types",
@@ -93,7 +98,7 @@ object DamageTracker : Feature("damagetracker") {
                     }
                 }
             ))
-            .addElement("Slayers", "Carrying", "GUI", ConfigElement(
+            .addElement("General", "Damage Tracker", "GUI", ConfigElement(
                 "",
                 null,
                 ElementType.TextParagraph("Use the command §c/damagetracker §rto open the Stats GUI. §7§oAlias: /zendt, /dmg")
