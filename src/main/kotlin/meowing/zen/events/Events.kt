@@ -79,6 +79,7 @@ abstract class EntityEvent {
     class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
     class Spawn(val packet: EntitySpawnS2CPacket) : Event()
     class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
+    class ArrowHit(val shooterName: String, val hitEntity: Entity) : Event()
 }
 
 abstract class GuiEvent {

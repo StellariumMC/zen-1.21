@@ -44,6 +44,7 @@ object ChatUtils {
         }
     }
 
+    @JvmOverloads
     fun addMessage(
         message: String,
         hover: String? = null,

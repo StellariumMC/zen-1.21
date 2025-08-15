@@ -2,7 +2,6 @@ package meowing.zen.config.ui.core
 
 import gg.essential.elementa.UIComponent
 import meowing.zen.config.ui.ConfigData
-import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.elements.*
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -11,9 +10,9 @@ import meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
 
 class ElementFactory(private val theme: ConfigTheme) {
-    fun createButton(element: ConfigElement, config: ConfigData, ui: ConfigUI): UIComponent {
+    fun createButton(element: ConfigElement): UIComponent {
         val type = element.type as ElementType.Button
-        return ButtonElement(type.text) { type.onClick(config, ui) }
+        return ButtonElement(type.text) { type.onClick() }
     }
 
     fun createSwitch(element: ConfigElement, config: ConfigData, roundness: Float = 3f, handleWidth: Float = 25f, onUpdate: (Any) -> Unit): UIComponent {

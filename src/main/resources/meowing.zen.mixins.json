@@ -28,6 +28,7 @@
   "mixins": [
     "AccessorPlayerInventory",
     "MixinLivingEntity",
+    "MixinPersistentProjectileEntity",
     "MixinYggdrasil"
   ]
 }
