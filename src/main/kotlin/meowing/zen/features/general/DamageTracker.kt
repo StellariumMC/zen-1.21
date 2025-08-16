@@ -53,7 +53,6 @@ data class DamageStats(
 
 @Zen.Module
 object DamageTracker : Feature("damagetracker") {
-    private val regex = "[✧✯]?(\\d{1,3}(?:,\\d{3})*)[⚔+✧❤♞☄✷ﬗ✯]*".toRegex()
     private val selectedTypes by ConfigDelegate<Set<Int>>("damagetrackertype")
     private val damagetrackersend by ConfigDelegate<Boolean>("damagetrackersend")
 

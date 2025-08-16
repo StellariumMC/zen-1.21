@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientConnection.class)
 public class MixinClientConnection {
-    @Inject(method = "channelRead0*", at = @At("HEAD"))
+    @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
     private void zen$onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
-        EventBus.INSTANCE.onPacketReceived(packet);
+        if (EventBus.INSTANCE.onPacketReceived(packet)) ci.cancel();
     }
 }

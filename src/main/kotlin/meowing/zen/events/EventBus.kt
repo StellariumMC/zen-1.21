@@ -134,17 +134,10 @@ object EventBus {
         }
     }
 
-    fun onPacketReceived(packet: Packet<*>) {
-        post(PacketEvent.Received(packet))
-        PacketReceived(packet)
-    }
+    fun onPacketReceived(packet: Packet<*>): Boolean {
+        if (post(PacketEvent.Received(packet))) return true
 
-    fun onPacketSent(packet: Packet<*>) {
-        post(PacketEvent.Sent(packet))
-    }
-
-    private fun PacketReceived(packet: Packet<*>) {
-        when (packet) {
+        return when (packet) {
             is CommonPingS2CPacket -> {
                 post(TickEvent.Server())
             }
@@ -159,10 +152,15 @@ object EventBus {
                     PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME -> {
                         post(TablistEvent.Update(packet))
                     }
-                    else -> {}
+                    else -> false
                 }
             }
+            else -> false
         }
+    }
+
+    fun onPacketSent(packet: Packet<*>) {
+        post(PacketEvent.Sent(packet))
     }
 
     /*

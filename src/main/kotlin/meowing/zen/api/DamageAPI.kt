@@ -14,7 +14,6 @@ object DamageAPI {
     private val damageRegex = "^[✧✯]?(\\d{1,3}(?:,\\d{3})*)[⚔+✧❤♞☄✷ﬗ✯]*$".toRegex()
 
     init {
-
         EventBus.register<EntityEvent.Metadata> { event ->
             val packet = event.packet
             val entity = event.entity ?: return@register
@@ -27,7 +26,7 @@ object DamageAPI {
                 val damageStr = matchResult.groupValues[1].replace(",", "")
                 val damage = damageStr.toIntOrNull() ?: return@register
 
-                post(SkyblockEvent.DamageSplash(damage, customName, entity.pos, packet, entity))
+                if (post(SkyblockEvent.DamageSplash(damage, customName, entity.pos, packet, entity))) event.cancel()
             }
         }
     }

@@ -21,6 +21,7 @@ import meowing.zen.config.ui.core.ConfigValidator
 import meowing.zen.config.ui.core.ElementFactory
 import meowing.zen.config.ui.elements.ColorPickerElement
 import meowing.zen.config.ui.elements.DropdownElement
+import meowing.zen.config.ui.elements.MCColorCode
 import meowing.zen.config.ui.elements.MultiCheckboxElement
 import meowing.zen.config.ui.elements.TextInputElement
 import meowing.zen.config.ui.types.*
@@ -544,6 +545,8 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
                 "b" to validatedValue.blue,
                 "a" to validatedValue.alpha
             )
+            is Set<*> -> validatedValue.toList()
+            is MCColorCode -> validatedValue.code
             else -> validatedValue
         }
 
@@ -633,7 +636,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     }
 
     fun addElement(categoryName: String, sectionName: String, element: ConfigElement, isSectionToggle: Boolean = false) =
-        addElement(categoryName, sectionName, "Backwards Config", element, isSectionToggle)
+        addElement(categoryName, sectionName, "Null", element, isSectionToggle)
 
     fun addElement(categoryName: String, sectionName: String, subcategoryName: String, element: ConfigElement, isSectionToggle: Boolean = false): ConfigUI {
         val isFirstCategory = categories.isEmpty()

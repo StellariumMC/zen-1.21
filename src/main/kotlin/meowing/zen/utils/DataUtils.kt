@@ -16,6 +16,7 @@ import net.fabricmc.loader.api.FabricLoader
 import java.awt.Color
 import java.io.File
 import java.lang.reflect.Type
+import java.math.BigDecimal
 import java.util.concurrent.ConcurrentHashMap
 
 class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private val typeToken: TypeToken<T>? = null) {
@@ -23,6 +24,14 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
     companion object {
         private val gson = GsonBuilder()
             .setPrettyPrinting()
+            .setObjectToNumberStrategy { reader ->
+                val value = reader.nextString()
+                val bd = value.toBigDecimal()
+                when {
+                    bd.scale() <= 0 && bd <= BigDecimal.valueOf(Int.MAX_VALUE.toLong()) && bd >= BigDecimal.valueOf(Int.MIN_VALUE.toLong()) -> bd.intValueExact()
+                    else -> bd.toDouble()
+                }
+            }
             .registerTypeAdapter(Color::class.java, object : JsonSerializer<Color>, JsonDeserializer<Color> {
                 override fun serialize(
                     src: Color,
@@ -30,10 +39,10 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
                     context: JsonSerializationContext
                 ): JsonElement {
                     val obj = JsonObject()
-                    obj.addProperty("r", src.red.toDouble())
-                    obj.addProperty("g", src.green.toDouble())
-                    obj.addProperty("b", src.blue.toDouble())
-                    obj.addProperty("a", src.alpha.toDouble())
+                    obj.addProperty("r", src.red)
+                    obj.addProperty("g", src.green)
+                    obj.addProperty("b", src.blue)
+                    obj.addProperty("a", src.alpha)
                     return obj
                 }
 
@@ -43,10 +52,10 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
                     context: JsonDeserializationContext
                 ): Color {
                     val obj = json.asJsonObject
-                    val r = obj.get("r").asFloat.toInt()
-                    val g = obj.get("g").asFloat.toInt()
-                    val b = obj.get("b").asFloat.toInt()
-                    val a = obj.get("a").asFloat.toInt()
+                    val r = obj.get("r").asInt
+                    val g = obj.get("g").asInt
+                    val b = obj.get("b").asInt
+                    val a = obj.get("a").asInt
                     return Color(r, g, b, a)
                 }
             })
