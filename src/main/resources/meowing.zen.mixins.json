@@ -7,6 +7,7 @@
     "MixinChatHud",
     "MixinClientConnection",
     "MixinClientPlayerInteraction",
+    "MixinClientPlayNetworkHandler",
     "MixinEntityRenderDispatcher",
     "MixinEntityRenderer",
     "MixinFallingBlockEntityRenderer",

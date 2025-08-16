@@ -20,6 +20,7 @@ import net.minecraft.screen.slot.SlotActionType
 import net.minecraft.text.Text
 import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 
 abstract class Event
@@ -33,6 +34,7 @@ abstract class CancellableEvent : Event() {
 abstract class SkyblockEvent {
     class ItemAbilityUsed(val ability: ItemAbility.ItemAbility) : Event()
     class EntitySpawn(val skyblockMob: EntityDetection.SkyblockMob) : Event()
+    class DamageSplash(val damage: Int, val originalName: String, val entityPos: Vec3d, val packet: EntityTrackerUpdateS2CPacket, val entity: Entity) : Event()
 }
 
 abstract class MouseEvent {
@@ -76,7 +78,7 @@ abstract class EntityEvent {
     class Leave(val entity: Entity) : Event()
     class Death(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
-    class Metadata(val packet: EntityTrackerUpdateS2CPacket) : Event()
+    class Metadata(val packet: EntityTrackerUpdateS2CPacket, val entity: Entity?) : Event()
     class Spawn(val packet: EntitySpawnS2CPacket) : Event()
     class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
     class ArrowHit(val shooterName: String, val hitEntity: Entity) : Event()

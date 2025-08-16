@@ -6,10 +6,12 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
+import meowing.zen.events.SkyblockEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
+import net.minecraft.util.math.Vec3d
 import java.util.regex.Pattern
 
 @Zen.Module
@@ -28,25 +30,21 @@ object VengDamage : Feature("vengdmg") {
     }
 
     override fun initialize() {
-        register<EntityEvent.Join> { event ->
+        register<SkyblockEvent.DamageSplash> { event ->
             if (nametagID == -1) return@register
 
-            TickUtils.scheduleServer(2) {
-                val entityName = event.entity.name.string?.removeFormatting() ?: return@scheduleServer
-                val vengMatch = veng.matcher(entityName)
-                if (!vengMatch.matches()) return@scheduleServer
+            val entityName = event.originalName.removeFormatting()
+            val vengMatch = veng.matcher(entityName)
+            if (!vengMatch.matches()) return@register
+            val name = vengMatch.group(0).replace("ﬗ", "")
 
-                val spawnedEntity = world?.getEntityById(event.entity.id) ?: return@scheduleServer
-                val nametagEntity = world?.getEntityById(nametagID) ?: return@scheduleServer
+            val nametagEntity = world?.getEntityById(nametagID) ?: return@register
+            if (event.entity.distanceTo(nametagEntity) > 5) return@register
 
-                if (spawnedEntity.distanceTo(nametagEntity) > 5) return@scheduleServer
+            val numStr = name.replace(",", "")
+            val num = numStr.toLongOrNull() ?: return@register
 
-                val numStr = vengMatch.group(0).replace("ﬗ", "").replace(",", "")
-                val num = numStr.toLongOrNull() ?: return@scheduleServer
-
-                if (num > 500000)
-                    ChatUtils.addMessage("$prefix §fVeng DMG: §c${vengMatch.group(0).replace("ﬗ", "")}")
-            }
+            if (num > 500000) ChatUtils.addMessage("$prefix §fVeng DMG: §c${name}")
         }
     }
 }

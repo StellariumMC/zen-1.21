@@ -23,7 +23,8 @@ import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
 
 object EventBus {
-    val listeners = ConcurrentHashMap<Class<*>, MutableSet<Any>>()
+    val listeners = ConcurrentHashMap<Class<*>, MutableSet<PrioritizedCallback<*>>>()
+    data class PrioritizedCallback<T>(val priority: Int, val callback: (T) -> Unit)
 
     init {
         ClientTickEvents.END_CLIENT_TICK.register { client ->
@@ -147,9 +148,6 @@ object EventBus {
             is CommonPingS2CPacket -> {
                 post(TickEvent.Server())
             }
-            is EntityTrackerUpdateS2CPacket -> {
-                post(EntityEvent.Metadata(packet))
-            }
             is EntitySpawnS2CPacket -> {
                 post(EntityEvent.Spawn(packet))
             }
@@ -171,11 +169,20 @@ object EventBus {
      * Modified from Devonian code
      * Under GPL 3.0 License
      */
-    inline fun <reified T : Event> register(noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
+    inline fun <reified T : Event> register(priority: Int = 0, noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
         val eventClass = T::class.java
         val handlers = listeners.getOrPut(eventClass) { ConcurrentHashMap.newKeySet() }
-        if (add) handlers.add(callback)
-        return EventCallImpl(callback, handlers)
+        val prioritizedCallback = PrioritizedCallback(priority, callback)
+        if (add) handlers.add(prioritizedCallback)
+        return EventCallImpl(prioritizedCallback, handlers)
+    }
+
+    inline fun <reified T : Event> register(noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
+        return register(0, callback, add)
+    }
+
+    inline fun <reified T : Event> register(noinline callback: (T) -> Unit): EventCall {
+        return register(0, callback, true)
     }
 
     fun <T : Event> post(event: T): Boolean {
@@ -183,10 +190,12 @@ object EventBus {
         val handlers = listeners[eventClass] ?: return false
         if (handlers.isEmpty()) return false
 
-        for (handler in handlers) {
+        val sortedHandlers = handlers.sortedBy { it.priority }
+
+        for (handler in sortedHandlers) {
             try {
                 @Suppress("UNCHECKED_CAST")
-                (handler as (T) -> Unit)(event)
+                (handler.callback as (T) -> Unit)(event)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -195,8 +204,8 @@ object EventBus {
     }
 
     class EventCallImpl(
-        private val callback: Any,
-        private val handlers: MutableSet<Any>
+        private val callback: PrioritizedCallback<*>,
+        private val handlers: MutableSet<PrioritizedCallback<*>>
     ) : EventCall {
         override fun unregister(): Boolean = handlers.remove(callback)
         override fun register(): Boolean = handlers.add(callback)

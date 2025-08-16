@@ -1,7 +1,6 @@
 package meowing.zen.config.ui.types
 
-import meowing.zen.config.ui.ConfigData
-import meowing.zen.config.ui.ConfigUI
+import meowing.zen.config.ui.elements.MCColorCode
 import java.awt.Color
 
 sealed class ElementType {
@@ -14,4 +13,5 @@ sealed class ElementType {
     data class ColorPicker(val default: Color) : ElementType()
     data class Keybind(val default: Int) : ElementType()
     data class MultiCheckbox(val options: List<String>, val default: Set<Int> = emptySet()) : ElementType()
+    data class MCColorPicker(val default: MCColorCode) : ElementType()
 }
