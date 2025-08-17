@@ -15,6 +15,7 @@
     "MixinHandledScreen",
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",
+    "MixinKeyboard",
     "MixinLightningEntityRenderer",
     "MixinMouse",
     "MixinPerspective",

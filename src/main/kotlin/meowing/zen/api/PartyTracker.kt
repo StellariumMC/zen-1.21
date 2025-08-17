@@ -9,7 +9,6 @@ import meowing.zen.utils.LoopUtils.setTimeout
 import meowing.zen.utils.Utils.chestName
 import meowing.zen.utils.Utils.getRegexGroups
 import meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.gui.screen.ingame.HandledScreen
 
 @Zen.Module
 object PartyTracker {

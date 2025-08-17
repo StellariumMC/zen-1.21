@@ -48,8 +48,13 @@ abstract class SkyblockEvent {
 abstract class MouseEvent {
     class Click(val button: Int) : Event()
     class Release(val button: Int) : Event()
-    class Scroll(val event: MouseEvent) : Event()
-    class Move(val event: MouseEvent) : Event()
+//    class Scroll(val event: MouseEvent) : Event()
+//    class Move(val event: MouseEvent) : Event()
+}
+
+abstract class KeyEvent {
+    class Press(val keyCode: Int, val scanCode: Int, val modifiers: Int) : Event()
+    class Release(val keyCode: Int, val scanCode: Int, val modifiers: Int) : Event()
 }
 
 abstract class TickEvent {
