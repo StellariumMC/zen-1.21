@@ -10,5 +10,3 @@ class ModMenu : ModMenuApi {
         return ConfigScreenFactory { parent: Screen? -> ModMenuCompat.createConfigScreen(parent) }
     }
 }
-
-// Testing, ignore
