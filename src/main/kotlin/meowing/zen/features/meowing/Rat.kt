@@ -17,7 +17,7 @@ import net.minecraft.util.math.Vec3d
 object Rat : Feature(area = "Hub") {
     private val position = Vec3d(-1.0, 72.0, -92.0)
     private val culling = Box(position.x, position.y, position.z, position.x + 1, position.y + 1, position.z + 1/16.0)
-    private val texture = Identifier.of("zen", "rat.png")
+    private val texture = Identifier.of("zen", "rat.jpg")
 
     override fun initialize() {
         register<RenderEvent.WorldPostEntities> { event ->
