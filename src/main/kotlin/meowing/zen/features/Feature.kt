@@ -137,6 +137,7 @@ open class Feature(
         }
     }
 
+    @Suppress("UNUSED")
     inline fun <reified T> loop(delay: Long, noinline stop: () -> Boolean = { false }, noinline action: () -> Unit): String {
         return when (T::class) {
             Timer::class -> {
@@ -148,6 +149,7 @@ open class Feature(
         }
     }
 
+    @Suppress("UNUSED")
     inline fun <reified T> loop(noinline delay: () -> Number, noinline stop: () -> Boolean = { false }, noinline action: () -> Unit): String {
         return when (T::class) {
             Timer::class -> {
