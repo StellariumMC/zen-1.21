@@ -18,7 +18,6 @@ import java.util.regex.Pattern
 object VengDamage : Feature("vengdmg") {
     private var nametagID = -1
     private val veng = Pattern.compile("^\\d+(,\\d+)*ﬗ$")
-    fun handleNametagUpdate(entityId: Int) { nametagID = entityId }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -30,6 +29,10 @@ object VengDamage : Feature("vengdmg") {
     }
 
     override fun initialize() {
+        register<SkyblockEvent.Slayer.Spawn> { event ->
+            nametagID = event.entityID
+        }
+
         register<SkyblockEvent.DamageSplash> { event ->
             if (nametagID == -1) return@register
 

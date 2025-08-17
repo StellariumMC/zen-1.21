@@ -26,9 +26,11 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 
     @Inject(method = "onEntityTrackerUpdate", at = @At("TAIL"))
     private void zen$onEntityTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity entity) {
-        if (EventBus.INSTANCE.post(new EntityEvent.Metadata(packet, entity))) {
-            if (mc != null && mc.world != null) {
-                mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+        if (entity != null) {
+            if (EventBus.INSTANCE.post(new EntityEvent.Metadata(packet, entity))) {
+                if (mc != null && mc.world != null) {
+                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+                }
             }
         }
     }

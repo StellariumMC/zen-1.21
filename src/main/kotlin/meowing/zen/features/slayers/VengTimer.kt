@@ -8,7 +8,6 @@ import meowing.zen.events.*
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
-import meowing.zen.utils.ScoreboardUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.fromNow
@@ -16,14 +15,12 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.BlazeEntity
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
 object VengTimer : Feature("vengtimer") {
     private var starttime = TimeUtils.zero
     private var hit = false
-    private val fail = Pattern.compile("^ {2}SLAYER QUEST FAILED!$")
     private var isFighting = false
     private var cachedNametag: Entity? = null
 
@@ -39,19 +36,22 @@ object VengTimer : Feature("vengtimer") {
     override fun initialize() {
         HUDManager.register("vengtimer", "§bVeng proc: §c4.3s")
 
-        register<ScoreboardEvent.Update> { event ->
-            val sidebarLines = ScoreboardUtils.getSidebarLines(true)
-
-            for (line in sidebarLines) {
-                when {
-                    line.contains("Slay the boss!") && !isFighting -> isFighting = true
-                    line.contains("Boss slain!") && isFighting -> cleanup()
-                }
-            }
+        createCustomEvent<GuiEvent.HUD>("render") {
+            if (HUDManager.isEnabled("VengTimer")) render(it.context)
         }
 
-        register<ChatEvent.Receive> { event ->
-            if (fail.matcher(event.message.string.removeFormatting()).matches() && isFighting) TickUtils.schedule(10) { cleanup() }
+        register<SkyblockEvent.Slayer.QuestStart> {
+            isFighting = true
+        }
+
+        register<SkyblockEvent.Slayer.Death> {
+            cleanup()
+        }
+
+        register<SkyblockEvent.Slayer.Fail> {
+            TickUtils.scheduleServer(10) {
+                cleanup()
+            }
         }
 
         register<EntityEvent.Attack> { event ->
@@ -70,25 +70,17 @@ object VengTimer : Feature("vengtimer") {
             if (nametagEntity != null && event.target.id == (nametagEntity.id - 3)) {
                 starttime = 6.seconds.fromNow
                 hit = true
+                registerEvent("render")
                 TickUtils.schedule(119) {
                     starttime = TimeUtils.zero
                     hit = false
+                    unregisterEvent("render")
                 }
             }
         }
-
-        register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
-    private fun cleanup() {
-        isFighting = false
-        cachedNametag = null
-        starttime = TimeUtils.zero
-    }
-
-    private fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled("vengtimer")) return
-
+    private fun render(context: DrawContext) {
         val text = getDisplayText()
         if (text.isEmpty()) return
 
@@ -106,4 +98,12 @@ object VengTimer : Feature("vengtimer") {
         }
         return ""
     }
+
+    private fun cleanup() {
+        isFighting = false
+        cachedNametag = null
+        starttime = TimeUtils.zero
+        unregisterEvent("render")
+    }
+
 }

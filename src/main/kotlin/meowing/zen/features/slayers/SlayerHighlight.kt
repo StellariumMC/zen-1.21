@@ -1,6 +1,7 @@
 package meowing.zen.features.slayers
 
 import meowing.zen.Zen
+import meowing.zen.api.EntityDetection.getSlayerEntity
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
@@ -30,8 +31,7 @@ object SlayerHighlight : Feature("slayerhighlight") {
 
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->
-            if (!SlayerTimer.isFighting || SlayerTimer.BossId == -1 || event.entity.id != SlayerTimer.BossId) return@register
-            if (player?.canSee(event.entity) == true) {
+            if (player?.canSee(event.entity) == true && event.entity == getSlayerEntity()) {
                 event.shouldGlow = true
                 event.glowColor = slayerhighlightcolor.toColorInt()
             }

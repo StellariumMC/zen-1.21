@@ -32,6 +32,14 @@ abstract class CancellableEvent : Event() {
 }
 
 abstract class SkyblockEvent {
+    abstract class Slayer {
+        class Spawn(val entity: Entity?, val entityID: Int, val packet: EntityTrackerUpdateS2CPacket) : Event()
+        class Death(val entity: Entity, val entityID: Int) : Event()
+        class Cleanup() : Event()
+        class Fail() : Event()
+        class QuestStart() : Event()
+    }
+
     class ItemAbilityUsed(val ability: ItemAbility.ItemAbility) : Event()
     class EntitySpawn(val skyblockMob: EntityDetection.SkyblockMob) : Event()
     class DamageSplash(val damage: Int, val originalName: String, val entityPos: Vec3d, val packet: EntityTrackerUpdateS2CPacket, val entity: Entity) : CancellableEvent()
@@ -78,7 +86,7 @@ abstract class EntityEvent {
     class Leave(val entity: Entity) : Event()
     class Death(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
-    class Metadata(val packet: EntityTrackerUpdateS2CPacket, val entity: Entity?) : CancellableEvent()
+    class Metadata(val packet: EntityTrackerUpdateS2CPacket, val entity: Entity) : CancellableEvent()
     class Spawn(val packet: EntitySpawnS2CPacket) : CancellableEvent()
     class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
     class ArrowHit(val shooterName: String, val hitEntity: Entity) : Event()

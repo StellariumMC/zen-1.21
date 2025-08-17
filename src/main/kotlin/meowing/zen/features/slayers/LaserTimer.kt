@@ -7,6 +7,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
+import meowing.zen.events.SkyblockEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.Render3D
 import java.awt.Color
@@ -15,7 +16,6 @@ import java.awt.Color
 object LaserTimer : Feature("lasertimer") {
     private var bossID = 0
     private val totaltime = 8.2
-    private val renderCall: EventBus.EventCall = EventBus.register<RenderEvent.WorldPostEntities> ({ drawString() }, false)
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -27,17 +27,29 @@ object LaserTimer : Feature("lasertimer") {
     }
 
     override fun initialize() {
-        register<EntityEvent.Leave> { event ->
-            if (event.entity.id == bossID) {
-                bossID = 0
-                renderCall.unregister()
-            }
+        createCustomEvent<RenderEvent.EntityPost>("render") {
+            drawString()
         }
-    }
 
-    fun handleSpawn(entityID: Int) {
-        bossID = entityID - 3
-        renderCall.register()
+        register<SkyblockEvent.Slayer.Spawn> { event ->
+            bossID = event.entityID - 3
+            registerEvent("render")
+        }
+
+        register<SkyblockEvent.Slayer.Death> {
+            bossID = 0
+            unregisterEvent("render")
+        }
+
+        register<SkyblockEvent.Slayer.Fail> {
+            bossID = 0
+            unregisterEvent("render")
+        }
+
+        register<SkyblockEvent.Slayer.Cleanup> {
+            bossID = 0
+            unregisterEvent("render")
+        }
     }
 
     private fun drawString() {
