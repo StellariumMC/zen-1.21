@@ -3,26 +3,59 @@ package meowing.zen.features.meowing
 import meowing.zen.Zen
 import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
+import meowing.zen.utils.NetworkUtils
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.block.BlockModelRenderer
 import net.minecraft.client.render.model.BlockStateManagers
+import net.minecraft.client.texture.NativeImage
+import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
+import java.io.File
 
 @Zen.Module
 object Rat : Feature(area = "Hub") {
     private val position = Vec3d(-1.0, 72.0, -92.0)
     private val culling = Box(position.x, position.y, position.z, position.x + 1, position.y + 1, position.z + 1/16.0)
-    private val texture = Identifier.of("zen", "rat.jpg")
+    private val textureId = Identifier.of("zen", "zen_rat_png")
+    private var textureLoaded = false
 
     override fun initialize() {
+        loadTexture()
         register<RenderEvent.WorldPostEntities> { event ->
-            render(event.context!!)
+            if (textureLoaded) {
+                render(event.context!!)
+            }
         }
+    }
+
+    private fun loadTexture() {
+        val cacheFile = File(mc.runDirectory, "cache/zen_rat.png")
+        cacheFile.parentFile.mkdirs()
+
+        NetworkUtils.downloadFile(
+            url = "https://github.com/meowing-xyz/zen-data/raw/main/assets/rat.png",
+            outputFile = cacheFile,
+            onComplete = { file ->
+                mc.execute {
+                    try {
+                        val image = NativeImage.read(file.inputStream())
+                        val texture = NativeImageBackedTexture({ "zen_rat" }, image)
+                        mc.textureManager.registerTexture(textureId, texture)
+                        textureLoaded = true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            },
+            onError = { error ->
+                error.printStackTrace()
+            }
+        )
     }
 
     private fun render(context: WorldRenderContext) {
@@ -63,7 +96,7 @@ object Rat : Feature(area = "Hub") {
         matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180f))
 
         val posMatrix = entry.positionMatrix
-        val overlayBuffer = consumers.getBuffer(RenderLayer.getText(texture))
+        val overlayBuffer = consumers.getBuffer(RenderLayer.getText(textureId))
         val depth = 0.9375f - 0.000488f
 
         overlayBuffer.vertex(posMatrix, 0f, 1f, depth).color(-1).texture(0f, 1f).light(15)

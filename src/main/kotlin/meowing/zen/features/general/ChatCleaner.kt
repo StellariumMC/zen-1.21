@@ -72,7 +72,7 @@ object chatcleaner : Feature("chatcleaner") {
                 "Keybind to add message to filter",
                 ElementType.Keybind(GLFW.GLFW_KEY_H)
             ))
-            .addElement("General", "Trash Highlighter", "GUI", ConfigElement(
+            .addElement("General", "Chat Cleaner", "GUI", ConfigElement(
                 "chatcleanergui",
                 "Chat Cleaner Filter GUI",
                 ElementType.Button("Open Filter GUI") {
