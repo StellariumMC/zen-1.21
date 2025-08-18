@@ -6,18 +6,13 @@ import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.ChatEvent
-import meowing.zen.events.EntityEvent
 import meowing.zen.events.EventBus
 import meowing.zen.events.SkyblockEvent
 import meowing.zen.events.TickEvent
-import meowing.zen.features.ClientTick
 import meowing.zen.utils.ChatUtils
-import meowing.zen.utils.Utils.removeFormatting
 import meowing.zen.features.Feature
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.millis
-import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.SpiderEntity
 
 @Zen.Module
@@ -52,7 +47,6 @@ object SlayerTimer : Feature("slayertimer") {
         register<SkyblockEvent.Slayer.Spawn> { _ ->
             if (!isFighting && !isSpider) {
                 startTime = TimeUtils.now
-                ChatUtils.addMessage("set time")
                 isFighting = true
                 serverTicks = 0
                 serverTickCall.register()
