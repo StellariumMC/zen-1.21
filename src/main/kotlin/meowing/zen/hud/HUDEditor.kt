@@ -9,9 +9,12 @@ import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UMatrixStack
 import meowing.zen.hud.HUDManager.setPosition
+import meowing.zen.utils.Utils.pop
+import meowing.zen.utils.Utils.push
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.text.Text
+import org.joml.Matrix3x2fStack
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 import kotlin.math.roundToInt
@@ -284,7 +287,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val popupY = (height - popupHeight) / 2
 
         context.matrices.push()
-        context.matrices.translate(0f, 0f, 300f)
+        // context.matrices.translate(0f, 0f)
         context.fill(0, 0, width, height, Color(0, 0, 0, 120).rgb)
         context.fill(popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(25, 25, 35, 240).rgb)
         drawHollowRect(context, popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(70, 130, 180, 255).rgb)

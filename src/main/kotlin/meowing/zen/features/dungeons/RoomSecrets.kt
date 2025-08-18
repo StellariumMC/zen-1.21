@@ -37,8 +37,8 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
     fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
         val matrix = context.matrices
 
-        matrix.push()
-        matrix.translate(x, y, 0f)
+        matrix.pushMatrix()
+        matrix.translate(x, y)
 
         val text1 = "§fSecrets"
         val text2 = "§a7§7/§a7"
@@ -46,12 +46,12 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
         val w1 = text1.width().toFloat()
         val w2 = text2.width().toFloat()
 
-        matrix.translate(25f, 5f, 0f)
+        matrix.translate(25f, 5f)
 
         Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
         Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
 
-        matrix.pop()
+        matrix.popMatrix()
     }
 
 
@@ -63,9 +63,9 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
 
-        matrix.push()
-        matrix.scale(scale, scale, 1f)
-        matrix.translate(x, y, 0f)
+        matrix.pushMatrix()
+        matrix.scale(scale, scale)
+        matrix.translate(x, y)
 
         val text1 = "§fSecrets"
         val text2 = getText()
@@ -73,12 +73,12 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
         val w1 = text1.width().toFloat()
         val w2 = text2.width().toFloat()
 
-        matrix.translate(25f, 5f, 0f)
+        matrix.translate(25f, 5f)
 
         Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
         Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
 
-        matrix.pop()
+        matrix.popMatrix()
     }
 
     private fun getText(): String {

@@ -9,28 +9,28 @@ import net.minecraft.util.Colors
 object Render2D {
 
     fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(x, y)
+        context.matrices.scale(scale, scale)
         context.drawText(mc.textRenderer, text, 0, 0, colors, shadow)
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 
     fun renderStringWithShadow(context: DrawContext, text: String, x: Float, y: Float, scale: Float) {
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(x, y)
+        context.matrices.scale(scale, scale)
         context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, true)
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 
     fun renderItem(context: DrawContext, item: ItemStack, x: Float, y: Float, scale: Float) {
         val matrixStack = context.matrices
-        matrixStack.push()
-        matrixStack.translate(x, y, 0.0f)
-        matrixStack.scale(scale, scale, 1f)
+        matrixStack.pushMatrix()
+        matrixStack.translate(x, y)
+        matrixStack.scale(scale, scale)
         context.drawItem(item, 0, 0)
-        matrixStack.pop()
+        matrixStack.popMatrix()
     }
 
     fun String.width(): Int {

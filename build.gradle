@@ -25,8 +25,8 @@ dependencies {
 
 	modImplementation "gg.essential:elementa:710"
 	include "gg.essential:elementa:710"
-	modImplementation "gg.essential:universalcraft-1.21.5-fabric:415"
-	include "gg.essential:universalcraft-1.21.5-fabric:415"
+	modImplementation "gg.essential:universalcraft-1.21.7-fabric:427"
+	include "gg.essential:universalcraft-1.21.7-fabric:427"
 	modImplementation "org.reflections:reflections:0.10.2"
 	include "org.reflections:reflections:0.10.2"
 	modImplementation "org.javassist:javassist:3.30.2-GA"

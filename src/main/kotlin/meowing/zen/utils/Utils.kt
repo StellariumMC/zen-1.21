@@ -17,6 +17,7 @@ import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.SystemUtils
+import org.joml.Matrix3x2fStack
 import java.awt.Color
 
 object Utils {
@@ -293,5 +294,13 @@ object Utils {
             },
             onError = onError
         )
+    }
+
+    fun Matrix3x2fStack.pop() {
+        this.popMatrix()
+    }
+
+    fun Matrix3x2fStack.push() {
+        this.pushMatrix()
     }
 }

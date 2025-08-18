@@ -69,12 +69,12 @@ object SlayerHUD : Feature("slayerhud") {
         val scale = HUDManager.getScale(name)
         val matrices = context.matrices
 
-        matrices.push()
-        matrices.translate(x, y, 0f)
+        matrices.pushMatrix()
+        matrices.translate(x, y)
         val hpWidth = hp.removeFormatting().width()
         val timeWidth = time.removeFormatting().width()
         Render2D.renderStringWithShadow(context, time, (hpWidth - timeWidth) / 2f, 0f, scale)
         Render2D.renderStringWithShadow(context, hp, 0f, 10f, scale)
-        matrices.pop()
+        matrices.popMatrix()
     }
 }
