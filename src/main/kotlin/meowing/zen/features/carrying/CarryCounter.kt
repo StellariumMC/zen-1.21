@@ -7,15 +7,14 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
-import meowing.zen.events.EventBus
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.ChatEvent
 import meowing.zen.events.GuiEvent
+import meowing.zen.features.ClientTick
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
 import meowing.zen.utils.Utils.removeFormatting
-import meowing.zen.utils.LoopUtils
 import meowing.zen.utils.NetworkUtils
 import meowing.zen.utils.SimpleTimeMark
 import meowing.zen.utils.TimeUtils
@@ -25,9 +24,7 @@ import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
-import net.minecraft.text.Text
 import java.awt.Color
-import java.util.Optional
 import java.util.concurrent.ConcurrentHashMap
 import java.util.regex.Pattern
 import kotlin.math.abs
@@ -112,28 +109,98 @@ object CarryCounter : Feature("carrycounter") {
     }
 
     override fun initialize() {
-        LoopUtils.loop(400) {
-            val world = mc.world ?: return@loop
-            val deadCarryees = carryeesByBossId.entries.mapNotNull { (bossId, carryee) ->
-                val entity = world.getEntityById(bossId)
-                if (entity == null || entity.isRemoved) carryee else null
-            }
-            deadCarryees.forEach { it.reset() }
-        }
+        setupLoops {
+            loop<ClientTick>(200) {
+                val world = world ?: return@loop
+                val deadCarryees = carryeesByBossId.entries.mapNotNull { (bossId, carryee) ->
+                    val entity = world.getEntityById(bossId)
+                    if (entity == null || !entity.isAlive) carryee else null
+                }
 
-        register<ChatEvent.Receive> { event ->
-            val text = event.message.string.removeFormatting()
-            tradeInit.matcher(text).let { matcher ->
-                if (matcher.matches()) {
-                    lasttradeuser = matcher.group(1)
-                    ChatEvents.register()
-                    LoopUtils.setTimeout(2000, { ChatEvents.unregister() })
+                deadCarryees.forEach {
+                    it.reset()
                 }
             }
         }
 
-        CarryHUD.initialize()
+        register<ChatEvent.Receive> { event ->
+            val text = event.message.string.removeFormatting()
 
+            tradeInit.matcher(text).let { matcher ->
+                if (matcher.matches()) {
+                    lasttradeuser = matcher.group(1)
+                    return@register
+                }
+            }
+
+            tradeComp.matcher(text).let { matcher ->
+                if (matcher.matches()) {
+                    val coins = matcher.group(1).toDoubleOrNull() ?: return@let
+                    val carry = carryvalue.split(',')
+                        .mapNotNull { it.trim().toDoubleOrNull() }
+                        .find { abs(coins / it - round(coins / it)) < 1e-6 } ?: return@let
+                    val count = round(coins / carry).toInt()
+                    lasttradeuser?.let { user ->
+                        ChatUtils.addMessage(
+                            "$prefix §fAdd §b$user §ffor §b$count §fcarries? ",
+                            "§aAdd",
+                            ClickEvent.Action.RUN_COMMAND,
+                            "/zencarry add $user $count"
+                        )
+                    }
+                }
+            }
+
+            playerDead.matcher(text).let { matcher ->
+                if (matcher.matches() && matcher.group(2) in bossNames) {
+                    carryeesByName[matcher.group(1)]?.reset()
+                }
+            }
+        }
+
+        createCustomEvent<EntityEvent.Metadata>("entityMetadata") { event ->
+            val name = event.name
+            if (name.contains("Spawned by")) {
+                val hasBlackhole = event.entity.let { entity ->
+                    world?.entities?.any { Entity ->
+                        entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
+                    }
+                } ?: false
+
+                if (hasBlackhole) return@createCustomEvent
+                val spawnerName = name.substringAfter("by: ")
+                carryeesByName[spawnerName]?.onSpawn(event.packet.id - 3)
+            }
+        }
+
+        createCustomEvent<EntityEvent.Death>("entityDeath") { event ->
+            carryeesByBossId[event.entity.id]?.let {
+                val seconds = (it.startTime.since.millis / 1000.0)
+                ChatUtils.addMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(seconds)}s")
+                it.onDeath()
+            }
+        }
+
+        createCustomEvent<RenderEvent.EntityGlow>("bossGlow") { event ->
+            if (!carrybosshighlight) return@createCustomEvent
+            carryeesByBossId[event.entity.id]?.let {
+                if (player?.canSee(event.entity) == false) return@let
+                event.shouldGlow = true
+                event.glowColor = carrybosscolor.toColorInt()
+            }
+        }
+
+        createCustomEvent<RenderEvent.EntityGlow>("clientGlow") { event ->
+            if (!carryclienthighlight) return@createCustomEvent
+            val cleanName = event.entity.name.string.removeFormatting()
+            carryeesByName[cleanName]?.let {
+                if (player?.canSee(event.entity) == false) return@let
+                event.shouldGlow = true
+                event.glowColor = carryclientcolor.toColorInt()
+            }
+        }
+
+        CarryHUD.initialize()
         register<GuiEvent.HUD> { CarryHUD.renderHUD(it.context) }
     }
 
@@ -156,13 +223,15 @@ object CarryCounter : Feature("carrycounter") {
 
     private fun checkRegistration() {
         if (carryeesByName.isNotEmpty()) {
-            EntityEvents.register()
-            RenderBossEntity.register()
-            RenderPlayerEntity.register()
+            registerEvent("entityMetadata")
+            registerEvent("entityDeath")
+            registerEvent("bossGlow")
+            registerEvent("clientGlow")
         } else {
-            EntityEvents.unregister()
-            RenderBossEntity.unregister()
-            RenderPlayerEntity.unregister()
+            unregisterEvent("entityMetadata")
+            unregisterEvent("entityDeath")
+            unregisterEvent("bossGlow")
+            unregisterEvent("clientGlow")
         }
         CarryHUD.checkRegistration()
     }
@@ -195,147 +264,6 @@ object CarryCounter : Feature("carrycounter") {
         carryeesByName.clear()
         carryeesByBossId.clear()
         checkRegistration()
-    }
-
-    object EntityEvents {
-        private var registered = false
-        private val events = mutableListOf<EventBus.EventCall>()
-
-        fun register() {
-            if (registered) return
-            events.add(EventBus.register<EntityEvent.Metadata> ({ event ->
-                val packet = event.packet
-                packet.trackedValues?.find { it.id == 2 && it.value is Optional<*> }?.let { obj ->
-                    val optional = obj.value as Optional<*>
-                    val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
-                    if (name.contains("Spawned by")) {
-                        val targetEntity = world?.getEntityById(packet.id)
-                        val hasBlackhole = targetEntity?.let { entity ->
-                            world?.entities?.any { Entity ->
-                                entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
-                            }
-                        } ?: false
-
-                        if (hasBlackhole) return@let
-                        val spawnerName = name.substringAfter("by: ")
-                        carryeesByName[spawnerName]?.onSpawn(event.packet.id - 3)
-                    }
-                }
-            }))
-
-            events.add(EventBus.register<EntityEvent.Death> ({ event ->
-                carryeesByBossId[event.entity.id]?.let {
-                    val seconds = (it.startTime.since.millis / 1000.0)
-                    ChatUtils.addMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(seconds)}s")
-                    it.onDeath()
-                }
-            }))
-            registered = true
-        }
-
-        fun unregister() {
-            if (!registered) return
-            events.forEach { it.unregister() }
-            events.clear()
-            registered = false
-        }
-    }
-
-    object RenderBossEntity {
-        private var registered = false
-        private val events = mutableListOf<EventBus.EventCall>()
-
-        fun register() {
-            if (registered || !carrybosshighlight) return
-            events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
-                carryeesByBossId[event.entity.id]?.let {
-                    if (player?.canSee(event.entity) == false) return@let
-                    event.shouldGlow = true
-                    event.glowColor = carrybosscolor.toColorInt()
-                }
-            }))
-            registered = true
-        }
-
-        fun unregister() {
-            if (!registered) return
-            events.forEach { it.unregister() }
-            events.clear()
-            registered = false
-        }
-    }
-
-    object RenderPlayerEntity {
-        private var registered = false
-        private val events = mutableListOf<EventBus.EventCall>()
-
-        fun register() {
-            if (registered || !carryclienthighlight) return
-            events.add(EventBus.register<RenderEvent.EntityGlow> ({ event ->
-                val cleanName = event.entity.name.string.removeFormatting()
-                carryeesByName[cleanName]?.let {
-                    if (player?.canSee(event.entity) == false) return@let
-                    event.shouldGlow = true
-                    event.glowColor = carryclientcolor.toColorInt()
-                }
-            }))
-            registered = true
-        }
-
-        fun unregister() {
-            if (!registered) return
-            events.forEach { it.unregister() }
-            events.clear()
-            registered = false
-        }
-    }
-
-    object ChatEvents {
-        private var registered = false
-        private val events = mutableListOf<EventBus.EventCall>()
-
-        fun register() {
-            if (registered) return
-            events.add(EventBus.register<ChatEvent.Receive> ({ event ->
-                val text = event.message.string.removeFormatting()
-
-                tradeComp.matcher(text).let { matcher ->
-                    if (matcher.matches()) {
-                        val coins = matcher.group(1).toDoubleOrNull() ?: return@let
-                        val carry = carryvalue.split(',')
-                            .mapNotNull { it.trim().toDoubleOrNull() }
-                            .find { abs(coins / it - round(coins / it)) < 1e-6 } ?: return@let
-                        val count = round(coins / carry).toInt()
-                        lasttradeuser?.let { user ->
-                            ChatUtils.addMessage(
-                                "$prefix §fAdd §b$user §ffor §b$count §fcarries? ",
-                                "§aAdd",
-                                ClickEvent.Action.RUN_COMMAND,
-                                "/zencarry add $user $count"
-                            )
-                        }
-                        return@register
-                    }
-                }
-
-                playerDead.matcher(text).let { matcher ->
-                    if (matcher.matches() && matcher.group(2) in bossNames) {
-                        carryeesByName[matcher.group(1)]?.reset()
-                    }
-                }
-
-                lasttradeuser = null
-                LoopUtils.setTimeout(500) { unregister() }
-            }))
-            registered = true
-        }
-
-        fun unregister() {
-            if (!registered) return
-            events.forEach { it.unregister() }
-            events.clear()
-            registered = false
-        }
     }
 
     data class CarryLogs(val completedCarries: MutableList<CompletedCarry> = mutableListOf())
@@ -380,6 +308,7 @@ object CarryCounter : Feature("carrycounter") {
             cleanup()
             if (++count >= total) {
                 complete()
+                if (carrywebhook.isEmpty()) return
                 val completeWebhookData =
                     """
                         {
@@ -397,7 +326,7 @@ object CarryCounter : Feature("carrycounter") {
                     body = completeWebhookData,
                     onError = { println("[Zen] Carry-Webhook POST failed: ${it.message}") }
                 )
-            } else {
+            } else if (carrywebhook.isNotEmpty()) {
                 val webhookData =
                     """
                         {

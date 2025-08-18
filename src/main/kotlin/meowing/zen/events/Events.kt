@@ -91,7 +91,7 @@ abstract class EntityEvent {
     class Leave(val entity: Entity) : Event()
     class Death(val entity: Entity) : Event()
     class Attack(val player: PlayerEntity, val target: Entity) : Event()
-    class Metadata(val packet: EntityTrackerUpdateS2CPacket, val entity: Entity) : CancellableEvent()
+    class Metadata(val packet: EntityTrackerUpdateS2CPacket, val entity: Entity, val name: String) : CancellableEvent()
     class Spawn(val packet: EntitySpawnS2CPacket) : CancellableEvent()
     class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
     class ArrowHit(val shooterName: String, val hitEntity: Entity) : Event()

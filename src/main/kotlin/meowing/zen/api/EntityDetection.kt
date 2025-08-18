@@ -13,8 +13,6 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.Entity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.projectile.ArrowEntity
-import net.minecraft.text.Text
-import java.util.Optional
 
 @Zen.Module
 object EntityDetection {
@@ -70,24 +68,19 @@ object EntityDetection {
             val world = mc.world ?: return@register
             val player = mc.player ?: return@register
 
-            event.packet.trackedValues()
-                ?.firstOrNull { it.id == 2 && it.value is Optional<*> }
-                ?.let { obj ->
-                    val optional = obj.value as Optional<*>
-                    val name = (optional.orElse(null) as? Text)?.string?.removeFormatting() ?: return@let
-                    if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {
-                        val hasBlackhole = world.entities.any {
-                            event.entity.distanceTo(it) <= 3f && it.name?.string?.removeFormatting()?.contains("black hole", true) == true
-                        }
-
-                        if (!hasBlackhole) {
-                            bossID = event.packet.id - 3
-                            SlayerEntity = world.getEntityById(event.packet.id - 3)
-                            inSlayerFight = true
-                            post(SkyblockEvent.Slayer.Spawn(event.entity, event.entity.id, event.packet))
-                        }
-                    }
+            val name = event.name
+            if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {
+                val hasBlackhole = world.entities.any {
+                    event.entity.distanceTo(it) <= 3f && it.name?.string?.removeFormatting()?.contains("black hole", true) == true
                 }
+
+                if (!hasBlackhole) {
+                    bossID = event.packet.id - 3
+                    SlayerEntity = world.getEntityById(event.packet.id - 3)
+                    inSlayerFight = true
+                    post(SkyblockEvent.Slayer.Spawn(event.entity, event.entity.id, event.packet))
+                }
+            }
         }
 
         EventBus.register<EntityEvent.Death> { event ->

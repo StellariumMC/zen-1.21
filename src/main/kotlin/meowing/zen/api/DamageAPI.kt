@@ -6,8 +6,6 @@ import meowing.zen.events.EventBus
 import meowing.zen.events.EventBus.post
 import meowing.zen.events.SkyblockEvent
 import meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.text.Text
-import java.util.*
 
 @Zen.Module
 object DamageAPI {
@@ -16,18 +14,14 @@ object DamageAPI {
     init {
         EventBus.register<EntityEvent.Metadata> { event ->
             val packet = event.packet
-            val entity = event.entity ?: return@register
-            packet.trackedValues?.let { trackedValues ->
-                val nameData = trackedValues.find { it.id == 2 } ?: return@register
-                val customName = (((nameData.value as? Optional<*>)?.orElse(null)) as? Text)?.string ?: return@register
+            val entity = event.entity
+            val name = event.name
 
-                val matchResult = damageRegex.find(customName.removeFormatting()) ?: return@register
+            val matchResult = damageRegex.find(name.removeFormatting()) ?: return@register
+            val damageStr = matchResult.groupValues[1].replace(",", "")
+            val damage = damageStr.toIntOrNull() ?: return@register
 
-                val damageStr = matchResult.groupValues[1].replace(",", "")
-                val damage = damageStr.toIntOrNull() ?: return@register
-
-                if (post(SkyblockEvent.DamageSplash(damage, customName, entity.pos, packet, entity))) event.cancel()
-            }
+            if (post(SkyblockEvent.DamageSplash(damage, name, entity.pos, packet, entity))) event.cancel()
         }
     }
 }
