@@ -24,7 +24,7 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 object UpdateChecker {
-    private const val current = "1.1.3"
+    private const val current = "1.1.4"
     private var isMessageShown = false
     private var latestVersion: String? = null
     private var githubUrl: String? = null
@@ -86,9 +86,18 @@ object UpdateChecker {
                 object : TypeToken<List<ModrinthVersion>>() {}.type
             )
 
-            versions.filter {
-                it.loaders.contains("fabric") && it.status == "listed" && it.version_type == "release" && it.game_versions.contains("1.21.5")
-            }.maxByOrNull { it.date_published }?.let { version ->
+            val filteredVersions =
+                //#if MC == 1.21.7
+                //$$ versions.filter {
+                //$$     it.loaders.contains("fabric") && it.status == "listed" && it.version_type == "release" && it.game_versions.contains("1.21.7")
+                //$$ }
+                //#else
+                versions.filter {
+                    it.loaders.contains("fabric") && it.status == "listed" && it.version_type == "release" && it.game_versions.contains("1.21.5")
+                }
+                //#endif
+
+            filteredVersions.maxByOrNull { it.date_published }?.let { version ->
                 val primaryFile = version.files.firstOrNull { it.primary } ?: version.files.firstOrNull()
                 primaryFile?.let {
                     Triple(version.version_number, "https://modrinth.com/mod/zenmod/version/${version.id}", it.url)
@@ -459,7 +468,12 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
 
         modsDir.listFiles()?.find { it.name.lowercase().contains("zen") && it.extension == "jar" }?.delete()
 
-        val fileName = "zen-1.21.5-fabric-${UpdateChecker.getLatestVersion()}.jar"
+        val fileName =
+            //#if MC == 1.21.7
+            //$$ "zen-1.21.7-fabric-${UpdateChecker.getLatestVersion()}.jar"
+            //#else
+            "zen-1.21.5-fabric-${UpdateChecker.getLatestVersion()}.jar"
+            //#endif
         val outputFile = File(modsDir, fileName)
 
         NetworkUtils.downloadFile(

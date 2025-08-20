@@ -55,11 +55,3 @@ dependencies {
         modImplementation(includeOrShade("org.spongepowered:mixin:0.7.11-SNAPSHOT")!!)
     }
 }
-
-tasks {
-    fatJar {
-        if (mcData.isLegacyForge) {
-            // yippee
-        }
-    }
-}
