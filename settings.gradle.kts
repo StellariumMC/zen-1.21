@@ -1,5 +1,3 @@
-import groovy.lang.MissingPropertyException
-
 pluginManagement {
     repositories {
         // Repositories
@@ -11,7 +9,6 @@ pluginManagement {
         maven("https://server.bbkr.space/artifactory/libs-release/")
         maven("https://jitpack.io/")
         maven("https://maven.terraformersmc.com/")
-        maven("https://repo.essential.gg/repository/maven-public")
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
 
         // Snapshots
@@ -29,8 +26,7 @@ pluginManagement {
     }
 }
 
-val projectName: String = extra["mod.name"]?.toString()
-    ?: throw MissingPropertyException("mod.name has not been set.")
+val projectName: String = extra["mod.name"].toString()
 
 rootProject.name = projectName
 rootProject.buildFileName = "root.gradle.kts"

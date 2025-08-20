@@ -33,20 +33,18 @@ toolkitLoomHelper {
 }
 
 dependencies {
-    val omnicoreVersion = "0.47.0"
-    modImplementation("dev.deftu:omnicore-$mcData:$omnicoreVersion")
-
     if (mcData.isFabric) {
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
         modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
         modImplementation("gg.essential:elementa:710")
-        includeOrShade("gg.essential:elementa:710")
+        shade("gg.essential:elementa:710")
         modImplementation("gg.essential:universalcraft-${mcData}:427")
-        includeOrShade("gg.essential:universalcraft-${mcData}:427")
+        shade("gg.essential:universalcraft-${mcData}:427")
         modImplementation("org.reflections:reflections:0.10.2")
         includeOrShade("org.reflections:reflections:0.10.2")
         modImplementation("org.javassist:javassist:3.30.2-GA")
         includeOrShade("org.javassist:javassist:3.30.2-GA")
+
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
         } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
@@ -57,17 +55,13 @@ dependencies {
         implementation(includeOrShade("org.jetbrains.kotlin:kotlin-reflect:1.6.10")!!)
 
         modImplementation(includeOrShade("org.spongepowered:mixin:0.7.11-SNAPSHOT")!!)
-
-        includeOrShade("dev.deftu:omnicore-$mcData:$omnicoreVersion")
     }
 }
 
 tasks {
-
     fatJar {
         if (mcData.isLegacyForge) {
-            relocate("dev.deftu.omnicore", "dev.deftu.favorita.omnicore")
+            // yippee
         }
     }
-
 }
