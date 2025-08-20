@@ -48,14 +48,19 @@ class HUDElement(
 
     fun render(context: DrawContext, mouseX: Float, mouseY: Float, partialTicks: Float, previewMode: Boolean) {
         if (!enabled && previewMode) return
-
         val renderX = getRenderX()
         val renderY = getRenderY()
         val isHovered = isMouseOver(mouseX, mouseY)
 
-        context.matrices.pushMatrix()
-        context.matrices.translate(renderX, renderY)
-        context.matrices.scale(scale, scale)
+        //#if MC >= 1.21.7
+        //$$ context.matrices.pushMatrix()
+        //$$ context.matrices.translate(renderX, renderY)
+        //$$ context.matrices.scale(scale, scale)
+        //#else
+        context.matrices.push()
+        context.matrices.translate(renderX, renderY, 0f)
+        context.matrices.scale(scale, scale, 1f)
+        //#endif
 
         val customRenderer = HUDManager.getCustomRenderer(name)
         if (customRenderer != null) {
@@ -70,7 +75,11 @@ class HUDElement(
             renderDefault(context, previewMode, isHovered)
         }
 
-        context.matrices.popMatrix()
+        //#if MC >= 1.21.7
+        //$$ context.matrices.popMatrix()
+        //#else
+        context.matrices.pop()
+        //#endif
     }
 
     private fun renderCustomBackground(context: DrawContext, isHovered: Boolean, customWidth: Int, customHeight: Int) {

@@ -100,7 +100,7 @@ object chatcleaner : Feature("chatcleaner") {
             val line = chat.getMessageLineIdx(chat.toChatLineMX(mouseX), chat.toChatLineMY(mouseY))
 
             if (line >= 0 && line < chat.visibleMessages.size && line < chat.messages.size) {
-                val text = chat.messages[line].content().string.removeFormatting()
+                val text = chat.messages[line].comp_893().string.removeFormatting()
 
                 if (text.isNotEmpty()) {
                     addPattern(text, ChatFilterType.EQUALS)
