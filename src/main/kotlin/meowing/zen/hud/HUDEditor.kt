@@ -283,8 +283,14 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         val popupX = (width - popupWidth) / 2
         val popupY = (height - popupHeight) / 2
 
+        //#if MC >= 1.21.7
+        //$$ context.matrices.pushMatrix()
+        //#else
         context.matrices.push()
-        context.matrices.translate(0f, 0f, 300f)
+        //#endif
+        //#if MC == 1.21.5
+        //$$ context.matrices.translate(0f, 0f, 300f)
+        //#endif
         context.fill(0, 0, width, height, Color(0, 0, 0, 120).rgb)
         context.fill(popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(25, 25, 35, 240).rgb)
         drawHollowRect(context, popupX, popupY, popupX + popupWidth, popupY + popupHeight, Color(70, 130, 180, 255).rgb)
@@ -328,7 +334,11 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         context.drawTextWithShadow(textRenderer, confirmText, confirmTextX, textY, Color.WHITE.rgb)
         context.drawTextWithShadow(textRenderer, cancelText, cancelTextX, textY, Color.WHITE.rgb)
 
+        //#if MC >= 1.21.7
+        //$$ context.matrices.popMatrix()
+        //#else
         context.matrices.pop()
+        //#endif
     }
 
     private fun drawTooltips(context: DrawContext) {

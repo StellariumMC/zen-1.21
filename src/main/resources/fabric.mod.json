@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "zen",
-	"version": "${version}",
-	"name": "Zen",
+	"id": "${mod_id}",
+	"version": "${mod_version}",
+	"name": "${mod_name}",
 	"description": "QOL Mod",
 	"authors": ["Kiwi"],
 	"contact": {
@@ -34,11 +34,11 @@
 		}
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.5",
-		"java": ">=21",
-		"fabric-api": "*",
-		"fabric-language-kotlin": "*"
+      "minecraft": "~${minor_mc_version}",
+      "fabric": "*",
+      "fabricloader": ">=0.15.11",
+      "fabric-language-kotlin": "*",
+      "omnicore": "*"
 	},
 	"suggests": {
 		"modmenu": "*"

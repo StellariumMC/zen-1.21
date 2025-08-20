@@ -9,28 +9,47 @@ import net.minecraft.util.Colors
 object Render2D {
 
     fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
+        //#if MC >= 1.21.7
+        //$$ context.matrices.pushMatrix()
+        //$$ context.matrices.translate(x, y)
+        //$$ context.matrices.scale(scale, scale)
+        //#else
         context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
+        context.matrices.translate(x, y, 0f)
+        context.matrices.scale(scale, scale, 1f)
+        //#endif
+
         context.drawText(mc.textRenderer, text, 0, 0, colors, shadow)
+
+        //#if MC >= 1.21.7
+        //$$ context.matrices.popMatrix()
+        //#else
         context.matrices.pop()
+        //#endif
     }
 
-    fun renderStringWithShadow(context: DrawContext, text: String, x: Float, y: Float, scale: Float) {
-        context.matrices.push()
-        context.matrices.translate(x.toDouble(), y.toDouble(), 0.0)
-        context.matrices.scale(scale, scale, 1.0f)
-        context.drawText(mc.textRenderer, text, 0, 0, Colors.WHITE, true)
-        context.matrices.pop()
+    fun renderStringWithShadow(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE) {
+        renderString(context, text, x, y, scale, colors, true)
     }
 
     fun renderItem(context: DrawContext, item: ItemStack, x: Float, y: Float, scale: Float) {
-        val matrixStack = context.matrices
-        matrixStack.push()
-        matrixStack.translate(x, y, 0.0f)
-        matrixStack.scale(scale, scale, 1f)
+        //#if MC >= 1.21.7
+        //$$ context.matrices.pushMatrix()
+        //$$ context.matrices.translate(x, y)
+        //$$ context.matrices.scale(scale, scale)
+        //#else
+        context.matrices.push()
+        context.matrices.translate(x, y, 0f)
+        context.matrices.scale(scale, scale, 1f)
+        //#endif
+
         context.drawItem(item, 0, 0)
-        matrixStack.pop()
+
+        //#if MC >= 1.21.7
+        //$$ context.matrices.popMatrix()
+        //#else
+        context.matrices.pop()
+        //#endif
     }
 
     fun String.width(): Int {

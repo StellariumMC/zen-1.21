@@ -15,10 +15,19 @@ import static meowing.zen.features.general.ContributorColor.replaceText;
 
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
+    //#if MC >= 1.21.7
+    //$$ @WrapOperation(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V"))
+    //$$ private void zen$shadowedNametags(TextRenderer textRenderer, Text text, float x, float y, int colour, boolean shadow, Matrix4f matrix, VertexConsumerProvider vertexConsumers, TextRenderer.TextLayerType layerType, int backgroundColour, int light, Operation<Integer> original) {
+    //$$    OrderedText replacedText = replaceText(text.asOrderedText());
+    //$$    x = -textRenderer.getWidth(replacedText) / 2f;
+    //$$    original.call(textRenderer, text, x, y, colour, shadow, matrix, vertexConsumers, layerType, backgroundColour, light);
+    //$$ }
+    //#else
     @WrapOperation(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)I"))
     private int zen$shadowedNametags(TextRenderer textRenderer, Text text, float x, float y, int colour, boolean shadow, Matrix4f matrix, VertexConsumerProvider vertexConsumers, TextRenderer.TextLayerType layerType, int backgroundColour, int light, Operation<Integer> original) {
         OrderedText replacedText = replaceText(text.asOrderedText());
         x = -textRenderer.getWidth(replacedText) / 2f;
         return original.call(textRenderer, text, x, y, colour, shadow, matrix, vertexConsumers, layerType, backgroundColour, light);
     }
+    //#endif
 }

@@ -34,51 +34,73 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
         register<GuiEvent.HUD> { renderHUD(it.context) }
     }
 
-    fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean){
+    fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
         val matrix = context.matrices
-
+        //#if MC >= 1.21.7
+        //$$ matrix.pushMatrix()
+        //$$ matrix.translate(x, y)
+        //#else
         matrix.push()
         matrix.translate(x, y, 0f)
+        //#endif
 
         val text1 = "§fSecrets"
         val text2 = "§a7§7/§a7"
-
         val w1 = text1.width().toFloat()
         val w2 = text2.width().toFloat()
 
+        //#if MC >= 1.21.7
+        //$$ matrix.translate(25f, 5f)
+        //#else
         matrix.translate(25f, 5f, 0f)
+        //#endif
 
         Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
         Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
 
+        //#if MC >= 1.21.7
+        //$$ matrix.popMatrix()
+        //#else
         matrix.pop()
+        //#endif
     }
-
 
     private fun renderHUD(context: DrawContext) {
         if (!HUDManager.isEnabled(name)) return
         val matrix = context.matrices
-
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
 
+        //#if MC >= 1.21.7
+        //$$ matrix.pushMatrix()
+        //$$ matrix.scale(scale, scale)
+        //$$ matrix.translate(x, y)
+        //#else
         matrix.push()
         matrix.scale(scale, scale, 1f)
         matrix.translate(x, y, 0f)
+        //#endif
 
         val text1 = "§fSecrets"
         val text2 = getText()
-
         val w1 = text1.width().toFloat()
         val w2 = text2.width().toFloat()
 
+        //#if MC >= 1.21.7
+        //$$ matrix.translate(25f, 5f)
+        //#else
         matrix.translate(25f, 5f, 0f)
+        //#endif
 
         Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
         Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
 
+        //#if MC >= 1.21.7
+        //$$ matrix.popMatrix()
+        //#else
         matrix.pop()
+        //#endif
     }
 
     private fun getText(): String {

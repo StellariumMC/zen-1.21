@@ -10,7 +10,11 @@ import static meowing.zen.features.general.ContributorColor.replaceText;
 
 @Mixin(TextRenderer.class)
 public class MixinTextRenderer {
+    //#if MC >= 1.21.7
+    //$$ @ModifyVariable(method = "prepare(Lnet/minecraft/text/OrderedText;FFIZI)Lnet/minecraft/client/font/TextRenderer$GlyphDrawable;", at = @At("HEAD"), argsOnly = true)
+    //#else
     @ModifyVariable(method = "drawInternal(Lnet/minecraft/text/OrderedText;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;IIZ)I", at = @At("HEAD"), argsOnly = true)
+    //#endif
     private OrderedText zen$visuallyReplaceOrderedText(OrderedText text) {
         return replaceText(text);
     }

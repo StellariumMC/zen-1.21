@@ -81,6 +81,8 @@ object ChatUtils {
                 ClickEvent.Action.OPEN_FILE -> ClickEvent.OpenFile(clickValue)
                 ClickEvent.Action.CHANGE_PAGE -> ClickEvent.ChangePage(clickValue.toIntOrNull() ?: 1)
                 ClickEvent.Action.COPY_TO_CLIPBOARD -> ClickEvent.CopyToClipboard(clickValue)
+                // TODO: add?
+                else -> ClickEvent.RunCommand("Not Added.")
             }
             style = style.withClickEvent(clickEvent)
         }

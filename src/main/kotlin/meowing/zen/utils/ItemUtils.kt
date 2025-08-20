@@ -26,7 +26,7 @@ object ItemUtils {
 
     inline val ItemStack?.skyblockID: String get() = this?.extraAttributes?.getString("id")?.orElse("") ?: ""
 
-    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponentTypes.LORE)?.lines?.map { it.string } ?: emptyList()
+    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponentTypes.LORE)?.comp_2400?.map { it.string } ?: emptyList()
 
     inline val ItemStack?.uuid: String get() = this?.extraAttributes?.getString("uuid")?.orElse("") ?: ""
 

@@ -12,7 +12,7 @@ object ScoreboardUtils {
 
         return scoreboard.getScoreboardEntries(objective)
             .mapNotNull { entry ->
-                entry.owner()?.let { owner ->
+                entry.comp_2127()?.let { owner ->
                     stripAlienCharacters(
                         scoreboard.getTeam(owner)?.decorateName(Text.literal(owner))?.string ?: owner
                     ).let {
