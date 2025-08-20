@@ -36,20 +36,18 @@ dependencies {
     if (mcData.isFabric) {
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
         modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-        modImplementation("gg.essential:elementa:710")
-        shade("gg.essential:elementa:710")
-        modImplementation("gg.essential:universalcraft-${mcData}:427")
-        shade("gg.essential:universalcraft-${mcData}:427")
-        modImplementation("org.reflections:reflections:0.10.2")
-        includeOrShade("org.reflections:reflections:0.10.2")
-        modImplementation("org.javassist:javassist:3.30.2-GA")
-        includeOrShade("org.javassist:javassist:3.30.2-GA")
+        modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
+        modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
+        modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
         } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
             modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
         }
+
+        runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
     } else if (mcData.version <= MinecraftVersions.VERSION_1_12_2) {
         implementation(includeOrShade(kotlin("stdlib-jdk8"))!!)
         implementation(includeOrShade("org.jetbrains.kotlin:kotlin-reflect:1.6.10")!!)

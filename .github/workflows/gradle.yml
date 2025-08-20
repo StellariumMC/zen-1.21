@@ -1,9 +1,7 @@
 name: Run Gradle Build
-
 on:
   - push
   - pull_request
-
 jobs:
   gradle:
     runs-on: ubuntu-latest
@@ -12,36 +10,35 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4.1.1
-
       - name: Setup Java
         uses: actions/setup-java@v4.0.0
         with:
           distribution: temurin
           java-version: 21
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.12.1
-
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-
       - name: Execute Gradle build
         run: ./gradlew clean build
-
-      - name: Rename built JAR
+      - name: Process built JARs
         run: |
-          ORIGINAL_JAR=$(find build/libs -name "*.jar" ! -name "*sources*" | head -n 1)
-          TARGET_JAR="build/libs/zen-1.21.5-fabric-nightly-${BUILD_NUMBER}.jar"
-          mv "$ORIGINAL_JAR" "$TARGET_JAR"
-
-      - name: Upload built mod JAR
+          mkdir -p build/processed
+          for jar in build/versions/*.jar; do
+            if [[ ! "$jar" == *"dev"* ]]; then
+              filename=$(basename "$jar")
+              version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
+              new_name="zen-${version}-fabric-nightly-${BUILD_NUMBER}.jar"
+              cp "$jar" "build/processed/$new_name"
+            fi
+          done
+      - name: Upload built mod JARs
         uses: actions/upload-artifact@v4.3.0
         with:
-          name: zen-1.21.5-fabric-nightly-${{ github.run_number }}
-          path: build/libs/zen-1.21.5-fabric-nightly-${{ github.run_number }}.jar
-
+          name: zen-fabric-nightly-${{ github.run_number }}
+          path: build/processed/*.jar
   send-to-discord:
     if: github.event_name == 'push'
     needs: gradle
@@ -54,29 +51,32 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Download built artifact
+      - name: Download built artifacts
         uses: actions/download-artifact@v4.1.7
         with:
-          name: zen-1.21.5-fabric-nightly-${{ github.run_number }}
+          name: zen-fabric-nightly-${{ github.run_number }}
           path: ./artifact
-
-      - name: Send jar to Discord
+      - name: Send jars to Discord
         run: |
-          JAR_FILE="./artifact/zen-1.21.5-fabric-nightly-${BUILD_NUMBER}.jar"
           COMMIT_MESSAGE=$(git log -1 --pretty=%s)
           COMMIT_HASH=$(git rev-parse --short HEAD)
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/${COMMIT_HASH}"
-
-          echo "Uploading $JAR_FILE to Discord..."
-
-          EMBED_PAYLOAD=$(jq -n \
-            --arg title "Zen 1.21.5 nightly build" \
-            --arg desc "[Commit: $COMMIT_MESSAGE]($COMMIT_URL)" \
-            '{embeds: [{title: $title, description: $desc, color: 5814783}]}')
-
-          curl -X POST \
-            -H "Content-Type: multipart/form-data" \
-            -F "payload_json=${EMBED_PAYLOAD}" \
-            -F "file=@${JAR_FILE}" \
-            "$DISCORD_WEBHOOK_URL"
+          
+          for jar in ./artifact/*.jar; do
+            if [[ -f "$jar" ]]; then
+              filename=$(basename "$jar")
+              version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
+          
+              echo "Uploading $jar to Discord..."
+              EMBED_PAYLOAD=$(jq -n \
+                --arg title "Zen $version nightly build" \
+                --arg desc "[Commit: $COMMIT_MESSAGE]($COMMIT_URL)" \
+                '{embeds: [{title: $title, description: $desc, color: 5814783}]}')
+          
+              curl -X POST \
+                -H "Content-Type: multipart/form-data" \
+                -F "payload_json=${EMBED_PAYLOAD}" \
+                -F "file=@${jar}" \
+                "$DISCORD_WEBHOOK_URL"
+            fi
+          done
