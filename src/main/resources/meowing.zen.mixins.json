@@ -13,6 +13,7 @@
     "MixinFallingBlockEntityRenderer",
     "MixinGameRenderer",
     "MixinHandledScreen",
+    "MixinHeldItemRenderer",
     "MixinInGameHud",
     "MixinInGameOverlayRenderer",
     "MixinKeyboard",

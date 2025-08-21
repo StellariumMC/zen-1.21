@@ -1,6 +1,7 @@
 package meowing.zen.features.dungeons
 
 import meowing.zen.Zen
+import meowing.zen.api.PetTracker
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
@@ -29,8 +30,6 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
     private val Phoenix: ItemStack = createSkull("ewogICJ0aW1lc3RhbXAiIDogMTY0Mjg2NTc3MTM5MSwKICAicHJvZmlsZUlkIiA6ICJiYjdjY2E3MTA0MzQ0NDEyOGQzMDg5ZTEzYmRmYWI1OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJsYXVyZW5jaW8zMDMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjZiMWI1OWJjODkwYzljOTc1Mjc3ODdkZGUyMDYwMGM4Yjg2ZjZiOTkxMmQ1MWE2YmZjZGIwZTRjMmFhM2M5NyIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9")
 
     private val BonzoRegex = "^Your (?:. )?Bonzo's Mask saved your life!$".toRegex()
-    private val AutopetRegex = "Autopet equipped your \\[Lvl \\d+] (.+)! VIEW RULE".toRegex()
-    private val SummonRegex = "You summoned your (.+)!".toRegex()
 
     private var BonzoTicks = 0.0
     private var SpiritTicks = 0.0
@@ -40,8 +39,6 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
     private var hasBonzoMask = false
 
     data class MaskData(val mask: ItemStack, val timeStr: String, val color: String, val isWearing: Boolean)
-    data class PersistentData(var pequipped: Boolean = false)
-    private val Data = DataUtils("MaskTimers", PersistentData())
 
     // Active even when catacombs so the timers actually tick down - register/unregister properly
     private val tickCall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({
@@ -56,26 +53,6 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-    }
-
-    init {
-        EventBus.register<ChatEvent.Receive> ({ event ->
-            val text = event.message.string.removeFormatting()
-
-            when {
-                text == "You despawned your Phoenix!" -> {
-                    updateData { it.pequipped = false }
-                }
-                text.matches(AutopetRegex) -> {
-                    val pet = AutopetRegex.find(text)?.groupValues?.get(1)
-                    updateData { it.pequipped = pet == "Phoenix" }
-                }
-                text.matches(SummonRegex) -> {
-                    val pet = SummonRegex.find(text)?.groupValues?.get(1)
-                    updateData { it.pequipped = pet == "Phoenix" }
-                }
-            }
-        })
     }
 
     override fun initialize() {
@@ -156,7 +133,7 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
 
         if (PhoenixTicks > 0) {
             val timeStr = String.format("%.1fs", PhoenixTicks / 20.0)
-            masks.add(MaskData(Phoenix, timeStr, "§6", Data.getData().pequipped))
+            masks.add(MaskData(Phoenix, timeStr, "§6", PetTracker.name.contains("phoenix", true)))
         }
 
         return masks
@@ -180,11 +157,5 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
 
             currentY += iconSize + spacing
         }
-    }
-
-    private fun updateData(updater: (PersistentData) -> Unit) {
-        val currentData = Data.getData()
-        updater(currentData)
-        Data.setData(currentData)
     }
 }

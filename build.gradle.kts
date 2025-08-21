@@ -13,6 +13,10 @@ plugins {
     id("dev.deftu.gradle.tools.minecraft.releases")
 }
 
+repositories {
+    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+}
+
 toolkitMultiversion {
     moveBuildsToRootProject.set(true)
 }
