@@ -211,9 +211,9 @@ object CarryCounter : Feature("carrycounter") {
             carriesList.forEach { carry ->
                 completedCarriesMap[carry.playerName] = carry
             }
-            println("[Zen] Data loaded.")
+            LOGGER.info("Data loaded.")
         } catch (e: Exception) {
-            println("[Zen] Data error: $e")
+            LOGGER.error("Data error: $e")
         }
     }
 
@@ -324,7 +324,7 @@ object CarryCounter : Feature("carrycounter") {
                 NetworkUtils.postData(
                     url = carrywebhook,
                     body = completeWebhookData,
-                    onError = { println("[Zen] Carry-Webhook POST failed: ${it.message}") }
+                    onError = { LOGGER.warn("Carry-Webhook onComplete POST failed: ${it.message}") }
                 )
             } else if (carrywebhook.isNotEmpty()) {
                 val webhookData =
@@ -342,7 +342,7 @@ object CarryCounter : Feature("carrycounter") {
                 NetworkUtils.postData(
                     url = carrywebhook,
                     body = webhookData,
-                    onError = { println("[Zen] Carry-Webhook POST failed: ${it.message}") }
+                    onError = { LOGGER.error("Carry-Webhook onKill POST failed: ${it.message}") }
                 )
             }
             if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.yggdrasil.YggdrasilMinecraftSessionService;
+import meowing.zen.Zen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -19,7 +20,7 @@ public class MixinYggdrasil {
         try {
             if (hasSig && instance.signature() != null && instance.signature().isEmpty()) return false;
         } catch (Throwable e) {
-            System.err.println("[Zen] Error in MixinYggdrasil: " + e);
+            Zen.LOGGER.error("Error in MixinYggdrasil: {}", String.valueOf(e));
         }
         return hasSig;
     }

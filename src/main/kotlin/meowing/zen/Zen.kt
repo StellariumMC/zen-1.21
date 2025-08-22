@@ -19,6 +19,7 @@ import meowing.zen.utils.ChatUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
+import org.apache.logging.log4j.LogManager
 
 data class firstInstall(val isFirstInstall: Boolean = true)
 
@@ -86,6 +87,7 @@ class Zen : ClientModInitializer {
     }
 
     companion object {
+        @JvmField var LOGGER = LogManager.getLogger("zen")
         private val pendingCallbacks = mutableListOf<Pair<String, (Any) -> Unit>>()
         private val pendingFeatures = mutableListOf<Feature>()
         private val areaFeatures = mutableListOf<Feature>()

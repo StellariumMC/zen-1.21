@@ -49,11 +49,13 @@ open class Feature(
                 configUI.getConfigValue(it) as? Boolean ?: false
             } ?: true
             configEnabled
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            LOGGER.warn("Caught exception in checkConfig(): $e")
             false
         }
     }
 
+    protected val LOGGER = Zen.LOGGER
     protected val mc = Zen.mc
     protected val fontRenderer = mc.textRenderer
     protected inline val player get() = mc.player

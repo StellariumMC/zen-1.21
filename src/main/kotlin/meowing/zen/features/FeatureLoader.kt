@@ -1,6 +1,7 @@
 package meowing.zen.features
 
 import meowing.zen.Zen
+import meowing.zen.Zen.Companion.LOGGER
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -28,7 +29,7 @@ object FeatureLoader {
                 Class.forName(clazz.name)
                 moduleCount++
             } catch (e: Exception) {
-                System.err.println("[Zen] Error initializing ${clazz.name}: $e")
+                LOGGER.error("Error initializing module-${clazz.name}: $e")
                 e.printStackTrace()
             }
         }
@@ -42,7 +43,7 @@ object FeatureLoader {
                     val registerMethod = commandClass.methods.find { it.name == "register" } // a bit eh but it works
                     registerMethod?.invoke(commandInstance, dispatcher)
                 } catch (e: Exception) {
-                    System.err.println("[Zen] Error initializing ${commandClass.name}: $e")
+                    LOGGER.error("Error initializing command-${commandClass.name}: $e")
                     e.printStackTrace()
                 }
             }
