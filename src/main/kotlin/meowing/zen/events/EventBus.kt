@@ -1,5 +1,6 @@
 package meowing.zen.events
 
+import meowing.zen.Zen.Companion.configUI
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -213,4 +214,29 @@ object EventBus {
         fun unregister(): Boolean
         fun register(): Boolean
     }
+}
+
+inline fun <reified T : Event> configRegister(configKey: String, priority: Int = 0, noinline enabledCheck: (Any?) -> Boolean, noinline callback: (T) -> Unit): EventBus.EventCall {
+    val eventCall = EventBus.register<T>(priority, callback, false)
+
+    configUI.registerListener(configKey) { newValue ->
+        if (enabledCheck(newValue)) eventCall.register() else eventCall.unregister()
+    }
+
+    return eventCall
+}
+
+@Suppress("UNUSED")
+inline fun <reified T : Event> configRegister(configKey: String, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
+    return configRegister(configKey, priority, { it as? Boolean == true }, callback)
+}
+
+@Suppress("UNUSED")
+inline fun <reified T : Event> configRegister(configKey: String, enabledIndices: Set<Int>, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
+    return configRegister(configKey, priority, { (it as? Int) in enabledIndices }, callback)
+}
+
+@Suppress("UNUSED")
+inline fun <reified T : Event> configRegister(configKey: String, requiredIndex: Int, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
+    return configRegister(configKey, priority, { (it as? Set<*>)?.contains(requiredIndex) == true }, callback)
 }
