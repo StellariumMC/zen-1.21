@@ -143,6 +143,10 @@ object chatcleaner : Feature("chatcleaner") {
         return true
     }
 
+    fun clearAllPatterns() {
+        patterns.clear()
+    }
+
     fun updatePattern(index: Int, newPattern: String, filterType: ChatFilterType): Boolean {
         if (index < 0 || index >= patterns.size || newPattern.isBlank()) return false
         return try {
@@ -291,6 +295,28 @@ class ChatCleanerGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             y = CenterConstraint()
             textScale = 1.8.pixels()
         }.setColor(theme.accent) childOf header
+
+        val clearAllButton = createBlock(3f).constrain {
+            x = 100.percent() - 70.pixels()
+            y = CenterConstraint()
+            width = 62.pixels()
+            height = 24.pixels()
+        }.setColor(theme.element) childOf header
+
+        clearAllButton.onMouseEnter {
+            animate { setColorAnimation(Animations.OUT_EXP, 0.3f, theme.danger.toConstraint()) }
+        }.onMouseLeave {
+            animate { setColorAnimation(Animations.OUT_EXP, 0.3f, theme.element.toConstraint()) }
+        }.onMouseClick {
+            chatcleaner.clearAllPatterns()
+            renderPatterns()
+        }
+
+        UIText("Clear All").constrain {
+            x = CenterConstraint()
+            y = CenterConstraint()
+            textScale = 0.8.pixels()
+        }.setColor(theme.accent) childOf clearAllButton
 
         createBlock(0f).constrain {
             x = 0.percent()
