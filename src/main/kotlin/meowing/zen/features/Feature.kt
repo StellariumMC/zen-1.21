@@ -58,6 +58,7 @@ open class Feature(
     protected val LOGGER = Zen.LOGGER
     protected val mc = Zen.mc
     protected val fontRenderer = mc.textRenderer
+    protected inline val scope get() = Zen.scope
     protected inline val player get() = mc.player
     protected inline val world get() = mc.world
     protected inline val window get() = mc.window

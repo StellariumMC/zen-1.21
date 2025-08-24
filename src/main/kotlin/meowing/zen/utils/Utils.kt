@@ -19,6 +19,9 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.SystemUtils
 import org.joml.Matrix3x2fStack
 import java.awt.Color
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 object Utils {
     private val emoteRegex = "[^\\u0000-\\u007F]".toRegex()
@@ -258,6 +261,24 @@ object Utils {
         }
 
         return text
+    }
+
+    fun getFormattedDate(): String {
+        val today = LocalDate.now()
+        val day = today.dayOfMonth
+        val suffix = getDaySuffix(day)
+        val formatter = DateTimeFormatter.ofPattern("MMMM d'$suffix', yyyy", Locale.ENGLISH)
+        return today.format(formatter)
+    }
+
+    private fun getDaySuffix(day: Int): String {
+        return when {
+            day in 11..13 -> "th"
+            day % 10 == 1 -> "st"
+            day % 10 == 2 -> "nd"
+            day % 10 == 3 -> "rd"
+            else -> "th"
+        }
     }
 
     fun getPlayerTexture(

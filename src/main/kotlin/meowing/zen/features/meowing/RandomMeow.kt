@@ -28,13 +28,13 @@ object RandomMeow : Feature("randommeow") {
         setupLoops {
             loopDynamic<Timer>({ Random.nextLong(3600000, 21600000) }) {
                 if (Random.nextFloat() >= 0.01f){
-                    ChatUtils.addMessage("$prefix §dboo.")
-                    Utils.playSound(SoundEvents.ENTITY_WARDEN_SONIC_BOOM, 1f, 1f)
-                    TitleUtils.showTitle("§dBOOOOO.", null, 2000)
-                } else {
                     ChatUtils.addMessage("$prefix §dmeow.")
                     Utils.playSound(SoundEvents.ENTITY_CAT_PURREOW, 1f, 1f)
                     TitleUtils.showTitle("§dmeow.", null, 2000)
+                } else {
+                    ChatUtils.addMessage("$prefix §dboo.")
+                    Utils.playSound(SoundEvents.ENTITY_WARDEN_SONIC_BOOM, 1f, 1f)
+                    TitleUtils.showTitle("§dBOOOOO.", null, 2000)
                 }
             }
         }

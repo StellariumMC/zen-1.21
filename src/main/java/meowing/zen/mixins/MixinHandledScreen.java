@@ -41,7 +41,7 @@ public class MixinHandledScreen {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlot(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/screen/slot/Slot;)V")
     )
     private void zen$drawSlots(HandledScreen instance, DrawContext context, Slot slot, Operation<Void> original) {
-        EventBus.INSTANCE.post(new GuiEvent.Slot.Render(context, slot));
+        EventBus.INSTANCE.post(new GuiEvent.Slot.Render(context, slot, instance));
         original.call(instance, context, slot);
     }
 }
