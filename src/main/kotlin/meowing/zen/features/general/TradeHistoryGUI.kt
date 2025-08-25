@@ -54,7 +54,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         val element = Color(12, 16, 20, 255)
         val accent = Color(100, 245, 255, 255)
         val accent2 = Color(80, 200, 220, 255)
-        val divider = Color(30, 35, 40, 255)
+        val divider = Color(70, 80, 90, 255)
         val give = Color(255, 85, 85, 255)
         val receive = Color(85, 255, 85, 255)
         val warning = Color(255, 170, 0, 255)
@@ -63,7 +63,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private lateinit var scrollComponent: ScrollComponent
     private lateinit var tradesContainer: UIContainer
     private val formatter = DecimalFormat("#,###")
-    private val timeFormatter = SimpleDateFormat("HH:mm:ss")
+    private val timeFormatter = SimpleDateFormat("HH:mm")
     private var searchQuery = ""
     private var tooltipElements: MutableMap<UIComponent, Set<String>> = mutableMapOf()
     private var stackElements: MutableMap<UIComponent, ItemStack?> = mutableMapOf()
@@ -275,7 +275,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         trades.reversed().forEach { tradeElement ->
             val trade = tradeElement.asJsonObject
             if (matchesSearch(trade, date)) {
-                createTradeCard(horizontalScroll, trade)
+                createTradeCard(horizontalScroll, trade, date)
             }
         }
     }
@@ -319,13 +319,20 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         return tooltip
     }
 
-    private fun createTradeCard(parent: UIComponent, trade: JsonObject) {
-        val card = createBlock(3f).constrain {
+    private fun createTradeCard(parent: UIComponent, trade: JsonObject, date: String) {
+        val outline = createBlock(3f).constrain {
             x = SiblingConstraint(8f)
             y = 0.percent()
             width = 220.pixels()
             height = 150.pixels()
-        }.setColor(theme.element) childOf parent
+        }.setColor(theme.accent) childOf parent
+
+        val card = createBlock(3f).constrain {
+            x = 0.percent() + 1.pixels()
+            y = 0.percent() + 1.pixels()
+            width = 100.percent() - 2.pixels()
+            height = 100.percent() - 2.pixels()
+        }.setColor(theme.element) childOf outline
 
         val timestamp = trade.get("timestamp").asLong
         val username = trade.get("username").asString
@@ -351,7 +358,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             x = 8.pixels(true)
             y = CenterConstraint()
             textScale = 0.9.pixels()
-        }.setColor(theme.divider) childOf header
+        }.setColor(theme.accent2) childOf header
 
         createBlock(0f).constrain {
             x = 4.pixels()
@@ -381,27 +388,39 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             height = 100.percent()
         } childOf contentArea
 
-        createTradeSide(leftSide, "You Gave", yourItems, yourCoins, theme.give)
-        createTradeSide(rightSide, "You Received", theirItems, theirCoins, theme.receive)
+        val yourCustomWorth = createTradeSide(leftSide, "You Gave", yourItems, yourCoins, theme.give, trade, "yourCustomValue")
+        val theirCustomWorth = createTradeSide(rightSide, "You Received", theirItems, theirCoins, theme.receive, trade, "theirCustomValue")
 
         UIBlock().constrain {
             x = 50.percent()
             y = 0.percent() - 2.pixels()
-            width = 1.pixels()
-            height = 90.percent()
+            width = 2.pixels()
+            height = 88.percent()
         }.setColor(theme.divider) childOf contentArea
 
-        val profit = theirCoins - yourCoins
-        val profitText = if (profit >= 0) "§a+${formatter.format(profit)}" else "§c${formatter.format(profit)}"
+        val profitContainer = UIContainer().constrain {
+            x = CenterConstraint()
+            y = 100.percent() - 12.pixels()
+            width = 0.pixels()
+            height = 12.pixels()
+        } childOf card
+
+        updateProfitText(profitContainer, yourCustomWorth, theirCustomWorth)
+    }
+
+    private fun updateProfitText(container: UIComponent, yourWorth: Long, theirWorth: Long) {
+        container.clearChildren()
+        val profit = theirWorth - yourWorth
+        val profitText = if (profit >= 0) "§a+${abbreviateNumber(profit)}" else "§c${abbreviateNumber(profit)}"
 
         UIText("Profit: $profitText").constrain {
             x = CenterConstraint()
-            y = 100.percent() - 10.pixels()
-            textScale = 0.9.pixels()
-        }.setColor(if (profit >= 0) theme.receive else theme.give) childOf card
+            y = 0.pixels()
+            textScale = 0.8.pixels()
+        }.setColor(if (profit >= 0) theme.receive else theme.give) childOf container
     }
 
-    private fun createTradeSide(parent: UIComponent, title: String, items: JsonArray, coins: Long, color: Color) {
+    private fun createTradeSide(parent: UIComponent, title: String, items: JsonArray, coins: Long, color: Color, trade: JsonObject, customValueKey: String): Long {
         UIText(title).constrain {
             x = CenterConstraint()
             y = 4.pixels()
@@ -446,13 +465,20 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             }.setColor(theme.accent2) childOf parent
         }
 
+        var currentWorth = coins
+        if (trade.has(customValueKey)) {
+            currentWorth = trade.get(customValueKey).asLong
+        }
+
         if (coins > 0) {
-            UIText("§6${formatter.format(coins)} coins").constrain {
+            UIText("§6${abbreviateNumber(currentWorth)} coins").constrain {
                 x = CenterConstraint()
                 y = 100.percent() - 25.pixels()
                 textScale = 0.8.pixels()
             }.setColor(theme.warning) childOf parent
         }
+
+        return currentWorth
     }
 
     private fun createItemStack(itemObj: JsonObject): ItemStack {
@@ -486,5 +512,19 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }
 
         return false
+    }
+
+    private fun abbreviateNumber(num: Long): String {
+        return when {
+            num >= 1_000_000_000_000 -> "${(num / 1_000_000_000_000.0).format()}T"
+            num >= 1_000_000_000 -> "${(num / 1_000_000_000.0).format()}B"
+            num >= 1_000_000 -> "${(num / 1_000_000.0).format()}M"
+            num >= 1_000 -> "${(num / 1_000.0).format()}K"
+            else -> num.toString()
+        }
+    }
+
+    private fun Double.format(): String {
+        return if (this == this.toInt().toDouble()) this.toInt().toString() else String.format("%.1f", this)
     }
 }
