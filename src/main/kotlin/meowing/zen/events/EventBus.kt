@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
@@ -132,6 +133,15 @@ object EventBus {
         AttackEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
             post(EntityEvent.Interact(player, world, hand, "ATTACK_ENTITY"))
             ActionResult.PASS
+        }
+
+        ItemTooltipCallback.EVENT.register { stack, context, type, lines ->
+            val tooltipEvent = ItemTooltipEvent(stack, context, type, lines)
+            post(tooltipEvent)
+            if (tooltipEvent.lines != lines) {
+                lines.clear()
+                lines.addAll(tooltipEvent.lines)
+            }
         }
     }
 

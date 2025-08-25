@@ -6,7 +6,6 @@ import meowing.zen.events.PacketEvent
 import meowing.zen.utils.Utils.removeEmotes
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
-import net.minecraft.network.packet.s2c.play.ScoreboardDisplayS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 
 /*

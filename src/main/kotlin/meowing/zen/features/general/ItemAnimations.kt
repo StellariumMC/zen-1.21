@@ -31,7 +31,7 @@ object ItemAnimations : Feature("itemanimations") {
             .addElement("General", "Item Animations", "Size", ConfigElement(
                 "itemsize",
                 "Item size multiplier",
-                ElementType.Slider(-2.0, 2.0, 0.0, true)
+                ElementType.Slider(-1.0, 2.0, 0.0, true)
             ))
             .addElement("General", "Item Animations", "Size", ConfigElement(
                 "itemx",

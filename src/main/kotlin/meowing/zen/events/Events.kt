@@ -13,6 +13,9 @@ import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.PlayerEntity
+import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
+import net.minecraft.item.tooltip.TooltipType
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.screen.ScreenHandler
@@ -72,6 +75,8 @@ abstract class PartyEvent {
     class Changed(val type: PartyChangeType, val playerName: String? = null, val members: Map<String, PartyMember>) : Event()
 }
 
+class ItemTooltipEvent(val stack: ItemStack, val context: Item.TooltipContext, val type: TooltipType, val lines: MutableList<Text>) : Event()
+
 enum class PartyChangeType {
     MEMBER_JOINED, MEMBER_LEFT, PLAYER_JOINED, PLAYER_LEFT, LEADER_CHANGED, DISBANDED, LIST, PARTY_FINDER
 }
@@ -104,6 +109,7 @@ abstract class GuiEvent {
     class Close(val screen: Screen) : Event()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
     class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
+
     abstract class Slot {
         class Click(val slot: net.minecraft.screen.slot.Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
         class Render(val context: DrawContext, val slot: net.minecraft.screen.slot.Slot, val screen: HandledScreen<ScreenHandler>) : Event()

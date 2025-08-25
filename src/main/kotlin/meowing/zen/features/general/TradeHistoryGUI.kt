@@ -275,7 +275,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         trades.reversed().forEach { tradeElement ->
             val trade = tradeElement.asJsonObject
             if (matchesSearch(trade, date)) {
-                createTradeCard(horizontalScroll, trade, date)
+                createTradeCard(horizontalScroll, trade)
             }
         }
     }
@@ -319,7 +319,7 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         return tooltip
     }
 
-    private fun createTradeCard(parent: UIComponent, trade: JsonObject, date: String) {
+    private fun createTradeCard(parent: UIComponent, trade: JsonObject) {
         val outline = createBlock(3f).constrain {
             x = SiblingConstraint(8f)
             y = 0.percent()

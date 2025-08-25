@@ -1,14 +1,11 @@
 package meowing.zen
 
+import com.google.gson.JsonParser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.booleanOrNull
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonPrimitive
 import meowing.zen.compat.OldConfig
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
@@ -95,11 +92,14 @@ class Zen : ClientModInitializer {
             }
         })
 
-        NetworkUtils.getJson("https://api.hypixel.net/v2/resources/skyblock/election",
+        NetworkUtils.getJson(
+            "https://api.hypixel.net/v2/resources/skyblock/election",
             onSuccess = { jsonObject ->
-                if (jsonObject["success"]?.jsonPrimitive?.booleanOrNull != true) return@getJson
-                val dataElement = jsonObject["data"] ?: return@getJson
-                mayorData = Json.decodeFromJsonElement<ApiMayor>(dataElement)
+                if (jsonObject.get("success")?.asBoolean != true) return@getJson
+
+                val dataElement = jsonObject.get("data") ?: return@getJson
+                val dataObj = JsonParser().parse(dataElement.toString()).asJsonObject
+                mayorData = com.google.gson.Gson().fromJson(dataObj, ApiMayor::class.java)
             },
             onError = { exception ->
                 LOGGER.warn("Failed to fetch election data: ${exception.message}")
