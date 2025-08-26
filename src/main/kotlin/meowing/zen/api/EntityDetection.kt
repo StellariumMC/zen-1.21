@@ -126,7 +126,7 @@ object EntityDetection {
             pattern.find(rawMobName)?.let { match ->
                 sbMob.id = when (index) {
                     0 -> match.groupValues[1]
-                    1 -> "${match.value} Slayer"
+                    1 -> match.value
                     2 -> {
                         val mobName = match.groupValues[1]
                         if (rawMobName.startsWith("ൠ")) "$mobName Pest" else mobName

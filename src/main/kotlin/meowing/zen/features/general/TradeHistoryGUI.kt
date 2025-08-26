@@ -19,10 +19,12 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UMatrixStack
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.api.ItemAPI
 import meowing.zen.api.TradeAPI
 import meowing.zen.events.EventBus
 import meowing.zen.events.GuiEvent
 import meowing.zen.utils.CommandUtils
+import meowing.zen.utils.ItemUtils.skyblockID
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.Utils.removeFormatting
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -434,27 +436,32 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             height = 64.pixels()
         } childOf parent
 
+        var itemWorth = 0L
+
         val filteredItems = items.filter { itemElement ->
             val itemObj = itemElement.asJsonObject
             val stack = createItemStack(itemObj)
             !stack.name.string.removeFormatting().equals("Air", ignoreCase = true)
         }
 
-        filteredItems.take(3).forEachIndexed { index, itemElement ->
+        filteredItems.forEachIndexed { index, itemElement ->
             val itemObj = itemElement.asJsonObject
             val stack = createItemStack(itemObj)
+            itemWorth += getItemValue(stack) * stack.count
 
-            val itemName = UIText("${stack.count}x ${stack.name.string}").constrain {
-                x = 2.pixels()
-                y = (index * 16).pixels()
-                textScale = 0.8.pixels()
-            }.setColor(Color.WHITE) childOf itemsList
+            if (index <= 3) {
+                val itemName = UIText("${stack.count}x ${stack.name.string}").constrain {
+                    x = 2.pixels()
+                    y = (index * 16).pixels()
+                    textScale = 0.8.pixels()
+                }.setColor(Color.WHITE) childOf itemsList
 
-            val tooltip = mutableSetOf<String>()
-            tooltip.add(stack.name.string)
-            tooltip.add("§7Count: ${stack.count}")
+                val tooltip = mutableSetOf<String>()
+                tooltip.add(stack.name.string)
+                tooltip.add("§7Count: ${stack.count}")
 
-            itemName.addTooltip(tooltip)
+                itemName.addTooltip(tooltip)
+            }
         }
 
         if (filteredItems.size > 3) {
@@ -465,13 +472,15 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             }.setColor(theme.accent2) childOf parent
         }
 
-        var currentWorth = coins
+        val totalWorth = itemWorth + coins
+        var currentWorth = totalWorth
+
         if (trade.has(customValueKey)) {
             currentWorth = trade.get(customValueKey).asLong
         }
 
         if (coins > 0) {
-            UIText("§6${abbreviateNumber(currentWorth)} coins").constrain {
+            UIText("§6${abbreviateNumber(coins)} coins").constrain {
                 x = CenterConstraint()
                 y = 100.percent() - 25.pixels()
                 textScale = 0.8.pixels()
@@ -479,6 +488,21 @@ class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }
 
         return currentWorth
+    }
+
+    private fun getItemValue(stack: ItemStack): Long {
+        val itemId = stack.skyblockID
+        if (itemId.isEmpty()) return 0L
+        val itemInfo = ItemAPI.getItemInfo(itemId) ?: return 0L
+
+        return when {
+            itemInfo.has("lowestBin") && itemInfo.get("lowestBin").asLong > 0 -> itemInfo.get("lowestBin").asLong
+            itemInfo.has("bazaarSell") && itemInfo.get("bazaarSell").asDouble > 0 -> itemInfo.get("bazaarSell").asDouble.toLong()
+            itemInfo.has("bazaarBuy") && itemInfo.get("bazaarBuy").asDouble > 0 -> itemInfo.get("bazaarBuy").asDouble.toLong()
+            itemInfo.has("avgLowestBin") && itemInfo.get("avgLowestBin").asLong > 0 -> itemInfo.get("avgLowestBin").asLong
+            itemInfo.has("npcSell") && itemInfo.get("npcSell").asLong > 1 -> itemInfo.get("npcSell").asLong
+            else -> 0L
+        }
     }
 
     private fun createItemStack(itemObj: JsonObject): ItemStack {

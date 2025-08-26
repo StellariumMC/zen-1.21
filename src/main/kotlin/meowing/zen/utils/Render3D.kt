@@ -23,6 +23,7 @@ import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 object Render3D {
     private fun getValidLineWidth(width: Float): Float {
@@ -62,27 +63,77 @@ object Render3D {
         )
     }
 
-    fun drawString(text: String, pos: Vec3d, color: Int, scale: Float = 1.0f, yOffset: Float = 0.0f) {
+    fun drawString(
+        text: String,
+        pos: Vec3d,
+        color: Int = 0xFFFFFF,
+        scale: Float = 1.0f,
+        yOffset: Float = 0.0f,
+        depth: Boolean = true,
+        dynamic: Boolean = true,
+        scaleMultiplier: Double = 1.0,
+        hideTooCloseAt: Double = 4.5,
+        smallestDistanceView: Double = 5.0,
+        ignoreY: Boolean = false,
+        maxDistance: Int? = null,
+    ) {
         val camera = mc.gameRenderer.camera
         val cameraPos = camera.pos
         val allocator = BufferAllocator(256)
         val consumers = VertexConsumerProvider.immediate(allocator)
 
+        val dirVec = Vec3d(cameraPos.x - pos.x, 0.0, cameraPos.z - pos.z).normalize()
+        val playerOffsetPos = Vec3d(pos.x + dirVec.x * 0.5, pos.y, pos.z + dirVec.z * 0.5)
+
+        val renderPos: Vec3d
+        val finalScale: Float
+
+        if (dynamic) {
+            val player = mc.player ?: return
+            val eyeHeight = player.standingEyeHeight
+            val x = playerOffsetPos.x
+            val y = playerOffsetPos.y
+            val z = playerOffsetPos.z
+
+            val dX = (x - cameraPos.x) * (x - cameraPos.x)
+            val dY = (y - (cameraPos.y + eyeHeight)) * (y - (cameraPos.y + eyeHeight))
+            val dZ = (z - cameraPos.z) * (z - cameraPos.z)
+            val distToPlayerSq = dX + dY + dZ
+            var distToPlayer = sqrt(distToPlayerSq)
+
+            distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceView)
+            if (distToPlayer < hideTooCloseAt) return
+
+            maxDistance?.let {
+                if (!depth && distToPlayer > it) return
+            }
+
+            val distRender = distToPlayer.coerceAtMost(50.0)
+            val dynamicScale = (distRender / 12) * scaleMultiplier
+            finalScale = dynamicScale.toFloat()
+
+            val resultX = cameraPos.x + (x - cameraPos.x) / (distToPlayer / distRender)
+            val resultY =
+                if (ignoreY) y * distToPlayer / distRender
+                else cameraPos.y + eyeHeight + (y + 20 * distToPlayer / 300 - (cameraPos.y + eyeHeight)) / (distToPlayer / distRender)
+            val resultZ = cameraPos.z + (z - cameraPos.z) / (distToPlayer / distRender)
+
+            renderPos = Vec3d(resultX, resultY, resultZ)
+        } else {
+            renderPos = playerOffsetPos
+            finalScale = scale
+        }
+
         val positionMatrix = Matrix4f()
             .translate(
-                (pos.x - cameraPos.x).toFloat(),
-                (pos.y - cameraPos.y + yOffset).toFloat(),
-                (pos.z - cameraPos.z).toFloat()
+                (renderPos.x - cameraPos.x).toFloat(),
+                (renderPos.y - cameraPos.y + yOffset).toFloat(),
+                (renderPos.z - cameraPos.z).toFloat()
             )
             .rotate(camera.rotation)
-            .scale(scale * 0.025f, -scale * 0.025f, scale * 0.025f)
+            .scale(finalScale * 0.025f, -(finalScale * 0.025f), finalScale * 0.025f)
 
         val xOffset = -mc.textRenderer.getWidth(text) / 2f
-        val depthFunc = GL11.glGetInteger(GL11.GL_DEPTH_FUNC)
-        val depthTest = GL11.glIsEnabled(GL11.GL_DEPTH_TEST)
-
-        GL11.glEnable(GL11.GL_DEPTH_TEST)
-        GL11.glDepthFunc(GL11.GL_ALWAYS)
 
         mc.textRenderer.draw(
             text,
@@ -92,15 +143,11 @@ object Render3D {
             false,
             positionMatrix,
             consumers,
-            TextRenderer.TextLayerType.NORMAL,
+            if (depth) TextRenderer.TextLayerType.NORMAL else TextRenderer.TextLayerType.SEE_THROUGH,
             0,
             LightmapTextureManager.MAX_LIGHT_COORDINATE
         )
-
         consumers.draw()
-
-        GL11.glDepthFunc(depthFunc)
-        if (!depthTest) GL11.glDisable(GL11.GL_DEPTH_TEST)
     }
 
     fun drawLineToEntity(entity: Entity, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {

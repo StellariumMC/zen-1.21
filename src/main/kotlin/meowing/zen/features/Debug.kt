@@ -25,16 +25,19 @@ import meowing.zen.Zen
 import meowing.zen.Zen.Companion.features
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.Zen.Companion.prefix
+import meowing.zen.api.EntityDetection.sbMobID
 import meowing.zen.api.PlayerStats
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.constraint.ChildHeightConstraint
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EventBus
+import meowing.zen.events.RenderEvent
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.DataUtils
 import meowing.zen.utils.DungeonUtils
+import meowing.zen.utils.Render3D
 import meowing.zen.utils.TickUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -49,6 +52,20 @@ object Debug : Feature() {
     val data = DataUtils("Debug", PersistentData())
 
     inline val debugmode get() = data.getData().debugmode
+
+    init {
+        createCustomEvent<RenderEvent.EntityPost>("mobid") { event ->
+            Render3D.drawString(
+                event.entity.sbMobID ?: return@createCustomEvent,
+                event.entity.pos,
+                depth = true
+            )
+        }
+
+        if (debugmode) {
+            registerEvent("mobid")
+        }
+    }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         if (!debugmode) {
@@ -144,6 +161,13 @@ object DebugCommand : CommandUtils("zendebug") {
                         "toggle" -> {
                             Debug.data.getData().debugmode = !Debug.data.getData().debugmode
                             Debug.data.save()
+
+                            if (Debug.debugmode) {
+                                Debug.registerEvent("mobid")
+                            } else {
+                                Debug.unregisterEvent("mobid")
+                            }
+
                             ChatUtils.addMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
                         }
                         "stats" -> {
