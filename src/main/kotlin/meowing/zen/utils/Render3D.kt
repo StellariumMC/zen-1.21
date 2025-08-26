@@ -124,29 +124,36 @@ object Render3D {
             finalScale = scale
         }
 
-        val positionMatrix = Matrix4f()
-            .translate(
-                (renderPos.x - cameraPos.x).toFloat(),
-                (renderPos.y - cameraPos.y + yOffset).toFloat(),
-                (renderPos.z - cameraPos.z).toFloat()
+        val lines = text.split("\n")
+        val fontHeight = mc.textRenderer.fontHeight
+        val totalHeight = lines.size * fontHeight
+        val startY = -(totalHeight / 2f)
+
+        lines.forEachIndexed { index, line ->
+            val positionMatrix = Matrix4f()
+                .translate(
+                    (renderPos.x - cameraPos.x).toFloat(),
+                    (renderPos.y - cameraPos.y + yOffset + startY + (index * fontHeight)).toFloat(),
+                    (renderPos.z - cameraPos.z).toFloat()
+                )
+                .rotate(camera.rotation)
+                .scale(finalScale * 0.025f, -(finalScale * 0.025f), finalScale * 0.025f)
+
+            val xOffset = -mc.textRenderer.getWidth(line) / 2f
+            mc.textRenderer.draw(
+                line,
+                xOffset,
+                0f,
+                color,
+                false,
+                positionMatrix,
+                consumers,
+                if (depth) TextRenderer.TextLayerType.NORMAL else TextRenderer.TextLayerType.SEE_THROUGH,
+                0,
+                LightmapTextureManager.MAX_LIGHT_COORDINATE
             )
-            .rotate(camera.rotation)
-            .scale(finalScale * 0.025f, -(finalScale * 0.025f), finalScale * 0.025f)
+        }
 
-        val xOffset = -mc.textRenderer.getWidth(text) / 2f
-
-        mc.textRenderer.draw(
-            text,
-            xOffset,
-            0f,
-            color,
-            false,
-            positionMatrix,
-            consumers,
-            if (depth) TextRenderer.TextLayerType.NORMAL else TextRenderer.TextLayerType.SEE_THROUGH,
-            0,
-            LightmapTextureManager.MAX_LIGHT_COORDINATE
-        )
         consumers.draw()
     }
 

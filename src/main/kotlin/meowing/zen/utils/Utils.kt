@@ -7,6 +7,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
 import meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
+import net.minecraft.entity.Entity
+import net.minecraft.entity.LivingEntity
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.sound.SoundEvent
 import net.minecraft.text.MutableText
@@ -347,4 +350,6 @@ object Utils {
         }
         return sign + formatted + suffix
     }
+
+    val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
 }
