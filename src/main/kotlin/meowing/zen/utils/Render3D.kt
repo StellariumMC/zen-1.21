@@ -74,8 +74,9 @@ object Render3D {
         scaleMultiplier: Double = 1.0,
         hideTooCloseAt: Double = 4.5,
         smallestDistanceView: Double = 5.0,
-        ignoreY: Boolean = false,
         maxDistance: Int? = null,
+        ignoreY: Boolean = false,
+        shadow: Boolean = true
     ) {
         val camera = mc.gameRenderer.camera
         val cameraPos = camera.pos
@@ -103,19 +104,15 @@ object Render3D {
 
             distToPlayer = distToPlayer.coerceAtLeast(smallestDistanceView)
             if (distToPlayer < hideTooCloseAt) return
-
-            maxDistance?.let {
-                if (!depth && distToPlayer > it) return
-            }
+            maxDistance?.let { if (!depth && distToPlayer > it) return }
 
             val distRender = distToPlayer.coerceAtMost(50.0)
             val dynamicScale = (distRender / 12) * scaleMultiplier
             finalScale = dynamicScale.toFloat()
 
             val resultX = cameraPos.x + (x - cameraPos.x) / (distToPlayer / distRender)
-            val resultY =
-                if (ignoreY) y * distToPlayer / distRender
-                else cameraPos.y + eyeHeight + (y + 20 * distToPlayer / 300 - (cameraPos.y + eyeHeight)) / (distToPlayer / distRender)
+            val resultY = if (ignoreY) y * distToPlayer / distRender
+            else cameraPos.y + eyeHeight + (y + 20 * distToPlayer / 300 - (cameraPos.y + eyeHeight)) / (distToPlayer / distRender)
             val resultZ = cameraPos.z + (z - cameraPos.z) / (distToPlayer / distRender)
 
             renderPos = Vec3d(resultX, resultY, resultZ)
@@ -125,15 +122,17 @@ object Render3D {
         }
 
         val lines = text.split("\n")
-        val fontHeight = mc.textRenderer.fontHeight
-        val totalHeight = lines.size * fontHeight
-        val startY = -(totalHeight / 2f)
+        val fontHeight = mc.textRenderer.fontHeight.toFloat()
+        val scaledFontHeight = fontHeight * finalScale * 0.025f
+        val totalHeight = lines.size * scaledFontHeight
+        val startY = -(totalHeight / 2f) + yOffset
 
         lines.forEachIndexed { index, line ->
+            val lineY = startY + (index * scaledFontHeight)
             val positionMatrix = Matrix4f()
                 .translate(
                     (renderPos.x - cameraPos.x).toFloat(),
-                    (renderPos.y - cameraPos.y + yOffset + startY + (index * fontHeight)).toFloat(),
+                    (renderPos.y - cameraPos.y + lineY).toFloat(),
                     (renderPos.z - cameraPos.z).toFloat()
                 )
                 .rotate(camera.rotation)
@@ -145,7 +144,7 @@ object Render3D {
                 xOffset,
                 0f,
                 color,
-                false,
+                shadow,
                 positionMatrix,
                 consumers,
                 if (depth) TextRenderer.TextLayerType.NORMAL else TextRenderer.TextLayerType.SEE_THROUGH,
