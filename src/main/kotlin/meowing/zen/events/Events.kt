@@ -128,6 +128,8 @@ abstract class WorldEvent {
 abstract class PacketEvent {
     class Received(val packet: Packet<*>) : Event()
     class Sent(val packet: Packet<*>) : Event()
+    class ReceivedPost(val packet: Packet<*>) : Event()
+    class SentPost(val packet: Packet<*>) : Event()
 }
 
 abstract class ScoreboardEvent {
