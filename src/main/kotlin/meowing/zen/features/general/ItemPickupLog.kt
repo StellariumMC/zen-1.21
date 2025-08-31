@@ -158,10 +158,9 @@ object ItemPickupLog : Feature("itempickuplog") {
         return previousItem?.key ?: "Unknown item"
     }
 
-    class PickupEntry(val itemName: String = "", itemId: String = "") {
+    class PickupEntry(val itemName: String = "", var itemId: String = "") {
         var count: Int = 0
         var lastUpdated: Long = 0
-        var itemId: String = itemId
         var animatedY: Float = 0f
         var targetY: Float = 0f
         private var lastTargetUpdate: Long = 0
