@@ -50,7 +50,7 @@ object ItemPickupLog : Feature("itempickuplog") {
         HUDManager.register(name, "§a+5 §fPotato §6$16\n§c-4 §fHay Bale §6$54")
 
         register<PacketEvent.ReceivedPost> { event ->
-            if(event.packet is ScreenHandlerSlotUpdateS2CPacket) {
+            if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
                 currentInventory = getCurrentInventoryState().toMutableMap()
                 compareInventories(previousInventory, currentInventory)
                 previousInventory = currentInventory

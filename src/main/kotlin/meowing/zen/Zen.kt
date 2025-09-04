@@ -22,6 +22,7 @@ import meowing.zen.events.GuiEvent
 import meowing.zen.features.Debug
 import meowing.zen.features.FeatureLoader
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.LoopUtils
 import meowing.zen.utils.NetworkUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
@@ -61,7 +62,10 @@ class Zen : ClientModInitializer {
             }
             if (Debug.debugmode) ChatUtils.addMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
-            UpdateChecker.checkForUpdates()
+            LoopUtils.setTimeout(5000) {
+                UpdateChecker.checkForUpdates()
+            }
+
             shown = true
         }
 
