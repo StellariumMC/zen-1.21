@@ -36,7 +36,7 @@ object VengTimer : Feature("vengtimer") {
     override fun initialize() {
         HUDManager.register("vengtimer", "§bVeng proc: §c4.3s")
 
-        createCustomEvent<GuiEvent.HUD>("render") {
+        createCustomEvent<RenderEvent.HUD>("render") {
             if (HUDManager.isEnabled("VengTimer")) render(it.context)
         }
 
@@ -105,5 +105,4 @@ object VengTimer : Feature("vengtimer") {
         starttime = TimeUtils.zero
         unregisterEvent("render")
     }
-
 }

@@ -4,13 +4,12 @@ import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.ItemUtils.skyblockID
 import meowing.zen.utils.Render2D
-import net.minecraft.item.equipment.EquipmentType
 
 @Zen.Module
 object ReaperTimer : Feature("reapertimer") {
@@ -31,7 +30,7 @@ object ReaperTimer : Feature("reapertimer") {
     override fun initialize() {
         HUDManager.register(name, "§c4.2s")
 
-        createCustomEvent<GuiEvent.HUD>("render") { event ->
+        createCustomEvent<RenderEvent.HUD>("render") { event ->
             val x = HUDManager.getX(name)
             val y = HUDManager.getY(name)
             val scale = HUDManager.getScale(name)

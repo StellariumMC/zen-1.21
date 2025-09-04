@@ -89,6 +89,7 @@ abstract class RenderEvent {
     class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
     class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
     class EntityGlow(val entity: Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
+    class HUD(val context: DrawContext) : Event()
 }
 
 abstract class EntityEvent {
@@ -104,6 +105,7 @@ abstract class EntityEvent {
 
 abstract class GuiEvent {
     class AfterRender(val screen: Screen, val context: DrawContext) : Event()
+    @Deprecated("Use RenderEvent.HUD instead.")
     class HUD(val context: DrawContext) : Event()
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen) : Event()

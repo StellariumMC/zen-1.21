@@ -9,7 +9,6 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.ChatEvent
-import meowing.zen.events.GuiEvent
 import meowing.zen.features.ClientTick
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
@@ -201,7 +200,7 @@ object CarryCounter : Feature("carrycounter") {
         }
 
         CarryHUD.initialize()
-        register<GuiEvent.HUD> { CarryHUD.renderHUD(it.context) }
+        register<RenderEvent.HUD> { CarryHUD.renderHUD(it.context) }
     }
 
     private fun loadCompletedCarries() {

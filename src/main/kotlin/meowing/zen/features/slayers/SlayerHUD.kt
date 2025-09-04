@@ -4,7 +4,7 @@ import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.events.SkyblockEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
@@ -33,7 +33,7 @@ object SlayerHUD : Feature("slayerhud") {
     override fun initialize() {
         HUDManager.register(name, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤")
 
-        createCustomEvent<GuiEvent.HUD>("render") {
+        createCustomEvent<RenderEvent.HUD>("render") {
             if (HUDManager.isEnabled(name)) render(it.context)
         }
 

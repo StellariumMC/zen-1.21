@@ -7,19 +7,17 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.events.EventBus
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
-import meowing.zen.utils.DataUtils
 import meowing.zen.utils.DungeonUtils
 import meowing.zen.utils.DungeonUtils.getCurrentCata
 import meowing.zen.utils.ItemUtils.createSkull
 import meowing.zen.utils.Render2D
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.entity.EquipmentSlot
 import net.minecraft.item.ItemStack
 
 @Zen.Module
@@ -77,7 +75,7 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
             }
         }
 
-        register<GuiEvent.HUD> { event ->
+        register<RenderEvent.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
 

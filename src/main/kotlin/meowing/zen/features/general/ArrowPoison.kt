@@ -4,8 +4,8 @@ import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
 import meowing.zen.events.PacketEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
@@ -39,7 +39,7 @@ object ArrowPoison : Feature("arrowpoison") {
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()
         }
 
-        register<GuiEvent.HUD> { event ->
+        register<RenderEvent.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

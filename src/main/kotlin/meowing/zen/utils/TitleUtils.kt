@@ -2,7 +2,7 @@ package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.utils.TimeUtils.millis
 import net.minecraft.client.gui.DrawContext
 import java.util.*
@@ -22,7 +22,7 @@ object TitleUtils {
     private var startTime = TimeUtils.zero
 
     init {
-        EventBus.register<GuiEvent.HUD> ({ render(it.context) })
+        EventBus.register<RenderEvent.HUD> ({ render(it.context) })
     }
 
     fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 4.0f) {

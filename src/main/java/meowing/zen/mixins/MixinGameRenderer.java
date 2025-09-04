@@ -1,8 +1,10 @@
 package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import kotlin.Suppress;
 import meowing.zen.events.EventBus;
 import meowing.zen.events.GuiEvent;
+import meowing.zen.events.RenderEvent;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
@@ -16,5 +18,6 @@ public class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
     private void zen$afterHudRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
         EventBus.INSTANCE.post(new GuiEvent.HUD(context));
+        EventBus.INSTANCE.post(new RenderEvent.HUD(context));
     }
 }

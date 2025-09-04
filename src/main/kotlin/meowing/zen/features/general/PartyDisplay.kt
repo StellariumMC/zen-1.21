@@ -5,8 +5,8 @@ import meowing.zen.api.PartyTracker
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
 import meowing.zen.events.PartyEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
@@ -33,7 +33,7 @@ object PartyDisplay : Feature("partydisplay") {
             partyMembers = event.members
         }
 
-        register<GuiEvent.HUD> { event ->
+        register<RenderEvent.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

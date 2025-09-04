@@ -11,7 +11,7 @@ import meowing.zen.Zen.Companion.prefix
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.Render2D.renderString
 import meowing.zen.utils.TimeUtils
@@ -44,7 +44,7 @@ object SlayerStats : Feature("slayerstats") {
 
     override fun initialize() {
         HUDManager.register(name, "$prefix §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
-        register<GuiEvent.HUD> { renderHUD(it.context) }
+        register<RenderEvent.HUD> { renderHUD(it.context) }
     }
 
     fun addKill(killtime: Duration) {

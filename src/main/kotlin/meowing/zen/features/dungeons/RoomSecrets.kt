@@ -5,7 +5,7 @@ import meowing.zen.api.PlayerStats
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
@@ -31,7 +31,7 @@ object RoomSecrets : Feature("roomsecrets", "catacombs") {
     override fun initialize() {
         HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)
 
-        register<GuiEvent.HUD> { renderHUD(it.context) }
+        register<RenderEvent.HUD> { renderHUD(it.context) }
     }
 
     fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {

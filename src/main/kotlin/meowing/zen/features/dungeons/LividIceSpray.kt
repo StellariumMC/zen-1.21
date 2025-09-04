@@ -6,7 +6,7 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
 import meowing.zen.events.EventBus
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
@@ -43,7 +43,7 @@ object LividIceSpray : Feature("lividicespray", area = "catacombs", subarea = li
 
         register<WorldEvent.Change> { cleanup() }
 
-        register<GuiEvent.HUD> { event ->
+        register<RenderEvent.HUD> { event ->
             if (HUDManager.isEnabled("Livid ice spray timer")) render(event.context)
         }
     }

@@ -5,7 +5,7 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
-import meowing.zen.events.GuiEvent
+import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
 import meowing.zen.hud.HUDManager
 import meowing.zen.utils.Render2D
@@ -45,7 +45,7 @@ object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = lis
             }
         }
 
-        register<GuiEvent.HUD> { renderHUD(it.context) }
+        register<RenderEvent.HUD> { renderHUD(it.context) }
     }
 
     override fun onRegister() {
