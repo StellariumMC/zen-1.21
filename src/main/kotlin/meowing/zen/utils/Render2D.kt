@@ -7,8 +7,21 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
 
 object Render2D {
+    enum class TextStyle {
+        DROP_SHADOW,
+        BLACK_OUTLINE,
+        DEFAULT
+    }
 
-    fun renderString(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE, shadow: Boolean = false) {
+    fun renderString(
+        context: DrawContext,
+        text: String,
+        x: Float,
+        y: Float,
+        scale: Float,
+        colors: Int = 0xFFFFFF,
+        textStyle: TextStyle = TextStyle.DEFAULT
+    ) {
         //#if MC >= 1.21.7
         //$$ context.matrices.pushMatrix()
         //$$ context.matrices.translate(x, y)
@@ -19,7 +32,75 @@ object Render2D {
         context.matrices.scale(scale, scale, 1f)
         //#endif
 
-        context.drawText(mc.textRenderer, text, 0, 0, colors, shadow)
+        when (textStyle) {
+            TextStyle.DROP_SHADOW -> {
+                context.drawText(mc.textRenderer, text, 0, 0, colors, true)
+            }
+            TextStyle.BLACK_OUTLINE -> {
+                val matrices = context.matrices
+
+                //#if MC >= 1.21.7
+                //$$ matrices.pushMatrix()
+                //$$ matrices.translate(-0.75f, 0f)
+                //#else
+                matrices.push()
+                matrices.translate(-0.75f, 0f, 0f)
+                //#endif
+                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                //#if MC >= 1.21.7
+                //$$ context.matrices.popMatrix()
+                //#else
+                context.matrices.pop()
+                //#endif
+
+                //#if MC >= 1.21.7
+                //$$ matrices.pushMatrix()
+                //$$ matrices.translate(0.75f, 0f)
+                //#else
+                matrices.push()
+                matrices.translate(0.75f, 0f, 0f)
+                //#endif
+                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                //#if MC >= 1.21.7
+                //$$ context.matrices.popMatrix()
+                //#else
+                context.matrices.pop()
+                //#endif
+
+                //#if MC >= 1.21.7
+                //$$ matrices.pushMatrix()
+                //$$ matrices.translate(0f, -0.75f)
+                //#else
+                matrices.push()
+                matrices.translate(0f, -0.75f, 0f)
+                //#endif
+                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                //#if MC >= 1.21.7
+                //$$ context.matrices.popMatrix()
+                //#else
+                context.matrices.pop()
+                //#endif
+
+                //#if MC >= 1.21.7
+                //$$ matrices.pushMatrix()
+                //$$ matrices.translate(0f, 0.75f)
+                //#else
+                matrices.push()
+                matrices.translate(0f, 0.75f, 0f)
+                //#endif
+                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                //#if MC >= 1.21.7
+                //$$ context.matrices.popMatrix()
+                //#else
+                context.matrices.pop()
+                //#endif
+
+                context.drawText(mc.textRenderer, text, 0, 0, colors, false)
+            }
+            TextStyle.DEFAULT -> {
+                context.drawText(mc.textRenderer, text, 0, 0, colors, false)
+            }
+        }
 
         //#if MC >= 1.21.7
         //$$ context.matrices.popMatrix()
@@ -29,7 +110,7 @@ object Render2D {
     }
 
     fun renderStringWithShadow(context: DrawContext, text: String, x: Float, y: Float, scale: Float, colors: Int = Colors.WHITE) {
-        renderString(context, text, x, y, scale, colors, true)
+        renderString(context, text, x, y, scale, colors, TextStyle.DROP_SHADOW)
     }
 
     fun renderItem(context: DrawContext, item: ItemStack, x: Float, y: Float, scale: Float) {

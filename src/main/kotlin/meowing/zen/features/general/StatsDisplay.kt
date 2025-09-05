@@ -1,5 +1,6 @@
 package meowing.zen.features.general
 
+import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.universal.UMatrixStack
 import meowing.zen.Zen
@@ -40,11 +41,18 @@ object StatsDisplay : Feature("statsdisplay") {
     @JvmStatic fun shouldHideVanillaArmor(): Boolean = isEnabled() && hideVanillaArmor
     @JvmStatic fun shouldHideExpBar(): Boolean = isEnabled() && hideExpBar
 
+    private val showHealthBar by ConfigDelegate<Boolean>("showhealthbar")
+    private val healthBarFillColor by ConfigDelegate<Color>("healthbarmaincolor")
+    private val healthBarExtraColor by ConfigDelegate<Color>("healthbarextracolor")
+    private val healthtextstyle by ConfigDelegate<Int>("healthtextstyle")
     private val showHealthText by ConfigDelegate<Boolean>("showhealthtext")
     private val showMaxHealth by ConfigDelegate<Boolean>("showmaxhealth")
     private val healthTextColor by ConfigDelegate<MCColorCode>("healthtextcolor")
     private val maxHealthTextColor by ConfigDelegate<MCColorCode>("maxhealthtextcolor")
 
+    private val showManaBar by ConfigDelegate<Boolean>("showmanabar")
+    private val manaBarFillColor by ConfigDelegate<Color>("manabarmaincolor")
+    private val manatextstyle by ConfigDelegate<Int>("manatextstyle")
     private val showManaText by ConfigDelegate<Boolean>("showmanatext")
     private val showMaxMana by ConfigDelegate<Boolean>("showmaxmana")
     private val manaTextColor by ConfigDelegate<MCColorCode>("manatextcolor")
@@ -105,45 +113,80 @@ object StatsDisplay : Feature("statsdisplay") {
                     default = emptySet()
                 )
             ))
-            .addElement("General", "Stats Display", "Health Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+                "showhealthbar",
+                "Show Health Bar",
+                ElementType.Switch(true)
+            ))
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+                "healthbarmaincolor",
+                "Health Bar Fill Color",
+                ElementType.ColorPicker(MCColorCode.RED.color)
+            ))
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+                "healthbarextracolor",
+                "Health Bar Absorption Fill Color",
+                ElementType.ColorPicker(MCColorCode.YELLOW.color)
+            ))
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
                 "showhealthtext",
                 "Show Health Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Health Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+                "healthtextstyle",
+                "Health Text Style",
+                ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
+            ))
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
                 "showmaxhealth",
                 "Show Max Health",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Health Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
                 "healthtextcolor",
                 "Health Text Color",
-                ElementType.MCColorPicker(MCColorCode.WHITE)
+                ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("General", "Stats Display", "Health Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Health Display", ConfigElement(
                 "maxhealthtextcolor",
                 "Max Health Text Color",
-                ElementType.MCColorPicker(MCColorCode.GRAY)
+                ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("General", "Stats Display", "Mana Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+                "showmanabar",
+                "Show Mana Bar",
+                ElementType.Switch(true)
+            ))
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+                "manabarmaincolor",
+                "Health Bar Fill Color",
+                ElementType.ColorPicker(MCColorCode.BLUE.color)
+            ))
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
                 "showmanatext",
                 "Show Mana Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Mana Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+                "manatextstyle",
+                "Mana Text Style",
+                ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
+            ))
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
                 "showmaxmana",
                 "Show Max Mana",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Mana Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
                 "manatextcolor",
                 "Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addElement("General", "Stats Display", "Mana Bar", ConfigElement(
+            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
                 "maxmanatextcolor",
                 "Max Mana Text Color",
-                ElementType.MCColorPicker(MCColorCode.DARK_BLUE)
+                ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
             .addElement("General", "Stats Display", "Overflow Mana", ConfigElement(
                 "showoverflowmanatext",
@@ -218,41 +261,67 @@ object StatsDisplay : Feature("statsdisplay") {
         }
     }
 
-    private fun renderBar(x: Float, y: Float, width: Int, height: Int, scale: Float, primaryFill: Double, primaryColor: Color, secondaryFill: Double = 0.0, secondaryColor: Color? = null) {
+    private fun renderBar(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, primaryFill: Double, primaryColor: Color, secondaryFill: Double = 0.0, secondaryColor: Color? = null) {
         val scaledWidth = width * scale
         val scaledHeight = height * scale
         val borderWidth = 1f * scale
         val fillHeight = 8f * scale
-        val radius = 2f * scale
 
+        //#if MC >= 1.21.6
+        //$$ context.fill(
+        //$$     x.toInt(), y.toInt(),
+        //$$     (x + scaledWidth).toInt(), (y + scaledHeight).toInt(),
+        //$$     (Color.BLACK.alpha shl 24) or (Color.BLACK.red shl 16) or (Color.BLACK.green shl 8) or Color.BLACK.blue
+        //$$ )
+        //$$ context.fill(
+        //$$     (x + borderWidth).toInt(), (y + borderWidth).toInt(),
+        //$$     (x + scaledWidth - borderWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
+        //$$     (Color.DARK_GRAY.alpha shl 24) or (Color.DARK_GRAY.red shl 16) or (Color.DARK_GRAY.green shl 8) or Color.DARK_GRAY.blue
+        //$$ )
+        //$$
+        //$$ val availableWidth = scaledWidth - 2 * borderWidth
+        //$$ val primaryWidth = (availableWidth * primaryFill).toFloat()
+        //$$ val secondaryWidth = (availableWidth * secondaryFill).toFloat()
+        //$$
+        //$$ if (primaryWidth > 0) {
+        //$$     context.fill(
+        //$$         (x + borderWidth).toInt(), (y + borderWidth).toInt(),
+        //$$         (x + borderWidth + primaryWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
+        //$$         (primaryColor.alpha shl 24) or (primaryColor.red shl 16) or (primaryColor.green shl 8) or primaryColor.blue
+        //$$     )
+        //$$ }
+        //$$
+        //$$ if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
+        //$$     context.fill(
+        //$$         (x + borderWidth + primaryWidth).toInt(), (y + borderWidth).toInt(),
+        //$$         (x + borderWidth + primaryWidth + secondaryWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
+        //$$         (secondaryColor.alpha shl 24) or (secondaryColor.red shl 16) or (secondaryColor.green shl 8) or secondaryColor.blue
+        //$$     )
+        //$$ }
+        //#else
+        val radius = 2f * scale
         if (!initedShadersUI) UIRoundedRectangle.initShaders()
         UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
         UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
-
         val availableWidth = scaledWidth - 2 * borderWidth
         val primaryWidth = (availableWidth * primaryFill).toFloat()
         val secondaryWidth = (availableWidth * secondaryFill).toFloat()
-
         if (primaryWidth > 0) {
-            if (secondaryFill > 0 && secondaryColor != null) {
-                UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
-            } else {
-                UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
-            }
+            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
         }
-
         if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
             UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
         }
+        //#endif
     }
 
-    private fun renderText(context: DrawContext, text: String, x: Float, y: Float, width: Int, scale: Float) {
+    private fun renderText(context: DrawContext, text: String, x: Float, y: Float, width: Int, scale: Float, style: Render2D.TextStyle = Render2D.TextStyle.DROP_SHADOW) {
         val textWidth = text.width() * scale
         val scaledWidth = width * scale
         val centerX = x + scaledWidth / 2f
         val textX = centerX - textWidth / 2f
-        val textY = y - 8f * scale
-        Render2D.renderStringWithShadow(context, text, textX, textY, scale)
+        val textY = if (text.contains("ʬ")) y else y - (8f * scale)
+        Render2D.renderString(context, text, textX, textY, scale, textStyle = style)
     }
 
     private fun renderHealthBar(context: DrawContext) {
@@ -323,7 +392,9 @@ object StatsDisplay : Feature("statsdisplay") {
     }
 
     fun healthBarEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean, healthPerc: Double = 0.75, absorbPerc: Double = 0.25) {
-        renderBar(x, y, width, height, scale, healthPerc, Color.RED, absorbPerc, Color.YELLOW)
+        if(showHealthBar) {
+            renderBar(context, x, y, width, height, scale, healthPerc, healthBarFillColor, absorbPerc, healthBarExtraColor)
+        }
 
         if (showHealthText || previewMode) {
             val currentHealth = if (previewMode) {
@@ -339,12 +410,20 @@ object StatsDisplay : Feature("statsdisplay") {
                 "${healthTextColor.code}$currentHealth"
             }
 
-            renderText(context, healthText, x, y, width, scale)
+            val healthTextStyle = when (healthtextstyle) {
+                0 -> Render2D.TextStyle.DROP_SHADOW
+                1 -> Render2D.TextStyle.DEFAULT
+                2 -> Render2D.TextStyle.BLACK_OUTLINE
+                else -> Render2D.TextStyle.DROP_SHADOW
+            }
+            renderText(context, healthText, x, y, width, scale, healthTextStyle)
         }
     }
 
     fun manaBarEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean, manaPerc: Double = 0.6) {
-        renderBar(x, y, width, height, scale, manaPerc, Color.BLUE)
+        if(showManaBar) {
+            renderBar(context, x, y, width, height, scale, manaPerc, manaBarFillColor)
+        }
 
         if (showManaText || previewMode) {
             val currentMana = if (previewMode) {
@@ -360,12 +439,18 @@ object StatsDisplay : Feature("statsdisplay") {
                 "${manaTextColor.code}$currentMana"
             }
 
-            renderText(context, manaText, x, y, width, scale)
+            val manaTextStyle = when (manatextstyle) {
+                0 -> Render2D.TextStyle.DROP_SHADOW
+                1 -> Render2D.TextStyle.DEFAULT
+                2 -> Render2D.TextStyle.BLACK_OUTLINE
+                else -> Render2D.TextStyle.DROP_SHADOW
+            }
+            renderText(context, manaText, x, y, width, scale, manaTextStyle)
         }
     }
 
     fun riftTimeBarEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean, timePerc: Double = 0.8) {
-        renderBar(x, y, width, height, scale, timePerc, Color.GREEN)
+        renderBar(context, x, y, width, height, scale, timePerc, Color.GREEN)
 
         if (showRiftTimeText || previewMode) {
             val timeValue = if (previewMode) {
@@ -382,7 +467,7 @@ object StatsDisplay : Feature("statsdisplay") {
     }
 
     fun drillFuelBarEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean, fuelPerc: Double = 0.7) {
-        renderBar(x, y, width, height, scale, fuelPerc, Color(0, 128, 0))
+        renderBar(context, x, y, width, height, scale, fuelPerc, Color(0, 128, 0))
 
         if (showDrillFuelText || previewMode) {
             val currentFuel = if (previewMode) {

@@ -184,8 +184,7 @@ object SlayerDisplay : Feature("slayerdisplay") {
                     it,
                     event.entity.pos.add(0.0, yOffset, 0.0),
                     scaleMultiplier = 1.5,
-                    smallestDistanceView = 8.0,
-                    yOffset = 2.5f
+                    smallestDistanceView = 8.0
                 )
             }
         }
@@ -197,8 +196,7 @@ object SlayerDisplay : Feature("slayerdisplay") {
                     Render3D.drawString(
                         timerData.second,
                         timerData.third.add(0.0, 0.25, 0.0),
-                        scaleMultiplier = 1.5,
-                        yOffset = 2.5f
+                        scaleMultiplier = 1.5
                     )
                 }
                 expired
@@ -255,7 +253,7 @@ object SlayerDisplay : Feature("slayerdisplay") {
 
     private fun buildDisplayText(entity: Entity?, bossType: BossTypes, hpMatch: MatchResult?, hitsMatch: MatchResult?, timerNametag: String, prefix: String = ""): String {
         val baseName = if (useFullName) bossType.fullName else bossType.shortName
-        val mobName = if (prefix.isNotEmpty()) "$prefix $baseName" else baseName
+        val mobName = if (prefix.isNotEmpty()) "$prefix$baseName" else baseName
         val laserTimer = entity?.let { getLaserTimer(it) } ?: ""
         val useCompactDisplay = 5 in displayOptions
         val showName = 0 in displayOptions

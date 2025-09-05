@@ -145,7 +145,7 @@ object CarryHUD {
 
         renderItems.forEach { item ->
             val color = if (item.shadow || hoveredButton?.let { btn -> btn.x == item.x && btn.y == item.y } != true) item.color else Colors.WHITE
-            Render2D.renderString(context, item.text, item.x, item.y, scale, color, item.shadow)
+            Render2D.renderString(context, item.text, item.x, item.y, scale, color, if (item.shadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT)
         }
 
         renderTooltip(context, MouseY, MouseY)

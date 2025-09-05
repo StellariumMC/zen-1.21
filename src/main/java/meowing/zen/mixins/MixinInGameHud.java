@@ -44,6 +44,9 @@ public class MixinInGameHud {
         if (StatsDisplay.shouldHideVanillaArmor()) ci.cancel();
     }
 
+    //#if MC >= 1.21.7
+    //$$ // explode
+    //#else
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     private void zen$onRenderExperienceBar(DrawContext context, int x, CallbackInfo ci) {
         if (StatsDisplay.shouldHideExpBar()) ci.cancel();
@@ -53,6 +56,7 @@ public class MixinInGameHud {
     private void zen$onRenderExperienceLevel(DrawContext drawContext, RenderTickCounter renderTickCounter, CallbackInfo ci) {
         if (StatsDisplay.shouldHideExpBar()) ci.cancel();
     }
+    //#endif
 
     @WrapOperation(method = "renderHeldItemTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;getWidth(Lnet/minecraft/text/StringVisitable;)I"))
     private int zen$correctXValue(TextRenderer textRenderer, StringVisitable text, Operation<Integer> operation) {

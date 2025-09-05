@@ -152,7 +152,6 @@ object Render3D {
                 LightmapTextureManager.MAX_LIGHT_COORDINATE
             )
         }
-
         consumers.draw()
     }
 
