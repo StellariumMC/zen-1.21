@@ -46,7 +46,7 @@ object PriceData : Feature("pricedata", true) {
     private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviateNumber() else formatNumber()
 
     override fun initialize() {
-        register<ItemTooltipEvent> { event ->
+        register<ItemTooltipEvent>(priority = 10) { event ->
             val stack = event.stack
             val pricingData = ItemAPI.getItemInfo(stack) ?: return@register
 

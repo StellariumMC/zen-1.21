@@ -47,6 +47,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
                 val constants = NEUApi.NeuConstantData.getData().getAsJsonObject("enchants")
                 enchantsData = constants?.getAsJsonObject("enchants")
                 enchantPools = constants?.getAsJsonArray("enchant_pools")
+                LOGGER.info("Loaded enchants in ShowMissingEnchants")
             } catch (e: Exception) {
                 LOGGER.warn("Failed to load enchants in ShowMissingEnchants: $e")
             }
@@ -59,10 +60,10 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
             val enchantments = extraAttributes.getCompound("enchantments").orElse(null) ?: return@register
             val enchantIds = enchantments.keys
             if (enchantIds.isEmpty()) return@register
-            val itemUuid = extraAttributes.getString("uuid")
-            if (itemUuid.isEmpty) return@register
+            val itemUUID = extraAttributes.getString("uuid")
+            if (itemUUID.isEmpty) return@register
 
-            val cacheKey = ItemCacheKey(itemUuid.toString(), enchantIds)
+            val cacheKey = ItemCacheKey(itemUUID.toString(), enchantIds)
             tooltipCache[cacheKey]?.let { cachedLines ->
                 event.lines.clear()
                 event.lines.addAll(cachedLines)
