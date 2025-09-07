@@ -1,4 +1,4 @@
-package meowing.zen.features.noclutter
+package meowing.zen.features.qol
 
 import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
@@ -11,12 +11,12 @@ import meowing.zen.features.Feature
  * Under GPL 3.0 License
  */
 @Zen.Module
-object HideThunder : Feature("hidethunder") {
+object HideFireOverlay : Feature("hidefireoverlay") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("No clutter", "Hide thunder", ConfigElement(
-                "hidethunder",
-                "Hide thunder",
+            .addElement("QoL", "Hide Fire Overlay", ConfigElement(
+                "hidefireoverlay",
+                null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
     }

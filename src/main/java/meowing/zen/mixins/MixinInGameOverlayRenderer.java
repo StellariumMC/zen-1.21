@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.features.noclutter.HideFireOverlay;
+import meowing.zen.features.qol.HideFireOverlay;
 import net.minecraft.client.gui.hud.InGameOverlayRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;

@@ -1,6 +1,5 @@
-package meowing.zen.features.general
+package meowing.zen.features.hud
 
-import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import gg.essential.universal.UMatrixStack
 import meowing.zen.Zen
@@ -80,32 +79,32 @@ object StatsDisplay : Feature("statsdisplay", true) {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Stats Display", ConfigElement(
+            .addElement("HUD", "Stats Display", ConfigElement(
                 "statsdisplay",
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-            .addElement("General", "Stats Display", "Options", ConfigElement(
+            .addElement("HUD", "Stats Display", "Options", ConfigElement(
                 "cleanactionbar",
                 "Clean Action Bar",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Options", ConfigElement(
+            .addElement("HUD", "Stats Display", "Options", ConfigElement(
                 "hidevanillahp",
                 "Hide Vanilla HP and Saturation",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Options", ConfigElement(
+            .addElement("HUD", "Stats Display", "Options", ConfigElement(
                 "hidevanillaarmor",
                 "Hide Armor Icon",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Options", ConfigElement(
+            .addElement("HUD", "Stats Display", "Options", ConfigElement(
                 "hideexpbar",
                 "Hide Experience Bar",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Options", ConfigElement(
+            .addElement("HUD", "Stats Display", "Options", ConfigElement(
                 "hiddenstats",
                 "Hide Stats",
                 ElementType.MultiCheckbox(
@@ -113,117 +112,117 @@ object StatsDisplay : Feature("statsdisplay", true) {
                     default = emptySet()
                 )
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "showhealthbar",
                 "Show Health Bar",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "healthbarmaincolor",
                 "Health Bar Fill Color",
                 ElementType.ColorPicker(MCColorCode.RED.color)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "healthbarextracolor",
                 "Health Bar Absorption Fill Color",
                 ElementType.ColorPicker(MCColorCode.YELLOW.color)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "showhealthtext",
                 "Show Health Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "healthtextstyle",
                 "Health Text Style",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "showmaxhealth",
                 "Show Max Health",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "healthtextcolor",
                 "Health Text Color",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("General", "Stats Display", "Health Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
                 "maxhealthtextcolor",
                 "Max Health Text Color",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "showmanabar",
                 "Show Mana Bar",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "manabarmaincolor",
                 "Health Bar Fill Color",
                 ElementType.ColorPicker(MCColorCode.BLUE.color)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "showmanatext",
                 "Show Mana Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "manatextstyle",
                 "Mana Text Style",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "showmaxmana",
                 "Show Max Mana",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "manatextcolor",
                 "Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addElement("General", "Stats Display", "Mana Display", ConfigElement(
+            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
                 "maxmanatextcolor",
                 "Max Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addElement("General", "Stats Display", "Overflow Mana", ConfigElement(
+            .addElement("HUD", "Stats Display", "Overflow Mana", ConfigElement(
                 "showoverflowmanatext",
                 "Show Overflow Mana",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Overflow Mana", ConfigElement(
+            .addElement("HUD", "Stats Display", "Overflow Mana", ConfigElement(
                 "overflowmanatextcolor",
                 "Overflow Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.DARK_AQUA)
             ))
-            .addElement("General", "Stats Display", "Rift Time Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Rift Time Bar", ConfigElement(
                 "showrifttimetext",
                 "Show Rift Time Text",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Rift Time Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Rift Time Bar", ConfigElement(
                 "rifttimetextcolor",
                 "Rift Time Text Color",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
             ))
-            .addElement("General", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
                 "showdrillfueltext",
                 "Show Drill Fuel Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
                 "showmaxdrillfuel",
                 "Show Max Drill Fuel",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
                 "drillfueltextcolor",
                 "Drill Fuel Text Color",
                 ElementType.MCColorPicker(MCColorCode.DARK_GREEN)
             ))
-            .addElement("General", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
                 "maxdrillfueltextcolor",
                 "Max Drill Fuel Text Color",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
@@ -300,17 +299,17 @@ object StatsDisplay : Feature("statsdisplay", true) {
         //$$ }
         //#else
         val radius = 2f * scale
-        if (!initedShadersUI) UIRoundedRectangle.initShaders()
-        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
-        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
+        if (!initedShadersUI) UIRoundedRectangle.Companion.initShaders()
+        UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
+        UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
         val availableWidth = scaledWidth - 2 * borderWidth
         val primaryWidth = (availableWidth * primaryFill).toFloat()
         val secondaryWidth = (availableWidth * secondaryFill).toFloat()
         if (primaryWidth > 0) {
-            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
+            UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
         }
         if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
-            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
+            UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
         }
         //#endif
     }

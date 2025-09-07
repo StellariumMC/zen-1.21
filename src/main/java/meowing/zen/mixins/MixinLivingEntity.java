@@ -5,7 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import meowing.zen.events.EntityEvent;
 import meowing.zen.events.EventBus;
-import meowing.zen.features.general.ItemAnimations;
+import meowing.zen.features.visuals.ItemAnimations;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;

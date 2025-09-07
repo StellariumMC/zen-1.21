@@ -2,8 +2,8 @@ package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import meowing.zen.features.general.StatsDisplay;
-import meowing.zen.features.noclutter.HideStatusEffects;
+import meowing.zen.features.hud.StatsDisplay;
+import meowing.zen.features.qol.HideStatusEffects;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;

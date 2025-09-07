@@ -1,7 +1,7 @@
 package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import meowing.zen.features.general.ItemAnimations;
+import meowing.zen.features.visuals.ItemAnimations;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;

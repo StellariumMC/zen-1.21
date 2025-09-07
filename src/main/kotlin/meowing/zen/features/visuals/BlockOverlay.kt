@@ -1,17 +1,17 @@
-package meowing.zen.features.general
+package meowing.zen.features.visuals
 
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
+import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.block.ShapeContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
-import meowing.zen.events.RenderEvent
 import java.awt.Color
 
 @Zen.Module
@@ -20,12 +20,12 @@ object BlockOverlay : Feature("blockoverlay") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Block overlay", ConfigElement(
+            .addElement("Visuals", "Block overlay", ConfigElement(
                 "blockoverlay",
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-            .addElement("General", "Block overlay", "Options", ConfigElement(
+            .addElement("Visuals", "Block overlay", "Options", ConfigElement(
                 "blockoverlaycolor",
                 "Block overlay color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))

@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.features.noclutter.HideFallingBlocks;
+import meowing.zen.features.qol.HideFallingBlocks;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.FallingBlockEntityRenderer;
 import net.minecraft.client.render.entity.state.FallingBlockEntityRenderState;

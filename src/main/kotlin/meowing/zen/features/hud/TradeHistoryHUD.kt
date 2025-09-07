@@ -1,4 +1,4 @@
-package meowing.zen.features.general
+package meowing.zen.features.hud
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
@@ -44,13 +44,13 @@ import java.util.*
 object TradeHistoryCommand : CommandUtils("tradelogs", aliases = listOf("zentl", "zentrades"))  {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
         TickUtils.schedule(2) {
-            mc.setScreen(TradeHistoryGui())
+            mc.setScreen(TradeHistoryHUD())
         }
         return 1
     }
 }
 
-class TradeHistoryGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
+class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private val theme = object {
         val bg = Color(8, 12, 16, 255)
         val element = Color(12, 16, 20, 255)

@@ -1,4 +1,4 @@
-package meowing.zen.features.general
+package meowing.zen.features.visuals
 
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
@@ -23,52 +23,52 @@ object ItemAnimations : Feature("itemanimations") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Item Animations", ConfigElement(
+            .addElement("Visuals", "Item Animations", ConfigElement(
                 "itemanimations",
                 "Enable item animations",
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-            .addElement("General", "Item Animations", "Size", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
                 "itemsize",
                 "Item size multiplier",
                 ElementType.Slider(-1.0, 2.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Size", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
                 "itemx",
                 "Item X position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Size", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
                 "itemy",
                 "Item Y position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Size", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
                 "itemz",
                 "Item Z position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Rotation", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
                 "itempitch",
                 "Item pitch rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Rotation", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
                 "itemyaw",
                 "Item yaw rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Rotation", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
                 "itemroll",
                 "Item roll rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Swing", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Swing", ConfigElement(
                 "itemswingspeed",
                 "Swing speed multiplier",
                 ElementType.Slider(-2.0, 1.0, 0.0, true)
             ))
-            .addElement("General", "Item Animations", "Options", ConfigElement(
+            .addElement("Visuals", "Item Animations", "Options", ConfigElement(
                 "itemcancelrequip",
                 "Cancel item re-equip animation",
                 ElementType.Switch(false)

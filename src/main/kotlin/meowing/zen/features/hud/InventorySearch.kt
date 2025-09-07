@@ -1,4 +1,4 @@
-package meowing.zen.features.general
+package meowing.zen.features.hud
 
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
@@ -7,6 +7,7 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.GuiEvent
 import meowing.zen.features.Feature
+import meowing.zen.features.general.CalculatorCommand
 import meowing.zen.ui.components.TextInputComponent
 import meowing.zen.utils.ItemUtils.lore
 import meowing.zen.utils.Render2D
@@ -35,22 +36,22 @@ object InventorySearch : Feature("inventorysearch") {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Inventory Search", ConfigElement(
+            .addElement("HUD", "Inventory Search", ConfigElement(
                 "inventorysearch",
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-            .addElement("General", "Inventory Search", "Options", ConfigElement(
+            .addElement("HUD", "Inventory Search", "Options", ConfigElement(
                 "inventorysearchlore",
                 "Search lore",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Inventory Search", "Options", ConfigElement(
+            .addElement("HUD", "Inventory Search", "Options", ConfigElement(
                 "inventorysearchcolor",
                 "Highlight color",
                 ElementType.ColorPicker(Color(0, 127, 127, 127))
             ))
-            .addElement("General", "Inventory Search", "Options", ConfigElement(
+            .addElement("HUD", "Inventory Search", "Options", ConfigElement(
                 "inventorysearchtype",
                 "Highlight type",
                 ElementType.Dropdown(listOf("Slot", "Border"), 0)

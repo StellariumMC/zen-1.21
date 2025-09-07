@@ -1,4 +1,4 @@
-package meowing.zen.features.noclutter
+package meowing.zen.features.qol
 
 import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
@@ -6,16 +6,12 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.features.Feature
 
-/*
- * Modified from Devonian code
- * Under GPL 3.0 License
- */
 @Zen.Module
-object HideFireOverlay : Feature("hidefireoverlay") {
+object RemoveChatLimit : Feature("removechatlimit") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("No clutter", "Hide Fire Overlay", ConfigElement(
-                "hidefireoverlay",
+            .addElement("QoL", "Remove chat history limit", ConfigElement(
+                "removechatlimit",
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)

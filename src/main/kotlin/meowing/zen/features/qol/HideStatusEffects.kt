@@ -1,4 +1,4 @@
-package meowing.zen.features.noclutter
+package meowing.zen.features.qol
 
 import meowing.zen.Zen
 import meowing.zen.config.ui.ConfigUI
@@ -11,12 +11,12 @@ import meowing.zen.features.Feature
  * Under GPL 3.0 License
  */
 @Zen.Module
-object HideFallingBlocks : Feature("hidefallingblocks") {
+object HideStatusEffects : Feature("hidestatuseffects") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("No clutter", "Hide falling blocks", ConfigElement(
-                "hidefallingblocks",
-                "Hide falling blocks",
+            .addElement("QoL", "Hide status effects", ConfigElement(
+                "hidestatuseffects",
+                "Hide status effects",
                 ElementType.Switch(false)
             ), isSectionToggle = true)
     }

@@ -1,4 +1,4 @@
-package meowing.zen.features.general
+package meowing.zen.features.visuals
 
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
@@ -27,12 +27,12 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
-            .addElement("General", "Fire freeze overlay", ConfigElement(
+            .addElement("Visuals", "Fire freeze overlay", ConfigElement(
                 "firefreezeoverlay",
                 null,
                 ElementType.Switch(false)
             ), isSectionToggle = true)
-            .addElement("General", "Fire freeze overlay", "Color", ConfigElement(
+            .addElement("Visuals", "Fire freeze overlay", "Color", ConfigElement(
                 "firefreezeoverlaycolor",
                 "Fire Freeze Overlay color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))

@@ -1,6 +1,6 @@
 package meowing.zen.mixins;
 
-import meowing.zen.features.noclutter.HideThunder;
+import meowing.zen.features.qol.HideThunder;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.LightningEntityRenderer;
 import net.minecraft.client.render.entity.state.LightningEntityRenderState;
