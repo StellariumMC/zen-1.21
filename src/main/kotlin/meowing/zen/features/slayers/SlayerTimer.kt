@@ -16,7 +16,7 @@ import meowing.zen.utils.TimeUtils.millis
 import net.minecraft.entity.mob.SpiderEntity
 
 @Zen.Module
-object SlayerTimer : Feature("slayertimer") {
+object SlayerTimer : Feature("slayertimer", true) {
     var spawnTime = TimeUtils.zero
     private var isFighting = false
     private var startTime = TimeUtils.zero

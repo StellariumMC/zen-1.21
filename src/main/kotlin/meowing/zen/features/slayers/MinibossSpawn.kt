@@ -16,7 +16,7 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
 
 @Zen.Module
-object MinibossSpawn : Feature("minibossspawn") {
+object MinibossSpawn : Feature("minibossspawn", true) {
     private val carrycounter by ConfigDelegate<Boolean>("carrycounter")
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val entities = mutableListOf<Int>()

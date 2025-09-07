@@ -96,6 +96,12 @@ class Zen : ClientModInitializer {
             }
         })
 
+        EventBus.register<AreaEvent.Skyblock> ({
+            TickUtils.scheduleServer(1) {
+                skyblockFeatures.forEach { it.update() }
+            }
+        })
+
         NetworkUtils.getJson(
             "https://api.hypixel.net/v2/resources/skyblock/election",
             onSuccess = { jsonObject ->
@@ -117,6 +123,7 @@ class Zen : ClientModInitializer {
         private val pendingFeatures = mutableListOf<Feature>()
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
+        private val skyblockFeatures = mutableListOf<Feature>()
         lateinit var configUI: ConfigUI
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
@@ -147,6 +154,7 @@ class Zen : ClientModInitializer {
                 features.add(feature)
                 if (feature.hasAreas()) areaFeatures.add(feature)
                 if (feature.hasSubareas()) subareaFeatures.add(feature)
+                if (feature.skyblockOnly) skyblockFeatures.add(feature)
                 feature.addConfig(configUI)
                 feature.initialize()
                 feature.configKey?.let { registerListener(it, feature) }

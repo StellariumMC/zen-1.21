@@ -12,7 +12,7 @@ import meowing.zen.utils.ItemUtils.skyblockID
 import meowing.zen.utils.Render2D
 
 @Zen.Module
-object ReaperTimer : Feature("reapertimer") {
+object ReaperTimer : Feature("reapertimer", true) {
     private const val name = "Reaper Timer"
     private val indices = listOf(36, 37, 38)
     private var reaped = false

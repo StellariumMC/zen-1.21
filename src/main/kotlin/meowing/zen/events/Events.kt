@@ -69,6 +69,7 @@ abstract class GameEvent {
     class Load : Event()
     class Unload : Event()
     class ActionBar(val message: Text) : CancellableEvent()
+    class Disconnect() : Event()
 }
 
 abstract class PartyEvent {
@@ -145,4 +146,5 @@ abstract class TablistEvent {
 abstract class AreaEvent {
     class Main(val area: String) : Event()
     class Sub(val subarea: String) : Event()
+    class Skyblock(val newVal: Boolean) : Event()
 }

@@ -22,7 +22,7 @@ import net.minecraft.client.gui.DrawContext
 import kotlin.time.Duration
 
 @Zen.Module
-object SlayerStats : Feature("slayerstats") {
+object SlayerStats : Feature("slayerstats", true) {
     private var kills = 0
     private var sessionStart = TimeUtils.now
     private var totalKillTime = Duration.ZERO

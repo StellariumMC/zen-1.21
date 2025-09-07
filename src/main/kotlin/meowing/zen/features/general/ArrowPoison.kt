@@ -18,7 +18,7 @@ import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.SetPlayerInventoryS2CPacket
 
 @Zen.Module
-object ArrowPoison : Feature("arrowpoison") {
+object ArrowPoison : Feature("arrowpoison", true) {
     private const val name = "ArrowPoison"
     private var twilight = 0
     private var toxic = 0

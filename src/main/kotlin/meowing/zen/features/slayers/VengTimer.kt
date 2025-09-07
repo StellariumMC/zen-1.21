@@ -18,7 +18,7 @@ import net.minecraft.entity.mob.BlazeEntity
 import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
-object VengTimer : Feature("vengtimer") {
+object VengTimer : Feature("vengtimer", true) {
     private var starttime = TimeUtils.zero
     private var hit = false
     private var isFighting = false

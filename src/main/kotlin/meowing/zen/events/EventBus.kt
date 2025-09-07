@@ -1,6 +1,7 @@
 package meowing.zen.events
 
 import meowing.zen.Zen.Companion.configUI
+import meowing.zen.utils.LocationUtils
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -8,6 +9,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents
@@ -144,6 +146,10 @@ object EventBus {
                 lines.addAll(tooltipEvent.lines)
             }
         }
+
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            post(GameEvent.Disconnect())
+        }
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {
@@ -227,7 +233,15 @@ object EventBus {
     }
 }
 
-inline fun <reified T : Event> configRegister(configKeys: Any, priority: Int = 0, noinline enabledCheck: (Map<String, Any?>) -> Boolean, noinline callback: (T) -> Unit): EventBus.EventCall {
+inline fun <reified T : Event> configRegister(
+    configKeys: Any,
+    priority: Int = 0,
+    skyblockOnly: Boolean = false,
+    area: Any? = null,
+    subarea: Any? = null,
+    noinline enabledCheck: (Map<String, Any?>) -> Boolean,
+    noinline callback: (T) -> Unit
+): EventBus.EventCall {
     val eventCall = EventBus.register<T>(priority, callback, false)
     val keys = when (configKeys) {
         is String -> listOf(configKeys)
@@ -235,35 +249,91 @@ inline fun <reified T : Event> configRegister(configKeys: Any, priority: Int = 0
         else -> throw IllegalArgumentException("configKeys must be String or List<String>")
     }
 
+    val areas = when (area) {
+        is String -> listOf(area.lowercase())
+        is List<*> -> area.filterIsInstance<String>().map { it.lowercase() }
+        else -> emptyList()
+    }
+    val subareas = when (subarea) {
+        is String -> listOf(subarea.lowercase())
+        is List<*> -> subarea.filterIsInstance<String>().map { it.lowercase() }
+        else -> emptyList()
+    }
+
     val checkAndUpdate = {
         val configValues = keys.associateWith { configUI.getConfigValue(it) }
-        if (enabledCheck(configValues)) eventCall.register() else eventCall.unregister()
+        val configEnabled = enabledCheck(configValues)
+        val skyblockEnabled = !skyblockOnly || LocationUtils.inSkyblock
+        val areaEnabled = areas.isEmpty() || areas.any { LocationUtils.checkArea(it) }
+        val subareaEnabled = subareas.isEmpty() || subareas.any { LocationUtils.checkSubarea(it) }
+
+        if (configEnabled && skyblockEnabled && areaEnabled && subareaEnabled) {
+            eventCall.register()
+        } else {
+            eventCall.unregister()
+        }
     }
 
     keys.forEach { configKey ->
         configUI.registerListener(configKey) { checkAndUpdate() }
     }
 
+    if (areas.isNotEmpty()) {
+        EventBus.register<AreaEvent.Main> { checkAndUpdate() }
+    }
+
+    if (subareas.isNotEmpty()) {
+        EventBus.register<AreaEvent.Sub> { checkAndUpdate() }
+    }
+
+    if (skyblockOnly) {
+        EventBus.register<AreaEvent.Skyblock> { checkAndUpdate() }
+    }
+
+    checkAndUpdate()
     return eventCall
 }
 
 @Suppress("UNUSED")
-inline fun <reified T : Event> configRegister(configKeys: Any, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
-    return configRegister(configKeys, priority, { configValues ->
+inline fun <reified T : Event> configRegister(
+    configKeys: Any,
+    priority: Int = 0,
+    skyblockOnly: Boolean = false,
+    area: Any? = null,
+    subarea: Any? = null,
+    noinline callback: (T) -> Unit
+): EventBus.EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
         configValues.values.all { it as? Boolean == true }
     }, callback)
 }
 
 @Suppress("UNUSED")
-inline fun <reified T : Event> configRegister(configKeys: Any, enabledIndices: Set<Int>, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
-    return configRegister(configKeys, priority, { configValues ->
+inline fun <reified T : Event> configRegister(
+    configKeys: Any,
+    enabledIndices: Set<Int>,
+    priority: Int = 0,
+    skyblockOnly: Boolean = false,
+    area: Any? = null,
+    subarea: Any? = null,
+    noinline callback: (T) -> Unit
+): EventBus.EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
         (configValues.values.first() as? Int) in enabledIndices
     }, callback)
 }
 
 @Suppress("UNUSED")
-inline fun <reified T : Event> configRegister(configKeys: Any, requiredIndex: Int, priority: Int = 0, noinline callback: (T) -> Unit): EventBus.EventCall {
-    return configRegister(configKeys, priority, { configValues ->
+inline fun <reified T : Event> configRegister(
+    configKeys: Any,
+    requiredIndex: Int,
+    priority: Int = 0,
+    skyblockOnly: Boolean = false,
+    area: Any? = null,
+    subarea: Any? = null,
+    noinline callback: (T) -> Unit
+): EventBus.EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
         (configValues.values.first() as? Set<*>)?.contains(requiredIndex) == true
     }, callback)
 }

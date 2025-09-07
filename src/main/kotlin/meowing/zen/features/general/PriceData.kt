@@ -13,7 +13,7 @@ import meowing.zen.utils.Utils.formatNumber
 import net.minecraft.text.Text
 
 @Zen.Module
-object PriceData : Feature("pricedata") {
+object PriceData : Feature("pricedata", true) {
     private val displaySet by ConfigDelegate<Set<Int>>("pricedatadisplay")
     private val abbreviateNumbers by ConfigDelegate<Boolean>("abbreviatenumbers")
     private val displayOptions = listOf(

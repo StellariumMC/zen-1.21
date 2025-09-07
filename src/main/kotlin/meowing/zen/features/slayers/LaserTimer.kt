@@ -13,7 +13,7 @@ import meowing.zen.utils.Render3D
 import java.awt.Color
 
 @Zen.Module
-object LaserTimer : Feature("lasertimer") {
+object LaserTimer : Feature("lasertimer", true) {
     private var bossID = 0
     private val totaltime = 8.2
 

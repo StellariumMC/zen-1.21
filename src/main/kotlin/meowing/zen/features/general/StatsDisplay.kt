@@ -22,7 +22,7 @@ import net.minecraft.text.Text
 import java.awt.Color
 
 @Zen.Module
-object StatsDisplay : Feature("statsdisplay") {
+object StatsDisplay : Feature("statsdisplay", true) {
     private const val healthBarName = "Health Bar"
     private const val manaBarName = "Mana Bar"
     private const val overflowManaName = "Overflow Mana"

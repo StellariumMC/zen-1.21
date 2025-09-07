@@ -17,7 +17,7 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket
 import net.minecraft.util.Hand
 
 @Zen.Module
-object RagnarockAlert : Feature("ragalert") {
+object RagnarockAlert : Feature("ragalert", true) {
     private val ragparty by ConfigDelegate<Boolean>("ragparty")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {

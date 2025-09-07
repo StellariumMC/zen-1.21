@@ -18,7 +18,7 @@ import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
 @Zen.Module
-object InventorySearch : Feature() {
+object InventorySearch : Feature("inventorysearch") {
     private val searchLore by ConfigDelegate<Boolean>("inventorysearchlore")
     private val highlightType by ConfigDelegate<Int>("inventorysearchtype")
     private val color by ConfigDelegate<Color>("inventorysearchcolor")
