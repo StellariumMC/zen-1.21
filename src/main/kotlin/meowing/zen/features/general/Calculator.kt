@@ -40,7 +40,7 @@ object CalculatorCommand : CommandUtils(
         )
     }
 
-    private fun eval(s: String): Double {
+    fun eval(s: String): Double {
         var i = 0
         fun next() = if (i < s.length) s[i++] else 0.toChar()
         fun peek() = if (i < s.length) s[i] else 0.toChar()

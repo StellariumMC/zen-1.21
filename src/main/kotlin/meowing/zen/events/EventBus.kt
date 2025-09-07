@@ -86,6 +86,7 @@ object EventBus {
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, _ ->
                 !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
             }
+
             ScreenEvents.remove(screen).register { screen ->
                 post(GuiEvent.Close(screen))
             }

@@ -56,8 +56,8 @@ abstract class MouseEvent {
 }
 
 abstract class KeyEvent {
-    class Press(val keyCode: Int, val scanCode: Int, val modifiers: Int) : Event()
-    class Release(val keyCode: Int, val scanCode: Int, val modifiers: Int) : Event()
+    class Press(val keyCode: Int, val scanCode: Int, val modifiers: Int) : CancellableEvent()
+    class Release(val keyCode: Int, val scanCode: Int, val modifiers: Int) : CancellableEvent()
 }
 
 abstract class TickEvent {
