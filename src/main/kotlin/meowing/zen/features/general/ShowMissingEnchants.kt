@@ -19,6 +19,12 @@ import org.apache.commons.lang3.StringUtils
 import org.lwjgl.glfw.GLFW.GLFW_PRESS
 import org.lwjgl.glfw.GLFW.glfwGetKey
 
+/**
+ * Module contains modified code from NEU
+ *
+ * @author NEU Contributors
+ * @see [NotEnoughUpdates - ItemTooltipListener.java](https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/master/src/main/java/io/github/moulberry/notenoughupdates/listener/ItemTooltipListener.java)
+ */
 @Zen.Module
 object ShowMissingEnchants : Feature("showmissingenchants", true) {
     private var enchantsData: JsonObject? = null

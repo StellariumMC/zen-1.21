@@ -8,10 +8,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.prefix
+import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
+import meowing.zen.events.SkyblockEvent
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.Render2D.renderString
 import meowing.zen.utils.TimeUtils
@@ -26,6 +28,7 @@ object SlayerStats : Feature("slayerstats", true) {
     private var kills = 0
     private var sessionStart = TimeUtils.now
     private var totalKillTime = Duration.ZERO
+    private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private const val name = "SlayerStats"
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -38,13 +41,19 @@ object SlayerStats : Feature("slayerstats", true) {
             .addElement("Slayers", "Slayer stats", "", ConfigElement(
                 "",
                 null,
-                ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats.")
+                ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
             ))
     }
 
     override fun initialize() {
         HUDManager.register(name, "$prefix §f§lSlayer Stats:\n§7> §bTotal bosses§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
         register<RenderEvent.HUD> { renderHUD(it.context) }
+
+        register<SkyblockEvent.Slayer.Death> {
+            if (!slayertimer) {
+                ChatUtils.addMessage("$prefix §cYou must enable the §eSlayer Timer§c feature for Slayer Stats to work.")
+            }
+        }
     }
 
     fun addKill(killtime: Duration) {
