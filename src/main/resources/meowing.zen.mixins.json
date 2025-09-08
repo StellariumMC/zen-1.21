@@ -6,6 +6,7 @@
     "AccessorChatHud",
     "MixinChatHud",
     "MixinClientConnection",
+    "MixinClientPlayerEntity",
     "MixinClientPlayerInteraction",
     "MixinClientPlayNetworkHandler",
     "MixinEntityRenderDispatcher",

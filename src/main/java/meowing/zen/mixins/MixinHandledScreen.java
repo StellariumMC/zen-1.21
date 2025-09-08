@@ -2,6 +2,7 @@ package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import kotlin.Suppress;
 import meowing.zen.events.EventBus;
 import meowing.zen.events.GuiEvent;
 import net.minecraft.client.gui.DrawContext;
@@ -15,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /*
  * Modified from Devonian code
@@ -43,5 +45,12 @@ public class MixinHandledScreen {
     private void zen$drawSlots(HandledScreen instance, DrawContext context, Slot slot, Operation<Void> original) {
         EventBus.INSTANCE.post(new GuiEvent.Slot.Render(context, slot, instance));
         original.call(instance, context, slot);
+    }
+
+    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;close()V", shift = At.Shift.BEFORE), cancellable = true)
+    private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+        if (EventBus.INSTANCE.post(new GuiEvent.Close((HandledScreen) (Object) this, this.handler))) {
+            cir.setReturnValue(true);
+        }
     }
 }

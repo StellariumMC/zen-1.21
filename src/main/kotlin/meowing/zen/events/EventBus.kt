@@ -89,9 +89,6 @@ object EventBus {
                 !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
             }
 
-            ScreenEvents.remove(screen).register { screen ->
-                post(GuiEvent.Close(screen))
-            }
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
                 post(GuiEvent.AfterRender(screen, context))
             }
@@ -199,6 +196,14 @@ object EventBus {
 
     inline fun <reified T : Event> register(noinline callback: (T) -> Unit): EventCall {
         return register(0, callback, true)
+    }
+
+    @JvmStatic
+    fun <T : Event> registerJava(eventClass: Class<T>, priority: Int, add: Boolean = false, callback: (T) -> Unit): EventCall {
+        val handlers = listeners.getOrPut(eventClass) { ConcurrentHashMap.newKeySet() }
+        val prioritizedCallback = PrioritizedCallback(priority, callback)
+        if (add) handlers.add(prioritizedCallback)
+        return EventCallImpl(prioritizedCallback, handlers)
     }
 
     fun <T : Event> post(event: T): Boolean {

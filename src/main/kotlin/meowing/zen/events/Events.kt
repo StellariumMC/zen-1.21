@@ -102,6 +102,7 @@ abstract class EntityEvent {
     class Spawn(val packet: EntitySpawnS2CPacket) : CancellableEvent()
     class Interact(val player: PlayerEntity, val world: World, val hand: Hand, val action: String, val pos: BlockPos? = null) : Event()
     class ArrowHit(val shooterName: String, val hitEntity: Entity) : Event()
+    class ItemToss(val stack: ItemStack) : CancellableEvent()
 }
 
 abstract class GuiEvent {
@@ -109,7 +110,7 @@ abstract class GuiEvent {
     @Deprecated("Use RenderEvent.HUD instead.")
     class HUD(val context: DrawContext) : Event()
     class Open(val screen: Screen) : Event()
-    class Close(val screen: Screen) : Event()
+    class Close(val screen: Screen, val handler: ScreenHandler) : CancellableEvent()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
     class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
 
