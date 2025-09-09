@@ -121,7 +121,7 @@ object SlayerStats : Feature("slayerstats", true) {
 @Zen.Command
 object SlayerStatsCommand : CommandUtils(
     "slayerstats",
-    listOf("zenslayers")
+    listOf()
 ) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
         ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
