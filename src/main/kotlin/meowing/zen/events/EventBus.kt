@@ -324,7 +324,13 @@ inline fun <reified T : Event> configRegister(
     noinline callback: (T) -> Unit
 ): EventBus.EventCall {
     return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
-        (configValues.values.first() as? Int) in enabledIndices
+        configValues.values.all { value ->
+            when (value) {
+                is Int -> value in enabledIndices
+                is Boolean -> value
+                else -> false
+            }
+        }
     }, callback)
 }
 
@@ -339,6 +345,12 @@ inline fun <reified T : Event> configRegister(
     noinline callback: (T) -> Unit
 ): EventBus.EventCall {
     return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
-        (configValues.values.first() as? Set<*>)?.contains(requiredIndex) == true
+        configValues.values.all { value ->
+            when (value) {
+                is Set<*> -> value.contains(requiredIndex)
+                is Boolean -> value
+                else -> false
+            }
+        }
     }, callback)
 }
