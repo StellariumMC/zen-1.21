@@ -85,12 +85,19 @@ enum class PartyChangeType {
 abstract class RenderEvent {
     class World(val context: WorldRenderContext?) : Event()
     class WorldPostEntities(val context: WorldRenderContext?) : Event()
-    class EntityPre(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
-    class EntityPost(val entity: Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
-    class PlayerPre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
     class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
-    class EntityGlow(val entity: Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
+    class EntityGlow(val entity: net.minecraft.entity.Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
     class HUD(val context: DrawContext) : Event()
+    class GuardianLaser(val entity: net.minecraft.entity.Entity, val target: net.minecraft.entity.Entity?) : CancellableEvent()
+
+    abstract class Entity {
+        class Pre(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
+        class Post(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
+    }
+
+    abstract class Player {
+        class Pre(val entity: PlayerEntityRenderState, val matrices: MatrixStack) : CancellableEvent()
+    }
 }
 
 abstract class EntityEvent {

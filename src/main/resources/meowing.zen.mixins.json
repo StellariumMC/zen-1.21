@@ -13,6 +13,7 @@
     "MixinEntityRenderer",
     "MixinFallingBlockEntityRenderer",
     "MixinGameRenderer",
+    "MixinGuardianEntityRenderer",
     "MixinHandledScreen",
     "MixinHeldItemRenderer",
     "MixinInGameHud",

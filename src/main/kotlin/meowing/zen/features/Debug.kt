@@ -54,7 +54,7 @@ object Debug : Feature() {
     inline val debugmode get() = data.getData().debugmode
 
     init {
-        createCustomEvent<RenderEvent.EntityPost>("mobid") { event ->
+        createCustomEvent<RenderEvent.Entity.Post>("mobid") { event ->
             Render3D.drawString(
                 event.entity.sbMobID ?: return@createCustomEvent,
                 event.entity.pos,

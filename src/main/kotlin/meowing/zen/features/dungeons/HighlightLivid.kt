@@ -106,7 +106,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
             }
         }
 
-        createCustomEvent<RenderEvent.PlayerPre>("renderWrong") { event ->
+        createCustomEvent<RenderEvent.Player.Pre>("renderWrong") { event ->
             if (event.entity != lividEntity && event.entity.name.contains(" Livid")) {
                 event.cancel()
             }

@@ -135,7 +135,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
             }
         }
 
-        configRegister<RenderEvent.EntityPre>(listOf("slayerdisplay", "slayerdisplayhideoriginalnametags"), priority = 1000) { event ->
+        configRegister<RenderEvent.Entity.Pre>(listOf("slayerdisplay", "slayerdisplayhideoriginalnametags"), priority = 1000) { event ->
             if (event.entity is ArmorStandEntity && hiddenArmorStands.contains(event.entity.id)) {
                 event.cancel()
             }
@@ -168,7 +168,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
             }
         }
 
-        register<RenderEvent.EntityPre> { event ->
+        register<RenderEvent.Entity.Pre> { event ->
             if (event.entity is BlazeEntity) return@register
             val entityId = event.entity.id
             val slayerEntityId = entityId - 1

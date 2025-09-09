@@ -32,7 +32,7 @@ object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
     }
 
     override fun initialize() {
-        register<RenderEvent.EntityPre> { event ->
+        register<RenderEvent.Entity.Pre> { event ->
             if (event.entity !is ArmorStandEntity) return@register
             val name = event.entity.name.string.removeFormatting()
             if (name == "Wither Key" || name == "Blood Key") {

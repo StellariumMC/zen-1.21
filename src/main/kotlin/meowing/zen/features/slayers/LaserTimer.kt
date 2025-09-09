@@ -27,7 +27,7 @@ object LaserTimer : Feature("lasertimer", true) {
     }
 
     override fun initialize() {
-        createCustomEvent<RenderEvent.EntityPost>("render") {
+        createCustomEvent<RenderEvent.Entity.Post>("render") {
             drawString()
         }
 

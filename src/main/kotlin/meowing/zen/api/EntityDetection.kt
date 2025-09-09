@@ -17,6 +17,7 @@ import net.minecraft.entity.projectile.ArrowEntity
 @Zen.Module
 object EntityDetection {
     private val hashMap = HashMap<Entity, SkyblockMob>()
+    private val slayerEntities = HashMap<Entity, SkyblockMob>()
     private val normalMobRegex = "\\[Lv\\d+k?] (?:[༕ൠ☮⊙Ž✰♨⚂❆☽✿☠⸕⚓♆♣⚙\uFE0E♃⛨✈⸙]+ )?(.+?) [\\d.,]+[MkB]?/[\\d.,]+[MkB]?❤".toRegex()
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
     private val dungeonMobRegex = "(?:[༕ൠ☮⊙Ž✰♨⚂❆☽✿☠⸕⚓♆♣⚙︎♃⛨✈⸙]+ )?✯?\\s*(?:Flaming|Super|Healing|Boomer|Golden|Speedy|Fortified|Stormy|Healthy)?\\s*([\\w\\s]+?)\\s*([\\d.,]+[mkM?]*|[?]+)❤".toRegex()
@@ -127,7 +128,12 @@ object EntityDetection {
             pattern.find(rawMobName)?.let { match ->
                 sbMob.id = when (index) {
                     0 -> match.groupValues[1]
-                    1 -> match.value
+                    1 -> {
+                        match.value.also {
+                            sbMob.id = it
+                            slayerEntities[sbMob.skyblockMob] = sbMob
+                        }
+                    }
                     2 -> {
                         val mobName = match.groupValues[1]
                         if (rawMobName.startsWith("ൠ")) "$mobName Pest" else mobName
@@ -148,6 +154,7 @@ object EntityDetection {
     inline val Entity.sbMobID: String? get() = getSkyblockMob(this)?.id
 
     fun getSkyblockMob(entity: Entity): SkyblockMob? = hashMap.values.firstOrNull { it.skyblockMob == entity }
+    fun getSlayerEntities(): Map<Entity, SkyblockMob> = slayerEntities
     fun getNameTag(entity: Entity): SkyblockMob? = hashMap.values.firstOrNull { it.nameEntity == entity }
     fun getSlayerEntity(): Entity? = SlayerEntity
 }
