@@ -108,4 +108,5 @@ tasks.classes {
     dependsOn("generateLists")
 }
 
+tasks.findByName("preprocessResources")?.dependsOn(":1.21.5-fabric:generateLists")
 tasks.findByName("preprocessResources")?.dependsOn("generateLists")
