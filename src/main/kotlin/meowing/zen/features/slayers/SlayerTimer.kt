@@ -18,7 +18,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 @Zen.Module
 object SlayerTimer : Feature("slayertimer", true) {
-    private val slayerRecord = DataUtils("slayerRecords", JsonObject())
+    val slayerRecord = DataUtils("slayerRecords", JsonObject())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -70,46 +70,47 @@ object SlayerTimer : Feature("slayertimer", true) {
         val hoverText = "§c${timeSinceQuestStart}ms"
         ChatUtils.addMessage(content, hoverText)
     }
+}
 
-    @Zen.Command
-    object SlayerPBCommand : CommandUtils("zenslayers", aliases = listOf("zenpb")) {
-        override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-            val data = slayerRecord.getData()
-            if (data.entrySet().isEmpty()) {
-                ChatUtils.addMessage("$prefix §fYou have no recorded slayer boss kills.")
-                return 0
-            }
 
-            // Parse records into structured objects
-            val records = data.entrySet().mapNotNull { (key, value) ->
-                val raw = key.removePrefix("timeToKill").removeSuffix("MS")
-                val parts = raw.split("_")
-
-                if (parts.size < 2) return@mapNotNull null
-
-                val slayerName = parts.dropLast(1).joinToString(" ")
-                val tierRoman = parts.last()
-                val tier = Utils.decodeRoman(tierRoman)
-                val seconds = value.asLong / 1000.0
-
-                Triple(slayerName, "$slayerName $tierRoman", seconds to tier)
-            }
-
-            // Group by slayer name and sort tiers
-            val grouped = records.groupBy { it.first }
-            ChatUtils.addMessage("$prefix §6§lYour Slayer Personal Bests:")
-
-            for ((slayer, entries) in grouped) {
-                ChatUtils.addMessage("")
-                ChatUtils.addMessage("§8» §e§l$slayer Slayer")
-                for ((_, displayName, timeTier) in entries.sortedBy { it.third.second }) {
-                    val (seconds, _) = timeTier
-                    ChatUtils.addMessage(
-                        "   §7▪ §c$displayName §7➜ §a${"%.2f".format(seconds)}s"
-                    )
-                }
-            }
-            return 1
+@Zen.Command
+object SlayerPBCommand : CommandUtils("zenslayers", aliases = listOf("zenpb")) {
+    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
+        val data = SlayerTimer.slayerRecord.getData()
+        if (data.entrySet().isEmpty()) {
+            ChatUtils.addMessage("$prefix §fYou have no recorded slayer boss kills.")
+            return 0
         }
+
+        // Parse records into structured objects
+        val records = data.entrySet().mapNotNull { (key, value) ->
+            val raw = key.removePrefix("timeToKill").removeSuffix("MS")
+            val parts = raw.split("_")
+
+            if (parts.size < 2) return@mapNotNull null
+
+            val slayerName = parts.dropLast(1).joinToString(" ")
+            val tierRoman = parts.last()
+            val tier = Utils.decodeRoman(tierRoman)
+            val seconds = value.asLong / 1000.0
+
+            Triple(slayerName, "$slayerName $tierRoman", seconds to tier)
+        }
+
+        // Group by slayer name and sort tiers
+        val grouped = records.groupBy { it.first }
+        ChatUtils.addMessage("$prefix §6§lYour Slayer Personal Bests:")
+
+        for ((slayer, entries) in grouped) {
+            ChatUtils.addMessage("")
+            ChatUtils.addMessage("§8» §e§l$slayer Slayer")
+            for ((_, displayName, timeTier) in entries.sortedBy { it.third.second }) {
+                val (seconds, _) = timeTier
+                ChatUtils.addMessage(
+                    "   §7▪ §c$displayName §7➜ §a${"%.2f".format(seconds)}s"
+                )
+            }
+        }
+        return 1
     }
 }

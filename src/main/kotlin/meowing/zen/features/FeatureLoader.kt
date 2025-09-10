@@ -1,55 +1,48 @@
 package meowing.zen.features
 
-import meowing.zen.Zen
 import meowing.zen.Zen.Companion.LOGGER
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.millis
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import org.reflections.Reflections
 
 object FeatureLoader {
     private var moduleCount = 0
     private var commandCount = 0
     private var loadtime: Long = 0
 
+    val featureClassNames = FeatureLoader::class.java.getResourceAsStream("/features.list")?.use { stream ->
+        stream.bufferedReader().use { reader ->
+            reader.readLines()
+        }
+    } ?: emptyList()
+
+    val commandClassNames = FeatureLoader::class.java.getResourceAsStream("/commands.list")?.use { stream ->
+        stream.bufferedReader().use { reader ->
+            reader.readLines()
+        }
+    } ?: emptyList()
+
     fun init() {
-        val reflections = Reflections("meowing.zen")
-
-        val features = reflections.getTypesAnnotatedWith(Zen.Module::class.java)
         val starttime = TimeUtils.now
-        val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "meowing", "rift")
 
-        features.sortedWith(compareBy<Class<*>> { clazz ->
-            val packageName = clazz.`package`.name
-            val category = packageName.substringAfterLast(".")
-            val normalizedCategory = if (category == "carrying") "slayers" else category
-            categoryOrder.indexOf(normalizedCategory).takeIf { it != -1 } ?: Int.MAX_VALUE
-        }.thenBy { it.name }).forEach { clazz ->
+        featureClassNames.forEach { className ->
             try {
-                Class.forName(clazz.name)
+                Class.forName(className)
                 moduleCount++
             } catch (e: Exception) {
-                LOGGER.error("Error initializing module-${clazz.name}: $e")
+                LOGGER.error("Error loading module-$className: $e")
+            }
+        }
+
+        commandClassNames.forEach { className ->
+            try {
+                Class.forName(className)
+                commandCount++
+            } catch (e: Exception) {
+                LOGGER.error("Error initializing command-$className: $e")
                 e.printStackTrace()
             }
         }
 
-        val commands = reflections.getTypesAnnotatedWith(Zen.Command::class.java)
-        commandCount = commands.size
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
-            commands.forEach { commandClass ->
-                try {
-                    val commandInstance = commandClass.getDeclaredField("INSTANCE").get(null)
-                    val registerMethod = commandClass.methods.find { it.name == "register" } // a bit eh but it works
-                    registerMethod?.invoke(commandInstance, dispatcher)
-                } catch (e: Exception) {
-                    LOGGER.error("Error initializing command-${commandClass.name}: $e")
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        Zen.initializeFeatures()
         loadtime = starttime.since.millis
     }
 

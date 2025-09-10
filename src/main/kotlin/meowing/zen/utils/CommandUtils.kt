@@ -4,12 +4,19 @@ import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 abstract class CommandUtils(
     private val name: String,
     private val aliases: List<String> = emptyList()
 ) {
+    init {
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+            register(dispatcher)
+        }
+    }
+
     fun register(dispatcher: CommandDispatcher<FabricClientCommandSource>) {
         val command = ClientCommandManager.literal(name)
             .executes { context -> execute(context) }
