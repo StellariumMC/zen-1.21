@@ -73,6 +73,7 @@ class Zen : ClientModInitializer {
             OldConfig.convertConfig(FabricLoader.getInstance().configDir.toFile())
             configUI = ZenConfig()
             FeatureLoader.init()
+            initializeFeatures()
             executePending()
         })
 

@@ -7,7 +7,6 @@ import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
-import meowing.zen.utils.Utils.toColorInt
 import net.minecraft.block.ShapeContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
@@ -49,7 +48,7 @@ object BlockOverlay : Feature("blockoverlay") {
                 blockPos.x - camPos.x,
                 blockPos.y - camPos.y,
                 blockPos.z - camPos.z,
-                blockoverlaycolor.toColorInt()
+                blockoverlaycolor.rgb
             )
         }
     }
