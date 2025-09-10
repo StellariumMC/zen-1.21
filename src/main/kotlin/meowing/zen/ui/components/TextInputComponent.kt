@@ -1,8 +1,10 @@
 package meowing.zen.ui.components
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.utils.Render2D.renderRoundedRect
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import org.joml.Vector4f
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 import kotlin.math.max
@@ -17,6 +19,7 @@ class TextInputComponent(
     var y: Int,
     var width: Int,
     var height: Int,
+    var radius: Float,
     val accentColor: Color,
     val hoverColor: Color,
     val placeholder: String = ""
@@ -37,6 +40,9 @@ class TextInputComponent(
     private var caretVisible = true
     private var isHovered = false
 
+    private val radius4f = Vector4f(radius, radius, radius, radius)
+    private val normalBorderColor = Color(60, 60, 60)
+
     private var lastBlink = System.currentTimeMillis()
     private val caretBlinkRate = 500L
 
@@ -55,13 +61,13 @@ class TextInputComponent(
         isHovered = mouseX in x..(x + width) && mouseY in y..(y + height)
 
         val borderColor = when {
-            focused -> accentColor.rgb
-            isHovered -> hoverColor.rgb
-            else -> Color(60, 60, 60).rgb
+            focused -> accentColor
+            isHovered -> hoverColor
+            else -> normalBorderColor
         }
 
-        context.fill(x - 1, y - 1, x + width + 1, y + height + 1, borderColor)
-        context.fill(x, y, x + width, y + height, Color(20, 20, 20).rgb)
+        renderRoundedRect(context, (x - 1).toFloat(), (y - 1).toFloat(), (width + 2).toFloat(), (height + 2).toFloat(), radius4f, borderColor)
+        renderRoundedRect(context, (x).toFloat(), (y).toFloat(), (width).toFloat(), (height).toFloat(), radius4f, Color(20, 20, 20))
 
         val shouldShowPlaceholder = value.isEmpty() && !focused
         val textToRender = if (shouldShowPlaceholder) placeholder else value

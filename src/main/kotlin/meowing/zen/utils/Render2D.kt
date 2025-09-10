@@ -1,10 +1,13 @@
 package meowing.zen.utils
 
+import me.x150.renderer.render.ExtendedDrawContext
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
+import org.joml.Vector4f
+import java.awt.Color
 
 object Render2D {
     enum class TextStyle {
@@ -133,6 +136,12 @@ object Render2D {
         //#endif
     }
 
+    // Renderer uses Colors in ABGR format
+    fun renderRoundedRect(context: DrawContext, x: Float, y: Float, width: Float, height: Float, roundness: Vector4f, color: Color) {
+        val renderColor = me.x150.renderer.util.Color(color.toABGR())
+        ExtendedDrawContext.drawRoundedRect(context, x, y, width, height, roundness, renderColor)
+    }
+
     fun String.width(): Int {
         val lines = split('\n')
         return lines.maxOf { mc.textRenderer.getWidth(it.removeFormatting()) }
@@ -141,5 +150,9 @@ object Render2D {
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
         return mc.textRenderer.fontHeight * lineCount
+    }
+
+    fun Color.toABGR(): Color {
+        return Color(blue, green, red, alpha)
     }
 }

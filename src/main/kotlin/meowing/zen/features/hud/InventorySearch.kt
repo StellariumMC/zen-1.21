@@ -30,6 +30,7 @@ object InventorySearch : Feature("inventorysearch") {
         y = 0,
         width = 200,
         height = 25,
+        radius = 3f,
         accentColor = Color(170, 230, 240),
         hoverColor = Color(70, 120, 140)
     )
@@ -79,6 +80,7 @@ object InventorySearch : Feature("inventorysearch") {
                     val screenHeight = window.scaledHeight / sf
                     x = ((screenWidth - width) / 2).toInt()
                     y = (screenHeight * 0.95 - height / 2).toInt()
+                    width = 200
 
                     val matrices = event.context.matrices
 
