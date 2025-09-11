@@ -41,7 +41,7 @@ object MinibossSpawn : Feature("minibossspawn", true) {
     override fun initialize() {
         register<EntityEvent.Metadata> { event ->
             if (entities.contains(event.packet.id)) return@register
-            if ((carrycounter && CarryCounter.carryees.isEmpty()) && (slayertimer && SlayerTracker.spawnTime.isZero)) return@register
+            if ((carrycounter && CarryCounter.carryees.isEmpty()) && (slayertimer && SlayerTracker.questStartTime.isZero)) return@register
             val name = event.name.removeFormatting().replace(regex, "")
             if (names.contains(name)) {
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 1f, 1f)

@@ -9,7 +9,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ItemTooltipEvent
 import meowing.zen.features.Feature
 import meowing.zen.features.Timer
-import meowing.zen.utils.ItemUtils.uuid
+import meowing.zen.utils.ItemUtils.displayName
 import meowing.zen.utils.Utils.abbreviateNumber
 import meowing.zen.utils.Utils.formatNumber
 import net.minecraft.text.Text
@@ -66,8 +66,7 @@ object PriceData : Feature("pricedata", true) {
 
         register<ItemTooltipEvent>(priority = 10) { event ->
             val stack = event.stack
-            val itemUuid = stack.uuid
-            if (itemUuid.isEmpty()) return@register
+            val itemUuid = stack.displayName()
 
             val cacheKey = "${itemUuid}_${stack.count}_${displaySet.hashCode()}_${abbreviateNumbers}"
 

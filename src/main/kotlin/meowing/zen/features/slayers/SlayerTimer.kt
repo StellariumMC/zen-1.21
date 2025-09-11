@@ -11,10 +11,10 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.DataUtils
-import meowing.zen.utils.SimpleTimeMark
 import meowing.zen.utils.*
 import meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import kotlin.time.Duration
 
 @Zen.Module
 object SlayerTimer : Feature("slayertimer", true) {
@@ -34,8 +34,8 @@ object SlayerTimer : Feature("slayertimer", true) {
             ))
     }
 
-    fun sendTimerMessage(action: String, timeTaken: Long, ticks: Int) {
-        val seconds = timeTaken / 1000.0
+    fun sendTimerMessage(action: String, timeTaken: Duration, ticks: Int) {
+        val seconds = timeTaken.millis / 1000.0
         val serverTime = ticks / 20.0
         val content = "$prefix §f$action in §b${"%.2f".format(seconds)}s §7| §b${"%.2f".format(serverTime)}s"
         val hoverText = "§c${timeTaken}ms §f| §c${"%.0f".format(ticks.toFloat())} ticks"
@@ -44,7 +44,7 @@ object SlayerTimer : Feature("slayertimer", true) {
         if (action == "You killed your boss") {
             val lastRecord = getSelectedSlayerRecord()
 
-            if (timeTaken < lastRecord && bossType.isNotEmpty()) {
+            if (timeTaken.millis < lastRecord && bossType.isNotEmpty()) {
                 if (lastRecord == Long.MAX_VALUE) {
                     ChatUtils.addMessage("$prefix §d§lNew personal best! §r§7This is your first recorded time!", hoverText)
                 } else {
@@ -52,7 +52,7 @@ object SlayerTimer : Feature("slayertimer", true) {
                 }
 
                 slayerRecord.setData(slayerRecord.getData().apply {
-                    addProperty("timeToKill${bossType.replace(" ", "_")}MS", timeTaken)
+                    addProperty("timeToKill${bossType.replace(" ", "_")}MS", timeTaken.millis)
                 })
                 slayerRecord.save()
             }
@@ -64,9 +64,8 @@ object SlayerTimer : Feature("slayertimer", true) {
         return data.get("timeToKill${bossType.replace(" ", "_")}MS")?.asLong ?: Long.MAX_VALUE
     }
 
-    fun sendBossSpawnMessage(spawnTime: SimpleTimeMark) {
-        val timeSinceQuestStart = spawnTime.since.millis
-        val content = "$prefix §fBoss spawned after §b${"%.2f".format(timeSinceQuestStart / 1000.0)}s"
+    fun sendBossSpawnMessage(timeSinceQuestStart: Duration) {
+        val content = "$prefix §fBoss spawned after §b${"%.2f".format(timeSinceQuestStart.millis / 1000.0)}s"
         val hoverText = "§c${timeSinceQuestStart}ms"
         ChatUtils.addMessage(content, hoverText)
     }
