@@ -10,7 +10,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.EntityEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
-import meowing.zen.features.carrying.CarryCounter
+import meowing.zen.features.slayers.carrying.CarryCounter
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils
 import meowing.zen.utils.Utils.removeFormatting

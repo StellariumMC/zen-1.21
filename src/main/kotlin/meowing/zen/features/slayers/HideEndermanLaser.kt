@@ -9,7 +9,7 @@ import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.RenderEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
-import meowing.zen.features.carrying.CarryCounter
+import meowing.zen.features.slayers.carrying.CarryCounter
 import net.minecraft.entity.mob.EndermanEntity
 import java.util.concurrent.ConcurrentHashMap
 

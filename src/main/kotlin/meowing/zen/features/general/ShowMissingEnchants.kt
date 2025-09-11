@@ -2,12 +2,12 @@ package meowing.zen.features.general
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import kotlinx.coroutines.runBlocking
 import meowing.zen.Zen
 import meowing.zen.api.NEUApi
 import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
+import meowing.zen.events.InternalEvent
 import meowing.zen.events.ItemTooltipEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.ItemUtils.extraAttributes
@@ -49,7 +49,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
     }
 
     override fun initialize() {
-        runBlocking {
+        register<InternalEvent.NeuAPI.Load> {
             try {
                 val constants = NEUApi.NeuConstantData.getData().getAsJsonObject("enchants")
                 enchantsData = constants?.getAsJsonObject("enchants")

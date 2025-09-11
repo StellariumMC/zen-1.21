@@ -34,6 +34,12 @@ abstract class CancellableEvent : Event() {
     fun isCancelled() = cancelled
 }
 
+abstract class InternalEvent {
+    abstract class NeuAPI {
+        class Load() : Event()
+    }
+}
+
 abstract class SkyblockEvent {
     abstract class Slayer {
         class Spawn(val entity: Entity?, val entityID: Int, val packet: EntityTrackerUpdateS2CPacket) : Event()

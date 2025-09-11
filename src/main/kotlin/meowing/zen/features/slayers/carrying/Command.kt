@@ -1,4 +1,4 @@
-package meowing.zen.features.carrying
+package meowing.zen.features.slayers.carrying
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
