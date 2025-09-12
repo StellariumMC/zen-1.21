@@ -307,8 +307,6 @@ object CarryCounter : Feature("carrycounter") {
             bossTimes.add(startTime.since.millis)
             cleanup()
 
-            if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")
-
             if (++count >= total) {
                 complete()
                 if (carrywebhook.isEmpty()) return
@@ -348,6 +346,8 @@ object CarryCounter : Feature("carrycounter") {
                     onError = { LOGGER.error("Carry-Webhook onKill POST failed: ${it.message}") }
                 )
             }
+
+            if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")
         }
 
         fun reset() {
