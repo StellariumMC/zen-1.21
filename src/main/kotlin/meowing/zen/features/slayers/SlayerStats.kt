@@ -69,11 +69,6 @@ object SlayerStats : Feature("slayerstats", true) {
         }
     }
 
-    private fun getXPPH(): Int {
-        if(SlayerTracker.lastXp == 0) return 0
-        return getBPH() * SlayerTracker.xpPerKill
-    }
-
     private fun getBPH(): Int {
         if (SlayerTracker.sessionBossKills == 0) return 0
 
@@ -131,7 +126,7 @@ object SlayerStats : Feature("slayerstats", true) {
                     list.add(" §7> §bAvg. spawn§f: §c$avgSpawn")
                 }
                 5 -> {
-                    val xpPH = getXPPH()
+                    val xpPH = getBPH() * SlayerTracker.xpPerKill
                     list.add(" §7> §bXP/hr§f: §c${xpPH.formatNumber()} XP")
                 }
             }
