@@ -5,24 +5,39 @@ import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
 import net.minecraft.text.Text
 
+
 object ScoreboardUtils {
+    // Modified from Skyblocker https://github.com/SkyblockerMod/Skyblocker
     fun getSidebarLines(cleanColor: Boolean): List<String> {
-        val scoreboard = mc.world?.scoreboard ?: return emptyList()
+        val scoreboard = mc.player?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
 
-        return scoreboard.getScoreboardEntries(objective)
-            .mapNotNull { entry ->
-                entry.comp_2127()?.let { owner ->
-                    stripAlienCharacters(
-                        scoreboard.getTeam(owner)?.decorateName(Text.literal(owner))?.string ?: owner
-                    ).let {
-                        if (cleanColor) it.removeFormatting()
-                        else it
-                    }
-                }
+        val stringLines = mutableListOf<String>()
+
+        // Loop over all known scoreboard entries
+        for (scoreHolder in scoreboard.knownScoreHolders) {
+            if (!scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) continue
+            // Only include entries that are part of the current objective
+            val objectivesForEntry = scoreboard.getScoreHolderObjectives(scoreHolder)
+            if (!objectivesForEntry.containsKey(objective)) continue
+
+            val team = scoreboard.getScoreHolderTeam(scoreHolder.nameForScoreboard)
+
+            if(team != null) {
+                val strLine = team.prefix.string + team.suffix.string
+
+                if(!strLine.trim().isEmpty()) stringLines.add(strLine)
             }
-            .reversed()
+        }
+
+        // Add the objective title at the end (top of sidebar)
+        val objectiveTitle = objective.displayName
+        stringLines.add(objectiveTitle.string)
+
+        // Reverse so the sidebar order is correct
+        return stringLines.reversed()
     }
+
 
     fun getScoreboardTitle(cleanColor: Boolean = true): String? {
         val scoreboard = mc.world?.scoreboard ?: return null
