@@ -105,10 +105,14 @@ object SlayerStats : Feature("slayerstats", true) {
         val list = mutableListOf("$prefix §f§lSlayer Stats: ")
 
         if (slayerStatsLines.contains(4)) {
-            val pauseMark = SlayerTracker.pauseStart
-            val totalTime = TimeUtils.now - SlayerTracker.sessionStart - (pauseMark?.since ?: Duration.ZERO) - SlayerTracker.totalSessionPaused.milliseconds
-            val timeString = totalTime.millis.toFormattedDuration(false)
-            list.add(" §7> §bSession time§f: §c$timeString" + if (SlayerTracker.isPaused) " §7(Paused)" else "")
+            if (SlayerTracker.sessionStart.isZero) {
+                list.add(" §7> §bSession time§f: §c-")
+            } else {
+                val pauseMark = SlayerTracker.pauseStart
+                val totalTime = TimeUtils.now - SlayerTracker.sessionStart - (pauseMark?.since ?: Duration.ZERO) - SlayerTracker.totalSessionPaused.milliseconds
+                val timeString = totalTime.millis.toFormattedDuration(false)
+                list.add(" §7> §bSession time§f: §c$timeString" + if (SlayerTracker.isPaused) " §7(Paused)" else "")
+            }
         }
 
         slayerStatsLines.sorted().forEach { line ->
@@ -140,7 +144,7 @@ object SlayerStats : Feature("slayerstats", true) {
 @Zen.Command
 object SlayerStatsCommand : CommandUtils(
     "slayerstats",
-    listOf()
+    listOf("zenslayerstats")
 ) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
         ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
