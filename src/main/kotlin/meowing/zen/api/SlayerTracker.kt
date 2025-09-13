@@ -1,75 +1,70 @@
 package meowing.zen.api
 
-import meowing.zen.Zen
+import meowing.zen.Zen.Companion.mayorData
 import meowing.zen.api.EntityDetection.bossID
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.events.*
 import meowing.zen.features.slayers.SlayerTimer
+import meowing.zen.utils.SimpleTimeMark
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.TimeUtils
+import meowing.zen.utils.TimeUtils.millis
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.SpiderEntity
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO: reset and hide the slayer stats after some time of not being in a fight or swapping worlds
-@Zen.Module
 object SlayerTracker {
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
-    // Maybe add Slayer XP / hour later https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO/blob/63fd91727910a671d64f54e21a74f7624b2aecde/constants/leveling.json#L170
+    private val killRegex = " (?<kills>.*)/(?<target>.*) Kills".toRegex()
+    private val tierXp = mapOf("I" to 5, "II" to 25, "III" to 100, "IV" to 500, "V" to 1500)
 
-    var slayerSpawnedAtTime = TimeUtils.zero
-        private set
-    var pauseStart: Long? = null
-    var isPaused = false
-    var totalPaused: Long = 0
-    var bossType = ""
-        private set
-    var isFightingBoss = false
-        private set
+    private val serverTickCall = EventBus.register<TickEvent.Server>({ serverTicks++ }, false)
+
+    private var slayerSpawnedAtTime = TimeUtils.zero
+    private var currentMobKills = 0
+    private var isFightingBoss = false
     private var isSpider = false
     private var serverTicks = 0
-    private var serverTickCall: EventBus.EventCall =
-        EventBus.register<TickEvent.Server>({ serverTicks++ }, false)
+    private var totalCurrentPaused: Long = 0
+
+    var isPaused = false
+    var pauseStart: SimpleTimeMark? = null
+    var totalSessionPaused: Long = 0
 
     var sessionBossKills = 0
-        private set
     var sessionStart = TimeUtils.zero
-        private set
     var totalKillTime = Duration.ZERO
-        private set
     var totalSpawnTime = Duration.ZERO
-        private set
-
-    var questStartTime = TimeUtils.zero
-
-    var killRegex = " (?<kills>.*)/(?<target>.*) Kills".toRegex()
-    var currentMobKills = 0
+    var questStartedAtTime = TimeUtils.zero
     var mobLastKilledAt = TimeUtils.zero
+
+    var bossType = ""
+    var xpPerKill = 0
 
     private fun startFightTimer() {
         slayerSpawnedAtTime = TimeUtils.now
         pauseStart = null
         isPaused = false
+        totalCurrentPaused = 0
     }
 
     private fun pauseSessionTimer() {
         if (pauseStart == null) {
-            pauseStart = System.currentTimeMillis()
+            pauseStart = TimeUtils.now
             isPaused = true
         }
     }
 
     private fun resumeSessionTimer() {
-        if(!isPaused) return
+        if(!isPaused || pauseStart == null) return
 
-        pauseStart?.let {
-            totalPaused += System.currentTimeMillis() - it
-            pauseStart = null
-            isPaused = false
-        }
+        totalSessionPaused += pauseStart!!.since.millis
+        totalCurrentPaused += pauseStart!!.since.millis
+        pauseStart = null
+        isPaused = false
     }
 
     init {
@@ -84,7 +79,7 @@ object SlayerTracker {
         }
 
         EventBus.register<SkyblockEvent.Slayer.QuestStart> {
-            questStartTime = TimeUtils.now
+            questStartedAtTime = TimeUtils.now
         }
 
         EventBus.register<SidebarUpdateEvent> { event ->
@@ -94,7 +89,7 @@ object SlayerTracker {
                 if (killsInt != currentMobKills) {
                     // Start the session timer if it's not already started
                     if (sessionStart.isZero) sessionStart = TimeUtils.now
-                    if (questStartTime.isZero) questStartTime = TimeUtils.now
+                    if (questStartedAtTime.isZero) questStartedAtTime = TimeUtils.now
 
                     mobLastKilledAt = TimeUtils.now
                     currentMobKills = killsInt
@@ -112,13 +107,16 @@ object SlayerTracker {
                 serverTicks = 0
                 serverTickCall.register()
 
-                val rawElapsed: Duration = questStartTime.since
-                val adjustedTime: Duration = rawElapsed - totalPaused.milliseconds
-                if (slayertimer) SlayerTimer.sendBossSpawnMessage(adjustedTime)
+                if (!questStartedAtTime.isZero) {
+                    val adjustedTime = (questStartedAtTime.since - totalCurrentPaused.milliseconds)
+                    if (slayertimer) SlayerTimer.sendBossSpawnMessage(adjustedTime)
 
-                totalSpawnTime += adjustedTime
-                questStartTime = TimeUtils.zero
-                currentMobKills = 0
+                    totalSpawnTime += adjustedTime
+                }
+
+                questStartedAtTime = TimeUtils.zero
+                mobLastKilledAt = TimeUtils.now
+                totalCurrentPaused = 0
 
                 resumeSessionTimer()
                 startFightTimer()
@@ -131,6 +129,7 @@ object SlayerTracker {
                     val name = event.entity.name.string.removeFormatting()
                     slayerMobRegex.find(name)?.let { matchResult ->
                         bossType = matchResult.value
+                        xpPerKill = getBossXP(bossType)
                     }
                 }
             }
@@ -190,6 +189,23 @@ object SlayerTracker {
         serverTicks = 0
         bossType = ""
         serverTickCall.unregister()
+        totalCurrentPaused = 0
+    }
+
+    private fun getBossXP(bossName: String): Int {
+        val xp = when {
+            bossName.endsWith(" V") -> tierXp["V"]!!
+            bossName.endsWith(" IV") -> tierXp["IV"]!!
+            bossName.endsWith(" III") -> tierXp["III"]!!
+            bossName.endsWith(" II") -> tierXp["II"]!!
+            bossName.endsWith(" I") -> tierXp["I"]!!
+            else -> 0
+        }
+
+        val isAatrox = mayorData?.mayor?.perks?.any { it.name == "Slayer XP Buff" } == true || mayorData?.mayor?.minister?.perks?.any { it.name == "Slayer XP Buff" } == true
+        if (isAatrox) return (xp * 1.25).toInt()
+
+        return xp
     }
 
     fun reset() {
@@ -197,6 +213,6 @@ object SlayerTracker {
         sessionStart = TimeUtils.now
         totalKillTime = Duration.ZERO
         totalSpawnTime = Duration.ZERO
-        totalPaused = 0
+        totalSessionPaused = 0
     }
 }

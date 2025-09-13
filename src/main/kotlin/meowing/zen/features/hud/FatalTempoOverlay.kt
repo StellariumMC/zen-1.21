@@ -75,6 +75,6 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
         val color = if (currentPercent > 0) "§a" else "§c"
         val text = "§eFatal Tempo: $color$currentPercent%"
 
-        Render2D.renderString(context, text, x, y, scale)
+        Render2D.renderString(context, text, x, y, scale, textStyle = Render2D.TextStyle.DROP_SHADOW)
     }
 }

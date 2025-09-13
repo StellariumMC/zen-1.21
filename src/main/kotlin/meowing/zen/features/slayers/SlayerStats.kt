@@ -17,7 +17,7 @@ import meowing.zen.hud.HUDManager
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.Render2D
-import meowing.zen.utils.SimpleTimeMark
+import meowing.zen.utils.Utils.formatNumber
 import meowing.zen.utils.TimeUtils
 import meowing.zen.utils.TimeUtils.millis
 import meowing.zen.utils.Utils.toFormattedDuration
@@ -49,8 +49,8 @@ object SlayerStats : Feature("slayerstats", true) {
                 "slayerstatslines",
                 "",
                 ElementType.MultiCheckbox(
-                    options = listOf("Show Bosses Killed", "Show Bosses/hr", "Show Average kill time", "Show Average spawn time", "Show Total Session time"),
-                    default = setOf(0, 1, 2)
+                    options = listOf("Show Bosses Killed", "Show Bosses/hr", "Show Average kill time", "Show Average spawn time", "Show Total Session time", "Show XP/hr"),
+                    default = setOf(0, 1, 4, 5)
                 )
             ))
     }
@@ -68,7 +68,6 @@ object SlayerStats : Feature("slayerstats", true) {
             }
         }
     }
-
 
     private fun getBPH(): Int {
         if (SlayerTracker.sessionBossKills == 0) return 0
@@ -106,10 +105,14 @@ object SlayerStats : Feature("slayerstats", true) {
         val list = mutableListOf("$prefix §f§lSlayer Stats: ")
 
         if (slayerStatsLines.contains(4)) {
-            val pauseMark = SlayerTracker.pauseStart?.let { SimpleTimeMark(it) }
-            val totalTime = TimeUtils.now - SlayerTracker.sessionStart - (pauseMark?.since ?: Duration.ZERO) - SlayerTracker.totalPaused.milliseconds
-            val timeString = totalTime.millis.toFormattedDuration(false)
-            list.add(" §7> §bSession time§f: §c$timeString" + if (SlayerTracker.isPaused) " §7(Paused)" else "")
+            if (SlayerTracker.sessionStart.isZero) {
+                list.add(" §7> §bSession time§f: §c-")
+            } else {
+                val pauseMark = SlayerTracker.pauseStart
+                val totalTime = TimeUtils.now - SlayerTracker.sessionStart - (pauseMark?.since ?: Duration.ZERO) - SlayerTracker.totalSessionPaused.milliseconds
+                val timeString = totalTime.millis.toFormattedDuration(false)
+                list.add(" §7> §bSession time§f: §c$timeString" + if (SlayerTracker.isPaused) " §7(Paused)" else "")
+            }
         }
 
         slayerStatsLines.sorted().forEach { line ->
@@ -126,6 +129,10 @@ object SlayerStats : Feature("slayerstats", true) {
                     else (SlayerTracker.totalSpawnTime.millis / SlayerTracker.sessionBossKills / 1000.0).format(1) + "s"
                     list.add(" §7> §bAvg. spawn§f: §c$avgSpawn")
                 }
+                5 -> {
+                    val xpPH = getBPH() * SlayerTracker.xpPerKill
+                    list.add(" §7> §bXP/hr§f: §c${xpPH.formatNumber()} XP")
+                }
             }
         }
 
@@ -137,7 +144,7 @@ object SlayerStats : Feature("slayerstats", true) {
 @Zen.Command
 object SlayerStatsCommand : CommandUtils(
     "slayerstats",
-    listOf()
+    listOf("zenslayerstats")
 ) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
         ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
