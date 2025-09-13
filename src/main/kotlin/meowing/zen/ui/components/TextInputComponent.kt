@@ -142,18 +142,14 @@ class TextInputComponent(
         }
     }
 
-    fun keyTyped(keyCode: Int): Boolean {
+    fun keyTyped(keyCode: Int, charTyped: Char): Boolean {
         if (!focused) return false
 
         val ctrlDown = Screen.hasControlDown()
         val shiftDown = Screen.hasShiftDown()
 
         when (keyCode) {
-            GLFW.GLFW_KEY_ESCAPE -> {
-                focused = false
-                return true
-            }
-            GLFW.GLFW_KEY_ENTER -> {
+            GLFW.GLFW_KEY_ESCAPE, GLFW.GLFW_KEY_ENTER -> {
                 focused = false
                 return true
             }
@@ -185,29 +181,14 @@ class TextInputComponent(
                 moveCaretTo(value.length, shiftDown)
                 return true
             }
-            GLFW.GLFW_KEY_A -> {
-                if (ctrlDown) {
-                    selectAll()
-                    return true
-                }
-            }
-            GLFW.GLFW_KEY_C -> {
-                if (ctrlDown) {
-                    copySelection()
-                    return true
-                }
-            }
-            GLFW.GLFW_KEY_V -> {
-                if (ctrlDown) {
-                    paste()
-                    return true
-                }
-            }
-            GLFW.GLFW_KEY_X -> {
-                if (ctrlDown) {
-                    cutSelection()
-                    return true
-                }
+        }
+
+        if (ctrlDown) {
+            when (charTyped) {
+                'a' -> { selectAll(); return true }
+                'c' -> { copySelection(); return true }
+                'v' -> { paste(); return true }
+                'x' -> { cutSelection(); return true }
             }
         }
         return false

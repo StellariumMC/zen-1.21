@@ -1,6 +1,7 @@
 package meowing.zen.events
 
 import meowing.zen.Zen.Companion.configUI
+import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.LocationUtils
 import meowing.zen.utils.ScoreboardUtils
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
@@ -86,8 +87,15 @@ object EventBus {
                 !post(GuiEvent.Click(mx, my, mbtn, false, screen))
             }
 
-            ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, _ ->
-                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, scancode, screen))
+            ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, modifiers ->
+                val charTyped = GLFW.glfwGetKeyName(key, scancode)?.firstOrNull() ?: '\u0000'
+                !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, charTyped, scancode, screen))
+            }
+
+            GLFW.glfwSetCharCallback(mc.window.handle) { window, codepoint ->
+                val charTyped = codepoint.toChar()
+
+                !post(GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen))
             }
 
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->

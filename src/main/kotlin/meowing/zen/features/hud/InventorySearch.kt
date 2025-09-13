@@ -127,35 +127,16 @@ object InventorySearch : Feature("inventorysearch") {
                 return@register
             }
 
-            val keyHandled = searchInput.keyTyped(event.key)
-            var charHandled = false
+            // Handle special keys (Enter, Escape, Backspace, Delete, arrows, ctrl+keys)
+            val keyHandled = if (event.key != GLFW.GLFW_KEY_UNKNOWN) {
+                searchInput.keyTyped(event.key, event.character)
+            } else false
 
-            if (searchInput.focused && event.key != GLFW.GLFW_KEY_UNKNOWN) {
-                val window = mc.window.handle
-                val shiftPressed =
-                    GLFW.glfwGetKey(window, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS ||
-                    GLFW.glfwGetKey(window, GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS
-
-                val char = when (event.key) {
-                    GLFW.GLFW_KEY_EQUAL -> if (shiftPressed) '+' else '='
-                    GLFW.GLFW_KEY_MINUS -> if (shiftPressed) '_' else '-'
-                    GLFW.GLFW_KEY_0 -> if (shiftPressed) ')' else '0'
-                    GLFW.GLFW_KEY_1 -> if (shiftPressed) '!' else '1'
-                    GLFW.GLFW_KEY_5 -> if (shiftPressed) '%' else '5'
-                    GLFW.GLFW_KEY_6 -> if (shiftPressed) '^' else '6'
-                    GLFW.GLFW_KEY_8 -> if (shiftPressed) '*' else '8'
-                    GLFW.GLFW_KEY_9 -> if (shiftPressed) '(' else '9'
-                    GLFW.GLFW_KEY_SLASH -> if (shiftPressed) '?' else '/'
-                    GLFW.GLFW_KEY_PERIOD -> if (shiftPressed) '>' else '.'
-                    GLFW.GLFW_KEY_SPACE -> ' '
-                    in GLFW.GLFW_KEY_1..GLFW.GLFW_KEY_9 -> (event.key - GLFW.GLFW_KEY_0 + '0'.code).toChar()
-                    else -> event.keyName?.firstOrNull()
-                }
-
-                char?.let {
-                    charHandled = searchInput.charTyped(it)
-                }
-            }
+            // Handle typed characters (letters, numbers, symbols, international layouts)
+            val charHandled = if (event.character != '\u0000') {
+                if(event.key == GLFW.GLFW_KEY_UNKNOWN) searchInput.charTyped(event.character)
+                true
+            } else false
 
             if (keyHandled || charHandled) {
                 mathResult = if (searchInput.value.isNotEmpty()) calculateMath(searchInput.value) else null
