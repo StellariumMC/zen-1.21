@@ -127,6 +127,8 @@ object InventorySearch : Feature("inventorysearch") {
                 return@register
             }
 
+            if (!searchInput.focused) return@register
+
             // Handle special keys (Enter, Escape, Backspace, Delete, arrows, ctrl+keys)
             val keyHandled = if (event.key != GLFW.GLFW_KEY_UNKNOWN) {
                 searchInput.keyTyped(event.key, event.character)
@@ -134,7 +136,10 @@ object InventorySearch : Feature("inventorysearch") {
 
             // Handle typed characters (letters, numbers, symbols, international layouts)
             val charHandled = if (event.character != '\u0000') {
-                if(event.key == GLFW.GLFW_KEY_UNKNOWN) searchInput.charTyped(event.character)
+                if (event.key == GLFW.GLFW_KEY_UNKNOWN) {
+                    searchInput.charTyped(event.character)
+                }
+
                 true
             } else false
 
