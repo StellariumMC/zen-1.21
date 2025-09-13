@@ -125,7 +125,7 @@ abstract class GuiEvent {
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen, val handler: ScreenHandler) : CancellableEvent()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
-    class Key(val keyName: String?, val key: Int, val scanCode: Int, val screen: Screen) : CancellableEvent()
+    class Key(val keyName: String?, val key: Int, val character: Char, val scanCode: Int, val screen: Screen) : CancellableEvent()
 
     abstract class Slot {
         class Click(val slot: net.minecraft.screen.slot.Slot?, val slotId: Int, val button: Int, val actionType: SlotActionType, val handler: ScreenHandler, val screen: HandledScreen<*>) : CancellableEvent()
