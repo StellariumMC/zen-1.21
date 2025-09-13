@@ -1,41 +1,45 @@
 package meowing.zen.utils
 
+import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
-import net.minecraft.text.Text
-
 
 object ScoreboardUtils {
     // Modified from Skyblocker https://github.com/SkyblockerMod/Skyblocker
     fun getSidebarLines(cleanColor: Boolean): List<String> {
-        val scoreboard = mc.player?.scoreboard ?: return emptyList()
-        val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
+        return try {
+            val scoreboard = mc.player?.scoreboard ?: return emptyList()
+            val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
 
-        val stringLines = mutableListOf<String>()
+            val stringLines = mutableListOf<String>()
 
-        // Loop over all known scoreboard entries
-        for (scoreHolder in scoreboard.knownScoreHolders) {
-            if (!scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) continue
-            // Only include entries that are part of the current objective
-            val objectivesForEntry = scoreboard.getScoreHolderObjectives(scoreHolder)
-            if (!objectivesForEntry.containsKey(objective)) continue
+            // Loop over all known scoreboard entries
+            for (scoreHolder in scoreboard.knownScoreHolders) {
+                if (!scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) continue
+                // Only include entries that are part of the current objective
+                val objectivesForEntry = scoreboard.getScoreHolderObjectives(scoreHolder)
+                if (!objectivesForEntry.containsKey(objective)) continue
 
-            val team = scoreboard.getScoreHolderTeam(scoreHolder.nameForScoreboard)
+                val team = scoreboard.getScoreHolderTeam(scoreHolder.nameForScoreboard)
 
-            if(team != null) {
-                val strLine = team.prefix.string + team.suffix.string
+                if (team != null) {
+                    val strLine = team.prefix.string + team.suffix.string
 
-                if(!strLine.trim().isEmpty()) stringLines.add(strLine)
+                    if (!strLine.trim().isEmpty()) stringLines.add(strLine)
+                }
             }
+
+            // Add the objective title at the end (top of sidebar)
+            val objectiveTitle = objective.displayName
+            stringLines.add(objectiveTitle.string)
+
+            // Reverse so the sidebar order is correct
+            return stringLines.reversed()
+        } catch (e: Exception) {
+            Zen.LOGGER.warn("Error in getSidebarLines: $e")
+            emptyList()
         }
-
-        // Add the objective title at the end (top of sidebar)
-        val objectiveTitle = objective.displayName
-        stringLines.add(objectiveTitle.string)
-
-        // Reverse so the sidebar order is correct
-        return stringLines.reversed()
     }
 
 
