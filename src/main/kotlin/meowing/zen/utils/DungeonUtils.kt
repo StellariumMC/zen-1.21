@@ -1,24 +1,36 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.api.DungeonsAPI
 import meowing.zen.events.EventBus
 import meowing.zen.events.AreaEvent
+import meowing.zen.events.ChatEvent
 import meowing.zen.events.TablistEvent
+import meowing.zen.events.TickEvent
 import meowing.zen.events.WorldEvent
 import meowing.zen.utils.Utils.removeFormatting
+import kotlin.collections.mutableMapOf
 import kotlin.math.floor
 
 object DungeonUtils {
     private val cryptsRegex = "^ Crypts: (\\d+)$".toRegex()
     private val cataRegex = "^ Catacombs (\\d+):".toRegex()
     private val playerInfoRegex = "^[^\\x00-\\x7F]?(?:\\[\\d+] )?(?:\\[\\w+] )?(\\w{1,16})(?: [^\\x00-\\x7F]+)? \\((\\w+) ?(([IVXLCDM]+))?\\)$".toRegex()
+    private val completeRegex = """^\s*(Master Mode)?\s?(?:The)? Catacombs - (Entrance|Floor .{1,3})$""".toRegex()
     private var crypts = 0
     private var currentClass: String? = null
     private var currentLevel = 0
     private val players = mutableMapOf<String, PlayerData>()
     private var cryptsTab: EventBus.EventCall? = null
 
-    data class PlayerData(val name: String, val className: String, val level: Int)
+    data class PlayerData(
+        val name: String,
+        val className: String,
+        val level: Int,
+        var secrets: Int = 0,
+        var intSecrets: Int = 0,
+        var uuid: String  = ""
+    )
 
     data class PersistentData(var cataLevel: Int = 0)
     private val Data = DataUtils("DungeonUtils", PersistentData())
@@ -75,6 +87,31 @@ object DungeonUtils {
             cryptsTab = null
             reset()
         })
+
+        EventBus.register<TickEvent.Client> {
+            players.forEach { (player, info) ->
+                println("Checking player $players for a player entity")
+                val playerObj = mc.world?.players?.firstOrNull { it.name.string == player } ?: return@forEach
+                println("Has a player")
+
+                val uuid = playerObj.uuid.toString()
+                info.uuid = uuid
+
+                DungeonsAPI.fetchSecrets(uuid, cacheMs = 120_000) { secrets ->
+                    info.intSecrets = secrets
+                    info.secrets = secrets
+                }
+            }
+        }
+
+        EventBus.register<ChatEvent.Receive> { event ->
+            completeRegex.find(event.message.string.removeFormatting()) ?: return@register
+            players.forEach { (player, info) ->
+                DungeonsAPI.fetchSecrets(info.uuid, cacheMs = 0) { secrets ->
+                    info.secrets = secrets
+                }
+            }
+        }
     }
 
     private fun reset() {
@@ -83,6 +120,8 @@ object DungeonUtils {
         currentLevel = 0
         players.clear()
     }
+
+    fun getPlayers(): MutableMap<String, PlayerData> = players
 
     fun getCryptCount(): Int = crypts
 
