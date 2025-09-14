@@ -21,6 +21,7 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.toConstraint
+import meowing.zen.UpdateChecker
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.features
 import meowing.zen.Zen.Companion.mc
@@ -146,9 +147,9 @@ object Debug : Feature() {
 }
 
 @Zen.Command
-object DebugCommand : CommandUtils("zendebug") {
+object DebugCommand : CommandUtils("zendebug", listOf("zd")) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats>")
+        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
         return 1
     }
 
@@ -192,8 +193,12 @@ object DebugCommand : CommandUtils("zendebug") {
                                 if (it.isEnabled()) ChatUtils.addMessage("§f> §c${it.configKey}")
                             }
                         }
+                        "forceupdate" -> {
+                            UpdateChecker.forceUpdate = true
+                            UpdateChecker.checkForUpdates()
+                        }
                         else -> {
-                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|info>")
+                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
                             TickUtils.schedule(2) {
                                 mc.setScreen(DebugGui())
                             }
