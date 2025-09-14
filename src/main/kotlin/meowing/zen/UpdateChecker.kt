@@ -31,6 +31,7 @@ object UpdateChecker {
     private var modrinthUrl: String? = null
     private var githubDownloadUrl: String? = null
     private var modrinthDownloadUrl: String? = null
+    var forceUpdate = false
 
     private val settingsData = DataUtils("update_settings", UpdateSettings())
     private val dontShowForVersion: String? get() = settingsData.getData().dontShowForVersion
@@ -47,7 +48,7 @@ object UpdateChecker {
             val modrinth = checkModrinth()
             val latest = listOfNotNull(github?.first, modrinth?.first).maxByOrNull { compareVersions(it, current) } ?: return@supplyAsync
 
-            if (compareVersions(latest, current) > 0 && latest != dontShowForVersion) {
+            if ((compareVersions(latest, current) > 0 && latest != dontShowForVersion) || forceUpdate) {
                 isMessageShown = true
                 latestVersion = latest
                 githubUrl = github?.second
