@@ -149,7 +149,7 @@ object Debug : Feature() {
 @Zen.Command
 object DebugCommand : CommandUtils("zendebug", listOf("zd")) {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats>")
+        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
         return 1
     }
 
@@ -198,7 +198,7 @@ object DebugCommand : CommandUtils("zendebug", listOf("zd")) {
                             UpdateChecker.checkForUpdates()
                         }
                         else -> {
-                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats>")
+                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
                             TickUtils.schedule(2) {
                                 mc.setScreen(DebugGui())
                             }

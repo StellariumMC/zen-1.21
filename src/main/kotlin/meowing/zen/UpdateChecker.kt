@@ -50,6 +50,7 @@ object UpdateChecker {
 
             if ((compareVersions(latest, current) > 0 && latest != dontShowForVersion) || forceUpdate) {
                 isMessageShown = true
+                forceUpdate = false
                 latestVersion = latest
                 githubUrl = github?.second
                 githubDownloadUrl = github?.third
