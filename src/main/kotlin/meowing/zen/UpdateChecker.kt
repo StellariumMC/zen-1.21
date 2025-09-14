@@ -313,13 +313,15 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
     }
 
     private fun updateProgress(progress: Int, downloaded: Long, total: Long) {
-        progressBar?.parent?.unhide()
-        progressFill?.setWidth(progress.percent())
-        progressText?.setText("$progress% • ${formatBytes(downloaded)} / ${formatBytes(total)}")
-        if (progress == 100) {
-            progressBar?.hide()
-            progressFill?.hide()
-            progressText?.setText("yippee :3")
+        Window.enqueueRenderOperation {
+            progressBar?.parent?.unhide()
+            progressFill?.setWidth(progress.percent())
+            progressText?.setText("$progress% • ${formatBytes(downloaded)} / ${formatBytes(total)}")
+            if (progress == 100) {
+                progressBar?.hide()
+                progressFill?.hide()
+                progressText?.setText("yippee :3")
+            }
         }
     }
 
@@ -556,12 +558,14 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
     }
 
     private fun resetDownloadButton() {
-        isDownloading = false
-        downloadButtonText?.setText("Download & Install")
-        if (downloadButtonIcon is UIText) (downloadButtonIcon as UIText).setText("⬇")
-        downloadButton?.setColor(colors["success"]!!)
-        progressFill?.setWidth(0.percent())
-        progressText?.setText("")
+        Window.enqueueRenderOperation {
+            isDownloading = false
+            downloadButtonText?.setText("Download & Install")
+            if (downloadButtonIcon is UIText) (downloadButtonIcon as UIText).setText("⬇")
+            downloadButton?.setColor(colors["success"]!!)
+            progressFill?.setWidth(0.percent())
+            progressText?.setText("")
+        }
     }
 
     private fun openUrl(url: String) {

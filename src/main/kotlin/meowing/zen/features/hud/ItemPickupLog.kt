@@ -51,7 +51,7 @@ object ItemPickupLog : Feature("itempickuplog") {
 
         register<PacketEvent.ReceivedPost> { event ->
             if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
-                currentInventory = getCurrentInventoryState().toMutableMap()
+                currentInventory = getCurrentInventoryState()?.toMutableMap() ?: return@register
                 compareInventories(previousInventory, currentInventory)
                 previousInventory = currentInventory
             }
@@ -97,9 +97,9 @@ object ItemPickupLog : Feature("itempickuplog") {
         displayLines = displayLines.filterValues { !it.isExpired() } as MutableMap<String, PickupEntry>
     }
 
-    private fun getCurrentInventoryState(): Map<String, Int> {
+    private fun getCurrentInventoryState(): Map<String, Int>? {
         val inventoryState = mutableMapOf<String, Int>()
-        val mainInventory = player!!.inventory
+        val mainInventory = player?.inventory ?: return null
 
         loop@ for (element in mainInventory) {
             if (element == null) continue
