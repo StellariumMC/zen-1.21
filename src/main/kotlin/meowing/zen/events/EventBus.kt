@@ -46,7 +46,9 @@ object EventBus {
         }
 
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { mc, world ->
-            post(WorldEvent.Change(world))
+            if(WorldEvent.Change.shouldPost()) {
+                post(WorldEvent.Change(world))
+            }
         }
 
         ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->

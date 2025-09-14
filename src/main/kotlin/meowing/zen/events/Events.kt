@@ -139,7 +139,22 @@ abstract class ChatEvent {
 }
 
 abstract class WorldEvent {
-    class Change(val world: ClientWorld) : Event()
+    class Change(val world: ClientWorld) : Event() {
+        companion object {
+            private var lastChangeTime = 0L
+            private const val COOLDOWN_MS = 100L
+
+            fun shouldPost(): Boolean {
+                val currentTime = System.currentTimeMillis()
+                return if (currentTime - lastChangeTime >= COOLDOWN_MS) {
+                    lastChangeTime = currentTime
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
 }
 
 abstract class PacketEvent {
