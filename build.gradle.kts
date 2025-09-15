@@ -15,6 +15,7 @@ plugins {
 
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://repo.polyfrost.org/releases")
 }
 
 toolkitMultiversion {
@@ -44,6 +45,7 @@ dependencies {
         modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
         modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
         modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
+        modImplementation(includeOrShade("org.polyfrost:polyui:1.14.8")!!)
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
