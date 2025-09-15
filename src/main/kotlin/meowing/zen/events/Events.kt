@@ -135,7 +135,7 @@ abstract class GuiEvent {
 
 abstract class ChatEvent {
     class Receive(val message: Text) : CancellableEvent()
-    class Send(val message: String) : CancellableEvent()
+    class Send(val message: String, val chatUtils: Boolean) : CancellableEvent()
 }
 
 abstract class WorldEvent {

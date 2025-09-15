@@ -13,7 +13,7 @@ import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen.Companion.prefix
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
-data class Data(val meowcount: Double = 0.0)
+data class Data(var meowcount: Double = 0.0)
 
 @Zen.Module
 object meowcount : Feature("meowcount") {
@@ -36,9 +36,9 @@ object meowcount : Feature("meowcount") {
     override fun initialize() {
         register<ChatEvent.Send> { event ->
             if (event.message.lowercase().contains("meow")) {
-                val currentData = dataUtils.getData()
-                val newData = currentData.copy(currentData.meowcount + 1.0)
-                dataUtils.setData(newData)
+                dataUtils.updateAndSave {
+                    meowcount++
+                }
             }
         }
     }

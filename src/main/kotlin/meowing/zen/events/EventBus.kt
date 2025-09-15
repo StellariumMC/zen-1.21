@@ -29,6 +29,7 @@ import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
 
 object EventBus {
+    val messages = mutableListOf<String>()
     val listeners = ConcurrentHashMap<Class<*>, MutableSet<PrioritizedCallback<*>>>()
     data class PrioritizedCallback<T>(val priority: Int, val callback: (T) -> Unit)
 
@@ -61,13 +62,19 @@ object EventBus {
         }
 
         ClientSendMessageEvents.ALLOW_CHAT.register { string ->
-            !post(ChatEvent.Send(string))
+            val fromChatUtils = messages.remove(string)
+            !post(ChatEvent.Send(string, fromChatUtils))
         }
 
         ClientSendMessageEvents.ALLOW_COMMAND.register { string ->
             val command = string.split(" ")[0].lowercase()
+            val commandString = "/$string"
+            val fromChatUtils = messages.remove(commandString)
+
             when (command) {
-                "gc", "pc", "ac", "msg", "tell", "r", "say", "w", "reply" -> !post(ChatEvent.Send("/$string"))
+                "gc", "pc", "ac", "msg", "tell", "r", "say", "w", "reply" -> {
+                    !post(ChatEvent.Send(commandString, fromChatUtils))
+                }
                 else -> true
             }
         }
