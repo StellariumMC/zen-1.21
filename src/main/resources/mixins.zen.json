@@ -1,11 +1,14 @@
 {
-	"required": true,
-	"package": "meowing.zen.mixins",
-	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-      "MixinClientConnection"
-	],
-	"injectors": {
-		"defaultRequire": 1
-	}
+  "required": true,
+  "package": "meowing.zen.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MixinClientConnection"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "AccessorGlResourceManager"
+  ]
 }

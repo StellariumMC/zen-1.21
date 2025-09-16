@@ -1,7 +1,6 @@
 package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import kotlin.Suppress;
 import meowing.zen.events.EventBus;
 import meowing.zen.events.GuiEvent;
 import meowing.zen.events.RenderEvent;

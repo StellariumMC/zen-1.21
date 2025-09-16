@@ -45,7 +45,11 @@ dependencies {
         modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
         modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
         modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
-        modImplementation(includeOrShade("org.polyfrost:polyui:1.14.8")!!)
+        modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3")!!)
+
+        listOf("windows", "linux", "macos", "macos-arm64").forEach { v ->
+            modImplementation(includeOrShade("org.lwjgl:lwjgl-nanovg:3.3.3:natives-$v")!!)
+        }
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
