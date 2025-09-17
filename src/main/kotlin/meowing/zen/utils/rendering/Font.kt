@@ -5,6 +5,13 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+/**
+ * Implementation adapted from Odin by odtheking
+ * Original work: https://github.com/odtheking/Odin
+ * Modified to support Zen
+ *
+ * @author Odin Contributors
+ */
 class Font {
     val name: String
     private val resourcePath: String?

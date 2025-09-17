@@ -24,6 +24,13 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
 
+/**
+ * Implementation adapted from Odin by odtheking
+ * Original work: https://github.com/odtheking/Odin
+ * Modified to support Zen
+ *
+ * @author Odin Contributors
+ */
 object NVGRenderer {
     private val nvgPaint = NVGPaint.malloc()
     private val nvgColor = NVGColor.malloc()

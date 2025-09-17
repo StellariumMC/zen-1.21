@@ -8,13 +8,19 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.file.Files
 
+/**
+ * Implementation adapted from Odin by odtheking
+ * Original work: https://github.com/odtheking/Odin
+ * Modified to support Zen
+ *
+ * @author Odin Contributors
+ */
 class Image(
     val identifier: String,
     var isSVG: Boolean = false,
     var stream: InputStream = getStream(identifier),
     private var buffer: ByteBuffer? = null
 ) {
-
     init {
         isSVG = identifier.endsWith(".svg", true)
     }
