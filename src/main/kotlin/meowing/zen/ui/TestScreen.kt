@@ -19,15 +19,10 @@ import net.minecraft.text.Text as MinecraftText
 class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     private val rootContainer = Rectangle()
         .backgroundColor(0x80121212.toInt())
-        .setSizing(Size.ScreenPerc, Size.ScreenPerc)
-        .setSizing(100f, Size.ScreenPerc, 100f, Size.ScreenPerc)
+        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
         .padding(40f)
 
     private var clickCount = 0
-
-    init {
-        setupUI()
-    }
 
     override fun init() {
         super.init()
@@ -44,13 +39,13 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .color(0xFFFFFFFF.toInt())
             .size(24f)
             .shadow(true)
-            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .childOf(rootContainer)
 
         Text("Click the buttons to test functionality")
             .color(0xFF9CA3AF.toInt())
             .size(14f)
-            .setPositioning(0f, Pos.ParentPixels, 35f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, -20f, Pos.AfterSibling)
             .childOf(rootContainer)
 
         val leftColumn = Rectangle()
@@ -59,7 +54,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .borderColor(0xFF404040.toInt())
             .borderThickness(1f)
             .setSizing(45f, Size.ParentPerc, 100f, Size.Auto)
-            .setPositioning(0f, Pos.ParentPixels, 80f, Pos.ParentPixels)
+            .setPositioning(10f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .padding(20f)
             .childOf(rootContainer)
 
@@ -69,7 +64,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .borderColor(0xFF404040.toInt())
             .borderThickness(1f)
             .setSizing(45f, Size.ParentPerc, 100f, Size.Auto)
-            .setPositioning(10f, Pos.ParentPercent, 80f, Pos.ParentPixels)
+            .setPositioning(10f, Pos.AfterSibling, 0f, Pos.MatchSibling)
             .padding(10f)
             .childOf(rootContainer)
 
@@ -91,7 +86,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFFFFFFF.toInt())
             .borderRadius(6f)
             .padding(12f, 24f, 12f, 24f)
-            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 clickCount++
                 println("Primary button clicked! Count: $clickCount")
@@ -106,7 +101,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFFFFFFF.toInt())
             .borderRadius(6f)
             .padding(10f, 20f, 10f, 20f)
-            .setPositioning(0f, Pos.ParentPixels, 90f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Success button clicked!")
                 true
@@ -120,7 +115,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFFFFFFF.toInt())
             .borderRadius(6f)
             .padding(10f, 20f, 10f, 20f)
-            .setPositioning(0f, Pos.ParentPixels, 140f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Danger button clicked!")
                 true
@@ -134,7 +129,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFFFFFFF.toInt())
             .borderRadius(6f)
             .padding(10f, 20f, 10f, 20f)
-            .setPositioning(0f, Pos.ParentPixels, 190f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Warning button clicked!")
                 true
@@ -158,7 +153,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFD1D5DB.toInt())
             .borderRadius(6f)
             .padding(12f, 24f, 12f, 24f)
-            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Secondary button clicked!")
                 true
@@ -175,7 +170,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .hoverColors(text = 0xFFFFFFFF.toInt())
             .borderRadius(4f)
             .padding(8f, 16f, 8f, 16f)
-            .setPositioning(0f, Pos.ParentPixels, 90f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Ghost button clicked!")
                 true
@@ -190,7 +185,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .borderRadius(8f)
             .shadow(true)
             .padding(12f, 24f, 12f, 24f)
-            .setPositioning(0f, Pos.ParentPixels, 140f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Shadow button clicked!")
                 true
@@ -202,14 +197,14 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFF6B7280.toInt())
             .borderRadius(6f)
             .padding(12f, 24f, 12f, 24f)
-            .setPositioning(0f, Pos.ParentPixels, 190f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ -> false }
             .childOf(container)
 
         val counterText = Text("Clicks: $clickCount")
             .color(0xFF60A5FA.toInt())
             .size(14f)
-            .setPositioning(0f, Pos.ParentPixels, 250f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .childOf(container)
 
         Button("Reset Counter")
@@ -218,7 +213,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .textColor(0xFFE5E7EB.toInt())
             .borderRadius(4f)
             .padding(8f, 16f, 8f, 16f)
-            .setPositioning(0f, Pos.ParentPixels, 280f, Pos.ParentPixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 clickCount = 0
                 counterText.text("Clicks: 0")

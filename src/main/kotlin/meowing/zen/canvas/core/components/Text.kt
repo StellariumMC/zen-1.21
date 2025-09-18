@@ -27,6 +27,8 @@ class Text(
         } else {
             NVGRenderer.text(text, absoluteX, absoluteY, fontSize, textColor, font)
         }
+        // Draw border for debugging
+//        NVGRenderer.hollowRect(absoluteX, absoluteY, width, height, 1f, 0xFFFF00FF.toInt(), 0f)
     }
 
     override fun getAutoWidth(): Float = NVGRenderer.textWidth(text, fontSize, font)

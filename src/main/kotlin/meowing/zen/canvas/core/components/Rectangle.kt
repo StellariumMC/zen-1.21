@@ -33,26 +33,37 @@ open class Rectangle(
     }
 
     override fun getAutoWidth(): Float {
-        val contentWidth = children.maxOfOrNull { it.x + it.width } ?: 0f
-        return contentWidth + padding[3] + padding[1]
+        val visibleChildren = children.filter { it.visible }
+        if (visibleChildren.isEmpty()) return padding[1] + padding[3]
+
+        val minX = visibleChildren.minOf { it.absoluteX }
+        val maxX = visibleChildren.maxOf { it.absoluteX + it.width }
+
+        return (maxX - minX) + padding[3] + padding[1]
     }
 
     override fun getAutoHeight(): Float {
-        val contentHeight = children.maxOfOrNull { it.y + it.height } ?: 0f
-        return contentHeight + padding[0] + padding[2]
+        val visibleChildren = children.filter { it.visible }
+        if (visibleChildren.isEmpty()) return padding[0] + padding[2]
+
+        // Find topmost and bottommost edges
+        val minY = visibleChildren.minOf { it.absoluteY }
+        val maxY = visibleChildren.maxOf { it.absoluteY + it.height }
+
+        return (maxY - minY) + padding[0] + padding[2]
     }
 
     override fun renderChildren(mouseX: Float, mouseY: Float) {
         children.forEach { child ->
-            val oldX = child.x
-            val oldY = child.y
+            val oldX = child.xConstraint
+            val oldY = child.yConstraint
             try {
-                child.x += padding[3]
-                child.y += padding[0]
+                child.xConstraint += padding[3]
+                child.yConstraint += padding[0]
                 child.render(mouseX, mouseY)
             } finally {
-                child.x = oldX
-                child.y = oldY
+                child.xConstraint = oldX
+                child.yConstraint = oldY
             }
         }
     }
