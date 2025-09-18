@@ -1,12 +1,12 @@
 package meowing.zen.canvas.core
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.canvas.core.components.Rectangle
 import net.minecraft.client.util.Window
 
 enum class Size {
     Auto,
     ParentPerc,
-    ScreenPerc,
     Pixels
 }
 
@@ -16,7 +16,9 @@ enum class Pos {
     ParentPixels,
     ScreenPixels,
     ParentCenter,
-    ScreenCenter
+    ScreenCenter,
+    AfterSibling,
+    MatchSibling
 }
 
 abstract class CanvasElement<T : CanvasElement<T>>(
@@ -36,6 +38,10 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var absoluteX: Float = 0f
     var absoluteY: Float = 0f
     var visible: Boolean = true
+
+    // Add these fields to your CanvasElement class
+    var xConstraint: Float = 0f
+    var yConstraint: Float = 0f
 
     var isHovered: Boolean = false
     var isPressed: Boolean = false
@@ -83,18 +89,26 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     open fun updateWidth() {
         width = when (widthType) {
             Size.Auto -> getAutoWidth()
-            Size.ParentPerc -> findFirstVisibleParent()?.width?.times(widthPercent / 100f) ?: width
+            Size.ParentPerc -> {
+                if(parent == null) {
+                    screenWidth * (widthPercent / 100f)
+                }
+                else findFirstVisibleParent()?.width?.times(widthPercent / 100f) ?: width
+            }
             Size.Pixels -> width
-            Size.ScreenPerc -> screenWidth * (widthPercent / 100f)
         }
     }
 
     open fun updateHeight() {
         height = when (heightType) {
             Size.Auto -> getAutoHeight()
-            Size.ParentPerc -> findFirstVisibleParent()?.height?.times(heightPercent / 100f) ?: height
+            Size.ParentPerc -> {
+                if(parent == null) {
+                    screenHeight * (heightPercent / 100f)
+                }
+                else findFirstVisibleParent()?.height?.times(heightPercent / 100f) ?: height
+            }
             Size.Pixels -> height
-            Size.ScreenPerc -> screenHeight * (heightPercent / 100f)
         }
     }
 
@@ -104,27 +118,63 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     protected open fun getAutoHeight(): Float =
         children.filter { it.visible }.maxOfOrNull { it.y + it.height }?.coerceAtLeast(0f) ?: 0f
 
+    // Replace your updateX() with this
     fun updateX() {
         val visibleParent = findFirstVisibleParent()
+
         x = when (xPositionConstraint) {
-            Pos.ParentPercent -> visibleParent?.let { it.x + (it.width * (x / 100f)) } ?: x
-            Pos.ScreenPercent -> screenWidth * (x / 100f)
-            Pos.ParentPixels -> x
-            Pos.ScreenPixels -> x
-            Pos.ParentCenter -> visibleParent?.let { it.x + (it.width / 2f) - (width / 2f) + x } ?: x
-            Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f)
+            Pos.ParentPercent -> if (visibleParent != null) visibleParent.x + (visibleParent.width * (xConstraint / 100f)) else xConstraint
+            Pos.ScreenPercent -> screenWidth * (xConstraint / 100f)
+            Pos.ParentPixels -> xConstraint
+            Pos.ScreenPixels -> xConstraint
+            Pos.ParentCenter -> if (visibleParent != null) visibleParent.x + (visibleParent.width / 2f) - (width / 2f) + xConstraint else xConstraint
+            Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f) + xConstraint
+            Pos.AfterSibling -> {
+                val index = parent?.children?.indexOf(this) ?: -1
+                if (index > 0) {
+                    val prev = parent!!.children[index - 1]
+                    prev.x + prev.width + xConstraint
+                } else xConstraint
+            }
+            Pos.MatchSibling -> {
+                val index = parent?.children?.indexOf(this) ?: -1
+                if (index > 0) {
+                    val prev = parent!!.children[index - 1]
+                    prev.x
+                } else xConstraint
+            }
         }
     }
 
+
+    // Replace your updateY() with this
     fun updateY() {
         val visibleParent = findFirstVisibleParent()
+
         y = when (yPositionConstraint) {
-            Pos.ParentPercent -> visibleParent?.let { it.y + (it.height * (y / 100f)) } ?: y
-            Pos.ScreenPercent -> screenHeight * (y / 100f)
-            Pos.ParentPixels -> y
-            Pos.ScreenPixels -> y
-            Pos.ParentCenter -> visibleParent?.let { it.y + (it.height / 2f) - (height / 2f) + y } ?: y
-            Pos.ScreenCenter -> (screenHeight / 2f) - (height / 2f)
+            Pos.ParentPercent -> if (visibleParent != null) visibleParent.y + (visibleParent.height * (yConstraint / 100f)) else yConstraint
+            Pos.ScreenPercent -> screenHeight * (yConstraint / 100f)
+            Pos.ParentPixels -> yConstraint
+            Pos.ScreenPixels -> yConstraint
+            Pos.ParentCenter -> if (visibleParent != null) visibleParent.y + (visibleParent.height / 2f) - (height / 2f) + yConstraint else yConstraint
+            Pos.ScreenCenter -> (screenHeight / 2f) - (height / 2f) + yConstraint
+            Pos.AfterSibling -> {
+                val index = parent?.children?.indexOf(this) ?: -1
+                if (index > 0) {
+                    val prev = parent!!.children[index - 1]
+                    (prev.y + prev.height + yConstraint)
+                } else yConstraint
+            }
+            Pos.MatchSibling -> {
+                val index = parent?.children?.indexOf(this) ?: -1
+                if (index > 0) {
+                    val prev = parent!!.children[index - 1]
+                    if(prev is Rectangle) {
+                        // The current janky solution to account for padding in rectangles, works for now
+                        prev.y + yConstraint - (prev.padding[0] + prev.padding[2])
+                    } else prev.y + yConstraint
+                } else yConstraint
+            }
         }
     }
 
@@ -253,12 +303,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         this.yPositionConstraint = yConstraint
     } as T
 
-    fun setPositioning(x: Float, xConstraint: Pos, y: Float, yConstraint: Pos): T = apply {
-        this.x = x
-        this.y = y
-        this.xPositionConstraint = xConstraint
-        this.yPositionConstraint = yConstraint
-    } as T
+    fun setPositioning(xVal: Float, xPos: Pos, yVal: Float, yPos: Pos): T {
+        this.xConstraint = xVal
+        this.xPositionConstraint = xPos
+        this.yConstraint = yVal
+        this.yPositionConstraint = yPos
+        return this as T
+    }
 
     fun onHover(onEnter: (Float, Float) -> Unit, onExit: (Float, Float) -> Unit = { _, _ -> }): T = apply {
         this.onMouseEnter = onEnter
