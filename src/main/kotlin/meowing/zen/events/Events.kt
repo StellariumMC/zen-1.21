@@ -55,10 +55,10 @@ abstract class SkyblockEvent {
 }
 
 abstract class MouseEvent {
-    class Click(val button: Int) : Event()
+    class Click(val button: Int) : CancellableEvent()
     class Release(val button: Int) : Event()
-//    class Scroll(val event: MouseEvent) : Event()
-//    class Move(val event: MouseEvent) : Event()
+    class Scroll(val horizontal: Double, val vertical: Double) : Event()
+    class Move() : Event()
 }
 
 abstract class KeyEvent {

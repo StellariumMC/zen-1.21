@@ -25,4 +25,14 @@ public class MixinMouse {
             }
         }
     }
+
+    @Inject(method = "onCursorPos", at = @At("HEAD"))
+    private void zen$onMouseMove(long l, double d, double e, CallbackInfo ci) {
+        EventBus.INSTANCE.post(new MouseEvent.Move());
+    }
+
+    @Inject(method = "onMouseScroll", at = @At("HEAD"))
+    private void zen$onMouseScroll(long l, double d, double e, CallbackInfo ci) {
+        EventBus.INSTANCE.post(new MouseEvent.Scroll(d, e));
+    }
 }

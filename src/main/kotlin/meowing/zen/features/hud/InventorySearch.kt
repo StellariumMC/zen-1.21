@@ -158,7 +158,11 @@ object InventorySearch : Feature("inventorysearch") {
             val matrices = event.context.matrices
 
             NVGRenderer.push()
+            //#if MC >= 1.21.7
+            //$$ NVGRenderer.translate(matrices.m20(), matrices.m21())
+            //#else
             NVGRenderer.translate(matrices.peek().positionMatrix.m30(), matrices.peek().positionMatrix.m31())
+            //#endif
             when (highlightType) {
                 0 -> {
                     NVGRenderer.globalAlpha(0.3f)
