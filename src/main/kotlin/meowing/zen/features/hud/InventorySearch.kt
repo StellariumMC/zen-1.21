@@ -9,9 +9,10 @@ import meowing.zen.events.GuiEvent
 import meowing.zen.features.Feature
 import meowing.zen.features.general.CalculatorCommand
 import meowing.zen.ui.components.TextInputComponent
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.ItemUtils.lore
-import meowing.zen.utils.Render2D
 import meowing.zen.utils.Utils.removeFormatting
+import meowing.zen.utils.rendering.NVGRenderer
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.item.AirBlockItem
@@ -82,32 +83,20 @@ object InventorySearch : Feature("inventorysearch") {
                     y = (screenHeight * 0.95 - height / 2).toInt()
                     width = 200
 
-                    val matrices = event.context.matrices
-
-                    //#if MC >= 1.21.7
-                    //$$ matrices.pushMatrix()
-                    //$$ matrices.scale(sf, sf)
-                    //#else
-                    matrices.push()
-                    matrices.scale(sf, sf, sf)
-                    matrices.translate(0f, 0f, 300f)
-                    //#endif
-
-                    draw(event.context, mouseX.toInt(), mouseY.toInt())
+                    NVGRenderer.beginFrame(window.width.toFloat(), window.height.toFloat())
+                    NVGRenderer.scale(2f, 2f)
+                    draw(mouseX.toInt(), mouseY.toInt())
 
                     mathResult?.let { result ->
                         if (focused && value.isNotEmpty()) {
-                            val textEndX = (x + textPadding - scrollOffset + mc.textRenderer.getWidth(value)).toFloat()
-                            val textY = (y + (height - mc.textRenderer.fontHeight - 0.5) / 2).toFloat()
-                            Render2D.renderString(event.context, " = $result", textEndX, textY, 1f, 0x55FF55)
+                            val textEndX = (x + textPadding - scrollOffset + NVGRenderer.textWidth(value, 12f, NVGRenderer.defaultFont))
+                            val textY = y + (height - 12f) / 2
+
+                            NVGRenderer.text(" = $result", textEndX, textY, 12f, Color.GREEN.rgb, NVGRenderer.defaultFont)
                         }
                     }
 
-                    //#if MC >= 1.21.7
-                    //$$ matrices.popMatrix()
-                    //#else
-                    matrices.pop()
-                    //#endif
+                    NVGRenderer.endFrame()
                 }
             }
         }
@@ -164,19 +153,21 @@ object InventorySearch : Feature("inventorysearch") {
             if (!searchableText.contains(text)) return@register
 
             val highlightColor = color.rgb
-            val x = event.slot.x
-            val y = event.slot.y
-            val context = event.context
+            val x = event.slot.x.toFloat()
+            val y = event.slot.y.toFloat()
+            val matrices = event.context.matrices
 
+            NVGRenderer.push()
+            NVGRenderer.translate(matrices.peek().positionMatrix.m30(), matrices.peek().positionMatrix.m31())
             when (highlightType) {
-                0 -> context.fill(x, y, x + 16, y + 16, highlightColor)
-                1 -> {
-                    context.fill(x, y, x + 16, y + 1, highlightColor)
-                    context.fill(x, y, x + 1, y + 16, highlightColor)
-                    context.fill(x + 15, y, x + 16, y + 16, highlightColor)
-                    context.fill(x, y + 15, x + 16, y + 16, highlightColor)
+                0 -> {
+                    NVGRenderer.globalAlpha(0.3f)
+                    NVGRenderer.rect(x, y, 16f, 16f, highlightColor)
                 }
+                1 -> NVGRenderer.hollowRect(x, y, 16f, 16f, 1f, highlightColor, 0f)
             }
+
+            NVGRenderer.pop()
         }
     }
 }
