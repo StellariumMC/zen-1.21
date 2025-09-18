@@ -118,7 +118,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     protected open fun getAutoHeight(): Float =
         children.filter { it.visible }.maxOfOrNull { it.y + it.height }?.coerceAtLeast(0f) ?: 0f
 
-    // Replace your updateX() with this
     fun updateX() {
         val visibleParent = findFirstVisibleParent()
 
@@ -146,8 +145,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         }
     }
 
-
-    // Replace your updateY() with this
     fun updateY() {
         val visibleParent = findFirstVisibleParent()
 
