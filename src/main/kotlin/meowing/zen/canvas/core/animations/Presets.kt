@@ -1,6 +1,8 @@
 package meowing.zen.canvas.core.animations
 
 import meowing.zen.canvas.core.CanvasElement
+import meowing.zen.canvas.core.components.SvgImage
+import java.awt.Color
 
 private val elementOriginalSizes = mutableMapOf<String, Pair<Float, Float>>()
 private val elementOriginalPositions = mutableMapOf<String, Pair<Float, Float>>()
@@ -22,6 +24,10 @@ fun <T : CanvasElement<T>> T.fadeIn(
             val targetColor = (textColor and 0x00FFFFFF) or (255 shl 24)
             textColor = textColor and 0x00FFFFFF
             animateColor({ textColor }, { textColor = it }, targetColor, duration, type, onComplete)
+        }
+        is SvgImage -> {
+            val targetColor = (color.rgb and 0x00FFFFFF) or (255 shl 24)
+            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, targetColor, duration, type, onComplete)
         }
         else -> {
             animateFloat({ 0f }, {}, 1f, duration, type, AnimationType.ALPHA, onComplete)
@@ -46,6 +52,13 @@ fun <T : CanvasElement<T>> T.fadeOut(
             val targetColor = textColor and 0x00FFFFFF
             animateColor({ textColor }, { textColor = it }, targetColor, duration, type) {
                 visible = false
+                onComplete?.invoke()
+            }
+        }
+        is SvgImage -> {
+            val targetColor = color.rgb and 0x00FFFFFF
+            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, targetColor, duration, type) {
+                visible = true
                 onComplete?.invoke()
             }
         }

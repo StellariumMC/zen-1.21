@@ -42,6 +42,7 @@ object NVGRenderer {
     private val fontBounds = FloatArray(4)
 
     private val images = HashMap<Image, NVGImage>()
+    private val svgCache = HashMap<String, NVGImage>()
 
     private var scissor: Scissor? = null
 
@@ -337,10 +338,22 @@ object NVGRenderer {
         NanoVG.nvgFill(vg)
     }
 
-    fun createImage(resourcePath: String): Image {
-        val image = images.keys.find { it.identifier == resourcePath } ?: Image(resourcePath)
-        if (image.isSVG) images.getOrPut(image) { NVGImage(0, loadSVG(image)) }.count++
-        else images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count++
+    fun svg(id: String, x: Float, y: Float, w: Float, h: Float, a: Float = 1f) {
+        val nvg = svgCache[id]?.nvg ?: throw IllegalStateException("SVG Image (${id}) doesn't exist")
+
+        NanoVG.nvgImagePattern(vg, x, y, w, h, 0f, nvg, a, nvgPaint)
+        NanoVG.nvgBeginPath(vg)
+        NanoVG.nvgRect(vg, x, y, w, h + .5f)
+        NanoVG.nvgFillPaint(vg, nvgPaint)
+        NanoVG.nvgFill(vg)
+    }
+
+    fun createImage(resourcePath: String, width: Int=-1, height: Int=-1, color: java.awt.Color = java.awt.Color.WHITE, id: String): Image {
+        val image = Image(resourcePath)
+
+        if (image.isSVG) {
+            svgCache.put(id, NVGImage(0, loadSVG(image, width, height, color)))
+        } else images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count++
         return image
     }
 
@@ -372,17 +385,22 @@ object NVGRenderer {
         return NanoVG.nvgCreateImageRGBA(vg, w[0], h[0], 0, buffer)
     }
 
-    private fun loadSVG(image: Image): Int {
-        val vec = image.stream.use { it.bufferedReader().readText() }
-        val svg = NanoSVG.nsvgParse(vec, "px", 96f) ?: throw IllegalStateException("Failed to parse ${image.identifier}")
+    private fun loadSVG(image: Image, svgWidth: Int, svgHeight: Int, color: java.awt.Color): Int {
+        var vec = image.stream.use { it.bufferedReader().readText() }
 
-        val width = svg.width().toInt()
-        val height = svg.height().toInt()
+        val hexColor = "#%06X".format(color.rgb and 0xFFFFFF)
+        vec = vec.replace("currentColor", hexColor)
+
+        val svg = NanoSVG.nsvgParse(vec, "px", 96f)
+            ?: throw IllegalStateException("Failed to parse ${image.identifier}")
+
+        val width = if (svgWidth > 0) svgWidth else svg.width().toInt()
+        val height = if (svgHeight > 0) svgHeight else svg.height().toInt()
         val buffer = MemoryUtil.memAlloc(width * height * 4)
 
         try {
             val rasterizer = NanoSVG.nsvgCreateRasterizer()
-            NanoSVG.nsvgRasterize(rasterizer, svg, 0f, 0f, 1f, buffer, width, height, width * 4)
+            NanoSVG.nsvgRasterize(rasterizer, svg, 0f, 0f, width.toFloat() / svg.width(), buffer, width, height, width * 4)
             val nvgImage = NanoVG.nvgCreateImageRGBA(vg, width, height, 0, buffer)
             NanoSVG.nsvgDeleteRasterizer(rasterizer)
             return nvgImage

@@ -59,6 +59,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var onKeyPress: ((Int, Int, Int) -> Boolean)? = null
     var onKeyRelease: ((Int, Int, Int) -> Boolean)? = null
     var onCharType: ((Char) -> Boolean)? = null
+    var onValueChange: ((Any) -> Unit)? = null
 
     init {
         if (parent == null) {
@@ -126,7 +127,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             Pos.ParentCenter -> {
                 if (visibleParent != null) {
                     visibleParent.x + visibleParent.width / 2f - width / 2f
-                } else yConstraint
+                } else xConstraint
             }
             Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f) + xConstraint
             Pos.AfterSibling -> {
@@ -338,6 +339,11 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     @Suppress("UNCHECKED_CAST")
     fun onChar(callback: (Char) -> Boolean): T = apply {
         this.onCharType = callback
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onValueChange(callback: (Any) -> Unit): T = apply {
+        this.onValueChange = callback
     } as T
 
     @Suppress("UNCHECKED_CAST")
