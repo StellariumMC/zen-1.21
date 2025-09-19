@@ -70,6 +70,7 @@ object NVGRenderer {
         GlStateManager._glBindFramebuffer(GL30.GL_FRAMEBUFFER, glFramebuffer)
         GlStateManager._viewport(0, 0, framebuffer.viewportWidth, framebuffer.viewportHeight)
         GlStateManager._activeTexture(GL30.GL_TEXTURE0)
+        GlStateManager._bindTexture(0)
 
         NanoVG.nvgBeginFrame(vg, width, height, 1f)
         NanoVG.nvgTextAlign(vg, NanoVG.NVG_ALIGN_LEFT or NanoVG.NVG_ALIGN_TOP)

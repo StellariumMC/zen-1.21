@@ -37,7 +37,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var heightPercent: Float = 100f
     var visible: Boolean = true
 
-    // Add these fields to your CanvasElement class
     var xConstraint: Float = 0f
     var yConstraint: Float = 0f
 
@@ -153,7 +152,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         y = when (yPositionConstraint) {
             Pos.ParentPercent -> if (visibleParent != null) visibleParent.y + (visibleParent.height * (yConstraint / 100f)) else yConstraint
             Pos.ScreenPercent -> screenHeight * (yConstraint / 100f)
-            Pos.ParentPixels -> if(visibleParent != null) visibleParent.y + yConstraint else yConstraint
+            Pos.ParentPixels -> if (visibleParent != null) visibleParent.y + yConstraint else yConstraint
             Pos.ScreenPixels -> yConstraint
             Pos.ParentCenter -> {
                 if (visibleParent != null) {
@@ -172,7 +171,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 val index = parent?.children?.indexOf(this) ?: -1
                 if (index > 0) {
                     val prev = parent!!.children[index - 1]
-                    if(prev is Rectangle) {
+                    if (prev is Rectangle) {
                         // The current janky solution to account for padding in rectangles, works for now
                         prev.y + yConstraint - (prev.padding[0] + prev.padding[2])
                     } else prev.y + yConstraint
@@ -277,6 +276,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     fun childOf(parent: CanvasElement<*>): T = apply { parent.addChild(this) } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun addChild(child: CanvasElement<*>): T = apply {
         if (child.parent == null) {
             EventDispatcher.unregisterRoot(child)
@@ -285,11 +285,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         children.add(child)
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun setSizing(widthType: Size, heightType: Size): T = apply {
         this.widthType = widthType
         this.heightType = heightType
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun setSizing(width: Float, widthType: Size, height: Float, heightType: Size): T = apply {
         this.widthType = widthType
         this.heightType = heightType
@@ -297,11 +299,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         if (heightType == Size.Pixels) this.height = height else this.heightPercent = height
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun setPositioning(xConstraint: Pos, yConstraint: Pos): T = apply {
         this.xPositionConstraint = xConstraint
         this.yPositionConstraint = yConstraint
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun setPositioning(xVal: Float, xPos: Pos, yVal: Float, yPos: Pos): T {
         this.xConstraint = xVal
         this.xPositionConstraint = xPos
@@ -310,31 +314,38 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         return this as T
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun onHover(onEnter: (Float, Float) -> Unit, onExit: (Float, Float) -> Unit = { _, _ -> }): T = apply {
         this.onMouseEnter = onEnter
         this.onMouseExit = onExit
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun onClick(callback: (Float, Float, Int) -> Boolean): T = apply {
         this.onMouseClick = callback
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun onRelease(callback: (Float, Float, Int) -> Boolean): T = apply {
         this.onMouseRelease = callback
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun onKey(callback: (Int, Int, Int) -> Boolean): T = apply {
         this.onKeyPress = callback
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun onChar(callback: (Char) -> Boolean): T = apply {
         this.onCharType = callback
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun onScroll(callback: (Float, Float, Double, Double) -> Boolean): T = apply {
         this.onMouseScroll = callback
     } as T
 
+    @Suppress("UNCHECKED_CAST")
     fun ignoreMouseEvents(): T = apply {
         this.onMouseClick = { _, _, _ -> false }
         this.onMouseRelease = { _, _, _ -> false }
@@ -342,8 +353,15 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         this.onMouseMove = { _, _ -> }
     } as T
 
-    fun show(): T = apply { visible = true } as T
-    fun hide(): T = apply { visible = false } as T
+    @Suppress("UNCHECKED_CAST")
+    fun show(): T = apply {
+        visible = true
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun hide(): T = apply {
+        visible = false
+    } as T
 
     val hovered: Boolean get() = isHovered
     val pressed: Boolean get() = isPressed
