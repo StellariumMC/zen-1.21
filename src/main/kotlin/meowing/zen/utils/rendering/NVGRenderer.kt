@@ -348,11 +348,13 @@ object NVGRenderer {
         NanoVG.nvgFill(vg)
     }
 
+    // Might have a memory leak if the menu is left and re-entered lots of times with unique ids
     fun createImage(resourcePath: String, width: Int=-1, height: Int=-1, color: java.awt.Color = java.awt.Color.WHITE, id: String): Image {
         val image = Image(resourcePath)
 
         if (image.isSVG) {
             svgCache.put(id, NVGImage(0, loadSVG(image, width, height, color)))
+            svgCache[id]!!.count++
         } else images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count++
         return image
     }
@@ -364,6 +366,16 @@ object NVGRenderer {
         if (nvgImage.count == 0) {
             NanoVG.nvgDeleteImage(vg, nvgImage.nvg)
             images.remove(image)
+        }
+    }
+
+    // Not used anywhere yet, but will prob have to use it at some point
+    fun deleteSVG(id: String) {
+        val nvgImage = svgCache[id] ?: return
+        nvgImage.count--
+        if (nvgImage.count == 0) {
+            NanoVG.nvgDeleteImage(vg, nvgImage.nvg)
+            svgCache.remove(id)
         }
     }
 

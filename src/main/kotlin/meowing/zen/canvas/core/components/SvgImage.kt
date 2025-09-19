@@ -9,29 +9,29 @@ import java.util.UUID
 
 class SvgImage(
     var svgPath: String = "",
-    var widthOverride: Float = 80f,
-    var heightOverride: Float = 80f,
+    var startingWidth: Float = 80f,
+    var startingHeight: Float = 80f,
     var color: Color = Color.WHITE
 ) : CanvasElement<SvgImage>() {
     var imageId = "${UUID.randomUUID()}"
-    var image = NVGRenderer.createImage(svgPath, widthOverride.toInt(), heightOverride.toInt(), color, imageId)
+    var image = NVGRenderer.createImage(svgPath, startingWidth.toInt(), startingHeight.toInt(), color, imageId)
 
     init {
-        width = widthOverride
-        height = heightOverride
+        width = startingWidth
+        height = startingHeight
         setSizing(Size.Auto, Size.Auto)
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
         ignoreMouseEvents()
-        setSizing(widthOverride, Size.Pixels, heightOverride, Size.Pixels)
+        setSizing(startingWidth, Size.Pixels, startingHeight, Size.Pixels)
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (svgPath.isEmpty()) return
 
-        widthOverride = width
-        heightOverride = height
+        startingWidth = width
+        startingHeight = height
 
-        NVGRenderer.svg(imageId, x, y, widthOverride, heightOverride, color.alpha / 255f) // Draw the SVG with a red tint
+        NVGRenderer.svg(imageId, x, y, startingWidth, startingHeight, color.alpha / 255f) // Draw the SVG with a red tint
     }
 
     fun setSvgColor(newColor: Color) {
@@ -42,6 +42,6 @@ class SvgImage(
     }
 
     private fun reloadImage() {
-        image = NVGRenderer.createImage(svgPath, widthOverride.toInt(), heightOverride.toInt(), color, imageId)
+        image = NVGRenderer.createImage(svgPath, startingWidth.toInt(), startingHeight.toInt(), color, imageId)
     }
 }

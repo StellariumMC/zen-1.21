@@ -68,8 +68,7 @@ class CheckBox(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        super.onRender(mouseX, mouseY)
-
         updateBackgroundColor()
+        super.onRender(mouseX, mouseY)
     }
 }
