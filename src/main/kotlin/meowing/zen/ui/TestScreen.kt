@@ -37,14 +37,14 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     private fun setupUI() {
         Text("Button Component Test Suite")
             .color(0xFFFFFFFF.toInt())
-            .size(24f)
+            .fontSize(24f)
             .shadow(true)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .childOf(rootContainer)
 
         Text("Click the buttons to test functionality")
             .color(0xFF9CA3AF.toInt())
-            .size(14f)
+            .fontSize(14f)
             .setPositioning(0f, Pos.ParentPixels, -20f, Pos.AfterSibling)
             .childOf(rootContainer)
 
@@ -65,7 +65,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .borderThickness(1f)
             .setSizing(45f, Size.ParentPerc, 100f, Size.Auto)
             .setPositioning(10f, Pos.AfterSibling, 0f, Pos.MatchSibling)
-            .padding(10f)
+            .padding(20f)
             .childOf(rootContainer)
 
         setupLeftColumn(leftColumn)
@@ -75,14 +75,14 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     private fun setupLeftColumn(container: Rectangle) {
         Text("Primary Buttons")
             .color(0xFFE5E7EB.toInt())
-            .size(16f)
+            .fontSize(16f)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
             .childOf(container)
 
         Button("Primary Action")
             .backgroundColor(0xFF3B82F6.toInt())
-            .hoverColors(bg = 0xFF2563EB.toInt())
-            .pressedColors(bg = 0xFF1D4ED8.toInt())
+            .hoverColors(bg = 0xFF2563EB.toInt(), text = 0xFF0000FF.toInt())
+            .pressedColors(bg = 0xFF1D4ED8.toInt(), text = 0xFFFF00FF.toInt())
             .textColor(0xFFFFFFFF.toInt())
             .borderRadius(6f)
             .padding(12f, 24f, 12f, 24f)
@@ -140,7 +140,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     private fun setupRightColumn(container: Rectangle) {
         Text("Secondary & Special")
             .color(0xFFE5E7EB.toInt())
-            .size(16f)
+            .fontSize(16f)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
             .childOf(container)
 
@@ -203,7 +203,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
 
         val counterText = Text("Clicks: $clickCount")
             .color(0xFF60A5FA.toInt())
-            .size(14f)
+            .fontSize(14f)
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .childOf(container)
 

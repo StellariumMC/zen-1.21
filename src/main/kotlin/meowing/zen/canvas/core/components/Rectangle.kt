@@ -24,11 +24,11 @@ open class Rectangle(
         }
 
         if (currentBgColor != 0) {
-            NVGRenderer.rect(absoluteX, absoluteY, width, height, currentBgColor, borderRadius)
+            NVGRenderer.rect(x, y, width, height, currentBgColor, borderRadius)
         }
 
         if (borderThickness > 0f) {
-            NVGRenderer.hollowRect(absoluteX, absoluteY, width, height, borderThickness, borderColor, borderRadius)
+            NVGRenderer.hollowRect(x, y, width, height, borderThickness, borderColor, borderRadius)
         }
     }
 
@@ -36,8 +36,8 @@ open class Rectangle(
         val visibleChildren = children.filter { it.visible }
         if (visibleChildren.isEmpty()) return padding[1] + padding[3]
 
-        val minX = visibleChildren.minOf { it.absoluteX }
-        val maxX = visibleChildren.maxOf { it.absoluteX + it.width }
+        val minX = visibleChildren.minOf { it.x }
+        val maxX = visibleChildren.maxOf { it.x + it.width }
 
         return (maxX - minX) + padding[3] + padding[1]
     }
@@ -47,8 +47,8 @@ open class Rectangle(
         if (visibleChildren.isEmpty()) return padding[0] + padding[2]
 
         // Find topmost and bottommost edges
-        val minY = visibleChildren.minOf { it.absoluteY }
-        val maxY = visibleChildren.maxOf { it.absoluteY + it.height }
+        val minY = visibleChildren.minOf { it.y }
+        val maxY = visibleChildren.maxOf { it.y + it.height }
 
         return (maxY - minY) + padding[0] + padding[2]
     }

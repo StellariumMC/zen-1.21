@@ -24,6 +24,10 @@ class Button(
     heightType: Size = Size.Auto
 ) : Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, widthType, heightType) {
 
+    val innerText = Text(text, textColor, fontSize, shadowEnabled, font)
+        .childOf(this)
+        .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
+
     init {
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
     }
@@ -38,46 +42,24 @@ class Button(
                 else -> textColor
             }
 
-            val textWidth = NVGRenderer.textWidth(text, fontSize, font)
-            val textX = absoluteX + (width - textWidth) / 2f
-            val textY = absoluteY + (height - fontSize) / 2f
-
-            if (shadowEnabled) {
-                NVGRenderer.textShadow(text, textX, textY, fontSize, currentTextColor, font)
-            } else {
-                NVGRenderer.text(text, textX, textY, fontSize, currentTextColor, font)
-            }
+            textColor(currentTextColor)
         }
     }
 
-    override fun getAutoWidth(): Float {
-        val textWidth = if (text.isNotEmpty()) NVGRenderer.textWidth(text, fontSize, font) else 0f
-        val contentWidth = maxOf(textWidth, children.maxOfOrNull { it.x + it.width } ?: 0f)
-
-        return contentWidth + padding[1] + padding[3]
-    }
-
-    override fun getAutoHeight(): Float {
-        val textHeight = if (text.isNotEmpty()) fontSize else 0f
-        val contentHeight = maxOf(textHeight, children.maxOfOrNull { it.y + it.height } ?: 0f)
-
-        return contentHeight + padding[0] + padding[2]
-    }
-
     fun text(text: String): Button = apply {
-        this.text = text
+        innerText.text = text
     }
 
     fun textColor(color: Int): Button = apply {
-        this.textColor = color
+        innerText.textColor = color
     }
 
     fun fontSize(size: Float): Button = apply {
-        this.fontSize = size
+        innerText.fontSize = size
     }
 
     fun font(font: Font): Button = apply {
-        this.font = font
+        innerText.font = font
     }
 
     fun hoverColors(bg: Int? = null, text: Int? = null): Button = apply {
@@ -91,7 +73,7 @@ class Button(
     }
 
     fun shadow(enabled: Boolean = true): Button = apply {
-        this.shadowEnabled = enabled
+        innerText.shadowEnabled = enabled
     }
 
     override fun padding(top: Float, right: Float, bottom: Float, left: Float): Button = apply {
