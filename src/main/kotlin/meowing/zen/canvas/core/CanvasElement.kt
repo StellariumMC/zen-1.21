@@ -35,8 +35,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var height: Float = 0f
     var widthPercent: Float = 100f
     var heightPercent: Float = 100f
-    var absoluteX: Float = 0f
-    var absoluteY: Float = 0f
     var visible: Boolean = true
 
     // Add these fields to your CanvasElement class
@@ -124,9 +122,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         x = when (xPositionConstraint) {
             Pos.ParentPercent -> if (visibleParent != null) visibleParent.x + (visibleParent.width * (xConstraint / 100f)) else xConstraint
             Pos.ScreenPercent -> screenWidth * (xConstraint / 100f)
-            Pos.ParentPixels -> xConstraint
+            Pos.ParentPixels -> if(visibleParent != null) visibleParent.x + xConstraint else xConstraint
             Pos.ScreenPixels -> xConstraint
-            Pos.ParentCenter -> if (visibleParent != null) visibleParent.x + (visibleParent.width / 2f) - (width / 2f) + xConstraint else xConstraint
+            Pos.ParentCenter -> {
+                if (visibleParent != null) {
+                    visibleParent.x + visibleParent.width / 2f - width / 2f
+                } else yConstraint
+            }
             Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f) + xConstraint
             Pos.AfterSibling -> {
                 val index = parent?.children?.indexOf(this) ?: -1
@@ -151,9 +153,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         y = when (yPositionConstraint) {
             Pos.ParentPercent -> if (visibleParent != null) visibleParent.y + (visibleParent.height * (yConstraint / 100f)) else yConstraint
             Pos.ScreenPercent -> screenHeight * (yConstraint / 100f)
-            Pos.ParentPixels -> yConstraint
+            Pos.ParentPixels -> if(visibleParent != null) visibleParent.y + yConstraint else yConstraint
             Pos.ScreenPixels -> yConstraint
-            Pos.ParentCenter -> if (visibleParent != null) visibleParent.y + (visibleParent.height / 2f) - (height / 2f) + yConstraint else yConstraint
+            Pos.ParentCenter -> {
+                if (visibleParent != null) {
+                    visibleParent.y + visibleParent.height / 2f - height / 2f
+                } else yConstraint
+            }
             Pos.ScreenCenter -> (screenHeight / 2f) - (height / 2f) + yConstraint
             Pos.AfterSibling -> {
                 val index = parent?.children?.indexOf(this) ?: -1
@@ -176,7 +182,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     }
 
     fun isPointInside(mouseX: Float, mouseY: Float): Boolean =
-        mouseX >= absoluteX && mouseX <= absoluteX + width && mouseY >= absoluteY && mouseY <= absoluteY + height
+        mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
 
     open fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
         if (!visible) return false
@@ -259,10 +265,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         updateX()
         updateY()
 
-        val visibleParent = findFirstVisibleParent()
-        absoluteX = (visibleParent?.absoluteX ?: 0f) + x
-        absoluteY = (visibleParent?.absoluteY ?: 0f) + y
-
         onRender(mouseX, mouseY)
         renderChildren(mouseX, mouseY)
     }
@@ -331,6 +333,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     fun onScroll(callback: (Float, Float, Double, Double) -> Boolean): T = apply {
         this.onMouseScroll = callback
+    } as T
+
+    fun ignoreMouseEvents(): T = apply {
+        this.onMouseClick = { _, _, _ -> false }
+        this.onMouseRelease = { _, _, _ -> false }
+        this.onMouseScroll = { _, _, _, _ -> false }
+        this.onMouseMove = { _, _ -> }
     } as T
 
     fun show(): T = apply { visible = true } as T

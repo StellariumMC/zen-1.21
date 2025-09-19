@@ -17,18 +17,19 @@ class Text(
     init {
         setSizing(Size.Auto, Size.Auto)
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
+        ignoreMouseEvents()
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (text.isEmpty()) return
 
         if (shadowEnabled) {
-            NVGRenderer.textShadow(text, absoluteX, absoluteY, fontSize, textColor, font)
+            NVGRenderer.textShadow(text, x, y, fontSize, textColor, font)
         } else {
-            NVGRenderer.text(text, absoluteX, absoluteY, fontSize, textColor, font)
+            NVGRenderer.text(text, x, y, fontSize, textColor, font)
         }
         // Draw border for debugging
-//        NVGRenderer.hollowRect(absoluteX, absoluteY, width, height, 1f, 0xFFFF00FF.toInt(), 0f)
+//        NVGRenderer.hollowRect(x, y, width, height, 1f, 0xFFFF00FF.toInt(), 0f)
     }
 
     override fun getAutoWidth(): Float = NVGRenderer.textWidth(text, fontSize, font)
@@ -43,7 +44,7 @@ class Text(
         textColor = color
     }
 
-    fun size(size: Float): Text = apply {
+    fun fontSize(size: Float): Text = apply {
         fontSize = size
     }
 
