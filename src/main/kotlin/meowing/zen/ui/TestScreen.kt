@@ -8,12 +8,16 @@ import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Text
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
+import meowing.zen.canvas.core.animations.Manager
+import meowing.zen.canvas.core.components.CheckBox
+import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.rendering.NVGRenderer
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
+import java.awt.Color
 import net.minecraft.text.Text as MinecraftText
 
 class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
@@ -31,7 +35,13 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
 
     override fun close() {
         super.close()
+        Manager.clear()
         rootContainer.destroy()
+    }
+
+    override fun tick() {
+        super.tick()
+        Manager.update()
     }
 
     private fun setupUI() {
@@ -77,6 +87,17 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .color(0xFFE5E7EB.toInt())
             .fontSize(16f)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(container)
+
+        SvgImage(svgPath = "/assets/zen/checkmark.svg", color = Color.RED)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(container)
+
+        CheckBox()
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .onValueChange { checked ->
+                println("Checkbox is now: $checked")
+            }
             .childOf(container)
 
         Button("Primary Action")
