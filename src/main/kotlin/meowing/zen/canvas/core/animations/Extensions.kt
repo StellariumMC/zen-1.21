@@ -15,7 +15,7 @@ fun <T : CanvasElement<T>> T.animateFloat(
     onComplete: (() -> Unit)? = null
 ): FloatAnimation {
     val target = AnimationTarget(getter(), endValue) { value -> setter(value) }
-    val animation = FloatAnimation(target, duration, type, animationType, this.hashCode().toString(), onComplete)
+    val animation = FloatAnimation(target, duration, type, animationType, "${this.hashCode()}+${endValue}", onComplete)
     animation.start()
     return animation
 }
@@ -29,7 +29,7 @@ fun <T : CanvasElement<T>> T.animateColor(
     onComplete: (() -> Unit)? = null
 ): ColorAnimation {
     val target = AnimationTarget(getter(), endValue) { value -> setter(value) }
-    val animation = ColorAnimation(target, duration, type, this.hashCode().toString(), onComplete)
+    val animation = ColorAnimation(target, duration, type, "${this.hashCode()}+${endValue}", onComplete)
     animation.start()
     return animation
 }
@@ -41,7 +41,7 @@ fun <T : CanvasElement<T>> T.animatePosition(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = this.hashCode().toString()
+    val elementId = "${this.hashCode()}+${endX+endY}"
     elementOriginalPositions.putIfAbsent(elementId, x to y)
 
     val target = AnimationTarget(
@@ -64,7 +64,7 @@ fun <T : CanvasElement<T>> T.animateSize(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = this.hashCode().toString()
+    val elementId = "${this.hashCode()}+${endWidth+endHeight}"
     elementOriginalSizes.putIfAbsent(elementId, width to height)
 
     val target = AnimationTarget(

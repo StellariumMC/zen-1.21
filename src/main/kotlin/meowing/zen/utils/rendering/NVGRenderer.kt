@@ -359,6 +359,22 @@ object NVGRenderer {
         return image
     }
 
+    fun cleanCache() {
+        val iter = images.entries.iterator()
+        while (iter.hasNext()) {
+            val entry = iter.next()
+            NanoVG.nvgDeleteImage(vg, entry.value.nvg)
+            iter.remove()
+        }
+
+        val svgIter = svgCache.entries.iterator()
+        while (svgIter.hasNext()) {
+            val entry = svgIter.next()
+            NanoVG.nvgDeleteImage(vg, entry.value.nvg)
+            svgIter.remove()
+        }
+    }
+
     // lowers reference count by 1, if it reaches 0 it gets deleted from mem
     fun deleteImage(image: Image) {
         val nvgImage = images[image] ?: return
