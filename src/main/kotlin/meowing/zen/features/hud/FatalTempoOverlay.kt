@@ -51,7 +51,7 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
         val extraAttributes = item.extraAttributes ?: return
         val ftLevel = extraAttributes.getCompound("enchantments")
             .map { it.getInt("ultimate_fatal_tempo") }
-            .orElse(null).get()
+            .orElse(null)?.get() ?: return
 
         if (ftLevel <= 0) return
 

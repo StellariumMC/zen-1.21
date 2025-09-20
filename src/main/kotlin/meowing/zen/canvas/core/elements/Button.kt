@@ -1,9 +1,12 @@
-package meowing.zen.canvas.core.components
+package meowing.zen.canvas.core.elements
 
+import meowing.zen.canvas.core.CanvasElement
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
-import meowing.zen.utils.rendering.NVGRenderer
+import meowing.zen.canvas.core.components.Rectangle
+import meowing.zen.canvas.core.components.Text
 import meowing.zen.utils.rendering.Font
+import meowing.zen.utils.rendering.NVGRenderer
 
 class Button(
     var text: String = "",
@@ -22,10 +25,14 @@ class Button(
     pressedColor: Int? = 0x80303030.toInt(),
     widthType: Size = Size.Auto,
     heightType: Size = Size.Auto
-) : Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, widthType, heightType) {
+) : CanvasElement<Button>(widthType, heightType) {
+    private val background = Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
+        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
+        .ignoreMouseEvents()
+        .childOf(this)
 
     val innerText = Text(text, textColor, fontSize, shadowEnabled, font)
-        .childOf(this)
+        .childOf(background)
         .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
 
     init {
@@ -33,7 +40,8 @@ class Button(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        super.onRender(mouseX, mouseY)
+        background.isHovered = hovered
+        background.isPressed = pressed
 
         if (text.isNotEmpty()) {
             val currentTextColor = when {
@@ -41,8 +49,7 @@ class Button(
                 hovered && hoverTextColor != null -> hoverTextColor!!
                 else -> textColor
             }
-
-            textColor(currentTextColor)
+            innerText.textColor = currentTextColor
         }
     }
 
@@ -51,6 +58,7 @@ class Button(
     }
 
     fun textColor(color: Int): Button = apply {
+        this.textColor = color
         innerText.textColor = color
     }
 
@@ -63,12 +71,12 @@ class Button(
     }
 
     fun hoverColors(bg: Int? = null, text: Int? = null): Button = apply {
-        this.hoverColor = bg
+        background.hoverColor = bg
         this.hoverTextColor = text
     }
 
     fun pressedColors(bg: Int? = null, text: Int? = null): Button = apply {
-        this.pressedColor = bg
+        background.pressedColor = bg
         this.pressedTextColor = text
     }
 
@@ -76,43 +84,38 @@ class Button(
         innerText.shadowEnabled = enabled
     }
 
-    override fun padding(top: Float, right: Float, bottom: Float, left: Float): Button = apply {
-        super.padding(top, right, bottom, left)
+    fun padding(top: Float, right: Float, bottom: Float, left: Float): Button = apply {
+        background.padding(top, right, bottom, left)
     }
 
-    override fun padding(all: Float): Button = apply {
-        super.padding(all)
+    fun padding(all: Float): Button = apply {
+        background.padding(all)
     }
 
-    override fun backgroundColor(color: Int): Button = apply {
-        super.backgroundColor(color)
+    fun backgroundColor(color: Int): Button = apply {
+        background.backgroundColor(color)
     }
 
-    override fun borderColor(color: Int): Button = apply {
-        super.borderColor(color)
+    fun borderColor(color: Int): Button = apply {
+        background.borderColor(color)
     }
 
-    override fun borderRadius(radius: Float): Button = apply {
-        super.borderRadius(radius)
+    fun borderRadius(radius: Float): Button = apply {
+        background.borderRadius(radius)
     }
 
-    override fun borderThickness(thickness: Float): Button = apply {
-        super.borderThickness(thickness)
+    fun borderThickness(thickness: Float): Button = apply {
+        background.borderThickness(thickness)
     }
 
-    override fun hoverColor(color: Int): Button = apply {
-        super.hoverColor(color)
+    fun hoverColor(color: Int): Button = apply {
+        background.hoverColor(color)
     }
 
-    override fun pressedColor(color: Int): Button = apply {
-        super.pressedColor(color)
+    fun pressedColor(color: Int): Button = apply {
+        background.pressedColor(color)
     }
 
-    override fun width(newWidth: Float): Button = apply {
-        super.width(newWidth)
-    }
-
-    override fun height(newHeight: Float): Button = apply {
-        super.height(newHeight)
-    }
+    override fun getAutoWidth(): Float = background.getAutoWidth()
+    override fun getAutoHeight(): Float = background.getAutoHeight()
 }

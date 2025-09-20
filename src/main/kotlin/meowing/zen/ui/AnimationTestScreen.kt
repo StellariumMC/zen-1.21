@@ -4,7 +4,7 @@ import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
-import meowing.zen.canvas.core.components.Button
+import meowing.zen.canvas.core.elements.Button
 import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Text
 import meowing.zen.canvas.core.Pos
@@ -24,13 +24,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
         .padding(40f)
 
-    private lateinit var animatedBox: Rectangle
-    private lateinit var fadeBox: Rectangle
-    private lateinit var colorBox: Rectangle
-    private lateinit var slideBox: Rectangle
-    private lateinit var scaleBox: Rectangle
-    private lateinit var animatedText: Text
-    private lateinit var statusText: Text
+    private var statusText: Text? = null
 
     override fun init() {
         super.init()
@@ -46,7 +40,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
     override fun tick() {
         super.tick()
         Manager.update()
-        statusText.text("Active Animations: ${Manager.activeCount}")
+        statusText?.text("Active Animations: ${Manager.activeCount}")
     }
 
     private fun setupUI() {
@@ -84,42 +78,43 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
             .childOf(boxContainer)
 
-        animatedBox = Rectangle()
+        val animatedBox = Rectangle()
             .backgroundColor(0xFF3B82F6.toInt())
             .borderRadius(8f)
             .setSizing(60f, Size.Pixels, 60f, Size.Pixels)
             .setPositioning(50f, Pos.ParentPixels, 30f, Pos.ParentPixels)
+            .fadeIn(300)
             .childOf(boxContainer)
 
-        fadeBox = Rectangle()
+        val fadeBox = Rectangle()
             .backgroundColor(0xFF10B981.toInt())
             .borderRadius(8f)
             .setSizing(60f, Size.Pixels, 60f, Size.Pixels)
             .setPositioning(150f, Pos.ParentPixels, 30f, Pos.ParentPixels)
             .childOf(boxContainer)
 
-        colorBox = Rectangle()
+        val colorBox = Rectangle()
             .backgroundColor(0xFFEF4444.toInt())
             .borderRadius(8f)
             .setSizing(60f, Size.Pixels, 60f, Size.Pixels)
             .setPositioning(250f, Pos.ParentPixels, 30f, Pos.ParentPixels)
             .childOf(boxContainer)
 
-        slideBox = Rectangle()
+        val slideBox = Rectangle()
             .backgroundColor(0xFFF59E0B.toInt())
             .borderRadius(8f)
             .setSizing(60f, Size.Pixels, 60f, Size.Pixels)
             .setPositioning(350f, Pos.ParentPixels, 30f, Pos.ParentPixels)
             .childOf(boxContainer)
 
-        scaleBox = Rectangle()
+        val scaleBox = Rectangle()
             .backgroundColor(0xFF8B5CF6.toInt())
             .borderRadius(8f)
             .setSizing(40f, Size.Pixels, 40f, Size.Pixels)
             .setPositioning(460f, Pos.ParentPixels, 40f, Pos.ParentPixels)
             .childOf(boxContainer)
 
-        animatedText = Text("Animated Text")
+        val animatedText = Text("Animated Text")
             .color(0xFFFFFFFF.toInt())
             .fontSize(16f)
             .setPositioning(50f, Pos.ParentPixels, 120f, Pos.ParentPixels)
@@ -160,9 +155,18 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .fontSize(12f)
             .setPositioning(50f, Pos.ParentPixels, 140f, Pos.ParentPixels)
             .childOf(boxContainer)
+
+        setupAnimationControls(animatedBox, fadeBox, colorBox, slideBox, scaleBox, animatedText)
     }
 
-    private fun setupControlButtons() {
+    private fun setupAnimationControls(
+        animatedBox: Rectangle,
+        fadeBox: Rectangle,
+        colorBox: Rectangle,
+        slideBox: Rectangle,
+        scaleBox: Rectangle,
+        animatedText: Text
+    ) {
         val buttonContainer = Rectangle()
             .backgroundColor(0x80202020.toInt())
             .borderRadius(8f)
@@ -199,9 +203,12 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .padding(8f, 16f, 8f, 16f)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
             .onClick { _, _, _ ->
-                val newX = (50..400).random().toFloat()
-                val newY = (30..120).random().toFloat()
-                animatedBox.animatePosition(newX, newY, 800, EasingType.EASE_OUT)
+                animatedBox.moveTo(
+                    (50..400).random().toFloat(),
+                    (30..120).random().toFloat(),
+                    800,
+                    EasingType.EASE_OUT
+                )
                 true
             }
             .childOf(leftColumn)
@@ -238,14 +245,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
                     0xFFF59E0B.toInt(),
                     0xFF8B5CF6.toInt()
                 )
-                val newColor = colors.random()
-                colorBox.animateColor(
-                    { colorBox.backgroundColor },
-                    { colorBox.backgroundColor = it },
-                    newColor,
-                    600,
-                    EasingType.LINEAR
-                )
+                colorBox.colorTo(colors.random(), 600, EasingType.LINEAR)
                 true
             }
             .childOf(leftColumn)
@@ -306,14 +306,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
                     0xFFEF4444.toInt(),
                     0xFFF59E0B.toInt()
                 )
-                val newColor = colors.random()
-                animatedText.animateColor(
-                    { animatedText.textColor },
-                    { animatedText.textColor = it },
-                    newColor,
-                    500,
-                    EasingType.LINEAR
-                )
+                animatedText.colorTo(colors.random(), 500, EasingType.LINEAR)
                 true
             }
             .childOf(rightColumn)
@@ -326,19 +319,48 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .padding(8f, 16f, 8f, 16f)
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
-                animatedBox.animatePosition((50..400).random().toFloat(), (30..120).random().toFloat(), 1000, EasingType.EASE_IN)
+                animatedBox.moveTo(
+                    (50..400).random().toFloat(),
+                    (30..120).random().toFloat(),
+                    1000,
+                    EasingType.EASE_IN
+                )
+
                 fadeBox.fadeOut(300, EasingType.EASE_OUT) {
                     fadeBox.fadeIn(300, EasingType.EASE_IN)
                 }
-                colorBox.animateColor(
-                    { colorBox.backgroundColor },
-                    { colorBox.backgroundColor = it },
+
+                colorBox.colorTo(
                     arrayOf(0xFF3B82F6.toInt(), 0xFF10B981.toInt(), 0xFF8B5CF6.toInt()).random(),
                     800,
                     EasingType.LINEAR
                 )
+
                 slideBox.slideIn(-150f, 0f, 600, EasingType.EASE_OUT)
                 scaleBox.bounceScale(1.8f, 500)
+                true
+            }
+            .childOf(rightColumn)
+
+        Button("Chain Test")
+            .backgroundColor(0xFFDB2777.toInt())
+            .hoverColors(bg = 0xFFC2185B.toInt())
+            .textColor(0xFFFFFFFF.toInt())
+            .borderRadius(6f)
+            .padding(8f, 16f, 8f, 16f)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .onClick { _, _, _ ->
+                animatedBox
+                    .moveTo(300f, 50f, 500)
+                    .bounceScale(1.4f, 300)
+                    .colorTo(0xFF8B5CF6.toInt(), 400)
+
+                fadeBox
+                    .scaleTo(80f, 80f, 300)
+                    .colorTo(0xFFEF4444.toInt(), 400)
+                    .fadeOut(200) { fadeBox.fadeIn(200) }
+
+                animatedText.colorTo(0xFF10B981.toInt(), 300)
                 true
             }
             .childOf(rightColumn)
@@ -356,7 +378,9 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             }
             .childOf(rightColumn)
     }
-    
+
+    private fun setupControlButtons() {
+    }
 
     override fun render(drawContext: DrawContext?, mouseX: Int, mouseY: Int, delta: Float) {
         NVGRenderer.beginFrame(mc.window.width.toFloat(), mc.window.height.toFloat())

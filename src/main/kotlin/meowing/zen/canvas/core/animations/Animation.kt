@@ -3,7 +3,7 @@ package meowing.zen.canvas.core.animations
 abstract class Animation<T>(
     val target: AnimationTarget<T>,
     val duration: Long,
-    val type: EasingType = EasingType.LINEAR,
+    val type: EasingType,
     val animationType: AnimationType,
     val elementId: String,
     val onComplete: (() -> Unit)? = null
@@ -27,9 +27,8 @@ abstract class Animation<T>(
         val elapsed = System.currentTimeMillis() - startTime
         val progress = (elapsed.toFloat() / duration).coerceIn(0f, 1f)
         val easedProgress = applyEasing(progress)
-        val currentValue = interpolate(target.startValue, target.endValue, easedProgress)
 
-        target.setter(currentValue)
+        target.setter(interpolate(target.startValue, target.endValue, easedProgress))
 
         if (progress >= 1f) {
             isCompleted = true

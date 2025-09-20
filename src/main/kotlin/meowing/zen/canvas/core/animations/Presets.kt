@@ -1,81 +1,103 @@
 package meowing.zen.canvas.core.animations
 
 import meowing.zen.canvas.core.CanvasElement
+import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.SvgImage
+import meowing.zen.canvas.core.components.Text
 import java.awt.Color
 
-private val elementOriginalSizes = mutableMapOf<String, Pair<Float, Float>>()
-private val elementOriginalPositions = mutableMapOf<String, Pair<Float, Float>>()
+private val originalSizes = mutableMapOf<String, Pair<Float, Float>>()
+private val originalPositions = mutableMapOf<String, Pair<Float, Float>>()
 
 fun <T : CanvasElement<T>> T.fadeIn(
     duration: Long = 300,
     type: EasingType = EasingType.EASE_OUT,
+    includeChildren: Boolean = true,
     onComplete: (() -> Unit)? = null
-): Animation<*> {
+): T {
     visible = true
 
-    return when (this) {
-        is meowing.zen.canvas.core.components.Rectangle -> {
-            val targetBackgroundColor = (backgroundColor and 0x00FFFFFF) or (255 shl 24)
-            backgroundColor = backgroundColor and 0x00FFFFFF
-            animateColor({ backgroundColor }, { backgroundColor = it }, targetBackgroundColor, duration, type, onComplete)
-
-            val targetBorderColor = (borderColor and 0x00FFFFFF) or (255 shl 24)
-            borderColor = borderColor and 0x00FFFFFF
-            animateColor({ borderColor }, { borderColor = it }, targetBorderColor, duration, type, onComplete)
-        }
-        is meowing.zen.canvas.core.components.Text -> {
-            val targetColor = (textColor and 0x00FFFFFF) or (255 shl 24)
-            textColor = textColor and 0x00FFFFFF
-            animateColor({ textColor }, { textColor = it }, targetColor, duration, type, onComplete)
-        }
-        is SvgImage -> {
-            val targetColor = (color.rgb and 0x00FFFFFF) or (255 shl 24)
-            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, targetColor, duration, type, onComplete)
-        }
-        else -> {
-            animateFloat({ 0f }, {}, 1f, duration, type, AnimationType.ALPHA, onComplete)
+    if (includeChildren) {
+        children.forEach { child ->
+            when (child) {
+                is Rectangle -> child.fadeIn(duration, type, includeChildren)
+                is Text -> child.fadeIn(duration, type, includeChildren)
+                is SvgImage -> child.fadeIn(duration, type, includeChildren)
+            }
         }
     }
+
+    when (this) {
+        is Rectangle -> {
+            val targetBg = (backgroundColor and 0x00FFFFFF) or (255 shl 24)
+            val targetBorder = (borderColor and 0x00FFFFFF) or (255 shl 24)
+            backgroundColor = backgroundColor and 0x00FFFFFF
+            borderColor = borderColor and 0x00FFFFFF
+            animateColor({ backgroundColor }, { backgroundColor = it }, targetBg, duration, type, onComplete)
+            animateColor({ borderColor }, { borderColor = it }, targetBorder, duration, type)
+        }
+        is Text -> {
+            val target = (textColor and 0x00FFFFFF) or (255 shl 24)
+            textColor = textColor and 0x00FFFFFF
+            animateColor({ textColor }, { textColor = it }, target, duration, type, onComplete)
+        }
+        is SvgImage -> {
+            val target = (color.rgb and 0x00FFFFFF) or (255 shl 24)
+            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, target, duration, type, onComplete)
+        }
+        else -> animateFloat({ 0f }, {}, 1f, duration, type, AnimationType.ALPHA, onComplete)
+    }
+
+    return this
 }
 
 fun <T : CanvasElement<T>> T.fadeOut(
     duration: Long = 300,
     type: EasingType = EasingType.EASE_IN,
+    includeChildren: Boolean = true,
     onComplete: (() -> Unit)? = null
-): Animation<*> {
-    return when (this) {
-        is meowing.zen.canvas.core.components.Rectangle -> {
-            val targetColor = backgroundColor and 0x00FFFFFF
-            val targetBorderColor = borderColor and 0x00FFFFFF
-            animateColor({ backgroundColor }, { backgroundColor = it }, targetColor, duration, type) {
+): T {
+    if (includeChildren) {
+        children.forEach { child ->
+            when (child) {
+                is Rectangle -> child.fadeOut(duration, type, includeChildren)
+                is Text -> child.fadeOut(duration, type, includeChildren)
+                is SvgImage -> child.fadeOut(duration, type, includeChildren)
+            }
+        }
+    }
+
+    when (this) {
+        is Rectangle -> {
+            val targetBg = backgroundColor and 0x00FFFFFF
+            val targetBorder = borderColor and 0x00FFFFFF
+            animateColor({ backgroundColor }, { backgroundColor = it }, targetBg, duration, type) {
                 visible = false
                 onComplete?.invoke()
             }
-
-            animateColor({ borderColor }, { borderColor = it }, targetBorderColor, duration, type)
+            animateColor({ borderColor }, { borderColor = it }, targetBorder, duration, type)
         }
-        is meowing.zen.canvas.core.components.Text -> {
-            val targetColor = textColor and 0x00FFFFFF
-            animateColor({ textColor }, { textColor = it }, targetColor, duration, type) {
+        is Text -> {
+            val target = textColor and 0x00FFFFFF
+            animateColor({ textColor }, { textColor = it }, target, duration, type) {
                 visible = false
                 onComplete?.invoke()
             }
         }
         is SvgImage -> {
-            val targetColor = color.rgb and 0x00FFFFFF
-            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, targetColor, duration, type) {
-                visible = true
-                onComplete?.invoke()
-            }
-        }
-        else -> {
-            animateFloat({ 1f }, {}, 0f, duration, type, AnimationType.ALPHA) {
+            val target = color.rgb and 0x00FFFFFF
+            animateColor({ color.rgb }, { setSvgColor(Color(it, true)) }, target, duration, type) {
                 visible = false
                 onComplete?.invoke()
             }
         }
+        else -> animateFloat({ 1f }, {}, 0f, duration, type, AnimationType.ALPHA) {
+            visible = false
+            onComplete?.invoke()
+        }
     }
+
+    return this
 }
 
 fun <T : CanvasElement<T>> T.slideIn(
@@ -84,32 +106,71 @@ fun <T : CanvasElement<T>> T.slideIn(
     duration: Long = 500,
     type: EasingType = EasingType.EASE_OUT,
     onComplete: (() -> Unit)? = null
-): VectorAnimation {
-    val elementId = this.hashCode().toString()
-    elementOriginalPositions.putIfAbsent(elementId, xConstraint to yConstraint)
+): T {
+    val id = hashCode().toString()
+    originalPositions.putIfAbsent(id, xConstraint to yConstraint)
 
-    val (targetX, targetY) = elementOriginalPositions[elementId]!!
+    val (targetX, targetY) = originalPositions[id]!!
     xConstraint = fromX
     yConstraint = fromY
     visible = true
 
-    return animatePosition(targetX, targetY, duration, type, onComplete)
+    animatePosition(targetX, targetY, duration, type, onComplete)
+    return this
 }
 
 fun <T : CanvasElement<T>> T.bounceScale(
     scale: Float = 1.2f,
     duration: Long = 200,
     onComplete: (() -> Unit)? = null
-): VectorAnimation {
-    val elementId = this.hashCode().toString()
-    Manager.stopAnimations(elementId, AnimationType.SIZE)
-    elementOriginalSizes.putIfAbsent(elementId, width to height)
+): T {
+    val id = hashCode().toString()
+    Manager.stopAnimations(id, AnimationType.SIZE)
+    originalSizes.putIfAbsent(id, width to height)
 
-    val (originalWidth, originalHeight) = elementOriginalSizes[elementId]!!
+    val (originalWidth, originalHeight) = originalSizes[id]!!
     val targetWidth = originalWidth * scale
     val targetHeight = originalHeight * scale
 
-    return animateSize(targetWidth, targetHeight, duration / 2, EasingType.EASE_OUT) {
+    animateSize(targetWidth, targetHeight, duration / 2, EasingType.EASE_OUT) {
         animateSize(originalWidth, originalHeight, duration / 2, EasingType.EASE_IN, onComplete)
     }
+
+    return this
+}
+
+fun <T : CanvasElement<T>> T.moveTo(
+    x: Float,
+    y: Float,
+    duration: Long = 500,
+    type: EasingType = EasingType.EASE_OUT,
+    onComplete: (() -> Unit)? = null
+): T {
+    animatePosition(x, y, duration, type, onComplete)
+    return this
+}
+
+fun <T : CanvasElement<T>> T.scaleTo(
+    width: Float,
+    height: Float,
+    duration: Long = 300,
+    type: EasingType = EasingType.EASE_OUT,
+    onComplete: (() -> Unit)? = null
+): T {
+    animateSize(width, height, duration, type, onComplete)
+    return this
+}
+
+fun <T : CanvasElement<T>> T.colorTo(
+    color: Int,
+    duration: Long = 300,
+    type: EasingType = EasingType.LINEAR,
+    onComplete: (() -> Unit)? = null
+): T {
+    when (this) {
+        is Rectangle -> animateColor({ backgroundColor }, { backgroundColor = it }, color, duration, type, onComplete)
+        is Text -> animateColor({ textColor }, { textColor = it }, color, duration, type, onComplete)
+        is SvgImage -> animateColor({ this.color.rgb }, { setSvgColor(Color(it, true)) }, color, duration, type, onComplete)
+    }
+    return this
 }

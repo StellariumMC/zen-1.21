@@ -9,7 +9,7 @@ open class Rectangle(
     var borderColor: Int = 0xFFFFFFFF.toInt(),
     var borderRadius: Float = 0f,
     var borderThickness: Float = 0f,
-    var padding: FloatArray = floatArrayOf(0f, 0f, 0f, 0f),
+    var padding: FloatArray = floatArrayOf(0f, 0f, 0f, 0f), // top, right, bottom, left
     var hoverColor: Int? = null,
     var pressedColor: Int? = null,
     widthType: Size = Size.Auto,
@@ -17,7 +17,7 @@ open class Rectangle(
 ) : CanvasElement<Rectangle>(widthType, heightType) {
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        if( !visible) return
+        if (!visible || (height - (padding[0] + padding[2])) == 0f || (width - (padding[1] + padding[3])) == 0f) return
 
         val currentBgColor = when {
             pressed && pressedColor != null -> pressedColor!!
@@ -34,7 +34,7 @@ open class Rectangle(
         }
     }
 
-    override fun getAutoWidth(): Float {
+    public override fun getAutoWidth(): Float {
         val visibleChildren = children.filter { it.visible && !it.isFloating }
         if (visibleChildren.isEmpty()) return padding[1] + padding[3]
 
@@ -44,7 +44,7 @@ open class Rectangle(
         return (maxX - minX) + padding[3] + padding[1]
     }
 
-    override fun getAutoHeight(): Float {
+    public override fun getAutoHeight(): Float {
         val visibleChildren = children.filter { it.visible && !it.isFloating }
         if (visibleChildren.isEmpty()) return padding[0] + padding[2]
 

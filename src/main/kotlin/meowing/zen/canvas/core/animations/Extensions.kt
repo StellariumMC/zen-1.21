@@ -2,9 +2,6 @@ package meowing.zen.canvas.core.animations
 
 import meowing.zen.canvas.core.CanvasElement
 
-private val elementOriginalPositions = mutableMapOf<String, Pair<Float, Float>>()
-private val elementOriginalSizes = mutableMapOf<String, Pair<Float, Float>>()
-
 fun <T : CanvasElement<T>> T.animateFloat(
     getter: () -> Float,
     setter: (Float) -> Unit,
@@ -14,8 +11,8 @@ fun <T : CanvasElement<T>> T.animateFloat(
     animationType: AnimationType = AnimationType.CUSTOM,
     onComplete: (() -> Unit)? = null
 ): FloatAnimation {
-    val target = AnimationTarget(getter(), endValue) { value -> setter(value) }
-    val animation = FloatAnimation(target, duration, type, animationType, "${this.hashCode()}+${endValue}", onComplete)
+    val target = AnimationTarget(getter(), endValue, setter)
+    val animation = FloatAnimation(target, duration, type, animationType, "${hashCode()}+$endValue", onComplete)
     animation.start()
     return animation
 }
@@ -28,8 +25,8 @@ fun <T : CanvasElement<T>> T.animateColor(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): ColorAnimation {
-    val target = AnimationTarget(getter(), endValue) { value -> setter(value) }
-    val animation = ColorAnimation(target, duration, type, "${this.hashCode()}+${endValue}", onComplete)
+    val target = AnimationTarget(getter(), endValue, setter)
+    val animation = ColorAnimation(target, duration, type, "${hashCode()}+$endValue", onComplete)
     animation.start()
     return animation
 }
@@ -41,18 +38,14 @@ fun <T : CanvasElement<T>> T.animatePosition(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = "${this.hashCode()}:pos:${endX}:${endY}"
-    elementOriginalPositions.putIfAbsent(elementId, x to y)
-
     val target = AnimationTarget(
         xConstraint to yConstraint,
         endX to endY
-    ) { (newX, newY) ->
-        xConstraint = newX
-        yConstraint = newY
+    ) { (x, y) ->
+        xConstraint = x
+        yConstraint = y
     }
-
-    val animation = VectorAnimation(target, duration, type, AnimationType.POSITION, elementId, onComplete)
+    val animation = VectorAnimation(target, duration, type, AnimationType.POSITION, "${hashCode()}:pos", onComplete)
     animation.start()
     return animation
 }
@@ -64,18 +57,14 @@ fun <T : CanvasElement<T>> T.animateSize(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = "${this.hashCode()}:size:${endWidth}:${endHeight}"
-    elementOriginalSizes.putIfAbsent(elementId, width to height)
-
     val target = AnimationTarget(
         width to height,
         endWidth to endHeight
-    ) { (newWidth, newHeight) ->
-        width = newWidth
-        height = newHeight
+    ) { (w, h) ->
+        width = w
+        height = h
     }
-
-    val animation = VectorAnimation(target, duration, type, AnimationType.SIZE, elementId, onComplete)
+    val animation = VectorAnimation(target, duration, type, AnimationType.SIZE, "${hashCode()}:size", onComplete)
     animation.start()
     return animation
 }

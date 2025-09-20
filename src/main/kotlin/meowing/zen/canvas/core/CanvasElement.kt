@@ -6,6 +6,7 @@ import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Tooltip
+import meowing.zen.utils.ChatUtils
 import net.minecraft.client.util.Window
 
 enum class Size {
@@ -29,7 +30,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var widthType: Size = Size.Pixels,
     var heightType: Size = Size.Pixels
 ) {
-    protected val children: MutableList<CanvasElement<*>> = mutableListOf()
+    val children: MutableList<CanvasElement<*>> = mutableListOf()
 
     var xPositionConstraint = Pos.ParentPixels
     var yPositionConstraint = Pos.ParentPixels
@@ -106,7 +107,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         height = when (heightType) {
             Size.Auto -> getAutoHeight()
             Size.ParentPerc -> {
-                if(parent == null) {
+                if (parent == null) {
                     screenHeight * (heightPercent / 100f)
                 }
                 else findFirstVisibleParent()?.height?.times(heightPercent / 100f) ?: height
@@ -127,11 +128,11 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         x = when (xPositionConstraint) {
             Pos.ParentPercent -> if (visibleParent != null) visibleParent.x + (visibleParent.width * (xConstraint / 100f)) else xConstraint
             Pos.ScreenPercent -> screenWidth * (xConstraint / 100f)
-            Pos.ParentPixels -> if(visibleParent != null) visibleParent.x + xConstraint else xConstraint
+            Pos.ParentPixels -> if (visibleParent != null) visibleParent.x + xConstraint else xConstraint
             Pos.ScreenPixels -> xConstraint
             Pos.ParentCenter -> {
                 if (visibleParent != null) {
-                    visibleParent.x + visibleParent.width / 2f - width / 2f
+                    visibleParent.x + (visibleParent.width - width) / 2f
                 } else xConstraint
             }
             Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f) + xConstraint
@@ -186,8 +187,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         }
     }
 
-    fun isPointInside(mouseX: Float, mouseY: Float): Boolean =
-        mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
+    fun isPointInside(mouseX: Float, mouseY: Float): Boolean = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
 
     open fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
         if (!visible) return false

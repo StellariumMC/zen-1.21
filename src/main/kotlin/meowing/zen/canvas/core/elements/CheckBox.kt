@@ -1,10 +1,13 @@
-package meowing.zen.canvas.core.components
+package meowing.zen.canvas.core.elements
 
+import meowing.zen.canvas.core.CanvasElement
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
 import meowing.zen.canvas.core.animations.EasingType
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
+import meowing.zen.canvas.core.components.Rectangle
+import meowing.zen.canvas.core.components.SvgImage
 import java.awt.Color
 
 class CheckBox(
@@ -13,7 +16,6 @@ class CheckBox(
     var enabledBackgroundColor: Int = 0xFF212121.toInt(),
     var backgroundHoverColor: Int = 0xFF424242.toInt(),
     var backgroundPressedColor: Int = 0xFF1B1B1B.toInt(),
-
     backgroundColor: Int = 0x80404040.toInt(),
     borderColor: Int = 0xFF606060.toInt(),
     borderRadius: Float = 4f,
@@ -23,13 +25,18 @@ class CheckBox(
     pressedColor: Int? = 0x80303030.toInt(),
     widthType: Size = Size.Pixels,
     heightType: Size = Size.Pixels
-) : Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, widthType, heightType) {
+) : CanvasElement<CheckBox>(widthType, heightType) {
     var checked: Boolean = false
+
+    private val background = Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
+        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
+        .ignoreMouseEvents()
+        .childOf(this)
 
     val checkMark = SvgImage(svgPath = "/assets/zen/checkmark.svg", color = Color(checkmarkColor and 0x00FFFFFF, true))
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
         .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
-        .childOf(this)
+        .childOf(background)
 
     init {
         setSizing(20f, Size.Pixels, 20f, Size.Pixels)
@@ -45,11 +52,9 @@ class CheckBox(
         if (!checked) {
             if (animated) {
                 checkMark.color = Color(checkmarkColor, true)
-
                 checkMark.fadeOut(100, EasingType.EASE_IN)
             }
         } else {
-
             if (animated) {
                 checkMark.fadeIn(100, EasingType.EASE_IN)
             }
@@ -64,11 +69,12 @@ class CheckBox(
             hovered -> backgroundHoverColor
             else -> enabledBackgroundColor
         }
-        backgroundColor(newColor)
+        background.backgroundColor(newColor)
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
+        background.isHovered = hovered
+        background.isPressed = pressed
         updateBackgroundColor()
-        super.onRender(mouseX, mouseY)
     }
 }

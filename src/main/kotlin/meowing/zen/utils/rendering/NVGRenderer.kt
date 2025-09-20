@@ -349,11 +349,11 @@ object NVGRenderer {
     }
 
     // Might have a memory leak if the menu is left and re-entered lots of times with unique ids
-    fun createImage(resourcePath: String, width: Int=-1, height: Int=-1, color: java.awt.Color = java.awt.Color.WHITE, id: String): Image {
+    fun createImage(resourcePath: String, width: Int = -1, height: Int = -1, color: java.awt.Color = java.awt.Color.WHITE, id: String): Image {
         val image = Image(resourcePath)
 
         if (image.isSVG) {
-            svgCache.put(id, NVGImage(0, loadSVG(image, width, height, color)))
+            svgCache[id] = NVGImage(0, loadSVG(image, width, height, color))
             svgCache[id]!!.count++
         } else images.getOrPut(image) { NVGImage(0, loadImage(image)) }.count++
         return image
