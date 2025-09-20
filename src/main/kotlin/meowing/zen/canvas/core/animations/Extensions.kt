@@ -41,7 +41,7 @@ fun <T : CanvasElement<T>> T.animatePosition(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = "${this.hashCode()}+${endX+endY}"
+    val elementId = "${this.hashCode()}:pos:${endX}:${endY}"
     elementOriginalPositions.putIfAbsent(elementId, x to y)
 
     val target = AnimationTarget(
