@@ -8,13 +8,13 @@ import meowing.zen.canvas.core.animations.fadeOut
 import java.awt.Color
 
 class Tooltip(
-    backgroundColor: Int = 0x1e1e1e,
-    borderColor: Int = 0x555759,
+    backgroundColor: Int = 0xFF1e1e1e.toInt(),
+    borderColor: Int = 0xFF555759.toInt(),
     borderRadius: Float = 4f,
     borderThickness: Float = 1f,
     padding: FloatArray = floatArrayOf(4f, 4f, 4f, 4f),
-    hoverColor: Int? = 0x1e1e1e,
-    pressedColor: Int? = 0x1e1e1e,
+    hoverColor: Int? = 0xFF1e1e1e.toInt(),
+    pressedColor: Int? = 0xFF1e1e1e.toInt(),
     widthType: Size = Size.Pixels,
     heightType: Size = Size.Pixels
 ) : Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, widthType, heightType) {
