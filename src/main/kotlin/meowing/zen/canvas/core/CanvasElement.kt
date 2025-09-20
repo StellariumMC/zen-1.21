@@ -1,7 +1,11 @@
 package meowing.zen.canvas.core
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.canvas.core.animations.EasingType
+import meowing.zen.canvas.core.animations.fadeIn
+import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
+import meowing.zen.canvas.core.components.Tooltip
 import net.minecraft.client.util.Window
 
 enum class Size {
@@ -43,6 +47,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var isHovered: Boolean = false
     var isPressed: Boolean = false
     var isFocused: Boolean = false
+    var isFloating: Boolean = false // If true, element is not considered in auto sizing of parents
 
     val window: Window get() = mc.window
     val screenWidth: Int get() = window.width
@@ -111,10 +116,10 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     }
 
     protected open fun getAutoWidth(): Float =
-        children.filter { it.visible }.maxOfOrNull { it.x + it.width }?.coerceAtLeast(0f) ?: 0f
+        children.filter { it.visible && !it.isFloating }.maxOfOrNull { it.x + it.width }?.coerceAtLeast(0f) ?: 0f
 
     protected open fun getAutoHeight(): Float =
-        children.filter { it.visible }.maxOfOrNull { it.y + it.height }?.coerceAtLeast(0f) ?: 0f
+        children.filter { it.visible && !it.isFloating }.maxOfOrNull { it.y + it.height }?.coerceAtLeast(0f) ?: 0f
 
     fun updateX() {
         val visibleParent = findFirstVisibleParent()
@@ -191,8 +196,20 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         isHovered = isPointInside(mouseX, mouseY)
 
         when {
-            isHovered && !wasHovered -> onMouseEnter?.invoke(mouseX, mouseY)
-            !isHovered && wasHovered -> onMouseExit?.invoke(mouseX, mouseY)
+            isHovered && !wasHovered -> {
+                onMouseEnter?.invoke(mouseX, mouseY)
+                tooltipElement?.let {
+                    it.fadeIn(200, EasingType.EASE_OUT)
+                    it.innerText.fadeIn(200, EasingType.EASE_OUT)
+                }
+            }
+            !isHovered && wasHovered -> {
+                onMouseExit?.invoke(mouseX, mouseY)
+                tooltipElement?.let {
+                    it.fadeOut(200, EasingType.EASE_OUT)
+                    it.innerText.fadeOut(200, EasingType.EASE_OUT)
+                }
+            }
         }
 
         if (isHovered) onMouseMove?.invoke(mouseX, mouseY)
@@ -315,6 +332,17 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         return this as T
     }
 
+    var tooltipElement: Tooltip? = null
+
+    @Suppress("UNCHECKED_CAST")
+    fun addTooltip(tooltip: String): T {
+        tooltipElement = Tooltip().apply {
+            innerText.text = tooltip
+            childOf(this@CanvasElement)
+        }
+        return this as T
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun onHover(onEnter: (Float, Float) -> Unit, onExit: (Float, Float) -> Unit = { _, _ -> }): T = apply {
         this.onMouseEnter = onEnter
@@ -357,6 +385,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         this.onMouseRelease = { _, _, _ -> false }
         this.onMouseScroll = { _, _, _, _ -> false }
         this.onMouseMove = { _, _ -> }
+        this.onMouseEnter = { _, _ -> }
+        this.onMouseExit = { _, _ -> }
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun setFloating(): T = apply {
+        isFloating = true
     } as T
 
     @Suppress("UNCHECKED_CAST")

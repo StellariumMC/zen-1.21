@@ -37,6 +37,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
         super.close()
         Manager.clear()
         rootContainer.destroy()
+        NVGRenderer.cleanCache()
     }
 
     override fun tick() {
@@ -114,6 +115,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
                 true
             }
             .childOf(container)
+            .addTooltip("This is a primary action button.")
 
         Button("Success")
             .backgroundColor(0xFF10B981.toInt())

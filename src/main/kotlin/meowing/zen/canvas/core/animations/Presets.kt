@@ -16,9 +16,13 @@ fun <T : CanvasElement<T>> T.fadeIn(
 
     return when (this) {
         is meowing.zen.canvas.core.components.Rectangle -> {
-            val targetColor = (backgroundColor and 0x00FFFFFF) or (255 shl 24)
+            val targetBackgroundColor = (backgroundColor and 0x00FFFFFF) or (255 shl 24)
             backgroundColor = backgroundColor and 0x00FFFFFF
-            animateColor({ backgroundColor }, { backgroundColor = it }, targetColor, duration, type, onComplete)
+            animateColor({ backgroundColor }, { backgroundColor = it }, targetBackgroundColor, duration, type, onComplete)
+
+            val targetBorderColor = (borderColor and 0x00FFFFFF) or (255 shl 24)
+            borderColor = borderColor and 0x00FFFFFF
+            animateColor({ borderColor }, { borderColor = it }, targetBorderColor, duration, type, onComplete)
         }
         is meowing.zen.canvas.core.components.Text -> {
             val targetColor = (textColor and 0x00FFFFFF) or (255 shl 24)
@@ -43,10 +47,13 @@ fun <T : CanvasElement<T>> T.fadeOut(
     return when (this) {
         is meowing.zen.canvas.core.components.Rectangle -> {
             val targetColor = backgroundColor and 0x00FFFFFF
+            val targetBorderColor = borderColor and 0x00FFFFFF
             animateColor({ backgroundColor }, { backgroundColor = it }, targetColor, duration, type) {
                 visible = false
                 onComplete?.invoke()
             }
+
+            animateColor({ borderColor }, { borderColor = it }, targetBorderColor, duration, type)
         }
         is meowing.zen.canvas.core.components.Text -> {
             val targetColor = textColor and 0x00FFFFFF
