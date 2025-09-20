@@ -205,9 +205,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             }
             !isHovered && wasHovered -> {
                 onMouseExit?.invoke(mouseX, mouseY)
-                if(tooltipElement != null) {
-                    tooltipElement!!.fadeOut(200, EasingType.EASE_OUT)
-                    tooltipElement!!.innerText.fadeOut(200, EasingType.EASE_OUT)
+                tooltipElement?.let {
+                    it.fadeOut(200, EasingType.EASE_OUT)
+                    it.innerText.fadeOut(200, EasingType.EASE_OUT)
                 }
             }
         }
