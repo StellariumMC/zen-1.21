@@ -64,7 +64,7 @@ fun <T : CanvasElement<T>> T.animateSize(
     type: EasingType = EasingType.LINEAR,
     onComplete: (() -> Unit)? = null
 ): VectorAnimation {
-    val elementId = "${this.hashCode()}+${endWidth+endHeight}"
+    val elementId = "${this.hashCode()}:size:${endWidth}:${endHeight}"
     elementOriginalSizes.putIfAbsent(elementId, width to height)
 
     val target = AnimationTarget(
