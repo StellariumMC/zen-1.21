@@ -9,7 +9,7 @@ class Tooltip(
     borderColor: Int = 0xFF555759.toInt(),
     borderRadius: Float = 4f,
     borderThickness: Float = 1f,
-    padding: FloatArray = floatArrayOf(4f, 4f, 4f, 4f),
+    var padding: FloatArray = floatArrayOf(4f, 4f, 4f, 4f),
     hoverColor: Int? = 0xFF1e1e1e.toInt(),
     pressedColor: Int? = 0xFF1e1e1e.toInt(),
     widthType: Size = Size.Auto,
@@ -24,7 +24,8 @@ class Tooltip(
 
     init {
         setSizing(Size.Auto, Size.Auto)
-        setPositioning(0f, Pos.ParentCenter, -40f, Pos.ParentPixels)
+        var parentPadding = if(parent is Rectangle) (parent as Rectangle).padding else floatArrayOf(0f, 0f, 0f, 0f)
+        setPositioning(0f, Pos.ParentCenter, -24f - parentPadding[0], Pos.ParentPixels)
         ignoreMouseEvents()
         setFloating()
         backgroundRect.visible = false
@@ -39,5 +40,13 @@ class Tooltip(
         } else {
             backgroundRect.visible = false
         }
+    }
+
+    override fun getAutoWidth(): Float {
+        return backgroundRect.getAutoWidth()
+    }
+
+    override fun getAutoHeight(): Float {
+        return backgroundRect.getAutoHeight()
     }
 }

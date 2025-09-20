@@ -42,6 +42,8 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     }
 
     private fun setupUI() {
+        rootContainer.children.clear()
+
         Text("Component Test Suite")
             .color(0xFFFFFFFF.toInt())
             .fontSize(24f)
