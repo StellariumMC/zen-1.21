@@ -14,6 +14,7 @@ import meowing.zen.canvas.core.elements.Switch
 import meowing.zen.canvas.core.elements.Slider
 import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.elements.Keybind
+import meowing.zen.canvas.core.elements.ColorPicker
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.rendering.NVGRenderer
@@ -33,6 +34,9 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     private var volumeValue = 0.7f
     private var brightnessValue = 0.5f
     private var sensitivityValue = 0.3f
+    private var primaryColor = Color.BLUE
+    private var secondaryColor = Color.RED
+    private var backgroundColorValue = Color(32, 32, 32)
 
     override fun init() {
         super.init()
@@ -56,7 +60,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .childOf(rootContainer)
 
-        Text("Test buttons, checkboxes, switches, and sliders")
+        Text("Test buttons, checkboxes, switches, sliders, and color pickers")
             .color(0xFF9CA3AF.toInt())
             .fontSize(14f)
             .setPositioning(0f, Pos.ParentPixels, -20f, Pos.AfterSibling)
@@ -171,6 +175,79 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
                 println("Compact switch is now: $enabled")
             }
             .childOf(compactSwitchContainer)
+
+        Text("Color Pickers")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(16f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
+
+        val primaryColorContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        val primaryColorLabel = Text("Primary Color")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .childOf(primaryColorContainer)
+
+        ColorPicker(primaryColor)
+            .setSizing(30f, Size.Pixels, 25f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .onValueChange { color ->
+                primaryColor = color as Color
+                primaryColorLabel.text("Primary: #${Integer.toHexString(color.rgb).substring(2).uppercase()}")
+                println("Primary color changed to: ${color}")
+            }
+            .childOf(primaryColorContainer)
+
+        val secondaryColorContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(container)
+
+        val secondaryColorLabel = Text("Secondary Color")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .childOf(secondaryColorContainer)
+
+        ColorPicker(secondaryColor)
+            .setSizing(30f, Size.Pixels, 25f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .onValueChange { color ->
+                secondaryColor = color as Color
+                secondaryColorLabel.text("Secondary: #${Integer.toHexString(color.rgb).substring(2).uppercase()}")
+                println("Secondary color changed to: ${color}")
+            }
+            .childOf(secondaryColorContainer)
+
+        val backgroundColorContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(container)
+
+        val backgroundColorLabel = Text("Background")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .childOf(backgroundColorContainer)
+
+        ColorPicker(backgroundColorValue)
+            .setSizing(30f, Size.Pixels, 25f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .onValueChange { color ->
+                backgroundColorValue = color as Color
+                backgroundColorLabel.text("BG: #${Integer.toHexString(color.rgb).substring(2).uppercase()}")
+                container.backgroundColor(color.rgb)
+                println("Background color changed to: ${color}")
+            }
+            .childOf(backgroundColorContainer)
 
         Text("Sliders")
             .color(0xFFE5E7EB.toInt())
@@ -348,6 +425,65 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
                 println("Shadow button clicked!")
+                true
+            }
+            .childOf(container)
+
+        Text("Color Picker Tests")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(16f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        val colorTestContainer = Rectangle()
+            .backgroundColor(primaryColor.rgb)
+            .borderRadius(8f)
+            .borderColor(secondaryColor.rgb)
+            .borderThickness(2f)
+            .setSizing(100f, Size.ParentPerc, 60f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .padding(10f)
+            .childOf(container)
+
+        Text("Dynamic Color Test")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
+            .childOf(colorTestContainer)
+
+        val alphaTestContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("Alpha Test Color")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .childOf(alphaTestContainer)
+
+        ColorPicker(Color(255, 0, 0, 128))
+            .setSizing(30f, Size.Pixels, 25f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            .onValueChange { color ->
+                val c = color as Color
+                println("Alpha test color: R=${c.red}, G=${c.green}, B=${c.blue}, A=${c.alpha}")
+            }
+            .childOf(alphaTestContainer)
+
+        Button("Apply Colors")
+            .backgroundColor(0xFF3B82F6.toInt())
+            .hoverColors(bg = 0xFF2563EB.toInt())
+            .pressedColors(bg = 0xFF1D4ED8.toInt())
+            .textColor(0xFFFFFFFF.toInt())
+            .borderRadius(6f)
+            .padding(10f, 20f, 10f, 20f)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .onClick { _, _, _ ->
+                colorTestContainer.backgroundColor(primaryColor.rgb)
+                colorTestContainer.borderColor(secondaryColor.rgb)
+                println("Applied colors - Primary: $primaryColor, Secondary: $secondaryColor")
                 true
             }
             .childOf(container)
