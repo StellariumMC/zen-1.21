@@ -12,6 +12,7 @@ import meowing.zen.canvas.core.animations.Manager
 import meowing.zen.canvas.core.elements.CheckBox
 import meowing.zen.canvas.core.elements.Switch
 import meowing.zen.canvas.core.components.SvgImage
+import meowing.zen.canvas.core.elements.Keybind
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.rendering.NVGRenderer
@@ -42,6 +43,8 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
     }
 
     private fun setupUI() {
+        rootContainer.children.clear()
+
         Text("Component Test Suite")
             .color(0xFFFFFFFF.toInt())
             .fontSize(24f)
@@ -180,6 +183,10 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             }
             .childOf(container)
             .addTooltip("This is a primary action button.")
+
+        Keybind()
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(rootContainer)
 
         Button("Success")
             .backgroundColor(0xFF10B981.toInt())
