@@ -34,14 +34,16 @@ class Keybind(
     init {
         setSizing(100f, Size.Pixels, 0f, Size.Auto)
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
+        ignoreFocus()
+
         onClick { _, _, _ ->
             listenForKeybind()
             true
         }
-        onKey { keyCode, scanCode, modifiers ->
-            if(!listen) return@onKey false
 
-            // Escape key to cancel
+        onKeyPress { keyCode, scanCode, _ ->
+            if (!listen) return@onKeyPress false
+
             if (keyCode == 256) {
                 innerText.text = "None"
                 selectedKeyId = null
@@ -51,6 +53,8 @@ class Keybind(
                 selectedKeyId = keyCode
                 selectedScanId = scanCode
             }
+
+            onValueChange?.invoke(keyCode)
             listen = false
             true
         }
@@ -59,7 +63,6 @@ class Keybind(
     fun listenForKeybind() {
         innerText.text = "Press a key.."
         listen = true
-        this.parent?.isFocused = true // For some reason it needs to be the parent thats marked as focused not the element itself
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
@@ -78,7 +81,7 @@ class Keybind(
         256 -> "None"
         32 -> "Space"
         in 290..301 -> "F${keyCode - 289}"
-        else -> "Key "+ (GLFW.glfwGetKeyName(keyCode, scanCode)?.uppercase() ?: "$keyCode")
+        else -> "Key " + (GLFW.glfwGetKeyName(keyCode, scanCode)?.uppercase() ?: "$keyCode")
     }
 
     override fun getAutoWidth(): Float = background.getAutoWidth()

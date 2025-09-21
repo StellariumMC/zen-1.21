@@ -11,6 +11,7 @@ import meowing.zen.canvas.core.Size
 import meowing.zen.canvas.core.animations.Manager
 import meowing.zen.canvas.core.elements.CheckBox
 import meowing.zen.canvas.core.elements.Switch
+import meowing.zen.canvas.core.elements.Slider
 import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.elements.Keybind
 import meowing.zen.utils.CommandUtils
@@ -29,6 +30,9 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
         .padding(40f)
 
     private var clickCount = 0
+    private var volumeValue = 0.7f
+    private var brightnessValue = 0.5f
+    private var sensitivityValue = 0.3f
 
     override fun init() {
         super.init()
@@ -52,7 +56,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .childOf(rootContainer)
 
-        Text("Test buttons, checkboxes, and switches")
+        Text("Test buttons, checkboxes, switches, and sliders")
             .color(0xFF9CA3AF.toInt())
             .fontSize(14f)
             .setPositioning(0f, Pos.ParentPixels, -20f, Pos.AfterSibling)
@@ -168,6 +172,96 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             }
             .childOf(compactSwitchContainer)
 
+        Text("Sliders")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(16f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
+
+        val volumeContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        val volumeLabel = Text("Volume: ${(volumeValue * 100).toInt()}%")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(volumeContainer)
+
+        Slider()
+            .setValue(volumeValue, animated = false)
+            .setSizing(95f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .trackFillColor(0xFF4c87f9.toInt())
+            .trackColor(0xFF424242.toInt())
+            .thumbColor(0xFFFFFFFF.toInt())
+            .thumbHoverColor(0xFFE5E7EB.toInt())
+            .thumbPressedColor(0xFFD1D5DB.toInt())
+            .onValueChange { value ->
+                volumeValue = value as Float
+                volumeLabel.text("Volume: ${(volumeValue * 100).toInt()}%")
+                println("Volume changed to: ${(volumeValue * 100).toInt()}%")
+            }
+            .childOf(volumeContainer)
+
+        val brightnessContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        val brightnessLabel = Text("Brightness: ${(brightnessValue * 100).toInt()}%")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(brightnessContainer)
+
+        Slider()
+            .setValue(brightnessValue, animated = false)
+            .setSizing(95f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .trackFillColor(0xFFF59E0B.toInt())
+            .trackColor(0xFF374151.toInt())
+            .thumbColor(0xFFFFFFFF.toInt())
+            .trackHoverColor(0xFF4B5563.toInt())
+            .onValueChange { value ->
+                brightnessValue = value as Float
+                brightnessLabel.text("Brightness: ${(brightnessValue * 100).toInt()}%")
+                println("Brightness changed to: ${(brightnessValue * 100).toInt()}%")
+            }
+            .childOf(brightnessContainer)
+
+        val sensitivityContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        val sensitivityLabel = Text("Sensitivity: ${(sensitivityValue * 10).toInt()}")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(sensitivityContainer)
+
+        Slider()
+            .setValue(sensitivityValue, animated = false)
+            .minValue(0f)
+            .maxValue(1f)
+            .step(0.1f)
+            .setSizing(95f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .trackFillColor(0xFF10B981.toInt())
+            .trackColor(0xFF4B5563.toInt())
+            .thumbColor(0xFFFFFFFF.toInt())
+            .onValueChange { value ->
+                sensitivityValue = value as Float
+                sensitivityLabel.text("Sensitivity: ${(sensitivityValue * 10).toInt()}")
+                println("Sensitivity changed to: ${(sensitivityValue * 10).toInt()}")
+            }
+            .childOf(sensitivityContainer)
+
         Button("Primary Action")
             .backgroundColor(0xFF3B82F6.toInt())
             .hoverColors(bg = 0xFF2563EB.toInt(), text = 0xFF0000FF.toInt())
@@ -186,7 +280,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
 
         Keybind()
             .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
-            .childOf(rootContainer)
+            .childOf(container)
 
         Button("Success")
             .backgroundColor(0xFF10B981.toInt())
@@ -295,6 +389,60 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .onClick { _, _, _ -> false }
             .childOf(container)
 
+        Text("Advanced Sliders")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(16f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
+
+        val rangeContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        val rangeLabel = Text("Range: 50")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(rangeContainer)
+
+        Slider()
+            .setValue(50f)
+            .minValue(0f)
+            .maxValue(100f)
+            .step(1f)
+            .setSizing(95f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .trackFillColor(0xFF8B5CF6.toInt())
+            .trackColor(0xFF374151.toInt())
+            .thumbColor(0xFFFFFFFF.toInt())
+            .onValueChange { value ->
+                rangeLabel.text("Range: ${(value as Float).toInt()}")
+            }
+            .childOf(rangeContainer)
+
+        val compactContainer = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(60f, Size.ParentPerc, 35f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("Compact")
+            .color(0xFFD1D5DB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(compactContainer)
+
+        Slider()
+            .setValue(0.25f)
+            .setSizing(100f, Size.ParentPerc, 15f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .trackFillColor(0xFFEF4444.toInt())
+            .trackColor(0xFF6B7280.toInt())
+            .thumbColor(0xFFFFFFFF.toInt())
+            .childOf(compactContainer)
+
         val counterText = Text("Clicks: $clickCount")
             .color(0xFF60A5FA.toInt())
             .fontSize(14f)
@@ -315,25 +463,28 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
                 true
             }
             .childOf(container)
+
+        Button("Reset All Sliders")
+            .backgroundColor(0xFF374151.toInt())
+            .hoverColors(bg = 0xFF4B5563.toInt())
+            .textColor(0xFFE5E7EB.toInt())
+            .borderRadius(4f)
+            .padding(8f, 16f, 8f, 16f)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .onClick { _, _, _ ->
+                println("Reset all sliders!")
+                true
+            }
+            .childOf(container)
     }
 
     override fun render(drawContext: DrawContext?, mouseX: Int, mouseY: Int, delta: Float) {
-        //#if MC >= 1.21.7
-        //$$ drawContext?.matrices?.pushMatrix()
-        //#else
-        drawContext?.matrices?.push()
-        //#endif
         NVGRenderer.beginFrame(mc.window.width.toFloat(), mc.window.height.toFloat())
         NVGRenderer.push()
         rootContainer.render(mouseX.toFloat(), mouseY.toFloat())
         Manager.update()
         NVGRenderer.pop()
         NVGRenderer.endFrame()
-        //#if MC >= 1.21.7
-        //$$ drawContext?.matrices?.popMatrix()
-        //#else
-        drawContext?.matrices?.pop()
-        //#endif
     }
 
     override fun shouldPause(): Boolean = false

@@ -54,10 +54,8 @@ class CheckBox(
                 checkMark.color = Color(checkmarkColor, true)
                 checkMark.fadeOut(100, EasingType.EASE_IN)
             }
-        } else {
-            if (animated) {
-                checkMark.fadeIn(100, EasingType.EASE_IN)
-            }
+        } else if (animated) {
+            checkMark.fadeIn(100, EasingType.EASE_IN)
         }
         if (!silent) onValueChange?.invoke(checked)
     }

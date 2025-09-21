@@ -1,13 +1,10 @@
 package meowing.zen.utils
 
-import me.x150.renderer.render.ExtendedDrawContext
-import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
-import org.joml.Vector4f
 import java.awt.Color
 
 object Render2D {
@@ -135,20 +132,6 @@ object Render2D {
         //#else
         context.matrices.pop()
         //#endif
-    }
-
-    // Renderer uses Colors in ABGR format
-    private var warned = false
-    fun renderRoundedRect(context: DrawContext, x: Float, y: Float, width: Float, height: Float, roundness: Vector4f, color: Color) {
-        try {
-            val renderColor = me.x150.renderer.util.Color(color.toABGR())
-            ExtendedDrawContext.drawRoundedRect(context, x, y, width, height, roundness, renderColor)
-        } catch (e: Exception) {
-            if (!warned) {
-                Zen.LOGGER.warn("Error in renderRoundedRect: $e")
-                warned = true
-            }
-        }
     }
 
     fun String.width(): Int {

@@ -24,7 +24,7 @@ class Tooltip(
 
     init {
         setSizing(Size.Auto, Size.Auto)
-        var parentPadding = if(parent is Rectangle) (parent as Rectangle).padding else floatArrayOf(0f, 0f, 0f, 0f)
+        var parentPadding = if (parent is Rectangle) (parent as Rectangle).padding else floatArrayOf(0f, 0f, 0f, 0f)
         setPositioning(0f, Pos.ParentCenter, -24f - parentPadding[0], Pos.ParentPixels)
         ignoreMouseEvents()
         setFloating()

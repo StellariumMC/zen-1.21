@@ -53,10 +53,8 @@ dependencies {
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-            modImplementation(includeOrShade("xyz.meowing:renderer:1.21.7+2.1.3")!!)
         } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
             modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-            modImplementation(includeOrShade("xyz.meowing:renderer:1.21.5+2.1.3")!!)
         }
 
         runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")

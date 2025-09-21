@@ -6,7 +6,6 @@ import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Tooltip
-import meowing.zen.utils.ChatUtils
 import net.minecraft.client.util.Window
 
 enum class Size {
@@ -48,7 +47,8 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var isHovered: Boolean = false
     var isPressed: Boolean = false
     var isFocused: Boolean = false
-    var isFloating: Boolean = false // If true, element is not considered in auto sizing of parents
+    var isFloating: Boolean = false
+    var ignoreFocus: Boolean = false
 
     val window: Window get() = mc.window
     val screenWidth: Int get() = window.width
@@ -56,15 +56,16 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     var parent: CanvasElement<*>? = null
 
-    var onMouseEnter: ((Float, Float) -> Unit)? = null
-    var onMouseExit: ((Float, Float) -> Unit)? = null
-    var onMouseMove: ((Float, Float) -> Unit)? = null
-    var onMouseScroll: ((Float, Float, Double, Double) -> Boolean)? = null
-    var onMouseClick: ((Float, Float, Int) -> Boolean)? = null
-    var onMouseRelease: ((Float, Float, Int) -> Boolean)? = null
-    var onKeyPress: ((Int, Int, Int) -> Boolean)? = null
-    var onKeyRelease: ((Int, Int, Int) -> Boolean)? = null
-    var onCharType: ((Char) -> Boolean)? = null
+    private val mouseEnterListeners = mutableListOf<(Float, Float) -> Unit>()
+    private val mouseExitListeners = mutableListOf<(Float, Float) -> Unit>()
+    private val mouseMoveListeners = mutableListOf<(Float, Float) -> Unit>()
+    private val mouseScrollListeners = mutableListOf<(Float, Float, Double, Double) -> Boolean>()
+    private val mouseClickListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
+    private val mouseReleaseListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
+    private val keyPressListeners = mutableListOf<(Int, Int, Int) -> Boolean>()
+    private val keyReleaseListeners = mutableListOf<(Int, Int, Int) -> Boolean>()
+    private val charTypeListeners = mutableListOf<(Char) -> Boolean>()
+
     var onValueChange: ((Any) -> Unit)? = null
 
     init {
@@ -73,12 +74,21 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         }
     }
 
-    fun destroy() {
+    open fun destroy() {
         if (parent == null) {
             EventDispatcher.unregisterRoot(this)
         }
         children.forEach { it.destroy() }
         children.clear()
+        mouseEnterListeners.clear()
+        mouseExitListeners.clear()
+        mouseMoveListeners.clear()
+        mouseScrollListeners.clear()
+        mouseClickListeners.clear()
+        mouseReleaseListeners.clear()
+        keyPressListeners.clear()
+        keyReleaseListeners.clear()
+        charTypeListeners.clear()
     }
 
     fun findFirstVisibleParent(): CanvasElement<*>? {
@@ -179,7 +189,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 if (index > 0) {
                     val prev = parent!!.children[index - 1]
                     if (prev is Rectangle) {
-                        // The current janky solution to account for padding in rectangles, works for now
                         prev.y + yConstraint - (prev.padding[0] + prev.padding[2])
                     } else prev.y + yConstraint
                 } else yConstraint
@@ -197,14 +206,14 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
         when {
             isHovered && !wasHovered -> {
-                onMouseEnter?.invoke(mouseX, mouseY)
+                mouseEnterListeners.forEach { it(mouseX, mouseY) }
                 tooltipElement?.let {
                     it.fadeIn(200, EasingType.EASE_OUT)
                     it.innerText.fadeIn(200, EasingType.EASE_OUT)
                 }
             }
             !isHovered && wasHovered -> {
-                onMouseExit?.invoke(mouseX, mouseY)
+                mouseExitListeners.forEach { it(mouseX, mouseY) }
                 tooltipElement?.let {
                     it.fadeOut(200, EasingType.EASE_OUT)
                     it.innerText.fadeOut(200, EasingType.EASE_OUT)
@@ -212,7 +221,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             }
         }
 
-        if (isHovered) onMouseMove?.invoke(mouseX, mouseY)
+        if (isHovered) mouseMoveListeners.forEach { it(mouseX, mouseY) }
 
         return children.reversed().any { it.handleMouseMove(mouseX, mouseY) } || isHovered
     }
@@ -227,7 +236,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             isPointInside(mouseX, mouseY) -> {
                 isPressed = true
                 focus()
-                onMouseClick?.invoke(mouseX, mouseY, button) ?: true
+                mouseClickListeners.any { it(mouseX, mouseY, button) } || mouseClickListeners.isEmpty()
             }
             else -> false
         }
@@ -240,29 +249,41 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         isPressed = false
 
         val childHandled = children.reversed().any { it.handleMouseRelease(mouseX, mouseY, button) }
-        return childHandled || (wasPressed && isPointInside(mouseX, mouseY) && (onMouseRelease?.invoke(mouseX, mouseY, button) ?: true))
+        return childHandled || (wasPressed && isPointInside(mouseX, mouseY) && (mouseReleaseListeners.any { it(mouseX, mouseY, button) } || mouseReleaseListeners.isEmpty()))
     }
 
     open fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
         if (!visible) return false
 
         val childHandled = children.reversed().any { it.handleMouseScroll(mouseX, mouseY, horizontal, vertical) }
-        return childHandled || (isPointInside(mouseX, mouseY) && (onMouseScroll?.invoke(mouseX, mouseY, horizontal, vertical) ?: false))
+        return childHandled || (isPointInside(mouseX, mouseY) && mouseScrollListeners.any { it(mouseX, mouseY, horizontal, vertical) })
     }
 
     open fun handleKeyPress(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (!visible || !isFocused) return false
-        return onKeyPress?.invoke(keyCode, scanCode, modifiers) ?: false || children.reversed().any { it.handleKeyPress(keyCode, scanCode, modifiers) }
+        if (!visible) return false
+
+        val childHandled = children.reversed().any { it.handleKeyPress(keyCode, scanCode, modifiers) }
+        val selfHandled = if (isFocused || ignoreFocus) keyPressListeners.any { it(keyCode, scanCode, modifiers) } else false
+
+        return childHandled || selfHandled
     }
 
     open fun handleKeyRelease(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (!visible || !isFocused) return false
-        return onKeyRelease?.invoke(keyCode, scanCode, modifiers) ?: false || children.reversed().any { it.handleKeyRelease(keyCode, scanCode, modifiers) }
+        if (!visible) return false
+
+        val childHandled = children.reversed().any { it.handleKeyRelease(keyCode, scanCode, modifiers) }
+        val selfHandled = if (isFocused || ignoreFocus) keyReleaseListeners.any { it(keyCode, scanCode, modifiers) } else false
+
+        return childHandled || selfHandled
     }
 
     open fun handleCharType(char: Char): Boolean {
-        if (!visible || !isFocused) return false
-        return onCharType?.invoke(char) ?: false || children.reversed().any { it.handleCharType(char) }
+        if (!visible) return false
+
+        val childHandled = children.reversed().any { it.handleCharType(char) }
+        val selfHandled = if (isFocused || ignoreFocus) charTypeListeners.any { it(char) } else false
+
+        return childHandled || selfHandled
     }
 
     fun focus() {
@@ -272,6 +293,16 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     fun unfocus() {
         isFocused = false
+    }
+
+    fun getRootElement(): CanvasElement<*> {
+        var current: CanvasElement<*> = this
+
+        while (current.parent != null) {
+            current = current.parent!!
+        }
+
+        return current
     }
 
     open fun render(mouseX: Float, mouseY: Float) {
@@ -344,29 +375,79 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     }
 
     @Suppress("UNCHECKED_CAST")
+    fun onMouseEnter(callback: (Float, Float) -> Unit): T = apply {
+        mouseEnterListeners.add(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onMouseExit(callback: (Float, Float) -> Unit): T = apply {
+        mouseExitListeners.add(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onMouseMove(callback: (Float, Float) -> Unit): T = apply {
+        mouseMoveListeners.add(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
     fun onHover(onEnter: (Float, Float) -> Unit, onExit: (Float, Float) -> Unit = { _, _ -> }): T = apply {
-        this.onMouseEnter = onEnter
-        this.onMouseExit = onExit
+        onMouseEnter(onEnter)
+        onMouseExit(onExit)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onMouseClick(callback: (Float, Float, Int) -> Boolean): T = apply {
+        mouseClickListeners.add(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")
     fun onClick(callback: (Float, Float, Int) -> Boolean): T = apply {
-        this.onMouseClick = callback
+        onMouseClick(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onMouseRelease(callback: (Float, Float, Int) -> Boolean): T = apply {
+        mouseReleaseListeners.add(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")
     fun onRelease(callback: (Float, Float, Int) -> Boolean): T = apply {
-        this.onMouseRelease = callback
+        onMouseRelease(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onMouseScroll(callback: (Float, Float, Double, Double) -> Boolean): T = apply {
+        mouseScrollListeners.add(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onScroll(callback: (Float, Float, Double, Double) -> Boolean): T = apply {
+        onMouseScroll(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onKeyPress(callback: (Int, Int, Int) -> Boolean): T = apply {
+        keyPressListeners.add(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")
     fun onKey(callback: (Int, Int, Int) -> Boolean): T = apply {
-        this.onKeyPress = callback
+        onKeyPress(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onKeyRelease(callback: (Int, Int, Int) -> Boolean): T = apply {
+        keyReleaseListeners.add(callback)
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun onCharType(callback: (Char) -> Boolean): T = apply {
+        charTypeListeners.add(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")
     fun onChar(callback: (Char) -> Boolean): T = apply {
-        this.onCharType = callback
+        onCharType(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")
@@ -375,18 +456,18 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     } as T
 
     @Suppress("UNCHECKED_CAST")
-    fun onScroll(callback: (Float, Float, Double, Double) -> Boolean): T = apply {
-        this.onMouseScroll = callback
+    fun ignoreMouseEvents(): T = apply {
+        mouseClickListeners.add { _, _, _ -> false }
+        mouseReleaseListeners.add { _, _, _ -> false }
+        mouseScrollListeners.add { _, _, _, _ -> false }
+        mouseMoveListeners.add { _, _ -> }
+        mouseEnterListeners.add { _, _ -> }
+        mouseExitListeners.add { _, _ -> }
     } as T
 
     @Suppress("UNCHECKED_CAST")
-    fun ignoreMouseEvents(): T = apply {
-        this.onMouseClick = { _, _, _ -> false }
-        this.onMouseRelease = { _, _, _ -> false }
-        this.onMouseScroll = { _, _, _, _ -> false }
-        this.onMouseMove = { _, _ -> }
-        this.onMouseEnter = { _, _ -> }
-        this.onMouseExit = { _, _ -> }
+    fun ignoreFocus(): T = apply {
+        ignoreFocus = true
     } as T
 
     @Suppress("UNCHECKED_CAST")
