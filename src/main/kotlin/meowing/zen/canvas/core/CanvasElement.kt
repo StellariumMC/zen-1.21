@@ -62,9 +62,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     private val mouseScrollListeners = mutableListOf<(Float, Float, Double, Double) -> Boolean>()
     private val mouseClickListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
     private val mouseReleaseListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
-    private val keyPressListeners = mutableListOf<(Int, Int, Int) -> Boolean>()
-    private val keyReleaseListeners = mutableListOf<(Int, Int, Int) -> Boolean>()
-    private val charTypeListeners = mutableListOf<(Char) -> Boolean>()
+    private val charTypeListeners = mutableListOf<(Int, Int, Char) -> Boolean>()
 
     var onValueChange: ((Any) -> Unit)? = null
 
@@ -86,8 +84,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         mouseScrollListeners.clear()
         mouseClickListeners.clear()
         mouseReleaseListeners.clear()
-        keyPressListeners.clear()
-        keyReleaseListeners.clear()
         charTypeListeners.clear()
     }
 
@@ -106,8 +102,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             Size.ParentPerc -> {
                 if(parent == null) {
                     screenWidth * (widthPercent / 100f)
+                } else {
+                    val thisparent = findFirstVisibleParent()!!
+                    var modifiedWidth = thisparent.width.times(widthPercent / 100f)
+                    if(thisparent is Rectangle) modifiedWidth -= (thisparent.padding[1] + thisparent.padding[3])
+
+                    modifiedWidth
                 }
-                else findFirstVisibleParent()?.width?.times(widthPercent / 100f) ?: width
             }
             Size.Pixels -> width
         }
@@ -119,8 +120,13 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             Size.ParentPerc -> {
                 if (parent == null) {
                     screenHeight * (heightPercent / 100f)
+                } else {
+                    val thisparent = findFirstVisibleParent()!!
+                    var modifiedHeight = thisparent.height.times(heightPercent / 100f)
+                    if(thisparent is Rectangle) modifiedHeight -= (thisparent.padding[0] + thisparent.padding[2])
+
+                    modifiedHeight
                 }
-                else findFirstVisibleParent()?.height?.times(heightPercent / 100f) ?: height
             }
             Size.Pixels -> height
         }
@@ -259,29 +265,12 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         return childHandled || (isPointInside(mouseX, mouseY) && mouseScrollListeners.any { it(mouseX, mouseY, horizontal, vertical) })
     }
 
-    open fun handleKeyPress(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+
+    open fun handleCharType(keyCode: Int, scanCode: Int, charTyped: Char): Boolean {
         if (!visible) return false
 
-        val childHandled = children.reversed().any { it.handleKeyPress(keyCode, scanCode, modifiers) }
-        val selfHandled = if (isFocused || ignoreFocus) keyPressListeners.any { it(keyCode, scanCode, modifiers) } else false
-
-        return childHandled || selfHandled
-    }
-
-    open fun handleKeyRelease(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        if (!visible) return false
-
-        val childHandled = children.reversed().any { it.handleKeyRelease(keyCode, scanCode, modifiers) }
-        val selfHandled = if (isFocused || ignoreFocus) keyReleaseListeners.any { it(keyCode, scanCode, modifiers) } else false
-
-        return childHandled || selfHandled
-    }
-
-    open fun handleCharType(char: Char): Boolean {
-        if (!visible) return false
-
-        val childHandled = children.reversed().any { it.handleCharType(char) }
-        val selfHandled = if (isFocused || ignoreFocus) charTypeListeners.any { it(char) } else false
+        val childHandled = children.reversed().any { it.handleCharType(keyCode, scanCode, charTyped) }
+        val selfHandled = if (isFocused || ignoreFocus) charTypeListeners.any { it(keyCode, scanCode, charTyped) } else false
 
         return childHandled || selfHandled
     }
@@ -426,28 +415,8 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     } as T
 
     @Suppress("UNCHECKED_CAST")
-    fun onKeyPress(callback: (Int, Int, Int) -> Boolean): T = apply {
-        keyPressListeners.add(callback)
-    } as T
-
-    @Suppress("UNCHECKED_CAST")
-    fun onKey(callback: (Int, Int, Int) -> Boolean): T = apply {
-        onKeyPress(callback)
-    } as T
-
-    @Suppress("UNCHECKED_CAST")
-    fun onKeyRelease(callback: (Int, Int, Int) -> Boolean): T = apply {
-        keyReleaseListeners.add(callback)
-    } as T
-
-    @Suppress("UNCHECKED_CAST")
-    fun onCharType(callback: (Char) -> Boolean): T = apply {
+    fun onCharType(callback: (Int, Int, Char) -> Boolean): T = apply {
         charTypeListeners.add(callback)
-    } as T
-
-    @Suppress("UNCHECKED_CAST")
-    fun onChar(callback: (Char) -> Boolean): T = apply {
-        onCharType(callback)
     } as T
 
     @Suppress("UNCHECKED_CAST")

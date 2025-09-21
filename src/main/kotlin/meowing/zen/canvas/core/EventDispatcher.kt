@@ -3,6 +3,7 @@ package meowing.zen.canvas.core
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.events.EventBus
+import meowing.zen.events.GuiEvent
 import meowing.zen.events.KeyEvent
 import meowing.zen.events.MouseEvent
 
@@ -29,14 +30,8 @@ object EventDispatcher {
             (handleMouseScroll(mc.mouse.x.toFloat(), mc.mouse.y.toFloat(), event.horizontal, event.vertical))
         }
 
-        EventBus.register<KeyEvent.Press> { event ->
-            if (handleKeyPress(event.keyCode, event.scanCode, event.modifiers)) {
-                event.cancel()
-            }
-        }
-
-        EventBus.register<KeyEvent.Release> { event ->
-            if (handleKeyRelease(event.keyCode, event.scanCode, event.modifiers)) {
+        EventBus.register<GuiEvent.Key> { event ->
+            if (handleCharPress(event.key, event.scanCode, event.character)) {
                 event.cancel()
             }
         }
@@ -62,12 +57,8 @@ object EventDispatcher {
         return rootElements.any { it.handleMouseMove(mouseX, mouseY) }
     }
 
-    private fun handleKeyPress(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        return rootElements.any { it.handleKeyPress(keyCode, scanCode, modifiers) }
-    }
-
-    private fun handleKeyRelease(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
-        return rootElements.any { it.handleKeyRelease(keyCode, scanCode, modifiers) }
+    private fun handleCharPress(keyCode: Int, scanCode: Int , charTyped: Char): Boolean {
+        return rootElements.any { it.handleCharType(keyCode, scanCode, charTyped) }
     }
 
     private fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
