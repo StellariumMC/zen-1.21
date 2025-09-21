@@ -15,6 +15,8 @@ import meowing.zen.canvas.core.elements.Slider
 import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.elements.Keybind
 import meowing.zen.canvas.core.elements.ColorPicker
+import meowing.zen.canvas.core.elements.NumberInput
+import meowing.zen.canvas.core.elements.TextInput
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.rendering.NVGRenderer
@@ -357,6 +359,24 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
 
         Keybind()
             .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        TextInput("This is a text input", "Placeholder...")
+            .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .onValueChange { text ->
+                println("Text input changed to: $text")
+            }
+            .fontSize(20f)
+            .childOf(container)
+
+        NumberInput(10_000_000, "Placeholder...")
+            .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .onValueChange { text ->
+                println("Number input changed to: $text")
+            }
+            .fontSize(20f)
             .childOf(container)
 
         Button("Success")

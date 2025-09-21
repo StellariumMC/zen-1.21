@@ -27,7 +27,7 @@ class Keybind(
         .ignoreMouseEvents()
         .childOf(this)
 
-    val innerText = Text("Key A", 0xFFFFFFFF.toInt(), 12f)
+    private val innerText = Text("Key A", 0xFFFFFFFF.toInt(), 12f)
         .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
         .childOf(background)
 
@@ -41,8 +41,8 @@ class Keybind(
             true
         }
 
-        onKeyPress { keyCode, scanCode, _ ->
-            if (!listen) return@onKeyPress false
+        onCharType { keyCode, scanCode, char ->
+            if (!listen) return@onCharType false
 
             if (keyCode == 256) {
                 innerText.text = "None"

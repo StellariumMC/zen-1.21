@@ -112,6 +112,9 @@ class ColorPicker(
     override fun onRender(mouseX: Float, mouseY: Float) {
         previewRect.isHovered = hovered
         previewRect.isPressed = pressed
+
+        previewRect.hoverColor = selectedColor.darker().rgb
+        previewRect.pressedColor = selectedColor.darker().rgb
     }
 
     override fun destroy() {

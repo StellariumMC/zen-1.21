@@ -7,6 +7,8 @@ import meowing.zen.canvas.core.animations.EasingType
 import meowing.zen.canvas.core.animations.animatePosition
 import meowing.zen.canvas.core.animations.animateSize
 import meowing.zen.canvas.core.components.Rectangle
+import java.awt.Color
+import kotlin.math.roundToInt
 
 class Slider(
     var value: Float = 0.5f,
@@ -23,7 +25,7 @@ class Slider(
     thumbWidth: Float = 20f,
     thumbHeight: Float = 20f,
     thumbRadius: Float = 10f,
-    trackHeight: Float = 4f,
+    var trackHeight: Float = 4f,
     trackRadius: Float = 2f,
     backgroundColor: Int = 0x00000000,
     borderColor: Int = 0x00000000,
@@ -40,6 +42,7 @@ class Slider(
     private var dragStartValue = 0f
     private var globalMoveListener: ((Float, Float) -> Unit)? = null
     private var globalReleaseListener: ((Float, Float, Int) -> Boolean)? = null
+    private val separators: MutableList<Rectangle> = mutableListOf()
 
     private val container = Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -49,6 +52,11 @@ class Slider(
     private val trackBackground = Rectangle(trackColor, 0x00000000, trackRadius, 0f, floatArrayOf(0f, 0f, 0f, 0f), null, null, Size.ParentPerc, Size.Pixels)
         .setSizing(100f, Size.ParentPerc, trackHeight, Size.Pixels)
         .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .ignoreMouseEvents()
+        .childOf(container)
+
+    private val stepContainer = Rectangle(0x00000000, 0x00000000, 0f, 0f, floatArrayOf(0f, 0f, 0f, 0f), null, null, Size.ParentPerc, Size.ParentPerc)
+        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
         .ignoreMouseEvents()
         .childOf(container)
 
@@ -81,6 +89,36 @@ class Slider(
                 startDragging(mouseX)
                 true
             } else false
+        }
+
+        setSliderSeparators()
+    }
+
+    private fun setSliderSeparators() {
+        separators.forEach { it.destroy() }
+
+        step?.let { stepSize ->
+            val totalSteps = ((maxValue - minValue) / stepSize).roundToInt()
+            if(totalSteps > 20 ) return
+
+            for (i in 1 until totalSteps) {
+                val stepValue = minValue + i * stepSize
+                val stepPercent = (stepValue - minValue) / (maxValue - minValue) * 100f
+
+                val separator = Rectangle(
+                    Color(trackColor).brighter().brighter().rgb, 0x00000000,
+                    1f, 0f,
+                    floatArrayOf(0f, 0f, 0f, 0f),
+                    null, null,
+                    Size.Pixels, Size.Pixels
+                )
+                .setSizing(3f, Size.Pixels, trackHeight, Size.Pixels)
+                .setPositioning(stepPercent, Pos.ParentPercent, 0f, Pos.ParentCenter)
+                .ignoreMouseEvents()
+                .childOf(stepContainer)
+
+                separators.add(separator)
+            }
         }
     }
 
@@ -130,9 +168,10 @@ class Slider(
     }
 
     fun setValue(newValue: Float, animated: Boolean = true, silent: Boolean = false): Slider {
+        println("Setting slider value to $newValue (clamped between $minValue and $maxValue, step $step, current $value)")
         val clampedValue = newValue.coerceIn(minValue, maxValue)
         val steppedValue = step?.let {
-            val steps = ((clampedValue - minValue) / it).toInt()
+            val steps = ((clampedValue - minValue) / it).roundToInt()
             minValue + steps * it
         } ?: clampedValue
 
@@ -203,6 +242,7 @@ class Slider(
     fun step(stepSize: Float?): Slider = apply {
         step = stepSize
         setValue(value, false)
+        setSliderSeparators()
     }
 
     fun thumbColor(color: Int): Slider = apply {
