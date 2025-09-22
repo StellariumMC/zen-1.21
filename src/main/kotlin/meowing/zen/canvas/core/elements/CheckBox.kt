@@ -34,7 +34,7 @@ class CheckBox(
         .childOf(this)
 
     val checkMark = SvgImage(svgPath = "/assets/zen/checkmark.svg", color = Color(checkmarkColor and 0x00FFFFFF, true))
-        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
+        .setSizing(120f, Size.ParentPerc, 120f, Size.ParentPerc)
         .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
         .childOf(background)
 

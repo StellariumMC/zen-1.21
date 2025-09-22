@@ -67,7 +67,7 @@ class ColorPicker(
             onValueChange?.invoke(color)
         }
 
-        pickerPanel?.fadeIn(200, EasingType.EASE_OUT) {
+        pickerPanel?.background?.fadeIn(200, EasingType.EASE_OUT) {
             isAnimating = false
         }
 
@@ -87,7 +87,7 @@ class ColorPicker(
         if (!isPickerOpen || pickerPanel == null || isAnimating) return
         isAnimating = true
 
-        pickerPanel?.fadeOut(200, EasingType.EASE_IN) {
+        pickerPanel?.background?.fadeOut(200, EasingType.EASE_IN) {
             getRootElement().children.remove(pickerPanel!!)
             pickerPanel!!.destroy()
             pickerPanel = null
@@ -151,7 +151,7 @@ private class ColorPickerPanel(
     private var draggingHue = false
     private var draggingAlpha = false
 
-    private val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
+    val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
         .setSizing(0f, Size.Auto, 170f,Size.Pixels)
         .ignoreMouseEvents()
         .setRenderOnTop()

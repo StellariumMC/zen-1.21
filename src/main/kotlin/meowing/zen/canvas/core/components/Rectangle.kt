@@ -6,6 +6,7 @@ import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.utils.rendering.Gradient
 import meowing.zen.utils.rendering.NVGRenderer
+import java.awt.Color
 
 open class Rectangle(
     var backgroundColor: Int = 0x80000000.toInt(),
@@ -158,7 +159,7 @@ open class Rectangle(
             val contentY = y + padding[0]
             val viewWidth = width - padding[1] - padding[3]
             val viewHeight = height - padding[0] - padding[2]
-            val buffer = 10f
+            val buffer = 2f
 
             NVGRenderer.push()
             NVGRenderer.pushScissor(
@@ -174,8 +175,10 @@ open class Rectangle(
             val oldX = child.xConstraint
             val oldY = child.yConstraint
             try {
-                child.xConstraint += padding[3]
-                child.yConstraint += padding[0]
+                if(!child.isFloating) {
+                    child.xConstraint += padding[3]
+                    child.yConstraint += padding[0]
+                }
                 child.render(mouseX, mouseY)
             } finally {
                 child.xConstraint = oldX
