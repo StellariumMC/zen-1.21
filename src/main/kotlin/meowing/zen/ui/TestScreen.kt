@@ -14,6 +14,7 @@ import meowing.zen.canvas.core.elements.Switch
 import meowing.zen.canvas.core.elements.Slider
 import meowing.zen.canvas.core.elements.Keybind
 import meowing.zen.canvas.core.elements.ColorPicker
+import meowing.zen.canvas.core.elements.Dropdown
 import meowing.zen.canvas.core.elements.NumberInput
 import meowing.zen.canvas.core.elements.TextInput
 import meowing.zen.utils.CommandUtils
@@ -92,6 +93,14 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
                 }
                 .childOf(container)
         }
+
+        Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 9", "Option A", "Option B", "Option C"), 0)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .fontSize(16f)
+            .onValueChange { index ->
+                println("Dropdown selected index: $index")
+            }
+            .childOf(container)
 
         Text("Number Input Components")
             .color(0xFF10B981.toInt())

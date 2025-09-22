@@ -159,7 +159,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 if (index > 0) {
                     val prev = parent!!.children[index - 1]
                     prev.x + prev.width + xConstraint
-                } else xConstraint
+                } else {
+                    if (visibleParent != null) visibleParent.x + xConstraint else xConstraint
+                }
             }
             Pos.MatchSibling -> {
                 val index = parent?.children?.indexOf(this) ?: -1
@@ -190,7 +192,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 if (index > 0) {
                     val prev = parent!!.children[index - 1]
                     (prev.y + prev.height + yConstraint)
-                } else yConstraint
+                } else {
+                    if (visibleParent != null) visibleParent.y + yConstraint else yConstraint
+                }
             }
             Pos.MatchSibling -> {
                 val index = parent?.children?.indexOf(this) ?: -1
