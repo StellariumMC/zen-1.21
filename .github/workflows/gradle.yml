@@ -1,7 +1,9 @@
 name: Run Gradle Build
+
 on:
   - push
   - pull_request
+
 jobs:
   gradle:
     runs-on: ubuntu-latest
@@ -44,6 +46,7 @@ jobs:
         with:
           name: zen-fabric-nightly-${{ steps.commit-count.outputs.commit-number }}
           path: build/processed/*.jar
+
   send-to-discord:
     if: github.event_name == 'push'
     needs: gradle
@@ -56,32 +59,32 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Download built artifacts
-        uses: actions/download-artifact@v4.1.7
-        with:
-          name: zen-fabric-nightly-${{ needs.gradle.outputs.commit-number }}
-          path: ./artifact
-      - name: Send jars to Discord
+      - name: Send nightly.link to Discord
         run: |
           COMMIT_MESSAGE=$(git log -1 --pretty=%s)
           COMMIT_HASH=$(git rev-parse --short HEAD)
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/${COMMIT_HASH}"
+          NIGHTLY_LINK="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/zen-fabric-nightly-${COMMIT_NUMBER}.zip"
           
-          for jar in ./artifact/*.jar; do
-            if [[ -f "$jar" ]]; then
-              filename=$(basename "$jar")
-              version=$(echo "$filename" | grep -o '1\.21\.[0-9]\+')
+          EMBED_PAYLOAD=$(jq -n \
+            --arg title "Zen 1.21 nightly release" \
+            --arg commit "**Latest Commit:** [$COMMIT_MESSAGE]($COMMIT_URL)" \
+            --arg build "**Build:** #${COMMIT_NUMBER}" \
+            --arg download "**Download:** [📦 zen-1.21-fabric-nightly-${COMMIT_NUMBER}.zip]($NIGHTLY_LINK)" \
+            --arg timestamp "$(date -u +%Y-%m-%dT%H:%M:%S.000Z)" \
+            '{
+              embeds: [{
+                title: $title,
+                description: ($commit + "\n" + $build + "\n" + $download),
+                color: 3447003,
+                timestamp: $timestamp,
+                footer: {
+                  text: "Zen Fabric Nightly"
+                }
+              }]
+            }')
           
-              echo "Uploading $jar to Discord..."
-              EMBED_PAYLOAD=$(jq -n \
-                --arg title "Zen $version nightly build #$COMMIT_NUMBER" \
-                --arg desc "[Commit: $COMMIT_MESSAGE]($COMMIT_URL)" \
-                '{embeds: [{title: $title, description: $desc, color: 5814783}]}')
-          
-              curl -X POST \
-                -H "Content-Type: multipart/form-data" \
-                -F "payload_json=${EMBED_PAYLOAD}" \
-                -F "file=@${jar}" \
-                "$DISCORD_WEBHOOK_URL"
-            fi
-          done
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "$EMBED_PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
