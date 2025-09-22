@@ -168,7 +168,6 @@ class Slider(
     }
 
     fun setValue(newValue: Float, animated: Boolean = true, silent: Boolean = false): Slider {
-        println("Setting slider value to $newValue (clamped between $minValue and $maxValue, step $step, current $value)")
         val clampedValue = newValue.coerceIn(minValue, maxValue)
         val steppedValue = step?.let {
             val steps = ((clampedValue - minValue) / it).roundToInt()
