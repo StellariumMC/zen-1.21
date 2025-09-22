@@ -8,6 +8,7 @@ import meowing.zen.canvas.core.animations.animateFloat
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
+import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.rendering.Gradient
 import meowing.zen.utils.rendering.NVGRenderer
 import java.awt.Color
@@ -54,7 +55,7 @@ class ColorPicker(
 
         pickerPanel = ColorPickerPanel(selectedColor, backgroundColor)
             .setSizing(Size.Auto, Size.Auto)
-            .setPositioning(x - 25f, Pos.ScreenPixels, y - 25f, Pos.ScreenPixels)
+            .setPositioning(previewRect.getScreenX() + 5f, Pos.ScreenPixels, previewRect.getScreenY() + 5f, Pos.ScreenPixels)
             .setFloating()
             .childOf(getRootElement())
 
@@ -181,13 +182,13 @@ private class ColorPickerPanel(
             true
         }
 
-        hueSlider.onMouseClick { mouseX, mouseY, _ ->
+        hueSlider.onMouseClick { _, mouseY, _ ->
             draggingHue = true
             updateHueFromMouse(mouseY)
             true
         }
 
-        alphaSlider.onMouseClick { mouseX, mouseY, _ ->
+        alphaSlider.onMouseClick { _, mouseY, _ ->
             draggingAlpha = true
             updateAlphaFromMouse(mouseY)
             true
@@ -270,7 +271,7 @@ private class ColorPickerPanel(
             val blackColor = 0xFF000000.toInt()
 
             NVGRenderer.gradientRect(x, y, width, height, whiteColor, hueColor, Gradient.LeftToRight, 0f)
-            NVGRenderer.gradientRect(x, y, width, height, 0x00000000, blackColor, Gradient.TopToBottom, 0f)
+            NVGRenderer.gradientRect(x, y, width, height + 1f, 0x00000000, blackColor, Gradient.TopToBottom, 0f)
 
             val indicatorX = x + currentSaturation * width - 3f
             val indicatorY = y + (1f - currentBrightness) * height - 3f
@@ -308,7 +309,7 @@ private class ColorPickerPanel(
     }
 
     inner class AlphaSlider : CanvasElement<AlphaSlider>() {
-        var currentColor = Color.WHITE
+        var currentColor: Color = Color.WHITE
         var alpha = 1f
 
         override fun onRender(mouseX: Float, mouseY: Float) {

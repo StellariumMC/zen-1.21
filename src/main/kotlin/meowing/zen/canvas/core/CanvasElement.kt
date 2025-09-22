@@ -55,27 +55,24 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     val screenHeight: Int get() = window.height
 
     var parent: CanvasElement<*>? = null
+    var tooltipElement: Tooltip? = null
 
-    private val mouseEnterListeners = mutableListOf<(Float, Float) -> Unit>()
-    private val mouseExitListeners = mutableListOf<(Float, Float) -> Unit>()
-    private val mouseMoveListeners = mutableListOf<(Float, Float) -> Unit>()
-    private val mouseScrollListeners = mutableListOf<(Float, Float, Double, Double) -> Boolean>()
-    private val mouseClickListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
-    private val mouseReleaseListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
-    private val charTypeListeners = mutableListOf<(Int, Int, Char) -> Boolean>()
+    val mouseEnterListeners = mutableListOf<(Float, Float) -> Unit>()
+    val mouseExitListeners = mutableListOf<(Float, Float) -> Unit>()
+    val mouseMoveListeners = mutableListOf<(Float, Float) -> Unit>()
+    val mouseScrollListeners = mutableListOf<(Float, Float, Double, Double) -> Boolean>()
+    val mouseClickListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
+    val mouseReleaseListeners = mutableListOf<(Float, Float, Int) -> Boolean>()
+    val charTypeListeners = mutableListOf<(Int, Int, Char) -> Boolean>()
 
     var onValueChange: ((Any) -> Unit)? = null
 
     init {
-        if (parent == null) {
-            EventDispatcher.registerRoot(this)
-        }
+        if (parent == null) EventDispatcher.registerRoot(this)
     }
 
     open fun destroy() {
-        if (parent == null) {
-            EventDispatcher.unregisterRoot(this)
-        }
+        EventDispatcher.unregisterRoot(this)
         children.forEach { it.destroy() }
         children.clear()
         mouseEnterListeners.clear()
@@ -351,8 +348,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         this.yPositionConstraint = yPos
         return this as T
     }
-
-    var tooltipElement: Tooltip? = null
 
     @Suppress("UNCHECKED_CAST")
     fun addTooltip(tooltip: String): T {
