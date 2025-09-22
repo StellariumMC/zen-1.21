@@ -178,6 +178,27 @@ object NVGRenderer {
         NanoVG.nvgStroke(vg)
     }
 
+    fun hollowGradientRect(
+        x: Float,
+        y: Float,
+        w: Float,
+        h: Float,
+        thickness: Float,
+        color1: Int,
+        color2: Int,
+        gradient: Gradient,
+        radius: Float
+    ) {
+        NanoVG.nvgBeginPath(vg)
+        NanoVG.nvgRoundedRect(vg, x, y, w, h, radius)
+        NanoVG.nvgStrokeWidth(vg, thickness)
+
+        // Gradient stroke
+        gradient(color1, color2, x, y, w, h, gradient)
+        NanoVG.nvgStrokePaint(vg, nvgPaint)
+        NanoVG.nvgStroke(vg)
+    }
+
     fun gradientRect(
         x: Float,
         y: Float,
@@ -464,6 +485,7 @@ object NVGRenderer {
         when (direction) {
             Gradient.LeftToRight -> NanoVG.nvgLinearGradient(vg, x, y, x + w, y, nvgColor, nvgColor2, nvgPaint)
             Gradient.TopToBottom -> NanoVG.nvgLinearGradient(vg, x, y, x, y + h, nvgColor, nvgColor2, nvgPaint)
+            Gradient.TopLeftToBottomRight -> NanoVG.nvgLinearGradient(vg, x, y, x + w, y + h, nvgColor, nvgColor2, nvgPaint)
         }
     }
 

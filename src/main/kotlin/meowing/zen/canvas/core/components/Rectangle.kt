@@ -2,6 +2,7 @@ package meowing.zen.canvas.core.components
 
 import meowing.zen.canvas.core.CanvasElement
 import meowing.zen.canvas.core.Size
+import meowing.zen.utils.rendering.Gradient
 import meowing.zen.utils.rendering.NVGRenderer
 
 open class Rectangle(
@@ -15,6 +16,8 @@ open class Rectangle(
     widthType: Size = Size.Auto,
     heightType: Size = Size.Auto,
 ) : CanvasElement<Rectangle>(widthType, heightType) {
+
+    var secondBorderColor : Int = borderColor
 
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (!visible || (height - (padding[0] + padding[2])) == 0f || (width - (padding[1] + padding[3])) == 0f) return
@@ -30,7 +33,9 @@ open class Rectangle(
         }
 
         if (borderThickness > 0f) {
-            NVGRenderer.hollowRect(x, y, width, height, borderThickness, borderColor, borderRadius)
+            if(borderColor != secondBorderColor) {
+                NVGRenderer.hollowGradientRect(x, y, width, height, borderThickness, borderColor, secondBorderColor, Gradient.TopLeftToBottomRight, borderRadius)
+            } else NVGRenderer.hollowRect(x, y, width, height, borderThickness, borderColor, borderRadius)
         }
     }
 
@@ -83,8 +88,14 @@ open class Rectangle(
         backgroundColor = color
     }
 
+    open fun setGradientBorderColor(color1: Int, color2: Int): Rectangle = apply {
+        borderColor = color1
+        secondBorderColor = color2
+    }
+
     open fun borderColor(color: Int): Rectangle = apply {
         borderColor = color
+        secondBorderColor = color
     }
 
     open fun borderRadius(radius: Float): Rectangle = apply {

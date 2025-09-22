@@ -77,6 +77,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setPositioning(10f, Pos.ParentPixels, 0f, Pos.AfterSibling)
             .padding(20f)
             .childOf(rootContainer)
+            .setGradientBorderColor(0xFF5aecf3.toInt(), 0xFF0194d8.toInt())
 
         val rightColumn = Rectangle()
             .backgroundColor(0x80202020.toInt())
@@ -87,6 +88,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setPositioning(10f, Pos.AfterSibling, 0f, Pos.MatchSibling)
             .padding(20f)
             .childOf(rootContainer)
+            .setGradientBorderColor(0xFF5aecf3.toInt(), 0xFF0194d8.toInt())
 
         setupLeftColumn(leftColumn)
         setupRightColumn(rightColumn)
@@ -102,6 +104,13 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
         SvgImage(svgPath = "/assets/zen/checkmark.svg", color = Color.RED)
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .childOf(container)
+
+        Rectangle(borderRadius = 5f)
+            .borderThickness(3f)
+            .setSizing(100f, Size.Pixels, 50f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(container)
+            .setGradientBorderColor(0xFF5aecf3.toInt(), 0xFF0194d8.toInt())
 
         CheckBox()
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
@@ -189,6 +198,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
             .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
             .childOf(container)
+            .borderColor(0xFF4B5563.toInt())
 
         val primaryColorLabel = Text("Primary Color")
             .color(0xFFD1D5DB.toInt())
@@ -202,7 +212,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Button Test GUI")) {
             .onValueChange { color ->
                 primaryColor = color as Color
                 primaryColorLabel.text("Primary: #${Integer.toHexString(color.rgb).substring(2).uppercase()}")
-                println("Primary color changed to: ${color}")
+                println("Primary color changed to: $color")
             }
             .childOf(primaryColorContainer)
 

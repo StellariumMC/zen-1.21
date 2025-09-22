@@ -15,7 +15,7 @@ import kotlin.math.roundToInt
 
 class ColorPicker(
     initialColor: Color = Color.WHITE,
-    val backgroundColor: Int = 0x80404040.toInt(),
+    val backgroundColor: Int = 0xFF171616.toInt(),
     borderColor: Int = 0xFF606060.toInt(),
     borderRadius: Float = 4f,
     borderThickness: Float = 1f,
@@ -54,7 +54,7 @@ class ColorPicker(
 
         pickerPanel = ColorPickerPanel(selectedColor, backgroundColor)
             .setSizing(Size.Auto, Size.Auto)
-            .setPositioning(x + width + 5f, Pos.ScreenPixels, y, Pos.ScreenPixels)
+            .setPositioning(x - 25f, Pos.ScreenPixels, y - 25f, Pos.ScreenPixels)
             .setFloating()
             .childOf(getRootElement())
 
@@ -132,7 +132,7 @@ class ColorPicker(
 
 private class ColorPickerPanel(
     initialColor: Color,
-    backgroundColor: Int = 0xFF2A2A2A.toInt(),
+    backgroundColor: Int = 0xFF171616.toInt(),
     borderColor: Int = 0xFF505050.toInt()
 ) : CanvasElement<ColorPickerPanel>() {
     private var currentColor = initialColor
@@ -144,24 +144,24 @@ private class ColorPickerPanel(
     private var draggingHue = false
     private var draggingAlpha = false
 
-    private val background = Rectangle(backgroundColor, borderColor, 0f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
+    private val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
         .setSizing(0f, Size.Auto, 170f,Size.Pixels)
         .ignoreMouseEvents()
         .childOf(this)
 
     val pickerArea = ColorPickerArea()
-        .setSizing(180f, Size.Pixels, 90f, Size.ParentPerc)
-        .setPositioning(Pos.ParentPixels, Pos.ParentPixels)
+        .setSizing(150f, Size.Pixels, 95f, Size.ParentPerc)
+        .setPositioning(Pos.ParentPixels, Pos.ParentCenter)
         .childOf(background)
 
     val hueSlider = HueSlider()
-        .setSizing(20f, Size.Pixels, 90f, Size.ParentPerc)
-        .setPositioning(5f, Pos.AfterSibling, 0f, Pos.ParentPixels)
+        .setSizing(20f, Size.Pixels, 95f, Size.ParentPerc)
+        .setPositioning(5f, Pos.AfterSibling, 0f, Pos.ParentCenter)
         .childOf(background)
 
     val alphaSlider = AlphaSlider()
-        .setSizing(20f, Size.Pixels, 90f, Size.ParentPerc)
-        .setPositioning(5f, Pos.AfterSibling, 0f, Pos.ParentPixels)
+        .setSizing(20f, Size.Pixels, 95f, Size.ParentPerc)
+        .setPositioning(5f, Pos.AfterSibling, 0f, Pos.ParentCenter)
         .childOf(background)
 
     init {
@@ -274,7 +274,7 @@ private class ColorPickerPanel(
 
             val indicatorX = x + currentSaturation * width - 3f
             val indicatorY = y + (1f - currentBrightness) * height - 3f
-            NVGRenderer.hollowRect(indicatorX, indicatorY, 6f, 6f, 2f, 0xFFFFFFFF.toInt(), 0f)
+            NVGRenderer.hollowRect(indicatorX, indicatorY, 6f, 6f, 2f, 0xFFFFFFFF.toInt(), 2f)
 
             NVGRenderer.globalAlpha(1f)
         }
@@ -301,7 +301,7 @@ private class ColorPickerPanel(
             }
 
             val indicatorY = y + currentHue * height - 2f
-            NVGRenderer.rect(x - 3f, indicatorY, width + 6f, 4f, 0xFFFFFFFF.toInt(), 0f)
+            NVGRenderer.rect(x - 3f, indicatorY, width + 6f, 4f, 0xFFFFFFFF.toInt(), 3f)
 
             NVGRenderer.globalAlpha(1f)
         }
@@ -340,7 +340,7 @@ private class ColorPickerPanel(
             NVGRenderer.gradientRect(x, y, width, height, opaqueColor, transparentColor, Gradient.TopToBottom, 0f)
 
             val indicatorY = y + (1f - currentAlpha) * height - 2f
-            NVGRenderer.rect(x - 3f, indicatorY, width + 6f, 4f, 0xFFFFFFFF.toInt(), 0f)
+            NVGRenderer.rect(x - 3f, indicatorY, width + 6f, 4f, 0xFFFFFFFF.toInt(), 2f)
 
             NVGRenderer.globalAlpha(1f)
         }
