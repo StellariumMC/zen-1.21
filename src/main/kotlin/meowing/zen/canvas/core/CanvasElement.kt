@@ -30,6 +30,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var heightType: Size = Size.Pixels
 ) {
     val children: MutableList<CanvasElement<*>> = mutableListOf()
+    val topChildren: MutableList<CanvasElement<*>> = mutableListOf()
 
     var xPositionConstraint = Pos.ParentPixels
     var yPositionConstraint = Pos.ParentPixels
@@ -49,6 +50,8 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var isFocused: Boolean = false
     var isFloating: Boolean = false
     var ignoreFocus: Boolean = false
+    var renderOnTop: Boolean = false
+    var requiresFocus: Boolean = false
 
     val window: Window get() = mc.window
     val screenWidth: Int get() = window.width
@@ -74,7 +77,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     open fun destroy() {
         EventDispatcher.unregisterRoot(this)
         children.forEach { it.destroy() }
+        topChildren.forEach { it.destroy() }
         children.clear()
+        topChildren.clear()
         mouseEnterListeners.clear()
         mouseExitListeners.clear()
         mouseMoveListeners.clear()
@@ -102,8 +107,8 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 } else {
                     val thisparent = findFirstVisibleParent()!!
                     var modifiedWidth = thisparent.width.times(widthPercent / 100f)
-                    if(thisparent is Rectangle) modifiedWidth -= (thisparent.padding[1] + thisparent.padding[3])
 
+                    if (thisparent is Rectangle) modifiedWidth -= (thisparent.padding[1] + thisparent.padding[3])
                     modifiedWidth
                 }
             }
@@ -120,8 +125,8 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 } else {
                     val thisparent = findFirstVisibleParent()!!
                     var modifiedHeight = thisparent.height.times(heightPercent / 100f)
-                    if(thisparent is Rectangle) modifiedHeight -= (thisparent.padding[0] + thisparent.padding[2])
 
+                    if (thisparent is Rectangle) modifiedHeight -= (thisparent.padding[0] + thisparent.padding[2])
                     modifiedHeight
                 }
             }
@@ -241,7 +246,10 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                 focus()
                 mouseClickListeners.any { it(mouseX, mouseY, button) } || mouseClickListeners.isEmpty()
             }
-            else -> false
+            else -> {
+                if (requiresFocus && isFocused) unfocus()
+                false
+            }
         }
     }
 
@@ -262,7 +270,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         return childHandled || (isPointInside(mouseX, mouseY) && mouseScrollListeners.any { it(mouseX, mouseY, horizontal, vertical) })
     }
 
-
     open fun handleCharType(keyCode: Int, scanCode: Int, charTyped: Char): Boolean {
         if (!visible) return false
 
@@ -273,12 +280,18 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     }
 
     fun focus() {
-        parent?.children?.forEach { it.isFocused = false }
+        getRootElement().unfocusAll()
         isFocused = true
     }
 
     fun unfocus() {
         isFocused = false
+    }
+
+    private fun unfocusAll() {
+        if (isFocused) unfocus()
+        children.forEach { it.unfocusAll() }
+        topChildren.forEach { it.unfocusAll() }
     }
 
     fun getRootElement(): CanvasElement<*> {
@@ -301,10 +314,16 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
         onRender(mouseX, mouseY)
         renderChildren(mouseX, mouseY)
+        renderTopChildren(mouseX, mouseY)
     }
 
     protected open fun renderChildren(mouseX: Float, mouseY: Float) {
-        children.forEach { it.render(mouseX, mouseY) }
+        children.filter { !it.renderOnTop }.forEach { it.render(mouseX, mouseY) }
+    }
+
+    protected open fun renderTopChildren(mouseX: Float, mouseY: Float) {
+        children.filter { it.renderOnTop }.forEach { it.render(mouseX, mouseY) }
+        topChildren.forEach { it.render(mouseX, mouseY) }
     }
 
     protected abstract fun onRender(mouseX: Float, mouseY: Float)
@@ -317,7 +336,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             EventDispatcher.unregisterRoot(child)
         }
         child.parent = this
-        children.add(child)
+        if (child.renderOnTop) topChildren.add(child) else children.add(child)
     } as T
 
     @Suppress("UNCHECKED_CAST")
@@ -437,6 +456,22 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     @Suppress("UNCHECKED_CAST")
     fun setFloating(): T = apply {
         isFloating = true
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun setRenderOnTop(): T = apply {
+        renderOnTop = true
+        parent?.let { p ->
+            if (this in p.children) {
+                p.children.remove(this)
+                p.topChildren.add(this)
+            }
+        }
+    } as T
+
+    @Suppress("UNCHECKED_CAST")
+    fun setRequiresFocus(): T = apply {
+        requiresFocus = true
     } as T
 
     @Suppress("UNCHECKED_CAST")

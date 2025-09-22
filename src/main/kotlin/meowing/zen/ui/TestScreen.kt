@@ -12,7 +12,6 @@ import meowing.zen.canvas.core.animations.Manager
 import meowing.zen.canvas.core.elements.CheckBox
 import meowing.zen.canvas.core.elements.Switch
 import meowing.zen.canvas.core.elements.Slider
-import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.elements.Keybind
 import meowing.zen.canvas.core.elements.ColorPicker
 import meowing.zen.canvas.core.elements.NumberInput

@@ -20,6 +20,7 @@ open class Rectangle(
     var scrollable: Boolean = false
 ) : CanvasElement<Rectangle>(widthType, heightType) {
     var secondBorderColor: Int = borderColor
+    var gradientType: Gradient = Gradient.TopLeftToBottomRight
     var scrollOffset: Float = 0f
 
     override fun onRender(mouseX: Float, mouseY: Float) {
@@ -37,7 +38,7 @@ open class Rectangle(
 
         if (borderThickness > 0f) {
             if (borderColor != secondBorderColor) {
-                NVGRenderer.hollowGradientRect(x, y, width, height, borderThickness, borderColor, secondBorderColor, Gradient.TopLeftToBottomRight, borderRadius)
+                NVGRenderer.hollowGradientRect(x, y, width, height, borderThickness, borderColor, secondBorderColor, gradientType, borderRadius)
             } else {
                 NVGRenderer.hollowRect(x, y, width, height, borderThickness, borderColor, borderRadius)
             }
@@ -225,6 +226,10 @@ open class Rectangle(
     open fun borderColor(color: Int): Rectangle = apply {
         borderColor = color
         secondBorderColor = color
+    }
+
+    open fun borderGradient(type: Gradient): Rectangle = apply {
+        gradientType = type
     }
 
     open fun borderRadius(radius: Float): Rectangle = apply {

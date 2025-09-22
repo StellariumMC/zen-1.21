@@ -28,6 +28,7 @@ class ColorPicker(
 ) : CanvasElement<ColorPicker>(widthType, heightType) {
     var selectedColor: Color = initialColor
     private var isPickerOpen = false
+    private var isAnimating = false
 
     private val previewRect = Rectangle(selectedColor.rgb, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -41,7 +42,7 @@ class ColorPicker(
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
 
         onClick { _, _, _ ->
-            togglePicker()
+            if (!isAnimating) togglePicker()
             true
         }
     }
@@ -51,7 +52,8 @@ class ColorPicker(
     }
 
     private fun openPicker() {
-        if (isPickerOpen) return
+        if (isPickerOpen || isAnimating) return
+        isAnimating = true
 
         pickerPanel = ColorPickerPanel(selectedColor, backgroundColor)
             .setSizing(Size.Auto, Size.Auto)
@@ -65,7 +67,9 @@ class ColorPicker(
             onValueChange?.invoke(color)
         }
 
-        pickerPanel?.fadeIn(200, EasingType.EASE_OUT)
+        pickerPanel?.fadeIn(200, EasingType.EASE_OUT) {
+            isAnimating = false
+        }
 
         pickerPanel?.animateFloat(
             { 0f },
@@ -80,12 +84,14 @@ class ColorPicker(
     }
 
     private fun closePicker() {
-        if (!isPickerOpen || pickerPanel == null) return
+        if (!isPickerOpen || pickerPanel == null || isAnimating) return
+        isAnimating = true
 
         pickerPanel?.fadeOut(200, EasingType.EASE_IN) {
             getRootElement().children.remove(pickerPanel!!)
             pickerPanel!!.destroy()
             pickerPanel = null
+            isAnimating = false
         }
 
         pickerPanel?.animateFloat(
@@ -103,7 +109,7 @@ class ColorPicker(
     override fun handleMouseClick(mouseX: Float, mouseY: Float, button: Int): Boolean {
         val handled = super.handleMouseClick(mouseX, mouseY, button)
 
-        if (isPickerOpen && pickerPanel != null && !pickerPanel!!.isPointInside(mouseX, mouseY) && !isPointInside(mouseX, mouseY)) {
+        if (isPickerOpen && pickerPanel != null && !pickerPanel!!.isPointInside(mouseX, mouseY) && !isPointInside(mouseX, mouseY) && !isAnimating) {
             closePicker()
         }
 
@@ -148,6 +154,7 @@ private class ColorPickerPanel(
     private val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
         .setSizing(0f, Size.Auto, 170f,Size.Pixels)
         .ignoreMouseEvents()
+        .setRenderOnTop()
         .childOf(this)
 
     val pickerArea = ColorPickerArea()

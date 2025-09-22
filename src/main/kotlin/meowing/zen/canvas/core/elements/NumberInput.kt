@@ -87,7 +87,7 @@ class NumberInput(
 
     init {
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
-        ignoreFocus()
+        setRequiresFocus()
 
         onClick { mouseX, mouseY, button ->
             if (button != 0) return@onClick false
