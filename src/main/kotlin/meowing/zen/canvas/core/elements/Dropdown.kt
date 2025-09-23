@@ -7,16 +7,19 @@ import meowing.zen.canvas.core.animations.EasingType
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
+import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.components.Text
+import java.awt.Color
 
 class Dropdown(
     var options: List<String>,
     var selectedIndex: Int = 0,
-    val backgroundColor: Int = 0xFF171616.toInt(),
-    borderColor: Int = 0xFF606060.toInt(),
-    borderRadius: Float = 4f,
-    borderThickness: Float = 3f,
-    padding: FloatArray = floatArrayOf(4f, 4f, 4f, 4f),
+    val backgroundColor: Int = 0xFF282e3a.toInt(),
+    var iconColor: Int = 0xFF4c87f9.toInt(),
+    borderColor: Int = 0xFF0194d8.toInt(),
+    borderRadius: Float = 6f,
+    borderThickness: Float = 2f,
+    padding: FloatArray = floatArrayOf(6f, 6f, 6f, 6f),
     hoverColor: Int? = 0x80505050.toInt(),
     pressedColor: Int? = 0x80303030.toInt(),
     widthType: Size = Size.Pixels,
@@ -29,16 +32,22 @@ class Dropdown(
     private val previewRect = Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
         .ignoreMouseEvents()
+        .setGradientBorderColor(0xFF0194d8.toInt(), 0xFF062897.toInt())
         .childOf(this)
 
     private val selectedText = Text(options[selectedIndex], 0xFFFFFFFF.toInt(), fontSize)
-        .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
+        .setPositioning(Pos.ParentPixels, Pos.ParentCenter)
+        .childOf(previewRect)
+
+    val dropdownArrow = SvgImage(svgPath = "/assets/zen/dropdown.svg", color = Color(iconColor))
+        .setSizing(20f, Size.Pixels, 20f, Size.Pixels)
+        .setPositioning(80f, Pos.ParentPercent, 0f, Pos.ParentCenter)
         .childOf(previewRect)
 
     private var pickerPanel: DropDownPanel? = null
 
     init {
-        setSizing(140f, Size.Pixels, 0f, Size.Auto)
+        setSizing(180f, Size.Pixels, 0f, Size.Auto)
         setPositioning(Pos.ParentPixels, Pos.ParentPixels)
 
         onClick { _, _, _ ->
@@ -57,7 +66,7 @@ class Dropdown(
 
         pickerPanel = DropDownPanel(selectedIndex, options, fontSize = fontSize)
             .setSizing(previewRect.width, Size.Pixels, 0f, Size.Auto)
-            .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY(), Pos.ScreenPixels)
+            .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 4f, Pos.ScreenPixels)
             .childOf(getRootElement())
 
         pickerPanel?.onValueChange { index ->
@@ -124,33 +133,23 @@ class Dropdown(
 class DropDownPanel(
     selectedIndex: Int,
     options: List<String> = listOf(),
-    backgroundColor: Int = 0xFF171616.toInt(),
-    borderColor: Int = 0xFF606060.toInt(),
-    selectedColor: Int = 0xFF303030.toInt(),
+    backgroundColor: Int = 0xFF333741.toInt(),
+    borderColor: Int = 0xFF3e414b.toInt(),
+    selectedColor: Int = 0xFF2a2f35.toInt(),
     fontSize: Float = 12f,
 ) : CanvasElement<DropDownPanel>() {
-    val backgroundPopup = Rectangle(backgroundColor, borderColor, 2f, 3f, floatArrayOf(4f, 4f, 4f, 4f))
+    val backgroundPopup = Rectangle(backgroundColor, borderColor, 8f, 1f, floatArrayOf(7f, 7f, 7f, 7f))
         .setSizing(width, widthType, 120f,Size.Pixels)
         .scrollable(true)
         .childOf(this)
+        .dropShadow()
 
     init {
         setSizing(0f, Size.Auto, 0f,Size.Auto)
         setFloating()
 
-        val rect = Rectangle(selectedColor, borderColor, 2f, 1f, floatArrayOf(2f, 2f, 2f, 2f))
-            .setSizing(100f, Size.ParentPerc, 0f,Size.Auto)
-            .setPositioning(0f, Pos.ParentPixels, 1f, Pos.AfterSibling)
-            .childOf(backgroundPopup)
-
-        Text(options[selectedIndex], 0xFFFFFFFF.toInt(), fontSize)
-            .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
-            .childOf(rect)
-
         options.forEachIndexed { index, option ->
-            if(index == selectedIndex) return@forEachIndexed
-
-            val rect = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(2f, 2f, 2f, 2f), hoverColor = 0x80505050.toInt())
+            val rect = Rectangle(if(index == selectedIndex) selectedColor else backgroundColor, borderColor, 5f, 0f, floatArrayOf(5f, 5f, 5f, 5f), hoverColor = 0x80505050.toInt())
                 .setSizing(100f, Size.ParentPerc, 0f,Size.Auto)
                 .setPositioning(0f, Pos.ParentPixels, 1f, Pos.AfterSibling)
                 .onClick { _, _, _ ->
@@ -160,7 +159,7 @@ class DropDownPanel(
                 .childOf(backgroundPopup)
 
             Text(option, 0xFFFFFFFF.toInt(), fontSize)
-                .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
+                .setPositioning(Pos.ParentPixels, Pos.ParentCenter)
                 .childOf(rect)
                 .ignoreMouseEvents()
         }

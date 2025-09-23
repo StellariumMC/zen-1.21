@@ -23,6 +23,7 @@ open class Rectangle(
     var secondBorderColor: Int = borderColor
     var gradientType: Gradient = Gradient.TopLeftToBottomRight
     var scrollOffset: Float = 0f
+    var dropShadow: Boolean = false
 
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (!visible || (height - (padding[0] + padding[2])) == 0f || (width - (padding[1] + padding[3])) == 0f) return
@@ -31,6 +32,10 @@ open class Rectangle(
             pressed && pressedColor != null -> pressedColor!!
             hovered && hoverColor != null -> hoverColor!!
             else -> backgroundColor
+        }
+
+        if(dropShadow) {
+            NVGRenderer.dropShadow(x, y, width, height, 30f, 1f, borderRadius)
         }
 
         if (currentBgColor != 0) {
@@ -190,6 +195,10 @@ open class Rectangle(
             NVGRenderer.popScissor()
             NVGRenderer.pop()
         }
+    }
+
+    fun dropShadow(): Rectangle = apply {
+        dropShadow = true
     }
 
     open fun getScreenX(): Float = x
