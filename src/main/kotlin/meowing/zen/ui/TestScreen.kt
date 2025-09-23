@@ -103,7 +103,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
             .childOf(container)
 
         Dropdown(listOf("Option 1", "Option 2"), 1)
-            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .setPositioning(5f, Pos.AfterSibling, 0f, Pos.MatchSibling)
             .fontSize(16f)
             .onValueChange { index ->
                 println("Dropdown selected index: $index")
@@ -111,7 +111,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
             .childOf(container)
 
         Dropdown(listOf("Option 1", "Option 2", "Option 3"), 1)
-            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .setPositioning(5f, Pos.AfterSibling, 0f, Pos.MatchSibling)
             .fontSize(16f)
             .onValueChange { index ->
                 println("Dropdown selected index: $index")
@@ -119,7 +119,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
             .childOf(container)
 
         Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4"), 1)
-            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .setPositioning(5f, Pos.AfterSibling, 0f, Pos.MatchSibling)
             .fontSize(16f)
             .onValueChange { index ->
                 println("Dropdown selected index: $index")
