@@ -9,7 +9,6 @@ import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.utils.rendering.Gradient
 import meowing.zen.utils.rendering.NVGRenderer
-import java.awt.Color
 
 open class Rectangle(
     var backgroundColor: Int = 0x80000000.toInt(),
@@ -72,6 +71,8 @@ open class Rectangle(
     override fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
         if (!visible) return false
 
+        if (!isMouseOnVisible(mouseX, mouseY)) return false
+
         val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
         val childHandled = children.reversed().any { it.handleMouseScroll(mouseX, adjustedMouseY, horizontal, vertical) }
 
@@ -116,11 +117,19 @@ open class Rectangle(
 
         if (isHovered) mouseMoveListeners.forEach { it(mouseX, mouseY) }
 
-        return children.reversed().any { it.handleMouseMove(mouseX, adjustedMouseY) } || isHovered
+        val childHandled = if (scrollable && !isMouseOnVisible(mouseX, mouseY)) {
+            false
+        } else {
+            children.reversed().any { it.handleMouseMove(mouseX, adjustedMouseY) }
+        }
+
+        return childHandled || isHovered
     }
 
     override fun handleMouseClick(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
+
+        if (scrollable && !isMouseOnVisible(mouseX, mouseY)) return false
 
         val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
         val childHandled = children.reversed().any { it.handleMouseClick(mouseX, adjustedMouseY, button) }
@@ -143,16 +152,32 @@ open class Rectangle(
         val wasPressed = isPressed
         isPressed = false
 
-        val childHandled = children.reversed().any { it.handleMouseRelease(mouseX, adjustedMouseY, button) }
+        val childHandled = if (scrollable && !isMouseOnVisible(mouseX, mouseY)) {
+            false
+        } else {
+            children.reversed().any { it.handleMouseRelease(mouseX, adjustedMouseY, button) }
+        }
+
         return childHandled || (wasPressed && isPointInside(mouseX, mouseY) && (mouseReleaseListeners.any { it(mouseX, mouseY, button) } || mouseReleaseListeners.isEmpty()))
     }
 
-    private fun getContentHeight(): Float {
+    fun getContentHeight(): Float {
         val visibleChildren = children.filter { !it.isFloating }
         if (visibleChildren.isEmpty()) return 0f
 
         val bottomChild = visibleChildren.maxByOrNull { it.y + it.height } ?: return 0f
         return bottomChild.y + bottomChild.height - (y + padding[0])
+    }
+
+    fun isMouseOnVisible(mouseX: Float, mouseY: Float): Boolean {
+        if (!scrollable) return true
+
+        val contentX = x + padding[3]
+        val contentY = y + padding[0]
+        val viewWidth = width - padding[1] - padding[3]
+        val viewHeight = height - padding[0] - padding[2]
+
+        return mouseX >= contentX && mouseX <= contentX + viewWidth && mouseY >= contentY && mouseY <= contentY + viewHeight
     }
 
     public override fun getAutoWidth(): Float {
@@ -169,7 +194,6 @@ open class Rectangle(
         val visibleChildren = children.filter { it.visible && !it.isFloating }
         if (visibleChildren.isEmpty()) return padding[0] + padding[2]
 
-        // Find topmost and bottommost edges
         val minY = visibleChildren.minOf { it.y }
         val maxY = visibleChildren.maxOf { it.y + it.height }
 

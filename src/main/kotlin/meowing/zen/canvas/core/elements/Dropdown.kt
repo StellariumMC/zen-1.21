@@ -155,7 +155,7 @@ class DropDownPanel(
         setFloating()
 
         options.forEachIndexed { index, option ->
-            val rect = Rectangle(if(index == selectedIndex) selectedColor else backgroundColor, borderColor, 5f, 0f, floatArrayOf(5f, 5f, 5f, 5f), hoverColor = 0x80505050.toInt())
+            val rect = Rectangle(if (index == selectedIndex) selectedColor else backgroundColor, borderColor, 5f, 0f, floatArrayOf(5f, 5f, 5f, 5f), hoverColor = 0x80505050.toInt())
                 .setSizing(100f, Size.ParentPerc, 0f,Size.Auto)
                 .setPositioning(0f, Pos.ParentPixels, 1f, Pos.AfterSibling)
                 .onClick { _, _, _ ->
