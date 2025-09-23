@@ -6,6 +6,8 @@ import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Tooltip
+import meowing.zen.features.Debug
+import meowing.zen.utils.rendering.NVGRenderer
 import net.minecraft.client.util.Window
 
 enum class Size {
@@ -30,7 +32,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var heightType: Size = Size.Pixels
 ) {
     val children: MutableList<CanvasElement<*>> = mutableListOf()
-    val topChildren: MutableList<CanvasElement<*>> = mutableListOf()
 
     var xPositionConstraint = Pos.ParentPixels
     var yPositionConstraint = Pos.ParentPixels
@@ -50,7 +51,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     var isFocused: Boolean = false
     var isFloating: Boolean = false
     var ignoreFocus: Boolean = false
-    var renderOnTop: Boolean = false
     var requiresFocus: Boolean = false
 
     val window: Window get() = mc.window
@@ -77,9 +77,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     open fun destroy() {
         EventDispatcher.unregisterRoot(this)
         children.forEach { it.destroy() }
-        topChildren.forEach { it.destroy() }
         children.clear()
-        topChildren.clear()
         mouseEnterListeners.clear()
         mouseExitListeners.clear()
         mouseMoveListeners.clear()
@@ -295,7 +293,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     private fun unfocusAll() {
         if (isFocused) unfocus()
         children.forEach { it.unfocusAll() }
-        topChildren.forEach { it.unfocusAll() }
     }
 
     fun getRootElement(): CanvasElement<*> {
@@ -318,16 +315,21 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
         onRender(mouseX, mouseY)
         renderChildren(mouseX, mouseY)
-        renderTopChildren(mouseX, mouseY)
+        if (Debug.debugmode) renderDebugHitbox()
+    }
+
+    private fun renderDebugHitbox() {
+        val color = when {
+            isPressed -> 0xFF0000FF.toInt()
+            isHovered -> 0xFFFF00FF.toInt()
+            else -> 0xFF00FFFF.toInt()
+        }
+
+        NVGRenderer.hollowRect(x, y, width, height, 1f, color, 0f)
     }
 
     protected open fun renderChildren(mouseX: Float, mouseY: Float) {
-        children.filter { !it.renderOnTop }.forEach { it.render(mouseX, mouseY) }
-    }
-
-    protected open fun renderTopChildren(mouseX: Float, mouseY: Float) {
-        children.filter { it.renderOnTop }.forEach { it.render(mouseX, mouseY) }
-        topChildren.forEach { it.render(mouseX, mouseY) }
+        children.forEach { it.render(mouseX, mouseY) }
     }
 
     protected abstract fun onRender(mouseX: Float, mouseY: Float)
@@ -340,7 +342,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             EventDispatcher.unregisterRoot(child)
         }
         child.parent = this
-        if (child.renderOnTop) topChildren.add(child) else children.add(child)
+        children.add(child)
     } as T
 
     @Suppress("UNCHECKED_CAST")
@@ -460,17 +462,6 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     @Suppress("UNCHECKED_CAST")
     fun setFloating(): T = apply {
         isFloating = true
-    } as T
-
-    @Suppress("UNCHECKED_CAST")
-    fun setRenderOnTop(): T = apply {
-        renderOnTop = true
-        parent?.let { p ->
-            if (this in p.children) {
-                p.children.remove(this)
-                p.topChildren.add(this)
-            }
-        }
     } as T
 
     @Suppress("UNCHECKED_CAST")

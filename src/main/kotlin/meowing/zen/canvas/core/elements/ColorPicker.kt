@@ -8,7 +8,6 @@ import meowing.zen.canvas.core.animations.animateFloat
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.canvas.core.components.Rectangle
-import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.rendering.Gradient
 import meowing.zen.utils.rendering.NVGRenderer
 import java.awt.Color
@@ -154,7 +153,6 @@ private class ColorPickerPanel(
     val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
         .setSizing(0f, Size.Auto, 170f,Size.Pixels)
         .ignoreMouseEvents()
-        .setRenderOnTop()
         .childOf(this)
 
     val pickerArea = ColorPickerArea()

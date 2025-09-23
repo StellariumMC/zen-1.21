@@ -255,7 +255,7 @@ object NVGRenderer {
         NanoVG.nvgFill(vg)
     }
 
-    fun text(text: String, x: Float, y: Float, size: Float, color: Int, font: Font) {
+    fun text(text: String, x: Float, y: Float, size: Float, color: Int, font: Font = defaultFont) {
         NanoVG.nvgFontSize(vg, size)
         NanoVG.nvgFontFaceId(vg, getFontID(font))
         color(color)
@@ -263,7 +263,7 @@ object NVGRenderer {
         NanoVG.nvgText(vg, x, y + .5f, text)
     }
 
-    fun textShadow(text: String, x: Float, y: Float, size: Float, color: Int, font: Font) {
+    fun textShadow(text: String, x: Float, y: Float, size: Float, color: Int, font: Font = defaultFont) {
         NanoVG.nvgFontFaceId(vg, getFontID(font))
         NanoVG.nvgFontSize(vg, size)
         color(-16777216)
