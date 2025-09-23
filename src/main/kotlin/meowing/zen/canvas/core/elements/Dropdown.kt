@@ -17,7 +17,7 @@ class Dropdown(
     var options: List<String>,
     var selectedIndex: Int = 0,
     val backgroundColor: Int = 0xFF282e3a.toInt(),
-    var iconColor: Int = 0xFF4c87f9.toInt(),
+    iconColor: Int = 0xFF4c87f9.toInt(),
     borderColor: Int = 0xFF0194d8.toInt(),
     borderRadius: Float = 6f,
     borderThickness: Float = 2f,
@@ -66,6 +66,8 @@ class Dropdown(
         if (isPickerOpen || isAnimating) return
         isAnimating = true
 
+        dropdownArrow.rotateTo(180f, 200)
+
         pickerPanel = DropDownPanel(selectedIndex, options, fontSize = fontSize)
             .setSizing(previewRect.width, Size.Pixels, 0f, Size.Auto)
             .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 4f, Pos.ScreenPixels)
@@ -95,6 +97,8 @@ class Dropdown(
     private fun closePicker() {
         if (!isPickerOpen || pickerPanel == null || isAnimating) return
         isAnimating = true
+
+        dropdownArrow.rotateTo(0f, 200)
 
         pickerPanel?.backgroundPopup?.fadeOut(200, EasingType.EASE_IN) {
             getRootElement().children.remove(pickerPanel!!)
@@ -174,5 +178,4 @@ class DropDownPanel(
     override fun getAutoHeight(): Float {
         return backgroundPopup.height
     }
-
 }

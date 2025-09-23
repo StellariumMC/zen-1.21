@@ -3,6 +3,8 @@ package meowing.zen.canvas.core.components
 import meowing.zen.canvas.core.CanvasElement
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
+import meowing.zen.canvas.core.animations.EasingType
+import meowing.zen.canvas.core.animations.animateFloat
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
 import meowing.zen.utils.rendering.Gradient
@@ -25,6 +27,7 @@ open class Rectangle(
     var gradientType: Gradient = Gradient.TopLeftToBottomRight
     var scrollOffset: Float = 0f
     var dropShadow: Boolean = false
+    var rotation: Float = 0f
 
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (!visible || (height - (padding[0] + padding[2])) == 0f || (width - (padding[1] + padding[3])) == 0f) return
@@ -33,6 +36,16 @@ open class Rectangle(
             pressed && pressedColor != null -> pressedColor!!
             hovered && hoverColor != null -> hoverColor!!
             else -> backgroundColor
+        }
+
+        val centerX = x + width / 2f
+        val centerY = y + height / 2f
+
+        if (rotation != 0f) {
+            NVGRenderer.push()
+            NVGRenderer.translate(centerX, centerY)
+            NVGRenderer.rotate(Math.toRadians(rotation.toDouble()).toFloat())
+            NVGRenderer.translate(-centerX, -centerY)
         }
 
         if(dropShadow) {
@@ -49,6 +62,10 @@ open class Rectangle(
             } else {
                 NVGRenderer.hollowRect(x, y, width, height, borderThickness, borderColor, borderRadius)
             }
+        }
+
+        if (rotation != 0f) {
+            NVGRenderer.pop()
         }
     }
 
@@ -84,15 +101,15 @@ open class Rectangle(
             isHovered && !wasHovered -> {
                 mouseEnterListeners.forEach { it(mouseX, mouseY) }
                 tooltipElement?.let {
-                    it.fadeIn(200, meowing.zen.canvas.core.animations.EasingType.EASE_OUT)
-                    it.innerText.fadeIn(200, meowing.zen.canvas.core.animations.EasingType.EASE_OUT)
+                    it.fadeIn(200, EasingType.EASE_OUT)
+                    it.innerText.fadeIn(200, EasingType.EASE_OUT)
                 }
             }
             !isHovered && wasHovered -> {
                 mouseExitListeners.forEach { it(mouseX, mouseY) }
                 tooltipElement?.let {
-                    it.fadeOut(200, meowing.zen.canvas.core.animations.EasingType.EASE_OUT)
-                    it.innerText.fadeOut(200, meowing.zen.canvas.core.animations.EasingType.EASE_OUT)
+                    it.fadeOut(200, EasingType.EASE_OUT)
+                    it.innerText.fadeOut(200, EasingType.EASE_OUT)
                 }
             }
         }
@@ -196,6 +213,11 @@ open class Rectangle(
             NVGRenderer.popScissor()
             NVGRenderer.pop()
         }
+    }
+
+    fun rotateTo(angle: Float, duration: Long = 300, type: EasingType = EasingType.EASE_OUT, onComplete: (() -> Unit)? = null): Rectangle {
+        animateFloat({ rotation }, { rotation = it }, angle, duration, type, onComplete = onComplete)
+        return this
     }
 
     fun dropShadow(): Rectangle = apply {
