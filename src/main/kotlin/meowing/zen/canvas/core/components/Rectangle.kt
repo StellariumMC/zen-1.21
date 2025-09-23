@@ -1,6 +1,7 @@
 package meowing.zen.canvas.core.components
 
 import meowing.zen.canvas.core.CanvasElement
+import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
@@ -181,8 +182,8 @@ open class Rectangle(
             val oldY = child.yConstraint
             try {
                 if(!child.isFloating) {
-                    child.xConstraint += padding[3]
-                    child.yConstraint += padding[0]
+                    if(child.xPositionConstraint != Pos.MatchSibling && child.xPositionConstraint != Pos.ScreenPixels) child.xConstraint += padding[3]
+                    if(child.yPositionConstraint != Pos.MatchSibling && child.yPositionConstraint != Pos.ScreenPixels) child.yConstraint += padding[0]
                 }
                 child.render(mouseX, mouseY)
             } finally {
