@@ -102,6 +102,30 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
             }
             .childOf(container)
 
+        Dropdown(listOf("Option 1", "Option 2"), 1)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .fontSize(16f)
+            .onValueChange { index ->
+                println("Dropdown selected index: $index")
+            }
+            .childOf(container)
+
+        Dropdown(listOf("Option 1", "Option 2", "Option 3"), 1)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .fontSize(16f)
+            .onValueChange { index ->
+                println("Dropdown selected index: $index")
+            }
+            .childOf(container)
+
+        Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4"), 1)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .fontSize(16f)
+            .onValueChange { index ->
+                println("Dropdown selected index: $index")
+            }
+            .childOf(container)
+
         Text("Number Input Components")
             .color(0xFF10B981.toInt())
             .fontSize(20f)

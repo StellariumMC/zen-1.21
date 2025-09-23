@@ -10,6 +10,8 @@ import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.SvgImage
 import meowing.zen.canvas.core.components.Text
 import java.awt.Color
+import kotlin.math.max
+import kotlin.math.min
 
 class Dropdown(
     var options: List<String>,
@@ -132,7 +134,7 @@ class Dropdown(
 
 class DropDownPanel(
     selectedIndex: Int,
-    options: List<String> = listOf(),
+    var options: List<String> = listOf(),
     backgroundColor: Int = 0xFF333741.toInt(),
     borderColor: Int = 0xFF3e414b.toInt(),
     selectedColor: Int = 0xFF2a2f35.toInt(),
@@ -166,7 +168,7 @@ class DropDownPanel(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        backgroundPopup.setSizing(width, widthType, 170f,Size.Pixels)
+        backgroundPopup.setSizing(width, widthType, min(max(75f,options.size * 37f), 170f),Size.Pixels)
     }
 
     override fun getAutoHeight(): Float {
