@@ -517,7 +517,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
                         posSetter(Pos.ParentPixels)
                         valSetter(con.value)
                     }
-                    else -> {}
+                    is Constraint.SizeConstraint -> throw IllegalArgumentException("Cannot apply a size constraint to a position property (x or y).")
                 }
             }
         }
