@@ -523,20 +523,22 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         }
 
         fun applySize(con: Constraint?, typeSetter: (Size) -> Unit, valSetter: (Float) -> Unit, percSetter: (Float) -> Unit) {
-            when (con) {
-                is Constraint.SizeConstraint -> {
-                    typeSetter(con.size)
-                    when (con.size) {
-                        Size.Pixels -> valSetter(con.value)
-                        Size.ParentPerc -> percSetter(con.value)
-                        Size.Auto -> { /* Value is ignored for Auto size */ }
+            con?.let {
+                when (con) {
+                    is Constraint.SizeConstraint -> {
+                        typeSetter(con.size)
+                        when (con.size) {
+                            Size.Pixels -> valSetter(con.value)
+                            Size.ParentPerc -> percSetter(con.value)
+                            Size.Auto -> { /* Value is ignored for Auto size */ }
+                        }
                     }
+                    is Constraint.RawPixels -> {
+                        typeSetter(Size.Pixels)
+                        valSetter(con.value)
+                    }
+                    is Constraint.PosConstraint -> throw IllegalArgumentException("Cannot apply a position constraint to a size property (width or height).")
                 }
-                is Constraint.RawPixels -> {
-                    typeSetter(Size.Pixels)
-                    valSetter(con.value)
-                }
-                is Constraint.PosConstraint -> throw IllegalArgumentException("Cannot apply a position constraint to a size property (width or height).")
             }
         }
 
