@@ -570,4 +570,4 @@ fun percentParent(value: Float): Constraint = Constraint.SizeConstraint(Size.Par
 val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0f)
 
 operator fun Pos.plus(offset: Float): Constraint = Constraint.PosConstraint(this, offset)
-operator fun Float.plus(pos: Pos): Constraint = Constraint.PosConstraint(pos, this)
+operator fun Size.plus(offset: Float): Constraint = Constraint.SizeConstraint(this, offset)
