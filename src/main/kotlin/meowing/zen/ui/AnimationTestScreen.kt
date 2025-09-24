@@ -83,7 +83,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .borderRadius(8f)
             .constrain {
                 x = 50f.px
-                y = 60f.px
+                y = 30f.px
                 width = 60f.px
                 height = 60f.px
             }
