@@ -56,7 +56,7 @@ class ColorPicker(
 
         pickerPanel = ColorPickerPanel(selectedColor, backgroundColor)
             .setSizing(Size.Auto, Size.Auto)
-            .setPositioning(previewRect.getScreenX() + 5f, Pos.ScreenPixels, previewRect.getScreenY() + 5f, Pos.ScreenPixels)
+            .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 3f, Pos.ScreenPixels)
             .setFloating()
             .childOf(getRootElement())
 
@@ -121,6 +121,7 @@ class ColorPicker(
 
         previewRect.hoverColor = selectedColor.darker().rgb
         previewRect.pressedColor = selectedColor.darker().rgb
+        pickerPanel?.setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 3f, Pos.ScreenPixels)
     }
 
     override fun destroy() {
