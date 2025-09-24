@@ -9,6 +9,7 @@ import meowing.zen.canvas.core.components.Text
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
 import meowing.zen.canvas.core.animations.*
+import meowing.zen.canvas.core.px
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import meowing.zen.utils.rendering.NVGRenderer
@@ -80,8 +81,12 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
         val animatedBox = Rectangle()
             .backgroundColor(0xFF3B82F6.toInt())
             .borderRadius(8f)
-            .setSizing(60f, Size.Pixels, 60f, Size.Pixels)
-            .setPositioning(50f, Pos.ParentPixels, 30f, Pos.ParentPixels)
+            .constrain {
+                x = 50.px
+                y = 60.px
+                width = 60.px
+                height = 60.px
+            }
             .fadeIn(300)
             .childOf(boxContainer)
 

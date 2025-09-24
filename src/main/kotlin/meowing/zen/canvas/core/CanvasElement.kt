@@ -28,6 +28,12 @@ enum class Pos {
     MatchSibling
 }
 
+sealed class Constraint {
+    data class SizeConstraint(val size: Size, val value: Int) : Constraint()
+    data class PosConstraint(val pos: Pos, val offset: Int) : Constraint()
+}
+
+
 abstract class CanvasElement<T : CanvasElement<T>>(
     var widthType: Size = Size.Pixels,
     var heightType: Size = Size.Pixels
@@ -496,7 +502,71 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         visible = false
     } as T
 
+    @Suppress("UNCHECKED_CAST")
+    fun constrain(block: ConstraintBuilder.() -> Unit): T {
+        val b = ConstraintBuilder().apply(block)
+
+        b.x?.let {
+            when (it) {
+                is Constraint.PosConstraint -> {
+                    xPositionConstraint = it.pos
+                    xConstraint = it.offset.toFloat()
+                }
+                is Constraint.SizeConstraint -> {
+                    xPositionConstraint = Pos.ParentPixels
+                    xConstraint = it.value.toFloat()
+                }
+            }
+        }
+
+        b.y?.let {
+            when (it) {
+                is Constraint.PosConstraint -> {
+                    yPositionConstraint = it.pos
+                    yConstraint = it.offset.toFloat()
+                }
+                is Constraint.SizeConstraint -> {
+                    yPositionConstraint = Pos.ParentPixels
+                    yConstraint = it.value.toFloat()
+                }
+            }
+        }
+
+        b.width?.let {
+            if (it is Constraint.SizeConstraint) {
+                widthType = it.size
+                if (it.size == Size.Pixels) width = it.value.toFloat()
+                else widthPercent = it.value.toFloat()
+            }
+        }
+
+        b.height?.let {
+            if (it is Constraint.SizeConstraint) {
+                heightType = it.size
+                if (it.size == Size.Pixels) height = it.value.toFloat()
+                else heightPercent = it.value.toFloat()
+            }
+        }
+
+        return this as T
+    }
+
+    class ConstraintBuilder {
+        var x: Constraint? = null
+        var y: Constraint? = null
+        var width: Constraint? = null
+        var height: Constraint? = null
+    }
+
     val hovered: Boolean get() = isHovered
     val pressed: Boolean get() = isPressed
     val focused: Boolean get() = isFocused
 }
+
+//DSL suff
+val Int.px: Constraint get() = Constraint.SizeConstraint(Size.Pixels, this)
+fun percentParent(value: Int): Constraint = Constraint.SizeConstraint(Size.ParentPerc, value)
+val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0)
+
+operator fun Pos.plus(offset: Int): Constraint = Constraint.PosConstraint(this, offset)
+operator fun Int.plus(pos: Pos): Constraint = Constraint.PosConstraint(pos, this)
