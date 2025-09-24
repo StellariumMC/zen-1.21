@@ -125,7 +125,7 @@ fun <T : CanvasElement<T>> T.bounceScale(
     onComplete: (() -> Unit)? = null
 ): T {
     val id = hashCode().toString()
-    Manager.stopAnimations(id, AnimationType.SIZE)
+    AnimationManager.stopAnimations(id, AnimationType.SIZE)
     originalSizes.putIfAbsent(id, width to height)
 
     val (originalWidth, originalHeight) = originalSizes[id]!!

@@ -3,12 +3,12 @@ package meowing.zen.ui
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.canvas.CanvasScreen
 import meowing.zen.canvas.core.elements.Button
 import meowing.zen.canvas.core.components.Rectangle
 import meowing.zen.canvas.core.components.Text
 import meowing.zen.canvas.core.Pos
 import meowing.zen.canvas.core.Size
-import meowing.zen.canvas.core.animations.Manager
 import meowing.zen.canvas.core.elements.CheckBox
 import meowing.zen.canvas.core.elements.Switch
 import meowing.zen.canvas.core.elements.Slider
@@ -19,14 +19,10 @@ import meowing.zen.canvas.core.elements.NumberInput
 import meowing.zen.canvas.core.elements.TextInput
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
-import meowing.zen.utils.rendering.NVGRenderer
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
 import java.awt.Color
-import net.minecraft.text.Text as MinecraftText
 
-class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) {
+class ButtonTestScreen : CanvasScreen() {
     private val rootContainer = Rectangle()
         .backgroundColor(0x80121212.toInt())
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -34,16 +30,9 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
 
     private var testCounter = 0
 
-    override fun init() {
-        super.init()
+    override fun afterInitialization() {
+        rootContainer.childOf(window)
         setupUI()
-    }
-
-    override fun close() {
-        super.close()
-        Manager.clear()
-        rootContainer.destroy()
-        NVGRenderer.cleanCache()
     }
 
     private fun setupUI() {
@@ -403,15 +392,6 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
             .fontSize(14f)
             .setPositioning(0f, Pos.ParentCenter, 20f, Pos.AfterSibling)
             .childOf(container)
-    }
-
-    override fun render(drawContext: DrawContext?, mouseX: Int, mouseY: Int, delta: Float) {
-        NVGRenderer.beginFrame(mc.window.width.toFloat(), mc.window.height.toFloat())
-        NVGRenderer.push()
-        rootContainer.render(mouseX.toFloat(), mouseY.toFloat())
-        Manager.update()
-        NVGRenderer.pop()
-        NVGRenderer.endFrame()
     }
 
     override fun shouldPause(): Boolean = false

@@ -17,7 +17,7 @@ abstract class Animation<T>(
         if (!isStarted) {
             startTime = System.currentTimeMillis()
             isStarted = true
-            Manager.register(this)
+            AnimationManager.register(this)
         }
     }
 

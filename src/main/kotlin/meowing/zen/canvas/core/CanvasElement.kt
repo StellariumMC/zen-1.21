@@ -1,6 +1,7 @@
 package meowing.zen.canvas.core
 
 import meowing.zen.Zen.Companion.mc
+import meowing.zen.canvas.CanvasWindow
 import meowing.zen.canvas.core.animations.EasingType
 import meowing.zen.canvas.core.animations.fadeIn
 import meowing.zen.canvas.core.animations.fadeOut
@@ -57,7 +58,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     val screenWidth: Int get() = window.width
     val screenHeight: Int get() = window.height
 
-    var parent: CanvasElement<*>? = null
+    var parent: Any? = null
     var tooltipElement: Tooltip? = null
 
     val mouseEnterListeners = mutableListOf<(Float, Float) -> Unit>()
@@ -70,12 +71,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     var onValueChange: ((Any) -> Unit)? = null
 
-    init {
-        if (parent == null) EventDispatcher.registerRoot(this)
-    }
-
     open fun destroy() {
-        EventDispatcher.unregisterRoot(this)
         children.forEach { it.destroy() }
         children.clear()
         mouseEnterListeners.clear()
@@ -90,8 +86,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     fun findFirstVisibleParent(): CanvasElement<*>? {
         var current = parent
         while (current != null) {
-            if (current.visible) return current
-            current = current.parent
+            if (current is CanvasElement<*> && current.visible) return current
+            if (current is CanvasWindow) return null
+            current = if (current is CanvasElement<*>) current.parent else null
         }
         return null
     }
@@ -100,13 +97,12 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         width = when (widthType) {
             Size.Auto -> getAutoWidth()
             Size.ParentPerc -> {
-                if(parent == null) {
+                val parentElement = findFirstVisibleParent()
+                if (parentElement == null) {
                     screenWidth * (widthPercent / 100f)
                 } else {
-                    val thisparent = findFirstVisibleParent()!!
-                    var modifiedWidth = thisparent.width.times(widthPercent / 100f)
-
-                    if (thisparent is Rectangle) modifiedWidth -= (thisparent.padding[1] + thisparent.padding[3])
+                    var modifiedWidth = parentElement.width * (widthPercent / 100f)
+                    if (parentElement is Rectangle) modifiedWidth -= (parentElement.padding[1] + parentElement.padding[3])
                     modifiedWidth
                 }
             }
@@ -118,13 +114,12 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         height = when (heightType) {
             Size.Auto -> getAutoHeight()
             Size.ParentPerc -> {
-                if (parent == null) {
+                val parentElement = findFirstVisibleParent()
+                if (parentElement == null) {
                     screenHeight * (heightPercent / 100f)
                 } else {
-                    val thisparent = findFirstVisibleParent()!!
-                    var modifiedHeight = thisparent.height.times(heightPercent / 100f)
-
-                    if (thisparent is Rectangle) modifiedHeight -= (thisparent.padding[0] + thisparent.padding[2])
+                    var modifiedHeight = parentElement.height * (heightPercent / 100f)
+                    if (parentElement is Rectangle) modifiedHeight -= (parentElement.padding[0] + parentElement.padding[2])
                     modifiedHeight
                 }
             }
@@ -157,19 +152,25 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             }
             Pos.ScreenCenter -> (screenWidth / 2f) - (width / 2f) + xConstraint
             Pos.AfterSibling -> {
-                val index = parent?.children?.indexOf(this) ?: -1
-                if (index > 0) {
-                    val prev = parent!!.children[index - 1]
-                    prev.x + prev.width + xConstraint
-                } else {
-                    if (visibleParent != null) visibleParent.x + xConstraint else xConstraint
-                }
+                val parentElement = parent
+                if (parentElement is CanvasElement<*>) {
+                    val index = parentElement.children.indexOf(this)
+                    if (index > 0) {
+                        val prev = parentElement.children[index - 1]
+                        prev.x + prev.width + xConstraint
+                    } else {
+                        if (visibleParent != null) visibleParent.x + xConstraint else xConstraint
+                    }
+                } else xConstraint
             }
             Pos.MatchSibling -> {
-                val index = parent?.children?.indexOf(this) ?: -1
-                if (index > 0) {
-                    val prev = parent!!.children[index - 1]
-                    prev.x
+                val parentElement = parent
+                if (parentElement is CanvasElement<*>) {
+                    val index = parentElement.children.indexOf(this)
+                    if (index > 0) {
+                        val prev = parentElement.children[index - 1]
+                        prev.x
+                    } else xConstraint
                 } else xConstraint
             }
         }
@@ -190,27 +191,34 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             }
             Pos.ScreenCenter -> (screenHeight / 2f) - (height / 2f) + yConstraint
             Pos.AfterSibling -> {
-                val index = parent?.children?.indexOf(this) ?: -1
-                if (index > 0) {
-                    val prev = parent!!.children[index - 1]
-                    (prev.y + prev.height + yConstraint)
-                } else {
-                    if (visibleParent != null) visibleParent.y + yConstraint else yConstraint
-                }
+                val parentElement = parent
+                if (parentElement is CanvasElement<*>) {
+                    val index = parentElement.children.indexOf(this)
+                    if (index > 0) {
+                        val prev = parentElement.children[index - 1]
+                        (prev.y + prev.height + yConstraint)
+                    } else {
+                        if (visibleParent != null) visibleParent.y + yConstraint else yConstraint
+                    }
+                } else yConstraint
             }
             Pos.MatchSibling -> {
-                val index = parent?.children?.indexOf(this) ?: -1
-                if (index > 0) {
-                    val prev = parent!!.children[index - 1]
-                    if (prev is Rectangle) {
-                        prev.y + yConstraint - (prev.padding[0] + prev.padding[2])
-                    } else prev.y + yConstraint
+                val parentElement = parent
+                if (parentElement is CanvasElement<*>) {
+                    val index = parentElement.children.indexOf(this)
+                    if (index > 0) {
+                        val prev = parentElement.children[index - 1]
+                        if (prev is Rectangle) {
+                            prev.y + yConstraint - (prev.padding[0] + prev.padding[2])
+                        } else prev.y + yConstraint
+                    } else yConstraint
                 } else yConstraint
             }
         }
     }
 
-    fun isPointInside(mouseX: Float, mouseY: Float): Boolean = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
+    fun isPointInside(mouseX: Float, mouseY: Float): Boolean =
+        mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height
 
     open fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
         if (!visible) return false
@@ -301,12 +309,14 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     fun getRootElement(): CanvasElement<*> {
         var current: CanvasElement<*> = this
-
-        while (current.parent != null) {
-            current = current.parent!!
+        while (current.parent is CanvasElement<*>) {
+            current = current.parent as CanvasElement<*>
         }
-
         return current
+    }
+
+    open fun onWindowResize() {
+        children.forEach { it.onWindowResize() }
     }
 
     open fun render(mouseX: Float, mouseY: Float) {
@@ -338,13 +348,16 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 
     protected abstract fun onRender(mouseX: Float, mouseY: Float)
 
-    fun childOf(parent: CanvasElement<*>): T = apply { parent.addChild(this) } as T
+    fun childOf(parent: CanvasElement<*>): T = apply {
+        parent.addChild(this)
+    } as T
+
+    fun childOf(parent: CanvasWindow): T = apply {
+        parent.addChild(this)
+    } as T
 
     @Suppress("UNCHECKED_CAST")
     fun addChild(child: CanvasElement<*>): T = apply {
-        if (child.parent == null) {
-            EventDispatcher.unregisterRoot(child)
-        }
         child.parent = this
         children.add(child)
     } as T

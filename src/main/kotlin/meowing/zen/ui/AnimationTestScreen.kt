@@ -1,6 +1,5 @@
 package meowing.zen.ui
 
-import com.mojang.blaze3d.opengl.GlStateManager
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
@@ -33,14 +32,14 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
 
     override fun close() {
         super.close()
-        Manager.clear()
+        AnimationManager.clear()
         rootContainer.destroy()
     }
 
     override fun tick() {
         super.tick()
-        Manager.update()
-        statusText?.text("Active Animations: ${Manager.activeCount}")
+        AnimationManager.update()
+        statusText?.text("Active Animations: ${AnimationManager.activeCount}")
     }
 
     private fun setupUI() {
@@ -373,7 +372,7 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .padding(8f, 16f, 8f, 16f)
             .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
             .onClick { _, _, _ ->
-                Manager.clear()
+                AnimationManager.clear()
                 true
             }
             .childOf(rightColumn)

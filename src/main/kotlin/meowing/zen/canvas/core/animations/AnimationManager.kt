@@ -1,6 +1,6 @@
 package meowing.zen.canvas.core.animations
 
-object Manager {
+object AnimationManager {
     private val activeAnimations = mutableListOf<Animation<*>>()
 
     val activeCount: Int
@@ -34,6 +34,7 @@ object Manager {
         } else {
             activeAnimations.filter { it.elementId == elementId }
         }
+
         activeAnimations.removeAll(toRemove.toSet())
     }
 
