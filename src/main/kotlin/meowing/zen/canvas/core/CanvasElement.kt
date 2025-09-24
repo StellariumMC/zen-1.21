@@ -562,7 +562,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     val focused: Boolean get() = isFocused
 }
 
-//DSL suff
+// Constraint DSL helpers
 val Float.px: Constraint get() = Constraint.RawPixels(this)
 val Int.px: Constraint get() = Constraint.RawPixels(this.toFloat())
 
