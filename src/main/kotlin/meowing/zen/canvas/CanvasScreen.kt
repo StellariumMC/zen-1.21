@@ -56,6 +56,4 @@ abstract class CanvasScreen : Screen(Text.literal("Canvas Screen")) {
         super.resize(client, width, height)
         window.onWindowResize()
     }
-
-    public override fun applyBlur() {}
 }
