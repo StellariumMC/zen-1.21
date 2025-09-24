@@ -30,6 +30,7 @@ class Dropdown(
     var fontSize = 12f
     private var isPickerOpen = false
     private var isAnimating = false
+    private var lastPosition = Pair(0f, 0f)
 
     private val previewRect = Rectangle(backgroundColor, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -68,9 +69,13 @@ class Dropdown(
 
         dropdownArrow.rotateTo(180f, 200)
 
-        pickerPanel = DropDownPanel(selectedIndex, options, fontSize = fontSize)
+        val currentX = previewRect.getScreenX()
+        val currentY = previewRect.getScreenY() + previewRect.height + 4f
+        lastPosition = Pair(currentX, currentY)
+
+        pickerPanel = DropDownPanel(selectedIndex, options, fontSize = fontSize, sourceDropdown = previewRect)
             .setSizing(previewRect.width, Size.Pixels, 0f, Size.Auto)
-            .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 4f, Pos.ScreenPixels)
+            .setPositioning(currentX, Pos.ScreenPixels, currentY, Pos.ScreenPixels)
             .childOf(getRootElement())
 
         pickerPanel?.onValueChange { index ->
@@ -90,6 +95,7 @@ class Dropdown(
     override fun getAutoWidth(): Float {
         return previewRect.getAutoWidth()
     }
+
     override fun getAutoHeight(): Float {
         return previewRect.getAutoHeight()
     }
@@ -120,12 +126,23 @@ class Dropdown(
         return handled
     }
 
+    private fun updatePickerPosition() {
+        val currentX = previewRect.getScreenX()
+        val currentY = previewRect.getScreenY() + previewRect.height + 4f
+
+        if (lastPosition.first != currentX || lastPosition.second != currentY) {
+            lastPosition = Pair(currentX, currentY)
+            pickerPanel?.setPositioning(currentX, Pos.ScreenPixels, currentY, Pos.ScreenPixels)
+        }
+    }
+
     override fun onRender(mouseX: Float, mouseY: Float) {
         previewRect.isHovered = hovered
         previewRect.isPressed = pressed
 
-        // Not the best way to do this but it works for now
-        pickerPanel?.setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 4f, Pos.ScreenPixels)
+        if (isPickerOpen && pickerPanel != null) {
+            if (!previewRect.isVisibleInScrollableParents()) closePicker() else updatePickerPosition()
+        }
     }
 
     override fun destroy() {
@@ -146,20 +163,21 @@ class DropDownPanel(
     borderColor: Int = 0xFF3e414b.toInt(),
     selectedColor: Int = 0xFF2a2f35.toInt(),
     fontSize: Float = 12f,
+    private val sourceDropdown: Rectangle
 ) : CanvasElement<DropDownPanel>() {
     val backgroundPopup = Rectangle(backgroundColor, borderColor, 8f, 1f, floatArrayOf(7f, 7f, 7f, 7f))
-        .setSizing(width, widthType, 120f,Size.Pixels)
+        .setSizing(width, widthType, 120f, Size.Pixels)
         .scrollable(true)
         .childOf(this)
         .dropShadow()
 
     init {
-        setSizing(0f, Size.Auto, 0f,Size.Auto)
+        setSizing(Size.Auto, Size.Auto)
         setFloating()
 
         options.forEachIndexed { index, option ->
             val rect = Rectangle(if (index == selectedIndex) selectedColor else backgroundColor, borderColor, 5f, 0f, floatArrayOf(5f, 5f, 5f, 5f), hoverColor = 0x80505050.toInt())
-                .setSizing(100f, Size.ParentPerc, 0f,Size.Auto)
+                .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
                 .setPositioning(0f, Pos.ParentPixels, 1f, Pos.AfterSibling)
                 .onClick { _, _, _ ->
                     onValueChange?.invoke(index)
@@ -175,7 +193,11 @@ class DropDownPanel(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
-        backgroundPopup.setSizing(width, widthType, min(max(75f,options.size * 37f), 170f),Size.Pixels)
+        backgroundPopup.visible = sourceDropdown.isVisibleInScrollableParents()
+
+        if (backgroundPopup.visible) {
+            backgroundPopup.setSizing(width, widthType, min(max(75f, options.size * 37f), 170f), Size.Pixels)
+        }
     }
 
     override fun getAutoHeight(): Float {

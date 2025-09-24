@@ -28,6 +28,7 @@ class ColorPicker(
     var selectedColor: Color = initialColor
     private var isPickerOpen = false
     private var isAnimating = false
+    private var lastPosition = Pair(0f, 0f)
 
     private val previewRect = Rectangle(selectedColor.rgb, borderColor, borderRadius, borderThickness, padding, hoverColor, pressedColor, Size.ParentPerc, Size.ParentPerc)
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -54,9 +55,13 @@ class ColorPicker(
         if (isPickerOpen || isAnimating) return
         isAnimating = true
 
-        pickerPanel = ColorPickerPanel(selectedColor, backgroundColor)
+        val currentX = previewRect.getScreenX()
+        val currentY = previewRect.getScreenY() + previewRect.height + 3f
+        lastPosition = Pair(currentX, currentY)
+
+        pickerPanel = ColorPickerPanel(selectedColor, backgroundColor, sourceColorPicker = previewRect)
             .setSizing(Size.Auto, Size.Auto)
-            .setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 3f, Pos.ScreenPixels)
+            .setPositioning(currentX, Pos.ScreenPixels, currentY, Pos.ScreenPixels)
             .setFloating()
             .childOf(getRootElement())
 
@@ -115,13 +120,30 @@ class ColorPicker(
         return handled
     }
 
+    private fun updatePickerPosition() {
+        val currentX = previewRect.getScreenX()
+        val currentY = previewRect.getScreenY() + previewRect.height + 3f
+
+        if (lastPosition.first != currentX || lastPosition.second != currentY) {
+            lastPosition = Pair(currentX, currentY)
+            pickerPanel?.setPositioning(currentX, Pos.ScreenPixels, currentY, Pos.ScreenPixels)
+        }
+    }
+
     override fun onRender(mouseX: Float, mouseY: Float) {
         previewRect.isHovered = hovered
         previewRect.isPressed = pressed
 
         previewRect.hoverColor = selectedColor.darker().rgb
         previewRect.pressedColor = selectedColor.darker().rgb
-        pickerPanel?.setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 3f, Pos.ScreenPixels)
+
+        if (isPickerOpen && pickerPanel != null) {
+            if (!previewRect.isVisibleInScrollableParents()) {
+                closePicker()
+            } else {
+                updatePickerPosition()
+            }
+        }
     }
 
     override fun destroy() {
@@ -140,7 +162,8 @@ class ColorPicker(
 private class ColorPickerPanel(
     initialColor: Color,
     backgroundColor: Int = 0xFF171616.toInt(),
-    borderColor: Int = 0xFF505050.toInt()
+    borderColor: Int = 0xFF505050.toInt(),
+    private val sourceColorPicker: Rectangle
 ) : CanvasElement<ColorPickerPanel>() {
     private var currentColor = initialColor
     private var currentHue: Float
@@ -152,7 +175,7 @@ private class ColorPickerPanel(
     private var draggingAlpha = false
 
     val background = Rectangle(backgroundColor, borderColor, 2f, 1f, floatArrayOf(8f, 8f, 8f, 8f))
-        .setSizing(0f, Size.Auto, 170f,Size.Pixels)
+        .setSizing(0f, Size.Auto, 170f, Size.Pixels)
         .ignoreMouseEvents()
         .childOf(this)
 
@@ -261,6 +284,7 @@ private class ColorPickerPanel(
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {
+        background.visible = sourceColorPicker.isVisibleInScrollableParents()
     }
 
     inner class ColorPickerArea : CanvasElement<ColorPickerArea>() {

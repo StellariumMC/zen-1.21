@@ -28,6 +28,9 @@ open class Rectangle(
     var dropShadow: Boolean = false
     var rotation: Float = 0f
 
+    private var isDraggingScrollbar = false
+    private var scrollbarDragOffset = 0f
+
     override fun onRender(mouseX: Float, mouseY: Float) {
         if (!visible || (height - (padding[0] + padding[2])) == 0f || (width - (padding[1] + padding[3])) == 0f) return
 
@@ -68,7 +71,6 @@ open class Rectangle(
         }
     }
 
-    // No mouse events for scrollbar currently
     private fun drawScrollbar() {
         if (!scrollable) return
 
@@ -79,38 +81,28 @@ open class Rectangle(
 
         val scrollbarWidth = 6f
         val scrollbarX = x + width - padding[1] - scrollbarWidth
-        val scrollbarY = y + padding[0] + (scrollOffset / contentHeight) * viewHeight
         val scrollbarHeight = (viewHeight / contentHeight) * viewHeight
+        val scrollbarY = y + padding[0] + (scrollOffset / contentHeight) * viewHeight
 
         NVGRenderer.rect(scrollbarX, scrollbarY, scrollbarWidth, scrollbarHeight, 0xFF7c7c7d.toInt(), 3f)
     }
 
-    override fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
-        if (!visible) return false
+    private fun isPointInScrollbar(mouseX: Float, mouseY: Float): Boolean {
+        if (!scrollable) return false
 
-        if (!isMouseOnVisible(mouseX, mouseY)) return false
+        val contentHeight = getContentHeight()
+        val viewHeight = height - padding[0] - padding[2]
+        if (contentHeight <= viewHeight) return false
 
-        val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
-        val childHandled = children.reversed().any { it.handleMouseScroll(mouseX, adjustedMouseY, horizontal, vertical) }
+        val scrollbarWidth = 6f
+        val scrollbarX = x + width - padding[1] - scrollbarWidth
+        val scrollbarHeight = (viewHeight / contentHeight) * viewHeight
+        val scrollbarY = y + padding[0] + (scrollOffset / contentHeight) * viewHeight
 
-        if (!childHandled && scrollable && isPointInside(mouseX, mouseY)) {
-            val contentHeight = getContentHeight()
-            val viewHeight = height - padding[0] - padding[2]
-
-            if (contentHeight > viewHeight) {
-                val scrollAmount = vertical.toFloat() * -30f
-                val maxScroll = contentHeight - viewHeight
-                scrollOffset = (scrollOffset + scrollAmount).coerceIn(0f, maxScroll)
-                return true
-            }
-        }
-
-        return childHandled
+        return mouseX >= scrollbarX && mouseX <= scrollbarX + scrollbarWidth && mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight
     }
 
-    override fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
-        if (!visible) return false
-
+    private fun updateHoverStates(mouseX: Float, mouseY: Float) {
         val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
         val wasHovered = isHovered
         isHovered = isPointInside(mouseX, mouseY)
@@ -134,6 +126,55 @@ open class Rectangle(
 
         if (isHovered) mouseMoveListeners.forEach { it(mouseX, mouseY) }
 
+        children.reversed().forEach { child ->
+            if (scrollable && !isMouseOnVisible(mouseX, mouseY)) return@forEach
+            child.handleMouseMove(mouseX, adjustedMouseY)
+        }
+    }
+
+    override fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
+        if (!visible) return false
+
+        if (!isMouseOnVisible(mouseX, mouseY)) return false
+
+        val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
+        val childHandled = children.reversed().any { it.handleMouseScroll(mouseX, adjustedMouseY, horizontal, vertical) }
+
+        if (!childHandled && scrollable && isPointInside(mouseX, mouseY)) {
+            val contentHeight = getContentHeight()
+            val viewHeight = height - padding[0] - padding[2]
+
+            if (contentHeight > viewHeight) {
+                val scrollAmount = vertical.toFloat() * -30f
+                val maxScroll = contentHeight - viewHeight
+                scrollOffset = (scrollOffset + scrollAmount).coerceIn(0f, maxScroll)
+
+                updateHoverStates(mouseX, mouseY)
+                return true
+            }
+        }
+
+        return childHandled
+    }
+
+    override fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
+        if (!visible) return false
+
+        if (isDraggingScrollbar) {
+            val contentHeight = getContentHeight()
+            val viewHeight = height - padding[0] - padding[2]
+            val relativeY = mouseY - scrollbarDragOffset - (y + padding[0])
+            val scrollRatio = (relativeY / viewHeight).coerceIn(0f, 1f)
+            val maxScroll = contentHeight - viewHeight
+            scrollOffset = (scrollRatio * maxScroll).coerceIn(0f, maxScroll)
+
+            updateHoverStates(mouseX, mouseY)
+            return true
+        }
+
+        updateHoverStates(mouseX, mouseY)
+
+        val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
         val childHandled = if (scrollable && !isMouseOnVisible(mouseX, mouseY)) {
             false
         } else {
@@ -145,6 +186,15 @@ open class Rectangle(
 
     override fun handleMouseClick(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
+
+        if (isPointInScrollbar(mouseX, mouseY)) {
+            isDraggingScrollbar = true
+            val contentHeight = getContentHeight()
+            val viewHeight = height - padding[0] - padding[2]
+            val scrollbarY = y + padding[0] + (scrollOffset / contentHeight) * viewHeight
+            scrollbarDragOffset = mouseY - scrollbarY
+            return true
+        }
 
         if (scrollable && !isMouseOnVisible(mouseX, mouseY)) return false
 
@@ -164,6 +214,11 @@ open class Rectangle(
 
     override fun handleMouseRelease(mouseX: Float, mouseY: Float, button: Int): Boolean {
         if (!visible) return false
+
+        if (isDraggingScrollbar) {
+            isDraggingScrollbar = false
+            return true
+        }
 
         val adjustedMouseY = if (scrollable) mouseY + scrollOffset else mouseY
         val wasPressed = isPressed
@@ -195,6 +250,20 @@ open class Rectangle(
         val viewHeight = height - padding[0] - padding[2]
 
         return mouseX >= contentX && mouseX <= contentX + viewWidth && mouseY >= contentY && mouseY <= contentY + viewHeight
+    }
+
+    fun isVisibleInScrollableParents(): Boolean {
+        var current: CanvasElement<*>? = this
+        while (current != null) {
+            if (!current.visible) return false
+            if (current is Rectangle && current.scrollable) {
+                val centerX = getScreenX() + width / 2
+                val centerY = getScreenY() + height / 2
+                if (!current.isMouseOnVisible(centerX, centerY)) return false
+            }
+            current = current.parent
+        }
+        return true
     }
 
     public override fun getAutoWidth(): Float {
@@ -239,9 +308,9 @@ open class Rectangle(
             val oldX = child.xConstraint
             val oldY = child.yConstraint
             try {
-                if(!child.isFloating) {
-                    if(child.xPositionConstraint != Pos.MatchSibling && child.xPositionConstraint != Pos.ScreenPixels) child.xConstraint += padding[3]
-                    if(child.yPositionConstraint != Pos.MatchSibling && child.yPositionConstraint != Pos.ScreenPixels) child.yConstraint += padding[0]
+                if (!child.isFloating) {
+                    if (child.xPositionConstraint != Pos.MatchSibling && child.xPositionConstraint != Pos.ScreenPixels) child.xConstraint += padding[3]
+                    if (child.yPositionConstraint != Pos.MatchSibling && child.yPositionConstraint != Pos.ScreenPixels) child.yConstraint += padding[0]
                 }
                 child.render(mouseX, mouseY)
             } finally {
@@ -254,7 +323,8 @@ open class Rectangle(
             NVGRenderer.popScissor()
             NVGRenderer.pop()
         }
-        if(isHovered) drawScrollbar()
+
+        if (isHovered || isDraggingScrollbar) drawScrollbar()
     }
 
     fun rotateTo(angle: Float, duration: Long = 300, type: EasingType = EasingType.EASE_OUT, onComplete: (() -> Unit)? = null): Rectangle {
