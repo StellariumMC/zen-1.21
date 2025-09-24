@@ -307,7 +307,7 @@ class ButtonTestScreen : Screen(MinecraftText.literal("Component Test Screen")) 
         repeat(3) { i ->
             val keybindContainer = Rectangle()
                 .backgroundColor(0x00000000)
-                .setSizing(100f, Size.ParentPerc, 50f, Size.Pixels)
+                .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
                 .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
                 .childOf(container)
 

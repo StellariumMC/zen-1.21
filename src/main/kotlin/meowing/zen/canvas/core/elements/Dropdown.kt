@@ -123,6 +123,9 @@ class Dropdown(
     override fun onRender(mouseX: Float, mouseY: Float) {
         previewRect.isHovered = hovered
         previewRect.isPressed = pressed
+
+        // Not the best way to do this but it works for now
+        pickerPanel?.setPositioning(previewRect.getScreenX(), Pos.ScreenPixels, previewRect.getScreenY() + previewRect.height + 4f, Pos.ScreenPixels)
     }
 
     override fun destroy() {

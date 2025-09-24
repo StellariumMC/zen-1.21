@@ -133,10 +133,14 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     }
 
     protected open fun getAutoWidth(): Float =
-        children.filter { it.visible && !it.isFloating }.maxOfOrNull { it.x + it.width }?.coerceAtLeast(0f) ?: 0f
+        children.filter { it.visible && !it.isFloating }.maxOfOrNull {
+            (this.x - it.x) + it.width
+        }?.coerceAtLeast(0f) ?: 0f
 
     protected open fun getAutoHeight(): Float =
-        children.filter { it.visible && !it.isFloating }.maxOfOrNull { it.y + it.height }?.coerceAtLeast(0f) ?: 0f
+        children.filter { it.visible && !it.isFloating }.maxOfOrNull {
+            (this.y - it.y) + it.height
+        }?.coerceAtLeast(0f) ?: 0f
 
     fun updateX() {
         val visibleParent = findFirstVisibleParent()

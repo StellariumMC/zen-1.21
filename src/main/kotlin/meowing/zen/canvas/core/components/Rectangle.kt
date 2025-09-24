@@ -68,6 +68,23 @@ open class Rectangle(
         }
     }
 
+    // No mouse events for scrollbar currently
+    private fun drawScrollbar() {
+        if (!scrollable) return
+
+        val contentHeight = getContentHeight()
+        val viewHeight = height - padding[0] - padding[2]
+
+        if (contentHeight <= viewHeight) return
+
+        val scrollbarWidth = 6f
+        val scrollbarX = x + width - padding[1] - scrollbarWidth
+        val scrollbarY = y + padding[0] + (scrollOffset / contentHeight) * viewHeight
+        val scrollbarHeight = (viewHeight / contentHeight) * viewHeight
+
+        NVGRenderer.rect(scrollbarX, scrollbarY, scrollbarWidth, scrollbarHeight, 0xFF7c7c7d.toInt(), 3f)
+    }
+
     override fun handleMouseScroll(mouseX: Float, mouseY: Float, horizontal: Double, vertical: Double): Boolean {
         if (!visible) return false
 
@@ -237,6 +254,7 @@ open class Rectangle(
             NVGRenderer.popScissor()
             NVGRenderer.pop()
         }
+        if(isHovered) drawScrollbar()
     }
 
     fun rotateTo(angle: Float, duration: Long = 300, type: EasingType = EasingType.EASE_OUT, onComplete: (() -> Unit)? = null): Rectangle {
