@@ -31,8 +31,8 @@ enum class Pos {
 sealed class Constraint {
     data class SizeConstraint(val size: Size, val value: Float) : Constraint()
     data class PosConstraint(val pos: Pos, val offset: Float) : Constraint()
+    data class RawPixels(val value: Float) : Constraint()
 }
-
 
 abstract class CanvasElement<T : CanvasElement<T>>(
     var widthType: Size = Size.Pixels,
@@ -503,78 +503,37 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     } as T
 
     @Suppress("UNCHECKED_CAST")
-    fun constrain1(block: ConstraintBuilder.() -> Unit): T {
-        val b = ConstraintBuilder().apply(block)
-
-        b.x?.let {
-            when (it) {
-                is Constraint.PosConstraint -> {
-                    xPositionConstraint = it.pos
-                    xConstraint = it.offset.toFloat()
-                }
-                is Constraint.SizeConstraint -> {
-                    xPositionConstraint = Pos.ParentPixels
-                    xConstraint = it.value.toFloat()
-                }
-            }
-        }
-
-        b.y?.let {
-            when (it) {
-                is Constraint.PosConstraint -> {
-                    yPositionConstraint = it.pos
-                    yConstraint = it.offset.toFloat()
-                }
-                is Constraint.SizeConstraint -> {
-                    yPositionConstraint = Pos.ParentPixels
-                    yConstraint = it.value.toFloat()
-                }
-            }
-        }
-
-        b.width?.let {
-            if (it is Constraint.SizeConstraint) {
-                widthType = it.size
-                if (it.size == Size.Pixels) width = it.value.toFloat()
-                else widthPercent = it.value.toFloat()
-            }
-        }
-
-        b.height?.let {
-            if (it is Constraint.SizeConstraint) {
-                heightType = it.size
-                if (it.size == Size.Pixels) height = it.value.toFloat()
-                else heightPercent = it.value.toFloat()
-            }
-        }
-
-        return this as T
-    }
-
-    @Suppress("UNCHECKED_CAST")
     fun constrain(block: ConstraintBuilder.() -> Unit): T {
         val builder = ConstraintBuilder().apply(block)
 
         fun applyPosition(con: Constraint?, posSetter: (Pos) -> Unit, valSetter: (Float) -> Unit) {
             con?.let {
-                when (it) {
+                when (con) {
                     is Constraint.PosConstraint -> {
-                        posSetter(it.pos)
-                        valSetter(it.offset)
+                        posSetter(con.pos)
+                        valSetter(con.offset)
                     }
-                    is Constraint.SizeConstraint -> {
+                    is Constraint.RawPixels -> {
                         posSetter(Pos.ParentPixels)
-                        valSetter(it.value)
+                        valSetter(con.value)
                     }
+                    else -> {}
                 }
             }
         }
 
         fun applySize(con: Constraint?, typeSetter: (Size) -> Unit, valSetter: (Float) -> Unit, percSetter: (Float) -> Unit) {
-            if (con is Constraint.SizeConstraint) {
-                typeSetter(con.size)
-                if (con.size == Size.Pixels) valSetter(con.value)
-                else percSetter(con.value)
+            when (con) {
+                is Constraint.SizeConstraint -> {
+                    typeSetter(con.size)
+                    if (con.size == Size.Pixels) valSetter(con.value)
+                    else percSetter(con.value)
+                }
+                is Constraint.RawPixels -> {
+                    typeSetter(Size.Pixels)
+                    valSetter(con.value)
+                }
+                else -> {}
             }
         }
 
@@ -599,7 +558,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 }
 
 //DSL suff
-val Float.px: Constraint get() = Constraint.SizeConstraint(Size.Pixels, this)
+val Float.px: Constraint get() = Constraint.RawPixels(this)
+val Int.px: Constraint get() = Constraint.RawPixels(this.toFloat())
+
 fun percentParent(value: Float): Constraint = Constraint.SizeConstraint(Size.ParentPerc, value)
 val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0f)
 
