@@ -82,10 +82,10 @@ class AnimationTestScreen : Screen(MinecraftText.literal("Animation Test GUI")) 
             .backgroundColor(0xFF3B82F6.toInt())
             .borderRadius(8f)
             .constrain {
-                x = 50.px
-                y = 60.px
-                width = 60.px
-                height = 60.px
+                x = 50f.px
+                y = 60f.px
+                width = 60f.px
+                height = 60f.px
             }
             .fadeIn(300)
             .childOf(boxContainer)

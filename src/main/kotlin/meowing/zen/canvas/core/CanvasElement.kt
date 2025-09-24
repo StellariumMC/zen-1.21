@@ -29,8 +29,8 @@ enum class Pos {
 }
 
 sealed class Constraint {
-    data class SizeConstraint(val size: Size, val value: Int) : Constraint()
-    data class PosConstraint(val pos: Pos, val offset: Int) : Constraint()
+    data class SizeConstraint(val size: Size, val value: Float) : Constraint()
+    data class PosConstraint(val pos: Pos, val offset: Float) : Constraint()
 }
 
 
@@ -503,7 +503,7 @@ abstract class CanvasElement<T : CanvasElement<T>>(
     } as T
 
     @Suppress("UNCHECKED_CAST")
-    fun constrain(block: ConstraintBuilder.() -> Unit): T {
+    fun constrain1(block: ConstraintBuilder.() -> Unit): T {
         val b = ConstraintBuilder().apply(block)
 
         b.x?.let {
@@ -551,6 +551,41 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         return this as T
     }
 
+    @Suppress("UNCHECKED_CAST")
+    fun constrain(block: ConstraintBuilder.() -> Unit): T {
+        val builder = ConstraintBuilder().apply(block)
+
+        fun applyPosition(con: Constraint?, posSetter: (Pos) -> Unit, valSetter: (Float) -> Unit) {
+            con?.let {
+                when (it) {
+                    is Constraint.PosConstraint -> {
+                        posSetter(it.pos)
+                        valSetter(it.offset)
+                    }
+                    is Constraint.SizeConstraint -> {
+                        posSetter(Pos.ParentPixels)
+                        valSetter(it.value)
+                    }
+                }
+            }
+        }
+
+        fun applySize(con: Constraint?, typeSetter: (Size) -> Unit, valSetter: (Float) -> Unit, percSetter: (Float) -> Unit) {
+            if (con is Constraint.SizeConstraint) {
+                typeSetter(con.size)
+                if (con.size == Size.Pixels) valSetter(con.value)
+                else percSetter(con.value)
+            }
+        }
+
+        applyPosition(builder.x, { xPositionConstraint = it }, { xConstraint = it })
+        applyPosition(builder.y, { yPositionConstraint = it }, { yConstraint = it })
+        applySize(builder.width, { widthType = it }, { width = it }, { widthPercent = it })
+        applySize(builder.height, { heightType = it }, { height = it }, { heightPercent = it })
+
+        return this as T
+    }
+
     class ConstraintBuilder {
         var x: Constraint? = null
         var y: Constraint? = null
@@ -564,9 +599,9 @@ abstract class CanvasElement<T : CanvasElement<T>>(
 }
 
 //DSL suff
-val Int.px: Constraint get() = Constraint.SizeConstraint(Size.Pixels, this)
-fun percentParent(value: Int): Constraint = Constraint.SizeConstraint(Size.ParentPerc, value)
-val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0)
+val Float.px: Constraint get() = Constraint.SizeConstraint(Size.Pixels, this)
+fun percentParent(value: Float): Constraint = Constraint.SizeConstraint(Size.ParentPerc, value)
+val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0f)
 
-operator fun Pos.plus(offset: Int): Constraint = Constraint.PosConstraint(this, offset)
-operator fun Int.plus(pos: Pos): Constraint = Constraint.PosConstraint(pos, this)
+operator fun Pos.plus(offset: Float): Constraint = Constraint.PosConstraint(this, offset)
+operator fun Float.plus(pos: Pos): Constraint = Constraint.PosConstraint(pos, this)
