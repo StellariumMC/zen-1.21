@@ -28,6 +28,12 @@ enum class Pos {
     MatchSibling
 }
 
+sealed class Constraint {
+    data class SizeConstraint(val size: Size, val value: Float) : Constraint()
+    data class PosConstraint(val pos: Pos, val offset: Float) : Constraint()
+    data class RawPixels(val value: Float) : Constraint()
+}
+
 abstract class CanvasElement<T : CanvasElement<T>>(
     var widthType: Size = Size.Pixels,
     var heightType: Size = Size.Pixels
@@ -496,7 +502,72 @@ abstract class CanvasElement<T : CanvasElement<T>>(
         visible = false
     } as T
 
+    @Suppress("UNCHECKED_CAST")
+    fun constrain(block: ConstraintBuilder.() -> Unit): T {
+        val builder = ConstraintBuilder().apply(block)
+
+        fun applyPosition(con: Constraint?, posSetter: (Pos) -> Unit, valSetter: (Float) -> Unit) {
+            con?.let {
+                when (con) {
+                    is Constraint.PosConstraint -> {
+                        posSetter(con.pos)
+                        valSetter(con.offset)
+                    }
+                    is Constraint.RawPixels -> {
+                        posSetter(Pos.ParentPixels)
+                        valSetter(con.value)
+                    }
+                    is Constraint.SizeConstraint -> throw IllegalArgumentException("Cannot apply a size constraint to a position property (x or y).")
+                }
+            }
+        }
+
+        fun applySize(con: Constraint?, typeSetter: (Size) -> Unit, valSetter: (Float) -> Unit, percSetter: (Float) -> Unit) {
+            con?.let {
+                when (con) {
+                    is Constraint.SizeConstraint -> {
+                        typeSetter(con.size)
+                        when (con.size) {
+                            Size.Pixels -> valSetter(con.value)
+                            Size.ParentPerc -> percSetter(con.value)
+                            Size.Auto -> { /* Value is ignored for Auto size */ }
+                        }
+                    }
+                    is Constraint.RawPixels -> {
+                        typeSetter(Size.Pixels)
+                        valSetter(con.value)
+                    }
+                    is Constraint.PosConstraint -> throw IllegalArgumentException("Cannot apply a position constraint to a size property (width or height).")
+                }
+            }
+        }
+
+        applyPosition(builder.x, ::xPositionConstraint::set, ::xConstraint::set)
+        applyPosition(builder.y, ::yPositionConstraint::set, ::yConstraint::set)
+        applySize(builder.width, ::widthType::set, ::width::set, ::widthPercent::set)
+        applySize(builder.height, ::heightType::set, ::height::set, ::heightPercent::set)
+
+        return this as T
+    }
+
+    class ConstraintBuilder {
+        var x: Constraint? = null
+        var y: Constraint? = null
+        var width: Constraint? = null
+        var height: Constraint? = null
+    }
+
     val hovered: Boolean get() = isHovered
     val pressed: Boolean get() = isPressed
     val focused: Boolean get() = isFocused
 }
+
+// Constraint DSL helpers
+val Float.px: Constraint get() = Constraint.RawPixels(this)
+val Int.px: Constraint get() = Constraint.RawPixels(this.toFloat())
+
+fun percentParent(value: Float): Constraint = Constraint.SizeConstraint(Size.ParentPerc, value)
+val auto: Constraint get() = Constraint.SizeConstraint(Size.Auto, 0f)
+
+operator fun Pos.plus(offset: Float): Constraint = Constraint.PosConstraint(this, offset)
+operator fun Size.plus(offset: Float): Constraint = Constraint.SizeConstraint(this, offset)
