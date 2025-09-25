@@ -542,10 +542,10 @@ abstract class CanvasElement<T : CanvasElement<T>>(
             }
         }
 
-        applyPosition(builder.x, { xPositionConstraint = it }, { xConstraint = it })
-        applyPosition(builder.y, { yPositionConstraint = it }, { yConstraint = it })
-        applySize(builder.width, { widthType = it }, { width = it }, { widthPercent = it })
-        applySize(builder.height, { heightType = it }, { height = it }, { heightPercent = it })
+        applyPosition(builder.x, ::xPositionConstraint::set, ::xConstraint::set)
+        applyPosition(builder.y, ::yPositionConstraint::set, ::yConstraint::set)
+        applySize(builder.width, ::widthType::set, ::width::set, ::widthPercent::set)
+        applySize(builder.height, ::heightType::set, ::height::set, ::heightPercent::set)
 
         return this as T
     }
