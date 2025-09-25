@@ -7,7 +7,7 @@
 	"authors": ["Kiwi"],
 	"contact": {
 		"homepage": "https://meowing.xyz/",
-		"sources": "https://github.com/kiwidotzip/zen-1.21"
+		"sources": "https://github.com/meowing-xyz/zen-1.21"
 	},
 	"license": "GPL-3.0-or-later",
 	"icon": "assets/zen/icon.png",
@@ -37,7 +37,8 @@
       "minecraft": "~${minor_mc_version}",
       "fabric": "*",
       "fabricloader": ">=0.15.11",
-      "fabric-language-kotlin": "*"
+      "fabric-language-kotlin": "*",
+      "vexel": "*"
 	},
 	"suggests": {
 		"modmenu": "*"

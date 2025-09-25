@@ -1,10 +1,9 @@
 package meowing.zen.ui.components
 
 import meowing.zen.Zen.Companion.mc
-import meowing.zen.utils.ChatUtils
-import meowing.zen.utils.rendering.NVGRenderer
 import net.minecraft.client.gui.screen.Screen
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.vexel.utils.render.NVGRenderer
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min

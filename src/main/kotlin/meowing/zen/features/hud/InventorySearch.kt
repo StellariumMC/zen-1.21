@@ -9,14 +9,13 @@ import meowing.zen.events.GuiEvent
 import meowing.zen.features.Feature
 import meowing.zen.features.general.CalculatorCommand
 import meowing.zen.ui.components.TextInputComponent
-import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.ItemUtils.lore
 import meowing.zen.utils.Utils.removeFormatting
-import meowing.zen.utils.rendering.NVGRenderer
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.item.AirBlockItem
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.vexel.utils.render.NVGRenderer
 import java.awt.Color
 
 @Zen.Module

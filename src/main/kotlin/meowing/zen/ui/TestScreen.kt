@@ -3,26 +3,16 @@ package meowing.zen.ui
 import com.mojang.brigadier.context.CommandContext
 import meowing.zen.Zen
 import meowing.zen.Zen.Companion.mc
-import meowing.zen.canvas.CanvasScreen
-import meowing.zen.canvas.core.elements.Button
-import meowing.zen.canvas.core.components.Rectangle
-import meowing.zen.canvas.core.components.Text
-import meowing.zen.canvas.core.Pos
-import meowing.zen.canvas.core.Size
-import meowing.zen.canvas.core.elements.CheckBox
-import meowing.zen.canvas.core.elements.Switch
-import meowing.zen.canvas.core.elements.Slider
-import meowing.zen.canvas.core.elements.Keybind
-import meowing.zen.canvas.core.elements.ColorPicker
-import meowing.zen.canvas.core.elements.Dropdown
-import meowing.zen.canvas.core.elements.NumberInput
-import meowing.zen.canvas.core.elements.TextInput
 import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import xyz.meowing.vexel.components.base.*
+import xyz.meowing.vexel.components.core.*
+import xyz.meowing.vexel.core.*
+import xyz.meowing.vexel.elements.*
 import java.awt.Color
 
-class ButtonTestScreen : CanvasScreen() {
+class ButtonTestScreen : VexelScreen() {
     private val rootContainer = Rectangle()
         .backgroundColor(0x80121212.toInt())
         .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
@@ -83,7 +73,22 @@ class ButtonTestScreen : CanvasScreen() {
                 .childOf(container)
         }
 
-        Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6", "Option 7", "Option 8", "Option 9", "Option A", "Option B", "Option C"), 0)
+        Dropdown(
+            listOf(
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4",
+                "Option 5",
+                "Option 6",
+                "Option 7",
+                "Option 8",
+                "Option 9",
+                "Option A",
+                "Option B",
+                "Option C"
+            ), 0
+        )
             .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
             .fontSize(16f)
             .onValueChange { index ->
