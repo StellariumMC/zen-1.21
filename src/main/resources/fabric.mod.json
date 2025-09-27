@@ -37,8 +37,7 @@
       "minecraft": "~${minor_mc_version}",
       "fabric": "*",
       "fabricloader": ">=0.15.11",
-      "fabric-language-kotlin": "*",
-      "vexel": "*"
+      "fabric-language-kotlin": "*"
 	},
 	"suggests": {
 		"modmenu": "*"

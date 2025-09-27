@@ -1,8 +1,8 @@
 package meowing.zen.features.slayers.carrying
 
-import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import meowing.zen.Zen
@@ -11,6 +11,7 @@ import meowing.zen.Zen.Companion.prefix
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.hud.HUDEditor
 import meowing.zen.utils.ChatUtils
+import meowing.zen.utils.CommandUtils
 import meowing.zen.utils.TickUtils
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.*
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -20,48 +21,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Zen.Command
-object carrycommand {
+object CarryCommand : CommandUtils("carry", listOf("zencarry")) {
     private val carrycounter by ConfigDelegate<Boolean>("carrycounter")
     private var currentLogPage = 1
-
-    fun register(dispatcher: CommandDispatcher<FabricClientCommandSource>) {
-        dispatcher.register(
-            literal("carry")
-                .then(literal("add")
-                    .then(argument("player", StringArgumentType.word())
-                        .suggests(playerSuggestions)
-                        .then(argument("count", IntegerArgumentType.integer(1))
-                            .executes { addCarryee(it) })))
-                .then(literal("remove")
-                    .then(argument("player", StringArgumentType.word())
-                        .suggests(carryeeSuggestions)
-                        .executes { removeCarryee(it) }))
-                .then(literal("settotal")
-                    .then(argument("player", StringArgumentType.word())
-                        .suggests(carryeeSuggestions)
-                        .then(argument("total", IntegerArgumentType.integer(1))
-                            .executes { setTotal(it) })))
-                .then(literal("setcount")
-                    .then(argument("player", StringArgumentType.word())
-                        .suggests(carryeeSuggestions)
-                        .then(argument("count", IntegerArgumentType.integer(0))
-                            .executes { setCount(it) })))
-                .then(literal("list").executes { listCarryees(it) })
-                .then(literal("clear").executes { clearCarryees(it) })
-                .then(literal("log")
-                    .executes { showLogs(it, currentLogPage) }
-                    .then(argument("page", IntegerArgumentType.integer(1))
-                        .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
-                .then(literal("logs")
-                    .executes { showLogs(it, currentLogPage) }
-                    .then(argument("page", IntegerArgumentType.integer(1))
-                        .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
-                .then(literal("gui").executes { openHudEditor(it) })
-                .executes { showHelp(it) }
-        )
-
-        dispatcher.register(literal("zencarry").redirect(dispatcher.getRoot().getChild("carry")))
-    }
 
     private val playerSuggestions = SuggestionProvider<FabricClientCommandSource> { _, builder ->
         mc.world?.players?.forEach { player ->
@@ -74,6 +36,44 @@ object carrycommand {
     private val carryeeSuggestions = SuggestionProvider<FabricClientCommandSource> { _, builder ->
         CarryCounter.carryees.forEach { builder.suggest(it.name) }
         builder.buildFuture()
+    }
+
+    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
+        builder
+            .then(literal("add")
+                .then(argument("player", StringArgumentType.word())
+                    .suggests(playerSuggestions)
+                    .then(argument("count", IntegerArgumentType.integer(1))
+                        .executes { addCarryee(it) })))
+            .then(literal("remove")
+                .then(argument("player", StringArgumentType.word())
+                    .suggests(carryeeSuggestions)
+                    .executes { removeCarryee(it) }))
+            .then(literal("settotal")
+                .then(argument("player", StringArgumentType.word())
+                    .suggests(carryeeSuggestions)
+                    .then(argument("total", IntegerArgumentType.integer(1))
+                        .executes { setTotal(it) })))
+            .then(literal("setcount")
+                .then(argument("player", StringArgumentType.word())
+                    .suggests(carryeeSuggestions)
+                    .then(argument("count", IntegerArgumentType.integer(0))
+                        .executes { setCount(it) })))
+            .then(literal("list").executes { listCarryees(it) })
+            .then(literal("clear").executes { clearCarryees(it) })
+            .then(literal("log")
+                .executes { showLogs(it, currentLogPage) }
+                .then(argument("page", IntegerArgumentType.integer(1))
+                    .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
+            .then(literal("logs")
+                .executes { showLogs(it, currentLogPage) }
+                .then(argument("page", IntegerArgumentType.integer(1))
+                    .executes { showLogs(it, IntegerArgumentType.getInteger(it, "page")) }))
+            .then(literal("gui").executes { openHudEditor(it) })
+    }
+
+    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
+        return showHelp(context)
     }
 
     private fun checkEnabled(): Boolean {

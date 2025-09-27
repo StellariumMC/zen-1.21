@@ -41,7 +41,7 @@ object CustomSpin : Feature("customspin") {
 
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->
-            if (spineveryone || event.entity == player) {
+            if (spineveryone || event.entity.id == player?.id) {
                 event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(getRotation()))
             }
         }
