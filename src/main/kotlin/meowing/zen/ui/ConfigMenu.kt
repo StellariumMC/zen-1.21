@@ -14,6 +14,7 @@ import xyz.meowing.vexel.animations.colorTo
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.SvgImage
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.core.VexelScreen
 import xyz.meowing.vexel.elements.Button
@@ -214,7 +215,13 @@ class ConfigMenu : VexelScreen() {
             .dropShadow()
             .childOf(base)
 
-        populateCategories(sidebar)
+        val categories = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.ParentPercent)
+            .childOf(sidebar)
+
+        reloadCategories(categories)
 
         featureArea = Rectangle()
             .backgroundColor(0x00000000)
@@ -226,45 +233,56 @@ class ConfigMenu : VexelScreen() {
 
         populateFeatures()
 
-//        val searchbar = Rectangle()
-//            .backgroundColor(0x00000000)
-//            .setSizing(90f, Size.ParentPerc, 6f, Size.ParentPerc)
-//            .setPositioning(5f, Pos.ParentPixels, 5f, Pos.ParentPixels)
-//            .borderThickness(2f)
-//            .borderRadius(6f)
-//            .setGradientBorderColor(0xFF0194d8.toInt(), 0xFF45bffe.toInt())
-//            .dropShadow()
-//            .childOf(base)
+        val searchbar = Rectangle()
+            .backgroundColor(0x00000000)
+            .setSizing(70f, Size.ParentPerc, 4f, Size.ParentPerc)
+            .setPositioning(24f, Pos.ParentPercent, 20f, Pos.ParentPixels)
+            .borderThickness(2f)
+            .borderRadius(6f)
+            .borderColor(0xFF7b7b84.toInt())
+            .dropShadow()
+            .childOf(base)
     }
 
-    fun populateCategories(sidebar: Rectangle) {
+    var lastSelectedElement: Rectangle? = null
+    fun reloadCategories(categoriesElement: Rectangle) {
         val categories = ConfigMenuManager.categories
 
         for (category in categories) {
-            val categoryElement = Rectangle()
-                .backgroundColor(0x00000000.toInt())
-                .padding(10f)
-                .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
-                .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
-                .borderRadius(5f)
-                .childOf(sidebar)
+            val unselectedBackground = 0x00000000
+            val unselectedTextColor = 0xFFAAAAAA.toInt()
+            val selectedBackground = 0x20FFFFFF
+            val selectedTextColor = 0xFFFFFFFF.toInt()
 
-            if(category == categories.first()) {
-                categoryElement.setPositioning(0f, Pos.ParentPixels, 10f, Pos.ParentPercent)
-            }
+            val categoryElement = Rectangle()
+                .backgroundColor(unselectedBackground)
+                .padding(10f)
+                .setSizing(80f, Size.ParentPerc, 0f, Size.Auto)
+                .setPositioning(0f, Pos.ParentCenter, 5f, Pos.AfterSibling)
+                .borderRadius(13f)
+                .childOf(categoriesElement)
 
             val text = Text(category.name)
                 .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
                 .fontSize(25f)
-                .color(0xFFAAAAAA.toInt())
+                .color(unselectedTextColor)
                 .childOf(categoryElement)
+
+            // Highlight if selected for the first time loading
+            if(selectedCategory == category.name) {
+                categoryElement.backgroundColor = selectedBackground
+                text.textColor = selectedTextColor
+                lastSelectedElement = categoryElement
+            }
 
             categoryElement.onHover(
                 onExit = { mouseX, mouseY ->
+                    if(selectedCategory == category.name) return@onHover
                     text.colorTo(0xFFAAAAAA.toInt(), 120, EasingType.EASE_OUT)
                     categoryElement.colorTo(0x00000000, 120, EasingType.EASE_OUT)
                 },
                 onEnter = {mouseX, mouseY ->
+                    if(selectedCategory == category.name) return@onHover
                     text.colorTo(0xFFFFFFFF.toInt(), 120, EasingType.EASE_OUT)
                     categoryElement.colorTo(0x20FFFFFF, 120, EasingType.EASE_OUT)
                 }
@@ -272,9 +290,17 @@ class ConfigMenu : VexelScreen() {
 
             // Add click event to load features of this category
             categoryElement.onClick { _, _, _ ->
-                // Load features for this category
-                println("Clicked on category: ${category.name}")
+                // Remove highlight from last selected
+                lastSelectedElement?.let { (lastSelectedElement as Rectangle).backgroundColor = 0x00000000; (it.children[0] as Text).textColor = 0xFFAAAAAA.toInt() }
+
+                // Highlight this element
+                categoryElement.backgroundColor = selectedBackground
+                text.textColor = selectedTextColor
+
                 selectedCategory = category.name
+                lastSelectedElement = categoryElement
+
+                // Populate features for this category
                 populateFeatures()
                 true
             }
@@ -287,20 +313,28 @@ class ConfigMenu : VexelScreen() {
 
         category.features.forEach { feature ->
             val featureElement = Rectangle()
-                .backgroundColor(0xFF000000.toInt())
-                .padding(10f)
+                .padding(20f)
                 .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
-                .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
-                .borderRadius(5f)
-                .borderThickness(2f)
-                .setGradientBorderColor(0xFF0194d8.toInt(), 0xFF062897.toInt())
+                .setPositioning(0f, Pos.ParentPixels, 12f, Pos.AfterSibling)
+                .borderRadius(8f)
+                .borderThickness(3f)
+                .setGradientBorderColor(0xFF052846.toInt(), 0xFF093463.toInt())
+                .setBackgroundGradientColor(0xFF001534.toInt(), 0xFF00050c.toInt())
                 .childOf(featureArea)
+                .dropShadow()
 
             val text = Text(feature.featureName)
                 .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
-                .fontSize(20f)
-                .color(0xFFFFFFFF.toInt())
+                .fontSize(24f)
+                .color(0xFF007acc.toInt())
                 .childOf(featureElement)
+
+            if(feature.options.isNotEmpty()) {
+                val optionsIcon = SvgImage(svgPath = "/assets/zen/options.svg", color = Color.GRAY)
+                    .setSizing(40f, Size.Pixels, 40f, Size.Pixels)
+                    .setPositioning(80f, Pos.ParentPercent, 0f, Pos.ParentCenter)
+                    .childOf(featureElement)
+            }
 
             createFeatureConfig(feature, featureElement)
         }
@@ -308,24 +342,34 @@ class ConfigMenu : VexelScreen() {
 
     fun createFeatureConfig(feature: FeatureElement, featureElement: Rectangle) {
         if(feature.configElement.type is ElementType.Switch) {
-            val switch = Switch()
+            val switch = Switch(thumbWidth = 27f, thumbHeight = 27f)
                 .childOf(featureElement)
+                .thumbColor(0xFF042e57.toInt())
+                .thumbDisabledColor(0xFF042e57.toInt())
+                .trackDisabledColor(0xFF00050c.toInt())
+                .trackEnabledColor(0xFF00050c.toInt())
+                .borderThickness(2f)
+                .borderRadius(19f)
+                .borderColor(0xFF042e57.toInt())
+                .setSizing(80f, Size.Pixels, 35f, Size.Pixels)
                 .setEnabled(value = true, animated = false, silent = true)
 
             featureElement.updateWidth()
-            switch.setPositioning(featureElement.width - switch.width - 20f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            switch.setPositioning(featureElement.width - switch.width - 40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            return
         }
         if(feature.configElement.type is ElementType.Button) {
             val button = Button(text = feature.configElement.type.text)
                 .childOf(featureElement)
 
             featureElement.updateWidth()
-            button.setPositioning(featureElement.width - button.width - 20f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+            button.setPositioning(featureElement.width - button.width - 40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
 
             button.onClick { _, _, _ ->
                 feature.configElement.type.onClick()
                 true
             }
+            return
         }
     }
 }
