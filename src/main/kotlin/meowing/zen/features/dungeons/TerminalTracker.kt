@@ -6,6 +6,7 @@ import meowing.zen.config.ui.ConfigUI
 import meowing.zen.config.ui.types.ConfigElement
 import meowing.zen.config.ui.types.ElementType
 import meowing.zen.events.ChatEvent
+import meowing.zen.events.WorldEvent
 import meowing.zen.features.Feature
 import meowing.zen.utils.ChatUtils
 import meowing.zen.utils.Utils.removeFormatting
@@ -13,7 +14,7 @@ import java.util.regex.Pattern
 
 @Zen.Module
 object TerminalTracker : Feature("termtracker", area = "catacombs") {
-    private lateinit var completed: MutableMap<String, MutableMap<String, Int>>
+    private var completed: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val pattern = Pattern.compile("^(\\w{1,16}) (?:activated|completed) a (\\w+)! \\(\\d/\\d\\)$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
@@ -26,7 +27,6 @@ object TerminalTracker : Feature("termtracker", area = "catacombs") {
     }
 
     override fun initialize() {
-        completed = mutableMapOf()
         register<ChatEvent.Receive> { event ->
             val msg = event.message.string.removeFormatting()
             val matcher = pattern.matcher(msg)
@@ -45,15 +45,9 @@ object TerminalTracker : Feature("termtracker", area = "catacombs") {
                 }
             }
         }
-    }
 
-    override fun onRegister() {
-        if (this::completed.isInitialized) completed.clear()
-        super.onRegister()
-    }
-
-    override fun onUnregister() {
-        if (this::completed.isInitialized) completed.clear()
-        super.onUnregister()
+        register<WorldEvent.Change> {
+            completed.clear()
+        }
     }
 }

@@ -7,15 +7,16 @@ import net.minecraft.scoreboard.ScoreboardDisplaySlot
 
 object ScoreboardUtils {
     // Modified from Skyblocker https://github.com/SkyblockerMod/Skyblocker
-    fun getSidebarLines(cleanColor: Boolean): List<String> {
+    fun getSidebarLines(): List<String> {
         return try {
             val scoreboard = mc.player?.scoreboard ?: return emptyList()
             val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
 
             val stringLines = mutableListOf<String>()
+            val scoreHolders = scoreboard.knownScoreHolders.toList()
 
             // Loop over all known scoreboard entries
-            for (scoreHolder in scoreboard.knownScoreHolders) {
+            for (scoreHolder in scoreHolders) {
                 if (!scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) continue
                 // Only include entries that are part of the current objective
                 val objectivesForEntry = scoreboard.getScoreHolderObjectives(scoreHolder)
@@ -25,8 +26,7 @@ object ScoreboardUtils {
 
                 if (team != null) {
                     val strLine = team.prefix.string + team.suffix.string
-
-                    if (!strLine.trim().isEmpty()) stringLines.add(strLine)
+                    if (strLine.trim().isNotEmpty()) stringLines.add(strLine)
                 }
             }
 

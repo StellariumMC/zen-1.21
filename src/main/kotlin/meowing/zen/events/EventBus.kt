@@ -178,7 +178,7 @@ object EventBus {
                 post(EntityEvent.Spawn(packet))
             }
             is ScoreboardObjectiveUpdateS2CPacket, is ScoreboardScoreUpdateS2CPacket, is ScoreboardDisplayS2CPacket, is TeamS2CPacket -> {
-                val lines = ScoreboardUtils.getSidebarLines(true)
+                val lines = ScoreboardUtils.getSidebarLines()
                 post(SidebarUpdateEvent(lines))
             }
             is PlayerListS2CPacket -> {

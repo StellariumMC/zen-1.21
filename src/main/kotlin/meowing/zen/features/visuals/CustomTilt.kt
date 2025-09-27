@@ -61,7 +61,7 @@ object CustomTilt : Feature("customtilt") {
 
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->
-            if (tilteveryone || event.entity == player) {
+            if (tilteveryone || event.entity.id == player?.id) {
                 val multiplier = if (animatedtilt) sin(System.currentTimeMillis() * tiltspeed / 1000.0) else 1.0
                 event.matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((tiltx * multiplier).toFloat()))
                 event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((tilty * multiplier).toFloat()))
