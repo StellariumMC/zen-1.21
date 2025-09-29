@@ -48,10 +48,10 @@ dependencies {
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.7-fabric:1.0.2")!!)
+//            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.7-fabric:1.0.2")!!)
         } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
             modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.5-fabric:1.0.2")!!)
+//            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.5-fabric:1.0.2")!!)
         }
 
         runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")

@@ -29,6 +29,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
+import net.minecraft.util.Identifier
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 
@@ -40,6 +41,7 @@ import java.awt.Color
 @Zen.Module
 object ProtectItem : Feature("protectitem", true) {
     val protectedItems = DataUtils("protected_items", mutableSetOf<String>())
+    val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -65,8 +67,7 @@ object ProtectItem : Feature("protectitem", true) {
     override fun initialize() {
         register<EntityEvent.ItemToss> { event ->
             if (LocationUtils.checkArea("catacombs")) return@register
-            val itemUuid = event.stack.uuid
-            if (itemUuid.isNotEmpty() && itemUuid in protectedItems()) {
+            if (isProtected(event.stack)) {
                 sendProtectionMessage("dropping", event.stack.name.string)
                 event.cancel()
             }
@@ -74,8 +75,7 @@ object ProtectItem : Feature("protectitem", true) {
 
         register<GuiEvent.Close> { event ->
             val item = event.handler.cursorStack ?: return@register
-            val itemUuid = item.uuid
-            if (itemUuid.isNotEmpty() && itemUuid in protectedItems()) {
+            if (isProtected(item)) {
                 for (slot in event.handler.slots) {
                     if (slot.inventory !== player?.inventory || slot.hasStack() || !slot.canInsert(item)) continue
                     mc.interactionManager?.clickSlot(event.handler.syncId, slot.id, 0, SlotActionType.PICKUP, player)
@@ -98,9 +98,8 @@ object ProtectItem : Feature("protectitem", true) {
         val chestName = event.screen.chestName
         val slot = event.slot ?: return
         val item = slot.stack ?: return
-        val itemUuid = item.uuid
 
-        if (!slot.hasStack() || itemUuid.isEmpty() || itemUuid !in protectedItems()) return
+        if (!slot.hasStack() || !isProtected(item)) return
 
         when {
             chestName.startsWith("Salvage") -> {
@@ -137,11 +136,18 @@ object ProtectItem : Feature("protectitem", true) {
             else -> return
         } ?: return
 
-        val itemUUID = item.uuid
-        if (itemUUID.isNotEmpty() && itemUUID in protectedItems()) {
+        if (isProtected(item)) {
             sendProtectionMessage("dropping", item.name.string)
             event.cancel()
         }
+    }
+
+    private fun isProtected(item: ItemStack): Boolean {
+        val itemUuid = item.uuid
+        if (itemUuid.isNotEmpty() && itemUuid in protectedItems()) return true
+
+        val itemId = item.item.toString()
+        return itemId in protectedTypes()
     }
 
     private fun sendProtectionMessage(action: String, itemName: String) {
@@ -159,18 +165,27 @@ object ProtectItemCommand : CommandUtils("protectitem", aliases = listOf("zenpro
         }
 
         val itemUuid = heldItem.uuid
-        if (itemUuid.isEmpty()) {
-            ChatUtils.addMessage("$prefix §cThis item doesn't have a UUID!")
-            return 0
-        }
+        val itemId = heldItem.item.toString()
 
-        ProtectItem.protectedItems.update {
-            if (itemUuid in this) {
-                remove(itemUuid)
-                ChatUtils.addMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
-            } else {
-                add(itemUuid)
-                ChatUtils.addMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
+        if (itemUuid.isEmpty()) {
+            ProtectItem.protectedTypes.update {
+                if (itemId in this) {
+                    remove(itemId)
+                    ChatUtils.addMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
+                } else {
+                    add(itemId)
+                    ChatUtils.addMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
+                }
+            }
+        } else {
+            ProtectItem.protectedItems.update {
+                if (itemUuid in this) {
+                    remove(itemUuid)
+                    ChatUtils.addMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
+                } else {
+                    add(itemUuid)
+                    ChatUtils.addMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
+                }
             }
         }
 
@@ -207,11 +222,15 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
     private val hoveredSlotColor = Color(80, 80, 100, 180).rgb
     private val normalSlotColor = Color(60, 60, 70, 180).rgb
     private val protectedBorder = Color(80, 200, 80, 255).rgb
+    private val typeProtectedColor = Color(120, 100, 40, 180).rgb
+    private val typeProtectedBorder = Color(200, 160, 80, 255).rgb
 
     data class InventorySlot(
         val stack: ItemStack,
         val uuid: String,
+        val itemId: String,
         var isProtected: Boolean,
+        var isTypeProtected: Boolean,
         val x: Int,
         val y: Int,
         val slotIndex: Int
@@ -226,16 +245,27 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
         slots.clear()
         val player = mc.player ?: return
         val protectedSet = ProtectItem.protectedItems()
+        val protectedTypeSet = ProtectItem.protectedTypes()
+
         val guiX = (width - guiWidth) / 2
         val guiY = (height - guiHeight) / 2
 
         val armorSlots = listOf(39, 38, 37, 36)
+
         armorSlots.forEachIndexed { index, slotIndex ->
             val stack = player.inventory.getStack(slotIndex)
             val uuid = if (!stack.isEmpty) stack.uuid else ""
+            val itemId = if (!stack.isEmpty) stack.item.toString() else ""
+
             val x = guiX + 8 + (index * 20)
             val y = guiY + 30
-            slots.add(InventorySlot(stack, uuid, uuid.isNotEmpty() && uuid in protectedSet, x, y, slotIndex))
+
+            slots.add(InventorySlot(
+                stack, uuid, itemId,
+                uuid.isNotEmpty() && uuid in protectedSet,
+                itemId.isNotEmpty() && itemId in protectedTypeSet,
+                x, y, slotIndex
+            ))
         }
 
         for (row in 0..2) {
@@ -243,18 +273,34 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
                 val slotIndex = 9 + row * 9 + col
                 val stack = player.inventory.getStack(slotIndex)
                 val uuid = if (!stack.isEmpty) stack.uuid else ""
+                val itemId = if (!stack.isEmpty) stack.item.toString() else ""
+
                 val x = guiX + 8 + (col * 20)
                 val y = guiY + 60 + (row * 20)
-                slots.add(InventorySlot(stack, uuid, uuid.isNotEmpty() && uuid in protectedSet, x, y, slotIndex))
+
+                slots.add(InventorySlot(
+                    stack, uuid, itemId,
+                    uuid.isNotEmpty() && uuid in protectedSet,
+                    itemId.isNotEmpty() && itemId in protectedTypeSet,
+                    x, y, slotIndex
+                ))
             }
         }
 
         for (col in 0..8) {
             val stack = player.inventory.getStack(col)
             val uuid = if (!stack.isEmpty) stack.uuid else ""
+            val itemId = if (!stack.isEmpty) stack.item.toString() else ""
+
             val x = guiX + 8 + (col * 20)
             val y = guiY + 130
-            slots.add(InventorySlot(stack, uuid, uuid.isNotEmpty() && uuid in protectedSet, x, y, col))
+
+            slots.add(InventorySlot(
+                stack, uuid, itemId,
+                uuid.isNotEmpty() && uuid in protectedSet,
+                itemId.isNotEmpty() && itemId in protectedTypeSet,
+                x, y, col
+            ))
         }
     }
 
@@ -265,6 +311,7 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
         val guiY = (height - guiHeight) / 2
 
         context.fill(guiX, guiY, guiX + guiWidth, guiY + guiHeight, guiBackground)
+
         drawHollowRect(context, guiX, guiY, guiX + guiWidth, guiY + guiHeight, guiBorder)
 
         val title = "Item Protection Manager"
@@ -277,9 +324,7 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
             renderSlot(context, slot, mouseX, mouseY, index)
         }
 
-        if (hoveredSlot >= 0) {
-            renderTooltip(context, slots[hoveredSlot], mouseX, mouseY)
-        }
+        if (hoveredSlot >= 0) renderTooltip(context, slots[hoveredSlot], mouseX, mouseY)
 
         val instructions = "L to toggle protection • ESC to close"
         val textWidth = textRenderer.getWidth(instructions)
@@ -295,13 +340,19 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
 
         val slotColor = when {
             slot.isProtected -> protectedSlotColor
+            slot.isTypeProtected -> typeProtectedColor
             isHovered -> hoveredSlotColor
             else -> normalSlotColor
         }
 
         context.fill(slot.x, slot.y, slot.x + slotSize, slot.y + slotSize, slotColor)
 
-        val borderColor = if (slot.isProtected) protectedBorder else guiBorder
+        val borderColor = when {
+            slot.isProtected -> protectedBorder
+            slot.isTypeProtected -> typeProtectedBorder
+            else -> guiBorder
+        }
+
         drawHollowRect(context, slot.x, slot.y, slot.x + slotSize, slot.y + slotSize, borderColor)
 
         if (!slot.stack.isEmpty) {
@@ -317,10 +368,12 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
             slot.stack.isEmpty -> lines.add(Text.literal("§7Empty Slot"))
             else -> {
                 lines.add(slot.stack.name)
+
                 when {
-                    slot.uuid.isEmpty() -> lines.add(Text.literal("§cNO UUID - Cannot protect"))
-                    slot.isProtected -> lines.add(Text.literal("§aProtected - Press L to unprotect"))
-                    else -> lines.add(Text.literal("§7Not protected - Press L to protect"))
+                    slot.isProtected -> lines.add(Text.literal("§aProtected (UUID) - Press L to unprotect"))
+                    slot.isTypeProtected -> lines.add(Text.literal("§6Protected (All of type) - Press L to unprotect"))
+                    slot.uuid.isNotEmpty() -> lines.add(Text.literal("§7Not protected - Press L to protect"))
+                    else -> lines.add(Text.literal("§7No UUID - Press L to protect all of this type"))
                 }
             }
         }
@@ -332,7 +385,7 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
         if (button == 0) {
             slots.forEachIndexed { _, slot ->
                 if (mouseX >= slot.x && mouseX <= slot.x + slotSize && mouseY >= slot.y && mouseY <= slot.y + slotSize) {
-                    if (!slot.stack.isEmpty && slot.uuid.isNotEmpty()) toggleProtection(slot)
+                    if (!slot.stack.isEmpty) toggleProtection(slot)
                     return true
                 }
             }
@@ -349,9 +402,7 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
             GLFW.GLFW_KEY_L -> {
                 if (hoveredSlot >= 0) {
                     val slot = slots[hoveredSlot]
-                    if (!slot.stack.isEmpty && slot.uuid.isNotEmpty()) {
-                        toggleProtection(slot)
-                    }
+                    if (!slot.stack.isEmpty) toggleProtection(slot)
                     return true
                 }
             }
@@ -361,13 +412,33 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
     }
 
     private fun toggleProtection(slot: InventorySlot) {
-        ProtectItem.protectedItems.update {
-            if (slot.uuid in this) {
-                remove(slot.uuid)
-                slot.isProtected = false
-            } else {
-                add(slot.uuid)
-                slot.isProtected = true
+        if (slot.uuid.isNotEmpty()) {
+            ProtectItem.protectedItems.update {
+                if (slot.uuid in this) {
+                    remove(slot.uuid)
+                    slot.isProtected = false
+                } else {
+                    add(slot.uuid)
+                    slot.isProtected = true
+                }
+            }
+        } else {
+            ProtectItem.protectedTypes.update {
+                if (slot.itemId in this) {
+                    remove(slot.itemId)
+                    slots.forEach { s ->
+                        if (s.itemId == slot.itemId) {
+                            s.isTypeProtected = false
+                        }
+                    }
+                } else {
+                    add(slot.itemId)
+                    slots.forEach { s ->
+                        if (s.itemId == slot.itemId) {
+                            s.isTypeProtected = true
+                        }
+                    }
+                }
             }
         }
     }
