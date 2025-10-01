@@ -70,8 +70,8 @@ val pkgRegex = Regex("package\\s+([\\w.]+)")
 
 tasks.register("generateLists") {
     val srcDir = rootProject.file("src/main/kotlin/meowing/zen")
-    val featureOutput = rootProject.file("src/main/resources/features.list")
-    val commandOutput = rootProject.file("src/main/resources/commands.list")
+    val featureOutput = project.file("build/generated/resources/features.list")
+    val commandOutput = project.file("build/generated/resources/commands.list")
 
     inputs.dir(srcDir).optional(true)
     outputs.files(featureOutput, commandOutput)
@@ -105,13 +105,11 @@ tasks.register("generateLists") {
 }
 
 tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     dependsOn("generateLists")
+    from("build/generated/resources")
 }
 
 tasks.classes {
     dependsOn("generateLists")
 }
-
-tasks.findByName("preprocessResources")?.dependsOn(":1.21.9-fabric:generateLists")
-tasks.findByName("preprocessResources")?.dependsOn(":1.21.5-fabric:generateLists")
-tasks.findByName("preprocessResources")?.dependsOn("generateLists")
