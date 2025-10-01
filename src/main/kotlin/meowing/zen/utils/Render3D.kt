@@ -1,7 +1,6 @@
 package meowing.zen.utils
 
 import meowing.zen.Zen.Companion.mc
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
@@ -25,6 +24,10 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+//#endif
+
 object Render3D {
     private fun getValidLineWidth(width: Float): Float {
         val range = FloatArray(2)
@@ -45,10 +48,15 @@ object Render3D {
         )
     }
 
+    //#if MC < 1.21.9
     fun drawEntityOutline(matrices: MatrixStack?, vertex: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Double, height: Float, r: Float, g: Float, b: Float, a: Float) {
         val halfWidth = width / 2
         VertexRendering.drawBox(
+            //#if MC >= 1.21.9
+            //$$ matrices?.peek()
+            //#else
             matrices,
+            //#endif
             vertex!!.getBuffer(RenderLayer.getLines()),
             x - halfWidth,
             y,
@@ -62,6 +70,7 @@ object Render3D {
             a
         )
     }
+    //#endif
 
     fun drawString(
         text: String,
@@ -155,6 +164,7 @@ object Render3D {
         consumers.draw()
     }
 
+    //#if MC < 1.21.9
     fun drawLineToEntity(entity: Entity, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
         val player = mc.player ?: return
         if (!player.canSee(entity)) return
@@ -412,8 +422,7 @@ object Render3D {
         consumers.draw(RenderLayer.getDebugFilledBox())
         matrices.pop()
     }
+    //#endif
 
     private fun Color.withAlpha(alpha: Float) = Color(red, green, blue, (alpha * 255).toInt())
-
-    private fun Entity.distanceTo(pos: Vec3d) = this.pos.distanceTo(pos).toFloat()
 }

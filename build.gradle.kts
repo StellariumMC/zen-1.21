@@ -42,16 +42,17 @@ dependencies {
         modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
         modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
         modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:427")!!)
+        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
         modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
         modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
+        modImplementation(includeOrShade("dev.deftu:omnicore-$mcData:1.0.0-beta.17")!!)
 
         if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-//            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.7-fabric:1.0.2")!!)
+            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.7-fabric:1.0.4")!!)
         } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
             modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-//            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.5-fabric:1.0.2")!!)
+            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.5-fabric:1.0.4")!!)
         }
 
         runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
@@ -111,5 +112,6 @@ tasks.classes {
     dependsOn("generateLists")
 }
 
+tasks.findByName("preprocessResources")?.dependsOn(":1.21.9-fabric:generateLists")
 tasks.findByName("preprocessResources")?.dependsOn(":1.21.5-fabric:generateLists")
 tasks.findByName("preprocessResources")?.dependsOn("generateLists")

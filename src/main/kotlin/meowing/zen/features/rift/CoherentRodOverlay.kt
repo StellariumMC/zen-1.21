@@ -33,17 +33,23 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
     override fun initialize() {
         register<RenderEvent.World> { event ->
             if (isHolding("NEARLY_COHERENT_ROD")) {
+                //#if MC < 1.21.9
                 val context = event.context ?: return@register
                 val player = player ?: return@register
                 val color = coherentrodoverlaycolor
                 Render3D.drawFilledCircle(
                     context,
+                    //#if MC >= 1.21.9
+                    //$$ player.entityPos,
+                    //#else
                     player.pos,
+                    //#endif
                     8f,
                     72,
                     color.darker().toColorInt(),
                     color.toColorInt()
                 )
+                //#endif
             }
         }
     }

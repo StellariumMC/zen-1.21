@@ -30,8 +30,8 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
     private void zen$onEntityTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity entity) {
         if (entity != null) {
             String name = packet.trackedValues() != null ? packet.trackedValues().stream()
-                    .filter(entry -> entry.comp_1115() == 2)
-                    .map(entry -> entry.comp_1117() instanceof Optional<?> ? ((Optional<?>) entry.comp_1117()).orElse(null) : null)
+                    .filter(entry -> entry.id() == 2)
+                    .map(entry -> entry.value() instanceof Optional<?> ? ((Optional<?>) entry.value()).orElse(null) : null)
                     .filter(value -> value instanceof Text)
                     .map(text -> ((Text) text).getString())
                     .findFirst().orElse("") : "";

@@ -1,5 +1,6 @@
 package meowing.zen.mixins;
 
+//#if MC < 1.21.9
 import meowing.zen.events.EventBus;
 import meowing.zen.events.RenderEvent;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -26,3 +27,4 @@ public class MixinEntityRenderDispatcher {
         EventBus.INSTANCE.post(event);
     }
 }
+//#endif

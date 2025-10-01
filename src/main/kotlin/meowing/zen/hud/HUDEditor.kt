@@ -1,5 +1,6 @@
 package meowing.zen.hud
 
+import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIImage
@@ -15,6 +16,11 @@ import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
 import kotlin.math.roundToInt
+
+//#if MC >= 1.21.9
+//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.gui.Click
+//#endif
 
 class HUDEditor : Screen(Text.literal("HUD Editor")) {
     private val elements = mutableListOf<HUDElement>()
@@ -366,7 +372,15 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount)
     }
 
+    //#if MC >= 1.21.9
+    //$$ override fun mouseClicked(click: Click?, doubled: Boolean): Boolean {
+    //$$     if (click == null) return super.mouseClicked(click, doubled)
+    //$$     val mouseX = click.x
+    //$$     val mouseY = click.y
+    //$$     val button = click.keycode
+    //#else
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    //#endif
         if (showResetConfirm) {
             handleResetConfirmClick(mouseX.toInt(), mouseY.toInt())
             return true
@@ -384,7 +398,12 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                 selected = it
             }
         }
+
+        //#if MC >= 1.21.9
+        //$$ return super.mouseClicked(click, doubled)
+        //#else
         return super.mouseClicked(mouseX, mouseY, button)
+        //#endif
     }
 
     private fun handleResetConfirmClick(mouseX: Int, mouseY: Int) {
@@ -452,7 +471,15 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
         }
     }
 
+    //#if MC >= 1.21.9
+    //$$ override fun mouseDragged(click: Click?, offsetX: Double, offsetY: Double): Boolean {
+    //$$     if (click == null) return super.mouseDragged(click, offsetX, offsetY)
+    //$$     val mouseX = click.x
+    //$$     val mouseY = click.y
+    //$$     val button = click.keycode
+    //#else
     override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, deltaX: Double, deltaY: Double): Boolean {
+    //#endif
         dragging?.let { element ->
             var newX = mouseX - dragOffsetX
             var newY = mouseY - dragOffsetY
@@ -468,22 +495,41 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             element.setPosition(newX.toFloat(), newY.toFloat())
             dirty = true
         }
+
+        //#if MC >= 1.21.9
+        //$$ return super.mouseDragged(click, offsetX, offsetY)
+        //#else
         return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)
+        //#endif
     }
 
+    //#if MC >= 1.21.9
+    //$$ override fun mouseReleased(click: Click?): Boolean {
+    //#else
     override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    //#endif
         if (showToolbar) {
             window.mouseRelease()
         }
 
-        dragging?.let { element ->
+        dragging?.let { _ ->
             dragging = null
             dirty = true
         }
+
+        //#if MC >= 1.21.9
+        //$$ return super.mouseReleased(click)
+        //#else
         return super.mouseReleased(mouseX, mouseY, button)
+        //#endif
     }
 
+    //#if MC >= 1.21.9
+    //$$ override fun keyPressed(input: KeyInput?): Boolean {
+    //$$    val keyCode = input?.keycode ?: return super.keyPressed(input)
+    //#else
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+    //#endif
         if (showResetConfirm) {
             if (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_N) {
                 showResetConfirm = false
@@ -504,8 +550,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             GLFW.GLFW_KEY_P -> previewMode = !previewMode
             GLFW.GLFW_KEY_R -> showResetConfirm = true
             GLFW.GLFW_KEY_T -> showToolbar = !showToolbar
-            GLFW.GLFW_KEY_Z -> if (hasControlDown()) undo()
-            GLFW.GLFW_KEY_Y -> if (hasControlDown()) redo()
+            GLFW.GLFW_KEY_Z -> if (OmniKeyboard.isCtrlKeyPressed) undo()
+            GLFW.GLFW_KEY_Y -> if (OmniKeyboard.isCtrlKeyPressed) redo()
             GLFW.GLFW_KEY_DELETE -> selected?.let { delete(it) }
             GLFW.GLFW_KEY_UP -> selected?.let { move(it, 0, -1) }
             GLFW.GLFW_KEY_DOWN -> selected?.let { move(it, 0, 1) }
@@ -514,7 +560,12 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             GLFW.GLFW_KEY_EQUAL, GLFW.GLFW_KEY_KP_ADD -> selected?.let { scale(it, 0.1f) }
             GLFW.GLFW_KEY_MINUS, GLFW.GLFW_KEY_KP_SUBTRACT -> selected?.let { scale(it, -0.1f) }
         }
+
+        //#if MC >= 1.21.9
+        //$$ return super.keyPressed(input)
+        //#else
         return super.keyPressed(keyCode, scanCode, modifiers)
+        //#endif
     }
 
     private fun scale(element: HUDElement, delta: Float) {
@@ -525,7 +576,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     private fun move(element: HUDElement, deltaX: Int, deltaY: Int) {
         saveState()
-        val moveAmount = if (hasShiftDown()) 10 else 1
+        val moveAmount = if (OmniKeyboard.isShiftKeyPressed) 10 else 1
         val newX = element.targetX + deltaX * moveAmount
         val newY = element.targetY + deltaY * moveAmount
 

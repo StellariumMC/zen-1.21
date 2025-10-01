@@ -29,9 +29,13 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
-import net.minecraft.util.Identifier
 import org.lwjgl.glfw.GLFW
 import java.awt.Color
+
+//#if MC >= 1.21.9
+//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.gui.Click
+//#endif
 
 /**
  * Module contains code from Skytils
@@ -381,6 +385,20 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
         context.drawTooltip(textRenderer, lines, mouseX, mouseY)
     }
 
+    //#if MC >= 1.21.9
+    //$$ override fun mouseClicked(click: Click?, doubled: Boolean): Boolean {
+    //$$     if (click?.keycode == 0) {
+    //$$         slots.forEachIndexed { _, slot ->
+    //$$             if (click.x >= slot.x && click.x <= slot.x + slotSize && click.y >= slot.y && click.y <= slot.y + slotSize) {
+    //$$                 if (!slot.stack.isEmpty) toggleProtection(slot)
+    //$$                 return true
+    //$$              }
+    //$$         }
+    //$$     }
+    //$$
+    //$$     return super.mouseClicked(click, doubled)
+    //$$ }
+    //#else
     override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
         if (button == 0) {
             slots.forEachIndexed { _, slot ->
@@ -392,9 +410,15 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
         }
         return super.mouseClicked(mouseX, mouseY, button)
     }
+    //#endif
 
+    //#if MC >= 1.21.9
+    //$$ override fun keyPressed(input: KeyInput?): Boolean {
+    //$$    when (input?.keycode) {
+    //#else
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
         when (keyCode) {
+    //#endif
             GLFW.GLFW_KEY_ESCAPE -> {
                 close()
                 return true
@@ -408,7 +432,11 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
             }
         }
 
+        //#if MC >= 1.21.9
+        //$$ return super.keyPressed(input)
+        //#else
         return super.keyPressed(keyCode, scanCode, modifiers)
+        //#endif
     }
 
     private fun toggleProtection(slot: InventorySlot) {

@@ -9,7 +9,6 @@
     "MixinClientPlayerEntity",
     "MixinClientPlayerInteraction",
     "MixinClientPlayNetworkHandler",
-    "MixinEntityRenderDispatcher",
     "MixinEntityRenderer",
     "MixinFallingBlockEntityRenderer",
     "MixinGameRenderer",

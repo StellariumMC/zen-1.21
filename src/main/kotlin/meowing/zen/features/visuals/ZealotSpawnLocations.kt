@@ -1,5 +1,6 @@
 package meowing.zen.features.visuals
 
+//#if MC < 1.21.9
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
@@ -125,3 +126,4 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
         }
     }
 }
+//#endif

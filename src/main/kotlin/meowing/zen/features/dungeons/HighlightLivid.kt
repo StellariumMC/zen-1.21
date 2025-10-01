@@ -94,6 +94,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
         }
 
         createCustomEvent<RenderEvent.World>("renderLine") { event ->
+            //#if MC < 1.21.9
             lividEntity?.let { entity ->
                 if (player?.canSee(entity) == true && event.context != null) {
                     Render3D.drawLineToEntity(
@@ -104,10 +105,18 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
                     )
                 }
             }
+            //#endif
         }
 
         createCustomEvent<RenderEvent.Player.Pre>("renderWrong") { event ->
-            if (event.entity != lividEntity && event.entity.name.contains(" Livid")) {
+            if (
+                event.entity != lividEntity &&
+                //#if MC >= 1.21.9
+                //$$ event.entity.displayName?.string?.contains(" Livid") == true
+                //#else
+                event.entity.name.contains(" Livid")
+                //#endif
+                ) {
                 event.cancel()
             }
         }

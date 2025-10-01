@@ -9,7 +9,12 @@ object ScoreboardUtils {
     // Modified from Skyblocker https://github.com/SkyblockerMod/Skyblocker
     fun getSidebarLines(): List<String> {
         return try {
+            //#if MC >= 1.21.9
+            //$$ val scoreboard = mc.world?.scoreboard ?: return emptyList()
+            //#else
             val scoreboard = mc.player?.scoreboard ?: return emptyList()
+            //#endif
+
             val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
 
             val stringLines = mutableListOf<String>()

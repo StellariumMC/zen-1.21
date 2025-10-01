@@ -58,7 +58,11 @@ object Debug : Feature() {
         createCustomEvent<RenderEvent.Entity.Post>("mobid") { event ->
             Render3D.drawString(
                 event.entity.sbMobID ?: return@createCustomEvent,
+                //#if MC >= 1.21.9
+                //$$ event.entity.entityPos,
+                //#else
                 event.entity.pos,
+                //#endif
                 depth = true
             )
         }

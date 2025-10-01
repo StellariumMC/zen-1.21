@@ -2,7 +2,6 @@ package meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import kotlin.Suppress;
 import meowing.zen.events.EventBus;
 import meowing.zen.events.GuiEvent;
 import net.minecraft.client.gui.DrawContext;
@@ -48,7 +47,11 @@ public class MixinHandledScreen {
     }
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;close()V", shift = At.Shift.BEFORE), cancellable = true)
+    //#if MC >= 1.21.9
+    //$$ private void closeWindowPressed(net.minecraft.client.input.KeyInput input, CallbackInfoReturnable<Boolean> cir) {
+    //#else
     private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
+    //#endif
         if (EventBus.INSTANCE.post(new GuiEvent.Close((HandledScreen) (Object) this, this.handler))) {
             cir.setReturnValue(true);
         }

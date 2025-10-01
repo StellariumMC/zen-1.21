@@ -1,5 +1,6 @@
 package meowing.zen.features.rift
 
+//#if MC < 1.21.9
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
@@ -75,3 +76,4 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
         }
     }
 }
+//#endif

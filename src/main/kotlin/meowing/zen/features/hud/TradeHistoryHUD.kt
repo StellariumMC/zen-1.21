@@ -259,7 +259,15 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         } childOf tradesContainer
 
         horizontalScroll.onMouseScroll {
-            if (!InputUtil.isKeyPressed(mc.window.handle, GLFW.GLFW_KEY_LEFT_SHIFT)) {
+            if (
+                !InputUtil.isKeyPressed(
+                    //#if MC >= 1.21.9
+                    //$$ mc.window,
+                    //#else
+                    mc.window.handle,
+                    //#endif
+                    GLFW.GLFW_KEY_LEFT_SHIFT)
+                ) {
                 it.stopImmediatePropagation()
                 scrollComponent.scrollTo(verticalOffset = (scrollComponent.verticalOffset + it.delta * 20).toFloat())
             }

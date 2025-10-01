@@ -3,7 +3,6 @@ package meowing.zen.events
 import meowing.zen.api.EntityDetection
 import meowing.zen.api.ItemAbility
 import meowing.zen.api.PartyTracker.PartyMember
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -25,6 +24,10 @@ import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
+
+//#if MC < 1.21.9
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
+//#endif
 
 abstract class Event
 
@@ -89,16 +92,32 @@ enum class PartyChangeType {
 }
 
 abstract class RenderEvent {
-    class World(val context: WorldRenderContext?) : Event()
-    class WorldPostEntities(val context: WorldRenderContext?) : Event()
-    class BlockOutline(val worldContext: WorldRenderContext, val blockContext: WorldRenderContext.BlockOutlineContext) : CancellableEvent()
+    class World(
+        //#if MC < 1.21.9
+        val context: WorldRenderContext?
+        //#endif
+    ) : Event()
+
+    class WorldPostEntities(
+        //#if MC < 1.21.9
+        val context: WorldRenderContext?
+        //#endif
+    ) : Event()
+
+    class BlockOutline(
+        //#if MC < 1.21.9
+        val worldContext: WorldRenderContext,
+        val blockContext: WorldRenderContext.BlockOutlineContext
+        //#endif
+    ) : CancellableEvent()
+
     class EntityGlow(val entity: net.minecraft.entity.Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()
     class HUD(val context: DrawContext) : Event()
     class GuardianLaser(val entity: net.minecraft.entity.Entity, val target: net.minecraft.entity.Entity?) : CancellableEvent()
 
     abstract class Entity {
-        class Pre(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : CancellableEvent()
-        class Post(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider, val light: Int) : Event()
+        class Pre(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider?, val light: Int) : CancellableEvent()
+        class Post(val entity: net.minecraft.entity.Entity, val matrices: MatrixStack, val vertex: VertexConsumerProvider?, val light: Int) : Event()
     }
 
     abstract class Player {

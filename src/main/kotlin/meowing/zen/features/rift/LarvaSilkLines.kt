@@ -41,6 +41,8 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
     override fun initialize() {
         createCustomEvent<RenderEvent.World>("render") { event ->
             if (startingSilkPos == null) return@createCustomEvent
+
+            //#if MC < 1.21.9
             if (isHolding("LARVA_SILK") && event.context != null) {
                 val lookingAt = mc.crosshairTarget
                 Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, event.context)
@@ -55,6 +57,8 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
                     Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, event.context)
                 }
             }
+
+            //#endif
         }
 
         register<ChatEvent.Receive> { event ->

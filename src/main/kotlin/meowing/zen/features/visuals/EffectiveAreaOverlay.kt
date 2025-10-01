@@ -1,5 +1,6 @@
 package meowing.zen.features.visuals
 
+//#if MC < 1.21.9
 import meowing.zen.Zen
 import meowing.zen.config.ConfigDelegate
 import meowing.zen.config.ui.ConfigUI
@@ -62,3 +63,4 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
         }
     }
 }
+//#endif

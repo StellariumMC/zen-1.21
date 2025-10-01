@@ -42,7 +42,11 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
     override fun initialize() {
         register<SkyblockEvent.ItemAbilityUsed> { event ->
             if (event.ability.itemId == "FIRE_FREEZE_STAFF") {
+                //#if MC >= 1.21.9
+                //$$ activatedPos = player?.entityPos
+                //#else
                 activatedPos = player?.pos
+                //#endif
                 frozenEntities.clear()
 
                 overlayTimerId = createTimer(100) {
@@ -67,10 +71,10 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
         }
 
         register<RenderEvent.World> { event ->
+            //#if MC < 1.21.9
             val context = event.context ?: return@register
             val timer = overlayTimerId?.let { getTimer(it) } ?: return@register
             val pos = activatedPos ?: return@register
-            val text = "§b${"%.1f".format(timer.ticks / 20.0)}s"
 
             Render3D.drawFilledCircle(
                 context,
@@ -81,11 +85,13 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
                 firefreezeoverlaycolor.toColorInt()
             )
 
+            val text = "§b${"%.1f".format(timer.ticks / 20.0)}s"
             Render3D.drawString(
                 text,
-                pos.add(0.0, 1.0, 0.0),
+                activatedPos?.add(0.0, 1.0, 0.0) ?: return@register,
                 0x000000
             )
+            //#endif
         }
 
         register<RenderEvent.World> { event ->
@@ -93,7 +99,15 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
             frozenEntities.removeAll { !it.isAlive }
             frozenEntities.forEach { ent ->
                 val freezeText = "§b${"%.1f".format(timer.ticks / 20.0)}s"
-                Render3D.drawString(freezeText, ent.pos, 0x000000)
+                Render3D.drawString(
+                    freezeText,
+                    //#if MC >= 1.21.9
+                    //$$ ent.entityPos,
+                    //#else
+                    ent.pos,
+                    //#endif
+                    0x000000
+                )
             }
         }
 

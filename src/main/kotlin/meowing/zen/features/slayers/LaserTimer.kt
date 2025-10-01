@@ -59,6 +59,16 @@ object LaserTimer : Feature("lasertimer", true) {
         val time = maxOf(0.0, totaltime - (ridingentity.age / 20.0))
         val text = "§bLaser: §c${"%.1f".format(time)}"
 
-        Render3D.drawString(text, ent.pos, Color.WHITE.rgb, 2.0f, 1.0f)
+        Render3D.drawString(
+            text,
+            //#if MC >= 1.21.9
+            //$$ ent.entityPos,
+            //#else
+            ent.pos,
+            //#endif
+            Color.WHITE.rgb,
+            2.0f,
+            1.0f
+        )
     }
 }

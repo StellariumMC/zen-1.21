@@ -165,7 +165,15 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
                 if (showKillTimer) {
                     val killTime = System.currentTimeMillis() - slayerData.spawnTime
                     val killTimeText = "§a${"%.1f".format(killTime / 1000.0)}s"
-                    killTimers[entityId] = Triple(System.currentTimeMillis(), killTimeText, event.entity.pos)
+                    killTimers[entityId] = Triple(
+                        System.currentTimeMillis(),
+                        killTimeText,
+                        //#if MC >= 1.21.9
+                        //$$ event.entity.entityPos
+                        //#else
+                        event.entity.pos
+                        //#endif
+                    )
                 }
             }
 
@@ -191,7 +199,11 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
                 val depth = player?.canSee(event.entity) != true
                 Render3D.drawString(
                     it,
+                    //#if MC >= 1.21.9
+                    //$$ event.entity.entityPos.add(0.0, yOffset, 0.0),
+                    //#else
                     event.entity.pos.add(0.0, yOffset, 0.0),
+                    //#endif
                     depth = depth,
                     scaleMultiplier = 1.5,
                     smallestDistanceView = 8.0

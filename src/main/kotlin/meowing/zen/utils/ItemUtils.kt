@@ -1,5 +1,6 @@
 package meowing.zen.utils
 
+import com.mojang.authlib.GameProfile
 import meowing.zen.Zen.Companion.mc
 import meowing.zen.utils.Utils.getPlayerTexture
 import meowing.zen.utils.Utils.getPlayerUuid
@@ -26,7 +27,7 @@ object ItemUtils {
 
     inline val ItemStack?.skyblockID: String get() = this?.extraAttributes?.getString("id")?.orElse("") ?: ""
 
-    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponentTypes.LORE)?.comp_2400?.map { it.string } ?: emptyList()
+    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponentTypes.LORE)?.lines?.map { it.string } ?: emptyList()
 
     inline val ItemStack?.uuid: String get() = this?.extraAttributes?.getString("uuid")?.orElse("") ?: ""
 
@@ -44,21 +45,29 @@ object ItemUtils {
 
     fun ItemStack.displayName(): String = this.get(DataComponentTypes.CUSTOM_NAME)?.string ?: this.name.string
 
-
     fun createSkull(texture: String, displayName: String? = null, lore: List<String> = emptyList()): ItemStack {
         val uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".replace("x".toRegex()) {
             Random.nextInt(16).toString(16)
         }
-        val profile = com.mojang.authlib.GameProfile(UUID.fromString(uuid), uuid)
-        profile.properties.put("textures", com.mojang.authlib.properties.Property("textures", texture))
+        val profile = GameProfile(UUID.fromString(uuid), uuid)
+
+        try {
+            profile.properties.put("textures", com.mojang.authlib.properties.Property("textures", texture))
+        } catch (e: UnsupportedOperationException) {
+        }
 
         return ItemStack(Items.PLAYER_HEAD).apply {
-            set(DataComponentTypes.PROFILE, ProfileComponent(profile))
-
+            set(
+                DataComponentTypes.PROFILE,
+                //#if MC >= 1.21.9
+                //$$ ProfileComponent.ofStatic(profile)
+                //#else
+                ProfileComponent(profile)
+                //#endif
+            )
             displayName?.let {
                 set(DataComponentTypes.CUSTOM_NAME, Text.literal(it))
             }
-
             if (lore.isNotEmpty()) {
                 set(DataComponentTypes.LORE, LoreComponent(
                     lore.map { Text.literal(it) }

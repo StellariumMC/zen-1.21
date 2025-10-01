@@ -1,5 +1,6 @@
 package meowing.zen.features.meowing
 
+//#if MC < 1.21.9
 import meowing.zen.Zen
 import meowing.zen.events.RenderEvent
 import meowing.zen.features.Feature
@@ -107,3 +108,4 @@ object Rat : Feature(area = "Hub") {
         matrices.pop()
     }
 }
+//#endif

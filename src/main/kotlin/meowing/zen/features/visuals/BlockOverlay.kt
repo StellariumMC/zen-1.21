@@ -13,6 +13,7 @@ import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
 import java.awt.Color
 
+//#if MC < 1.21.9
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
@@ -53,3 +54,4 @@ object BlockOverlay : Feature("blockoverlay") {
         }
     }
 }
+//#endif

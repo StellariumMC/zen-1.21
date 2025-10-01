@@ -21,7 +21,17 @@ object DamageAPI {
             val damageStr = matchResult.groupValues[1].replace(",", "")
             val damage = damageStr.toIntOrNull() ?: return@register
 
-            if (post(SkyblockEvent.DamageSplash(damage, name, entity.pos, packet, entity))) event.cancel()
+            if (post(SkyblockEvent.DamageSplash(
+                    damage,
+                    name,
+                    //#if MC >= 1.21.9
+                    //$$ entity.entityPos,
+                    //#else
+                    entity.pos,
+                    //#endif
+                    packet,
+                    entity
+            ))) event.cancel()
         }
     }
 }
