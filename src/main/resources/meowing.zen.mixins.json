@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "meowing.zen.mixins",
+  "package": "xyz.meowing.zen.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "AccessorChatHud",

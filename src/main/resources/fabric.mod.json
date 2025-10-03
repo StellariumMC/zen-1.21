@@ -15,13 +15,13 @@
 	"entrypoints": {
 		"client": [
 			{
-				"value": "meowing.zen.Zen",
+				"value": "xyz.meowing.zen.Zen",
 				"adapter": "kotlin"
 			}
 		],
 		"modmenu": [
 			{
-				"value": "meowing.zen.compat.ModMenu",
+				"value": "xyz.meowing.zen.compat.ModMenu",
 				"adapter": "kotlin"
 			}
 		]

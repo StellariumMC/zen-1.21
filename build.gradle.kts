@@ -52,7 +52,7 @@ dependencies {
 }
 
 tasks.register("generateLists") {
-    val srcDir = rootProject.file("src/main/kotlin/meowing/zen")
+    val srcDir = rootProject.file("src/main/kotlin/xyz/meowing/zen")
     val featureOutput = project.file("build/generated/resources/features.list")
     val commandOutput = project.file("build/generated/resources/commands.list")
 
