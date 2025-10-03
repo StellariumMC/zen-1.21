@@ -35,6 +35,7 @@ object CarryHUD {
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
 
+        buildRenderData()
         val lines = getLines()
         if (lines.isNotEmpty()) {
             var currentY = y
@@ -62,10 +63,13 @@ object CarryHUD {
         if (shouldRegister != isRegistered) {
             try {
                 if (shouldRegister) {
-                    guiClickHandler = EventBus.register<GuiEvent.Click> ({
+                    guiClickHandler = EventBus.register<GuiEvent.Click> {
                         if (it.state) onMouseInput()
-                    })
-                    guiDrawHandler = EventBus.register<GuiEvent.AfterRender> ({ onGuiRender(it.context) })
+                    }
+
+                    guiDrawHandler = EventBus.register<GuiEvent.AfterRender> {
+                        onGuiRender(it.context)
+                    }
                 } else {
                     guiClickHandler?.unregister()
                     guiDrawHandler?.unregister()

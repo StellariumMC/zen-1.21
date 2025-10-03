@@ -1,6 +1,5 @@
 pluginManagement {
     repositories {
-        // Repositories
         maven("https://maven.deftu.dev/releases")
         maven("https://maven.fabricmc.net")
         maven("https://maven.architectury.dev/")
@@ -10,14 +9,12 @@ pluginManagement {
         maven("https://jitpack.io/")
         maven("https://maven.terraformersmc.com/")
         maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-
-        // Snapshots
         maven("https://maven.deftu.dev/snapshots")
-        mavenLocal()
 
-        // Default repositories
-        gradlePluginPortal()
+        mavenLocal()
         mavenCentral()
+
+        gradlePluginPortal()
     }
 
     plugins {

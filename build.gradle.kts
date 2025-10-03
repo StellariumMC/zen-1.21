@@ -15,7 +15,6 @@ plugins {
 
 repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-    maven("https://repo.polyfrost.org/releases")
 }
 
 toolkitMultiversion {
@@ -23,55 +22,43 @@ toolkitMultiversion {
 }
 
 toolkitLoomHelper {
-    if (!mcData.isNeoForge) {
-        useMixinRefMap(modData.id)
-    }
-
-    if (mcData.isForge) {
-        useTweaker("org.spongepowered.asm.launch.MixinTweaker")
-        useForgeMixin(modData.id)
-    }
-
-    if (mcData.isForgeLike && mcData.version >= MinecraftVersions.VERSION_1_16_5) {
-        useKotlinForForge()
-    }
+    useMixinRefMap(modData.id)
 }
 
 dependencies {
-    if (mcData.isFabric) {
-        modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
-        modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-        modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-        modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
-        modImplementation(includeOrShade("org.reflections:reflections:0.10.2")!!)
-        modImplementation(includeOrShade("org.javassist:javassist:3.30.2-GA")!!)
-        modImplementation(includeOrShade("dev.deftu:omnicore-$mcData:1.0.0-beta.17")!!)
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
+    modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
+    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
+    modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
 
-        if (mcData.version == MinecraftVersions.VERSION_1_21_7) {
-            modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.7-fabric:1.0.4")!!)
-        } else if (mcData.version == MinecraftVersions.VERSION_1_21_5) {
-            modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-            modImplementation(includeOrShade("xyz.meowing:vexel-1.21.5-fabric:1.0.4")!!)
+    when (mcData.version) {
+        MinecraftVersions.VERSION_1_21_9 -> {
+            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
         }
-
-        runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
-    } else if (mcData.version <= MinecraftVersions.VERSION_1_12_2) {
-        implementation(includeOrShade(kotlin("stdlib-jdk8"))!!)
-        implementation(includeOrShade("org.jetbrains.kotlin:kotlin-reflect:1.6.10")!!)
-
-        modImplementation(includeOrShade("org.spongepowered:mixin:0.7.11-SNAPSHOT")!!)
+        MinecraftVersions.VERSION_1_21_7 -> {
+            modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
+            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
+            modImplementation(include("xyz.meowing:vexel-1.21.7-fabric:1.0.4")!!)
+        }
+        MinecraftVersions.VERSION_1_21_5 -> {
+            modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
+            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
+            modImplementation(include("xyz.meowing:vexel-1.21.5-fabric:1.0.4")!!)
+        }
+        else -> {}
     }
-}
 
-val moduleRegex = Regex("@Zen\\.Module\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
-val commandRegex = Regex("@Zen\\.Command\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
-val pkgRegex = Regex("package\\s+([\\w.]+)")
+    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+}
 
 tasks.register("generateLists") {
     val srcDir = rootProject.file("src/main/kotlin/meowing/zen")
     val featureOutput = project.file("build/generated/resources/features.list")
     val commandOutput = project.file("build/generated/resources/commands.list")
+
+    val moduleRegex = Regex("@Zen\\.Module\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
+    val commandRegex = Regex("@Zen\\.Command\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
+    val pkgRegex = Regex("package\\s+([\\w.]+)")
 
     inputs.dir(srcDir).optional(true)
     outputs.files(featureOutput, commandOutput)
