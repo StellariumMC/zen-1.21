@@ -52,7 +52,7 @@ public class MixinHandledScreen {
     //#else
     private void closeWindowPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {
     //#endif
-        if (EventBus.INSTANCE.post(new GuiEvent.Close((HandledScreen) (Object) this, this.handler))) {
+        if (this.handler != null && EventBus.INSTANCE.post(new GuiEvent.Close((HandledScreen) (Object) this, this.handler))) {
             cir.setReturnValue(true);
         }
     }
