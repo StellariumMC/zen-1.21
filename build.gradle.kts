@@ -30,20 +30,15 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(includeOrShade("gg.essential:elementa:710")!!)
     modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:1.0.6")!!)
+    modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
 
     when (mcData.version) {
-        MinecraftVersions.VERSION_1_21_9 -> {
-            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
-        }
         MinecraftVersions.VERSION_1_21_7 -> {
             modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
-            modImplementation(include("xyz.meowing:vexel-1.21.7-fabric:1.0.4")!!)
         }
         MinecraftVersions.VERSION_1_21_5 -> {
             modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-            modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
-            modImplementation(include("xyz.meowing:vexel-1.21.5-fabric:1.0.4")!!)
         }
         else -> {}
     }
