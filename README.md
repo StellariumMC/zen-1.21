@@ -1,10 +1,10 @@
 ![Title Logo](https://i.imgur.com/89LZy2p.png)
 <div align="center">
-    <a href="https://github.com/kiwidotzip/zen/releases/latest" target="_blank">
-        <img src="https://img.shields.io/github/v/release/kiwidotzip/zen?include_prereleases&label=Latest&logo=Github&logoColor=FFFFFF&labelColor=262626&color=0074D4&style=for-the-badge" alt="release">
+    <a href="https://github.com/StellariumMC/zen-1.21/releases/latest" target="_blank">
+        <img src="https://img.shields.io/github/v/release/StellariumMC/zen-1.21?include_prereleases&label=Latest&logo=Github&logoColor=FFFFFF&labelColor=262626&color=0074D4&style=for-the-badge" alt="release">
     </a>&nbsp;
-    <a href="https://github.com/kiwidotzip/zen/graphs/code-frequency" target="_blank">
-        <img src="https://img.shields.io/github/license/kiwidotzip/zen?label=License&logo=Github&logoColor=FFFFFF&labelColor=262626&color=0074D4&style=for-the-badge" alt="lines">
+    <a href="https://github.com/StellariumMC/zen-1.21/graphs/code-frequency" target="_blank">
+        <img src="https://img.shields.io/github/license/StellariumMC/zen-1.21?label=License&logo=Github&logoColor=FFFFFF&labelColor=262626&color=0074D4&style=for-the-badge" alt="lines">
     </a>&nbsp;
     <a href="https://discord.gg/KPmHQUC97G" target="_blank">
         <img src="https://img.shields.io/discord/1353646371407659018?label=Discord&logo=Discord&logoColor=FFFFFF&labelColor=262626&color=0074D4&style=for-the-badge" alt="discord">
@@ -14,7 +14,7 @@
 
 
 <p align="center">The 1.21 Fabric version of Zen (Formerly MeowAddons)</p>
-<p align="center">Looking for the 1.8 version? https://github.com/kiwidotzip/zen</p>
+<p align="center">Looking for the 1.8 version? https://github.com/StellariumMC/zen</p>
 
 <div align="center"><img src='https://i.imgur.com/0KOjr5l.png'/></div>
 
@@ -147,10 +147,10 @@
 
 ### Links
 
-- [GitHub](https://github.com/kiwidotzip/zen)
-  - [Releases](https://github.com/kiwidotzip/zen/releases)
-  - [Pull Requests](https://github.com/kiwidotzip/zen/pulls)
-  - [Issues](https://github.com/kiwidotzip/zen/issues)
+- [GitHub](https://github.com/StellariumMC/zen-1.21)
+  - [Releases](https://github.com/StellariumMC/zen-1.21/releases)
+  - [Pull Requests](https://github.com/StellariumMC/zen-1.21/pulls)
+  - [Issues](https://github.com/StellariumMC/zen-1.21/issues)
 - [Modrinth](https://modrinth.com/mod/zenmod)
 - [Discord](https://discordapp.com/invite/KPmHQUC97G)
 

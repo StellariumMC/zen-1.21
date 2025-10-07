@@ -26,7 +26,7 @@ object ContributorColor {
 
     init {
         NetworkUtils.fetchJson<Map<String, Map<String, Any>>>(
-            "https://raw.githubusercontent.com/kiwidotzip/zen-data/refs/heads/main/assets/ContributorColor.json",
+            "https://raw.githubusercontent.com/StellariumMC/zen-data/refs/heads/main/assets/ContributorColor.json",
             onSuccess = { data ->
                 contributorData = data.mapValues { (_, info) ->
                     val colorList = (info["highlightColor"] as? List<Int>)
