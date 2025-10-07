@@ -83,7 +83,7 @@ object UpdateChecker {
     }.getOrNull()
 
     private fun checkModrinth(): Triple<String, String, String?>? = runCatching {
-        val connection = createConnection("https://api.modrinth.com/v2/project/zenmod/version")
+        val connection = createConnection("https://api.modrinth.com/v2/project/${modrinthProjectId}/version")
         connection.requestMethod = "GET"
 
         if (connection.responseCode == 200) {
@@ -106,7 +106,7 @@ object UpdateChecker {
             filteredVersions.maxByOrNull { it.date_published }?.let { version ->
                 val primaryFile = version.files.firstOrNull { it.primary } ?: version.files.firstOrNull()
                 primaryFile?.let {
-                    Triple(version.version_number, "https://modrinth.com/mod/zenmod/version/${version.id}", it.url)
+                    Triple(version.version_number, "https://modrinth.com/mod/${modrinthProjectId}/version/${version.id}", it.url)
                 }
             }
         } else null
