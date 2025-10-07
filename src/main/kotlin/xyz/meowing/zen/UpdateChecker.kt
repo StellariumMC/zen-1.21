@@ -483,12 +483,12 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
 
             val pid = ProcessHandle.current().pid()
             if(isWindows) {
-                val vbs = File.createTempFile("delete_old_mod", ",vbs")
+                val vbs = File.createTempFile("delete_old_mod", ".vbs")
                 vbs.writeText("""
                     Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
                     Do
                         WScript.Sleep 2000
-                        Set colProcesses = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE ProcessId = ${'$'}pid")
+                        Set colProcesses = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE ProcessId = $pid")
                     Loop While colProcesses.Count > 0
 
                     Set fso = CreateObject("Scripting.FileSystemObject")
