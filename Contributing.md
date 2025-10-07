@@ -43,7 +43,7 @@ Have an idea for a new feature? Share it in our [Discord](https://discord.com/in
 We welcome contributions from everyone! Follow these steps to get started:
 
 #### 1. Fork the Repository
-Navigate to our [GitHub repository](https://github.com/meowing-xyz/zen-1.21) and click the **Fork** button to create a copy under your account.
+Navigate to our [GitHub repository](https://github.com/StellariumMC/zen-1.21) and click the **Fork** button to create a copy under your account.
 
 #### 2. Clone Your Fork
 ```bash

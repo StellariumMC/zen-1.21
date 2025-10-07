@@ -1,5 +1,6 @@
 package xyz.meowing.zen
 
+import com.google.common.base.Preconditions
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import gg.essential.elementa.ElementaVersion
@@ -16,15 +17,18 @@ import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.NetworkUtils.createConnection
 import xyz.meowing.zen.utils.TickUtils
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.util.Util
+import org.lwjgl.system.Platform
 import java.awt.Color
 import java.awt.Desktop
 import java.io.File
-import java.net.HttpURLConnection
 import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 object UpdateChecker {
     private const val current = "1.1.7"
+    private const val modrinthProjectId = "stWFyj4m"
+    const val githubRepository = "StellariumMC/zen-1.21"
     private var isMessageShown = false
     private var latestVersion: String? = null
     private var githubUrl: String? = null
@@ -62,7 +66,7 @@ object UpdateChecker {
     }
 
     private fun checkGitHub(): Triple<String, String, String?>? = runCatching {
-        val connection = createConnection("https://api.github.com/repos/kiwidotzip/zen-1.21/releases") as HttpURLConnection
+        val connection = createConnection("https://api.github.com/repos/${githubRepository}/releases")
         connection.requestMethod = "GET"
 
         if (connection.responseCode == 200) {
@@ -79,7 +83,7 @@ object UpdateChecker {
     }.getOrNull()
 
     private fun checkModrinth(): Triple<String, String, String?>? = runCatching {
-        val connection = createConnection("https://api.modrinth.com/v2/project/zenmod/version") as HttpURLConnection
+        val connection = createConnection("https://api.modrinth.com/v2/project/zenmod/version")
         connection.requestMethod = "GET"
 
         if (connection.responseCode == 200) {
@@ -459,35 +463,58 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         }
     }
 
-    // Tested on Windows, Unsure about MacOS/Linux
-    private fun setupShutdownHook(modsDir: File) {
-        modsDir.listFiles()?.find { it.name.lowercase().contains("zen") && it.extension == "jar" }?.let { zenFile ->
-            Runtime.getRuntime().addShutdownHook(Thread {
+    private fun tryDeleteCurrentFile(modsDir: File, isWindows: Boolean): File? {
+        return modsDir.listFiles()?.find {
+            it.isFile && it.name.contains("zen", ignoreCase = true) && it.extension.equals("jar", ignoreCase = true)
+        }?.let {
+            if(!isWindows) { // Unix allows us to immediately delete files.
                 try {
-                    if (System.getProperty("os.name").lowercase().contains("win")) {
-                        val vbs = File(modsDir, "delete_old_mod.vbs")
-                        vbs.writeText("""
-                            Set fso = CreateObject("Scripting.FileSystemObject")
-                            WScript.Sleep 2000
-                            fso.DeleteFile "${zenFile.absolutePath}"
-                            fso.DeleteFile "${vbs.absolutePath}"
-                        """.trimIndent())
-                        Runtime.getRuntime().exec(arrayOf("cscript", "//nologo", vbs.absolutePath))
-                    } else {
-                        val sh = File(modsDir, "delete_old_mod.sh")
-                        sh.writeText("""
-                            #!/bin/bash
-                            sleep 2
-                            rm -f "${zenFile.absolutePath}"
-                            rm -- "$0"
-                        """.trimIndent())
-                        sh.setExecutable(true)
-                        Runtime.getRuntime().exec(arrayOf("/bin/bash", sh.absolutePath))
+                    if(it.delete()) {
+                        return null
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
                 }
-            })
+                catch (t: Throwable) {
+                    Zen.LOGGER.error("Unable to delete old mod file '{}', scheduling for deletion on exit!", it.absolutePath, t)
+                }
+            }
+
+            // if windows or deletion failed: delete when the JVM exits
+            Zen.LOGGER.debug("Scheduling for deletion: {}", it.absolutePath)
+
+            val pid = ProcessHandle.current().pid()
+            if(isWindows) {
+                val vbs = File.createTempFile("delete_old_mod", ",vbs")
+                vbs.writeText("""
+                    Set objWMIService = GetObject("winmgmts:\\.\root\cimv2")
+                    Do
+                        WScript.Sleep 2000
+                        Set colProcesses = objWMIService.ExecQuery("SELECT * FROM Win32_Process WHERE ProcessId = ${'$'}pid")
+                    Loop While colProcesses.Count > 0
+
+                    Set fso = CreateObject("Scripting.FileSystemObject")
+                    fso.DeleteFile "${it.absolutePath}"
+                    fso.DeleteFile "${vbs.absolutePath}"
+                """.trimIndent())
+                Runtime.getRuntime().exec(arrayOf("cscript", "//nologo", vbs.absolutePath))
+            } else {
+                val sh = File.createTempFile("delete_old_mod", ".sh")
+                sh.writeText("""
+                    #!/bin/sh
+                    
+                    # Wait for process to exit
+                    while kill -s 0 $pid 2>/dev/null; do
+                        sleep 2
+                    done
+                    
+                    rm -f "${it.absolutePath}"
+                    rm -- "$0"
+                    """.trimIndent()
+                )
+                sh.setExecutable(true)
+                Runtime.getRuntime().exec(arrayOf("/bin/sh", "${sh.absolutePath}"))
+            }
+
+            return it
         }
     }
 
@@ -495,27 +522,39 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         if (downloadState != DownloadState.NotStarted) return
         downloadState = DownloadState.InProgress
 
+        //#if MC >= 1.21.9
+        //$$ val mcVersion = "1.21.9"
+        //#elseif MC >= 1.21.7
+        //$$ val mcVersion = "1.21.7"
+        //#else
+        val mcVersion = "1.21.5"
+        //#endif
+
+        val loader = "fabric"
+        val latestVersion = UpdateChecker.getLatestVersion()
+
         downloadButton?.setColor(colors["element"]!!)
         downloadButtonText?.setText("Preparing...")
         if (downloadButtonIcon is UIText) (downloadButtonIcon as UIText).setText("...")
 
-        val modsDir = FabricLoader.getInstance().gameDir.resolve("mods").toFile()
+        val modsDir = FabricLoader.getInstance().gameDir.resolve("mods").toFile().canonicalFile
         if (!modsDir.exists()) modsDir.mkdirs()
 
-        setupShutdownHook(modsDir)
+        val isWindows = Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS
+        val existingFile = tryDeleteCurrentFile(modsDir, isWindows)
 
-        val fileName =
-            //#if MC == 1.21.7
-            //$$ "zen-1.21.7-fabric-${UpdateChecker.getLatestVersion()}.jar"
-            //#else
-            "zen-1.21.5-fabric-${UpdateChecker.getLatestVersion()}.jar"
-            //#endif
-        val outputFile = File(modsDir, fileName)
+        var fileName = "zen-${mcVersion}-${loader}-${latestVersion}.jar"
+
+        if(existingFile?.let { it.exists() && it.name.equals(fileName, ignoreCase = isWindows) } ?: false) {
+            fileName = "zen-${mcVersion}-${loader}-${latestVersion}-1.jar"
+        }
+
+        val outputFile = modsDir.resolve(fileName)
+        Preconditions.checkArgument(outputFile.canonicalFile.startsWith(modsDir), "output file %s resolved to outside the mods directory, this is not allowed!")
 
         NetworkUtils.downloadFile(
             url = downloadUrl,
             outputFile = outputFile,
-            headers = mapOf("User-Agent" to "Zen"),
             onProgress = { downloaded, contentLength ->
                 if (contentLength > 0) {
                     val progress = ((downloaded * 100) / contentLength).toInt()
