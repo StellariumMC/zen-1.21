@@ -550,7 +550,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         }
 
         val outputFile = modsDir.resolve(fileName)
-        Preconditions.checkArgument(outputFile.canonicalFile.startsWith(modsDir), "output file %s resolved to outside the mods directory, this is not allowed!")
+        Preconditions.checkArgument(outputFile.canonicalFile.startsWith(modsDir), "output file %s resolved to outside the mods directory, this is not allowed!", outputFile.canonicalPath)
 
         NetworkUtils.downloadFile(
             url = downloadUrl,
