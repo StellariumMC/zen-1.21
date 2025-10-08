@@ -20,7 +20,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
     private val hideForOption by ConfigDelegate<Int>("hideendermanlaserboss")
     private val endermanCache = ConcurrentHashMap<Int, EndermanEntity>()
     private val spawnerCache = ConcurrentHashMap<Int, String>()
-    private var lastCacheUpdate = 0
+    private var lastCacheUpdate = 0L
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -53,7 +53,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
     }
 
     private fun getCachedClosestEnderman(guardianEntity: net.minecraft.entity.Entity): EndermanEntity? {
-        val currentTick = TickUtils.getCurrentServerTick().toInt()
+        val currentTick = TickUtils.getCurrentServerTick()
         if (currentTick - lastCacheUpdate >= 10) {
             lastCacheUpdate = currentTick
             val slayerEntities = EntityDetection.getSlayerEntities()
