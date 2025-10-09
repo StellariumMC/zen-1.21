@@ -100,8 +100,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
             val nameTag = entity?.customName?.string ?: ""
 
             if (nameTag.contains("Spawned by") &&
-                !nameTag.removeFormatting().contains("Armorstand") &&
-                nameTag.length > 15) {
+                !nameTag.removeFormatting().contains("Armorstand")) {
                 nameTag
             } else {
                 ""
