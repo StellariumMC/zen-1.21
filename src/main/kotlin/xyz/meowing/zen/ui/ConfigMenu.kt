@@ -202,6 +202,7 @@ class ConfigMenu : VexelScreen() {
             .borderRadius(12f)
             .dropShadow()
             .childOf(window)
+            .enableDebugRendering()
 
         val sidebar = Rectangle()
             .backgroundColor(0x00000000)
@@ -375,9 +376,7 @@ class ConfigMenu : VexelScreen() {
 @Zen.Command
 object CanvasCommand : CommandUtils("canvas") {
     override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        TickUtils.schedule(2) {
-            mc.setScreen(ConfigMenu())
-        }
+        ConfigMenu().display()
         return 1
     }
 }
