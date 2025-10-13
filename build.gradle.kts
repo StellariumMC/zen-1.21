@@ -22,6 +22,7 @@ toolkitMultiversion {
 }
 
 toolkitLoomHelper {
+    useDevAuth("1.2.1")
     useMixinRefMap(modData.id)
 }
 
@@ -30,8 +31,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(includeOrShade("gg.essential:elementa:710")!!)
     modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
-    modImplementation(include("xyz.meowing:vexel-${mcData}:1.0.6")!!)
-    modImplementation(include("dev.deftu:omnicore-${mcData}:1.0.0-beta.17")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:105")!!)
 
     when (mcData.version) {
         MinecraftVersions.VERSION_1_21_7 -> {
@@ -42,8 +42,12 @@ dependencies {
         }
         else -> {}
     }
+}
 
-    runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        freeCompilerArgs.add("-Xlambdas=class")
+    }
 }
 
 tasks.register("generateLists") {

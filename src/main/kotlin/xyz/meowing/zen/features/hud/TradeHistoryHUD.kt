@@ -2,7 +2,6 @@ package xyz.meowing.zen.features.hud
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.mojang.brigadier.context.CommandContext
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -23,11 +22,9 @@ import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.api.TradeAPI
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.GuiEvent
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.util.InputUtil
 import net.minecraft.item.ItemStack
@@ -35,18 +32,20 @@ import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.command.Commodore
 import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Zen.Command
-object TradeHistoryCommand : CommandUtils("tradelogs", aliases = listOf("zentl", "zentrades"))  {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        TickUtils.schedule(2) {
-            mc.setScreen(TradeHistoryHUD())
+object TradeHistoryCommand : Commodore("tradelogs", "zentl", "zentrades") {
+    init {
+        runs {
+            TickUtils.schedule(2) {
+                mc.setScreen(TradeHistoryHUD())
+            }
         }
-        return 1
     }
 }
 

@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.general
 
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
@@ -12,7 +10,6 @@ import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.uuid
@@ -20,8 +17,6 @@ import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.chestName
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.block.Blocks
 import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.screen.slot.SlotActionType
@@ -30,6 +25,7 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.command.Commodore
 import java.awt.Color
 
 //#if MC >= 1.21.9
@@ -160,52 +156,46 @@ object ProtectItem : Feature("protectitem", true) {
 }
 
 @Zen.Command
-object ProtectItemCommand : CommandUtils("protectitem", aliases = listOf("zenprotect", "pitem", "zenpi")) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        val heldItem = mc.player?.mainHandStack
-        if (heldItem == null || heldItem.isEmpty) {
-            ChatUtils.addMessage("$prefix §cYou must be holding an item!")
-            return 0
-        }
-
-        val itemUuid = heldItem.uuid
-        val itemId = heldItem.item.toString()
-
-        if (itemUuid.isEmpty()) {
-            ProtectItem.protectedTypes.update {
-                if (itemId in this) {
-                    remove(itemId)
-                    ChatUtils.addMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
-                } else {
-                    add(itemId)
-                    ChatUtils.addMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
-                }
-            }
-        } else {
-            ProtectItem.protectedItems.update {
-                if (itemUuid in this) {
-                    remove(itemUuid)
-                    ChatUtils.addMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
-                } else {
-                    add(itemUuid)
-                    ChatUtils.addMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
+object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zenpi") {
+    init {
+        literal("gui") {
+            runs {
+                TickUtils.schedule(2) {
+                    mc.setScreen(ItemProtectGUI())
                 }
             }
         }
 
-        return 1
-    }
-
-    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
-        builder.then(
-            ClientCommandManager.literal("gui")
-                .executes {
-                    TickUtils.schedule(2) {
-                        mc.setScreen(ItemProtectGUI())
+        runs {
+            val heldItem = mc.player?.mainHandStack
+            if (heldItem == null || heldItem.isEmpty) {
+                ChatUtils.addMessage("$prefix §cYou must be holding an item!")
+                return@runs
+            }
+            val itemUuid = heldItem.uuid
+            val itemId = heldItem.item.toString()
+            if (itemUuid.isEmpty()) {
+                ProtectItem.protectedTypes.update {
+                    if (itemId in this) {
+                        remove(itemId)
+                        ChatUtils.addMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
+                    } else {
+                        add(itemId)
+                        ChatUtils.addMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
                     }
-                    1
                 }
-        )
+            } else {
+                ProtectItem.protectedItems.update {
+                    if (itemUuid in this) {
+                        remove(itemUuid)
+                        ChatUtils.addMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
+                    } else {
+                        add(itemUuid)
+                        ChatUtils.addMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
+                    }
+                }
+            }
+        }
     }
 }
 

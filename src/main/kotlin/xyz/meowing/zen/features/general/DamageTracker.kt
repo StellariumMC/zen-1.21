@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.general
 
-import com.mojang.brigadier.context.CommandContext
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -24,12 +23,11 @@ import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.command.Commodore
 import java.awt.Color
 import java.text.DecimalFormat
 
@@ -184,12 +182,13 @@ object DamageTracker : Feature("damagetracker", true) {
 }
 
 @Zen.Command
-object DamageTrackerCommand : CommandUtils("damagetracker", aliases = listOf("dt", "dmg")) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        TickUtils.schedule(2) {
-            mc.setScreen(DamageTrackerGui())
+object DamageTrackerCommand : Commodore("damagetracker", "dt", "dmg") {
+    init {
+        runs {
+            TickUtils.schedule(2) {
+                mc.setScreen(DamageTrackerGui())
+            }
         }
-        return 1
     }
 }
 

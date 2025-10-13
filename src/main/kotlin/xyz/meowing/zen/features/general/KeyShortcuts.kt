@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.general
 
-import com.mojang.brigadier.context.CommandContext
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -22,12 +21,11 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.KeyEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.createBlock
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.command.Commodore
 import java.awt.Color
 
 data class KeybindEntry(
@@ -107,12 +105,13 @@ object KeyShortcuts : Feature("keyshortcuts") {
 }
 
 @Zen.Command
-object KeybindCommand : CommandUtils("keybind", aliases = listOf("zenkeybind", "zenkb")) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        TickUtils.schedule(2) {
-            mc.setScreen(KeybindGui())
+object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
+    init {
+        runs {
+            TickUtils.schedule(2) {
+                mc.setScreen(KeybindGui())
+            }
         }
-        return 1
     }
 }
 

@@ -1,5 +1,7 @@
 package xyz.meowing.zen.features
 
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.Zen.Companion.LOGGER
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
@@ -51,18 +53,25 @@ object FeatureLoader {
             }
         }
 
-        commandClassNames.forEach { className ->
-            try {
-                Class.forName(className)
-                commandCount++
-                LOGGER.debug("Loaded command: $className")
-            } catch (e: ClassNotFoundException) {
-                LOGGER.error("Command class not found: $className")
-            } catch (e: Exception) {
-                LOGGER.error("Error initializing command $className: ${e.message}")
-                e.printStackTrace()
+            commandClassNames.forEach { className ->
+                try {
+                    val commandClass = Class.forName(className)
+                    val instanceField = commandClass.getDeclaredField("INSTANCE")
+                    val command = instanceField.get(null) as Commodore
+
+                    ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+                        command.register(dispatcher)
+                    }
+
+                    commandCount++
+                    LOGGER.debug("Loaded command: $className")
+                } catch (e: ClassNotFoundException) {
+                    LOGGER.error("Command class not found: $className")
+                } catch (e: Exception) {
+                    LOGGER.error("Error initializing command $className: ${e.message}")
+                    e.printStackTrace()
+                }
             }
-        }
 
         loadtime = starttime.since.millis
         LOGGER.info("Loaded $moduleCount modules and $commandCount commands in ${loadtime}ms")

@@ -1,8 +1,5 @@
 package xyz.meowing.zen.features.slayers
 
-import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.SlayerTracker
@@ -15,15 +12,13 @@ import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.toFormattedDuration
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.command.Commodore
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -142,24 +137,20 @@ object SlayerStats : Feature("slayerstats", true) {
 }
 
 @Zen.Command
-object SlayerStatsCommand : CommandUtils(
-    "slayerstats",
-    listOf("zenslayerstats")
-) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
-        return 1
-    }
-
-    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
-        builder.then(
-            ClientCommandManager.argument("action", StringArgumentType.string())
-                .executes { context ->
-                    val action = StringArgumentType.getString(context, "action")
-                    if (action == "reset") SlayerStats.reset()
-                    else ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
-                    1
+object SlayerStatsCommand : Commodore("slayerstats", "zenslayerstats") {
+    init {
+        executable {
+            runs { action: String ->
+                if (action == "reset") {
+                    SlayerStats.reset()
+                } else {
+                    ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
                 }
-        )
+            }
+        }
+
+        runs {
+            ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
+        }
     }
 }

@@ -1,6 +1,5 @@
 package xyz.meowing.zen.hud
 
-import dev.deftu.omnicore.api.client.input.OmniKeyboard
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIImage
@@ -14,6 +13,7 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.input.KnitKeyboard
 import java.awt.Color
 import kotlin.math.roundToInt
 
@@ -550,8 +550,8 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
             GLFW.GLFW_KEY_P -> previewMode = !previewMode
             GLFW.GLFW_KEY_R -> showResetConfirm = true
             GLFW.GLFW_KEY_T -> showToolbar = !showToolbar
-            GLFW.GLFW_KEY_Z -> if (OmniKeyboard.isCtrlKeyPressed) undo()
-            GLFW.GLFW_KEY_Y -> if (OmniKeyboard.isCtrlKeyPressed) redo()
+            GLFW.GLFW_KEY_Z -> if (KnitKeyboard.isCtrlKeyPressed) undo()
+            GLFW.GLFW_KEY_Y -> if (KnitKeyboard.isCtrlKeyPressed) redo()
             GLFW.GLFW_KEY_DELETE -> selected?.let { delete(it) }
             GLFW.GLFW_KEY_UP -> selected?.let { move(it, 0, -1) }
             GLFW.GLFW_KEY_DOWN -> selected?.let { move(it, 0, 1) }
@@ -576,7 +576,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
 
     private fun move(element: HUDElement, deltaX: Int, deltaY: Int) {
         saveState()
-        val moveAmount = if (OmniKeyboard.isShiftKeyPressed) 10 else 1
+        val moveAmount = if (KnitKeyboard.isShiftKeyPressed) 10 else 1
         val newX = element.targetX + deltaX * moveAmount
         val newY = element.targetY + deltaY * moveAmount
 

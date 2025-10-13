@@ -1,8 +1,5 @@
 package xyz.meowing.zen.features
 
-import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -35,13 +32,11 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import xyz.meowing.knit.api.command.Commodore
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.collections.forEachIndexed
@@ -149,68 +144,61 @@ object Debug : Feature() {
             ))
     }
 }
-
 @Zen.Command
-object DebugCommand : CommandUtils("zendebug", listOf("zd")) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
-        return 1
-    }
-
-    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
-        builder.then(
-            ClientCommandManager.argument("action", StringArgumentType.string())
-                .executes { context ->
-                    val action = StringArgumentType.getString(context, "action")
-                    when (action.lowercase()) {
-                        "toggle" -> {
-                            Debug.data.getData().debugmode = !Debug.data.getData().debugmode
-                            Debug.data.save()
-
-                            if (Debug.debugmode) {
-                                Debug.registerEvent("mobid")
-                            } else {
-                                Debug.unregisterEvent("mobid")
-                            }
-
-                            ChatUtils.addMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
+object DebugCommand : Commodore("zendebug", "zd") {
+    init {
+        executable {
+            runs { action: String ->
+                when (action.lowercase()) {
+                    "toggle" -> {
+                        Debug.data.getData().debugmode = !Debug.data.getData().debugmode
+                        Debug.data.save()
+                        if (Debug.debugmode) {
+                            Debug.registerEvent("mobid")
+                        } else {
+                            Debug.unregisterEvent("mobid")
                         }
-                        "stats" -> {
-                            ChatUtils.addMessage(
-                                "§cHealth: ${PlayerStats.health} | Max: ${PlayerStats.maxHealth} | §6Absorb: ${PlayerStats.absorption}\n" +
-                                        "§9Mana: ${PlayerStats.mana} | Max: ${PlayerStats.maxMana} | §3Overflow: ${PlayerStats.overflowMana}\n" +
-                                        "§dRift Time: ${PlayerStats.riftTimeSeconds} | Max: ${PlayerStats.maxRiftTime}\n" +
-                                        "§aDefense: ${PlayerStats.defense} | Effective: ${PlayerStats.effectiveHealth} | Effective Max: ${PlayerStats.maxEffectiveHealth}"
-                            )
-                        }
-                        "dgutils" -> {
-                            ChatUtils.addMessage(
-                                "Crypt Count: ${DungeonUtils.getCryptCount()}\n" +
-                                        "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
-                                        "isMage: ${DungeonUtils.isMage()}\n" +
-                                        "Cata: ${DungeonUtils.getCurrentCata()}"
-                            )
-                        }
-                        "regfeats" -> {
-                            ChatUtils.addMessage("Features registered:")
-                            features.forEach { it ->
-                                if (it.isEnabled()) ChatUtils.addMessage("§f> §c${it.configKey}")
-                            }
-                        }
-                        "forceupdate" -> {
-                            UpdateChecker.forceUpdate = true
-                            UpdateChecker.checkForUpdates()
-                        }
-                        else -> {
-                            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
-                            TickUtils.schedule(2) {
-                                mc.setScreen(DebugGui())
-                            }
+                        ChatUtils.addMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
+                    }
+                    "stats" -> {
+                        ChatUtils.addMessage(
+                            "§cHealth: ${PlayerStats.health} | Max: ${PlayerStats.maxHealth} | §6Absorb: ${PlayerStats.absorption}\n" +
+                                    "§9Mana: ${PlayerStats.mana} | Max: ${PlayerStats.maxMana} | §3Overflow: ${PlayerStats.overflowMana}\n" +
+                                    "§dRift Time: ${PlayerStats.riftTimeSeconds} | Max: ${PlayerStats.maxRiftTime}\n" +
+                                    "§aDefense: ${PlayerStats.defense} | Effective: ${PlayerStats.effectiveHealth} | Effective Max: ${PlayerStats.maxEffectiveHealth}"
+                        )
+                    }
+                    "dgutils" -> {
+                        ChatUtils.addMessage(
+                            "Crypt Count: ${DungeonUtils.getCryptCount()}\n" +
+                                    "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
+                                    "isMage: ${DungeonUtils.isMage()}\n" +
+                                    "Cata: ${DungeonUtils.getCurrentCata()}"
+                        )
+                    }
+                    "regfeats" -> {
+                        ChatUtils.addMessage("Features registered:")
+                        features.forEach {
+                            if (it.isEnabled()) ChatUtils.addMessage("§f> §c${it.configKey}")
                         }
                     }
-                    1
+                    "forceupdate" -> {
+                        UpdateChecker.forceUpdate = true
+                        UpdateChecker.checkForUpdates()
+                    }
+                    else -> {
+                        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
+                        TickUtils.schedule(2) {
+                            mc.setScreen(DebugGui())
+                        }
+                    }
                 }
-        )
+            }
+        }
+
+        runs {
+            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
+        }
     }
 }
 

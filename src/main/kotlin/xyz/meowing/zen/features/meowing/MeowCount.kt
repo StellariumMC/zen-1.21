@@ -7,11 +7,9 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
 import xyz.meowing.zen.utils.DataUtils
-import com.mojang.brigadier.context.CommandContext
 import xyz.meowing.zen.Zen.Companion.prefix
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import xyz.meowing.knit.api.command.Commodore
 
 data class Data(var meowcount: Double = 0.0)
 
@@ -47,10 +45,11 @@ object meowcount : Feature("meowcount") {
 }
 
 @Zen.Command
-object MeowCommand : CommandUtils("meowcount", aliases = listOf("zenmeow", "zenmeowcount")) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        val count = meowcount.getMeowCount().toInt()
-        ChatUtils.addMessage("$prefix §fYou have meowed §b$count §ftimes!")
-        return 1
+object MeowCommand : Commodore("meowcount", "zenmeow", "zenmeowcount") {
+    init {
+        runs {
+            val count = meowcount.getMeowCount().toInt()
+            ChatUtils.addMessage("$prefix §fYou have meowed §b$count §ftimes!")
+        }
     }
 }

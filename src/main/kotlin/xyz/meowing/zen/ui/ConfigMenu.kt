@@ -1,382 +1,545 @@
 package xyz.meowing.zen.ui
 
-import com.mojang.brigadier.context.CommandContext
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
-import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.features.general.ChatCleanerGui
-import xyz.meowing.zen.utils.CommandUtils
-import xyz.meowing.zen.utils.TickUtils
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
-import org.lwjgl.glfw.GLFW
-import xyz.meowing.vexel.animations.EasingType
-import xyz.meowing.vexel.animations.colorTo
+import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.vexel.components.base.Offset
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.core.Rectangle
-import xyz.meowing.vexel.components.core.SvgImage
+import xyz.meowing.vexel.components.core.Container
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.core.VexelScreen
-import xyz.meowing.vexel.elements.Button
-import xyz.meowing.vexel.elements.Switch
-import java.awt.Color
 
-class ConfigMenu : VexelScreen() {
-    var selectedCategory: String = "General"
-    lateinit var featureArea: Rectangle
-    // Store features in a structure: Category -> Feature -> Options
+class OffsetTestScreen : VexelScreen() {
+    private val rootContainer = Rectangle()
+        .backgroundColor(0x80121212.toInt())
+        .setSizing(100f, Size.ParentPerc, 100f, Size.ParentPerc)
+        .padding(20f)
+        .childOf(window)
 
     override fun afterInitialization() {
-        // Not an actual solution just filling up ui with mock data until all features are converted in their respective files
-        ConfigMenuManager.addFeature("Architect Draft Message","", "Dungeons", ConfigElement(
-            "architectdraft",
-            ElementType.Switch(false)
-        )).addFeatureOption("Only get drafts on your fails", description = "", element = ConfigElement(
-            "selfdraft",
-            ElementType.Switch(false)
-        )).addFeatureOption("Automatically get architect drafts", description = "", element = ConfigElement(
-            "autogetdraft",
-            ElementType.Switch(false)
-        ))
-
-        ConfigMenuManager.addFeature("Slayer stats","Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.", "Slayers", ConfigElement(
-            "slayerstats",
-            ElementType.Switch(false)
-        )).addFeatureOption("Only get drafts on your fails", element = ConfigElement(
-            "slayerstatslines",
-            ElementType.MultiCheckbox(
-                options = listOf("Show Bosses Killed", "Show Bosses/hr", "Show Average kill time", "Show Average spawn time", "Show Total Session time", "Show XP/hr"),
-                default = setOf(0, 1, 4, 5)
-            )
-        ))
-
-        ConfigMenuManager.addFeature(
-            "Chat Emotes",
-            "Automatically replace emote codes with Unicode symbols in chat messages, example: <3 becomes ❤, use /emotes to see all supported emotes.",
-            "General",
-            ConfigElement(
-                "chatemotes",
-                ElementType.Switch(false)
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "World age message",
-            "Send world age",
-            "General",
-            ConfigElement(
-                "worldage",
-                ElementType.Switch(false)
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Chat Cleaner",
-            "",
-            "General",
-            ConfigElement(
-                "chatcleaner",
-                ElementType.Switch(false)
-            )
-        ).addFeatureOption(
-            "chatcleanerkey",
-            "Keybind to add message to filter",
-            "Options",
-            ConfigElement(
-                "chatcleanerkey",
-                ElementType.Keybind(GLFW.GLFW_KEY_H)
-            )
-        ).addFeatureOption(
-            "chatcleanergui",
-            "Chat Cleaner Filter GUI",
-            "GUI",
-            ConfigElement(
-                "chatcleanergui",
-                ElementType.Button("Open Filter GUI") {
-                    TickUtils.schedule(2) {
-                        mc.setScreen(ChatCleanerGui())
-                    }
-                }
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Armor HUD",
-            "",
-            "HUD",
-            ConfigElement(
-                "armorhud",
-                ElementType.Switch(false)
-            )
-        ).addFeatureOption(
-            "armorhudvert",
-            "Vertical Armor HUD",
-            "Options",
-            ConfigElement(
-                "armorhudvert",
-                ElementType.Switch(false)
-            )
-        ).addFeatureOption(
-            "armorpieces",
-            "Armor pieces to render",
-            "Options",
-            ConfigElement(
-                "armorpieces",
-                ElementType.MultiCheckbox(
-                    listOf("Helmet", "Chestplate", "Leggings", "Boots"),
-                    setOf(0, 1, 2, 3)
-                )
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Auto meow",
-            "Replies to messages in chat with a random meow",
-            "Meowing",
-            ConfigElement(
-                "automeow",
-                ElementType.Switch(false)
-            )
-        ).addFeatureOption(
-            "automeowchannels",
-            "Auto Meow Response Channels",
-            "Options",
-            ConfigElement(
-                "automeowchannels",
-                ElementType.MultiCheckbox(
-                    options = listOf("Guild", "Party", "Officer", "Co-op", "Private Messages"),
-                    default = setOf(0, 1, 2, 3, 4)
-                )
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Hide falling blocks",
-            "Hide falling blocks",
-            "QoL",
-            ConfigElement(
-                "hidefallingblocks",
-                ElementType.Switch(false)
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Coherent rod",
-            "Coherent rod radius display",
-            "Rift",
-            ConfigElement(
-                "coherentrodoverlay",
-                ElementType.Switch(false)
-            )
-        ).addFeatureOption(
-            "coherentrodoverlaycolor",
-            "Color",
-            "Color",
-            ConfigElement(
-                "coherentrodoverlaycolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            )
-        )
-
-        ConfigMenuManager.addFeature(
-            "Clean Chat",
-            "Clean messages",
-            "General",
-            ConfigElement(
-                "guildjoinleave",
-                ElementType.Switch(false)
-            )
-        )
-
         setupUI()
     }
 
     private fun setupUI() {
-        val base = Rectangle()
-            .backgroundColor(0x80121212.toInt())
-            .borderThickness(2f)
-            .setSizing(70f, Size.ParentPerc, 65f, Size.ParentPerc)
-            .setPositioning(0f, Pos.ScreenCenter, 0f, Pos.ScreenCenter)
-            .scrollable(true)
-            .setGradientBorderColor(0xFF0194d8.toInt(), 0xFF45bffe.toInt())
-            .borderRadius(12f)
-            .dropShadow()
-            .childOf(window)
-            .enableDebugRendering()
+        rootContainer.children.clear()
 
-        val sidebar = Rectangle()
-            .backgroundColor(0x00000000)
-            .setSizing(16f, Size.ParentPerc, 100f, Size.ParentPerc)
+        Text("Offset & Positioning Test Suite")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(28f)
+            .shadow(true)
+            .setPositioning(0f, Pos.ParentCenter, 20f, Pos.ParentPixels)
+            .childOf(rootContainer)
+
+        val mainScrollArea = Rectangle()
+            .backgroundColor(0x80202020.toInt())
+            .borderRadius(12f)
+            .borderColor(0xFF404040.toInt())
+            .borderThickness(2f)
+            .setSizing(90f, Size.ParentPerc, 85f, Size.ParentPerc)
+            .setPositioning(0f, Pos.ParentCenter, 20f, Pos.AfterSibling)
+            .padding(30f)
+            .scrollable(true)
+            .childOf(rootContainer)
+
+        setupPixelOffsetTests(mainScrollArea)
+        setupPercentOffsetTests(mainScrollArea)
+        setupMixedOffsetTests(mainScrollArea)
+        setupPaddingTests(mainScrollArea)
+        setupNestedPaddingTests(mainScrollArea)
+        setupPositioningValidationTests(mainScrollArea)
+        setupContainerTests(mainScrollArea)
+    }
+
+    private fun setupPixelOffsetTests(container: Rectangle) {
+        Text("Pixel Offset Tests")
+            .color(0xFF60A5FA.toInt())
+            .fontSize(22f)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
-            .setGradientBorderColor(0xFF0194d8.toInt(), 0xFF45bffe.toInt())
+            .childOf(container)
+
+        Text("Base element (no offset)")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("With 20px X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF10B981.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(20f, 0f)
+            .childOf(container)
+
+        Text("With 40px X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFEF4444.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(40f, 0f)
+            .childOf(container)
+
+        Text("Negative 20px X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(30f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFF59E0B.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(30f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(-20f, 0f)
+            .childOf(container)
+
+        Text("Y offset: 10px")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 30f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF8B5CF6.toInt())
+            .setSizing(150f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(0f, 10f)
+            .childOf(container)
+
+        Text("XY offset: 30px, 15px")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFEC4899.toInt())
+            .setSizing(120f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(30f, 15f)
+            .childOf(container)
+    }
+
+    private fun setupPercentOffsetTests(container: Rectangle) {
+        Text("Percent Offset Tests")
+            .color(0xFF10B981.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("10% X offset from parent width")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .setSizing(150f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(10f, Offset.Percent, 0f, Offset.Pixels)
+            .childOf(container)
+
+        Text("20% X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF10B981.toInt())
+            .setSizing(150f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(20f, Offset.Percent, 0f, Offset.Pixels)
+            .childOf(container)
+
+        Text("5% Y offset from parent height")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFEF4444.toInt())
+            .setSizing(200f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(0f, Offset.Pixels, 5f, Offset.Percent)
+            .childOf(container)
+
+        Text("15% X, 3% Y offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFF59E0B.toInt())
+            .setSizing(180f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(15f, Offset.Percent, 3f, Offset.Percent)
+            .childOf(container)
+    }
+
+    private fun setupMixedOffsetTests(container: Rectangle) {
+        Text("Mixed Positioning + Offset Tests")
+            .color(0xFFEF4444.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("ParentCenter + 50px X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentCenter, 10f, Pos.AfterSibling)
+            .setOffset(50f, 0f)
+            .childOf(container)
+
+        Text("ParentCenter - 50px X offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF10B981.toInt())
+            .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentCenter, 10f, Pos.AfterSibling)
+            .setOffset(-50f, 0f)
+            .childOf(container)
+
+        Text("AfterSibling + 20px spacing offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFEF4444.toInt())
+            .setSizing(80f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFF59E0B.toInt())
+            .setSizing(80f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.AfterSibling, 0f, Pos.MatchSibling)
+            .setOffset(20f, 0f)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFF8B5CF6.toInt())
+            .setSizing(80f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.AfterSibling, 0f, Pos.MatchSibling)
+            .setOffset(20f, 0f)
+            .childOf(container)
+
+        Text("ScreenCenter with percent offset")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFEC4899.toInt())
+            .setSizing(120f, Size.Pixels, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ScreenCenter, 10f, Pos.AfterSibling)
+            .setOffset(10f, Offset.Percent, 0f, Offset.Pixels)
+            .childOf(container)
+    }
+
+    private fun setupPaddingTests(container: Rectangle) {
+        Text("Padding Integration Tests")
+            .color(0xFFF59E0B.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("Rectangle with 20px padding")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        val paddedRect = Rectangle()
+            .backgroundColor(0x80374151.toInt())
+            .borderColor(0xFF6B7280.toInt())
             .borderThickness(2f)
-            .borderRadius(12f)
-            .dropShadow()
-            .childOf(base)
-
-        val categories = Rectangle()
-            .backgroundColor(0x00000000)
-            .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
-            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.ParentPercent)
-            .childOf(sidebar)
-
-        reloadCategories(categories)
-
-        featureArea = Rectangle()
-            .backgroundColor(0x00000000)
-            .setSizing(84f, Size.ParentPerc, 94f, Size.ParentPerc)
-            .setPositioning(0f, Pos.AfterSibling, 6f, Pos.ParentPercent)
+            .borderRadius(8f)
+            .setSizing(100f, Size.ParentPerc, 150f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
             .padding(20f)
-            .scrollable(true)
-            .childOf(base)
+            .childOf(container)
 
-        populateFeatures()
+        Text("Child 1 (ParentPixels)")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(paddedRect)
 
-        val searchbar = Rectangle()
-            .backgroundColor(0x00000000)
-            .setSizing(70f, Size.ParentPerc, 4f, Size.ParentPerc)
-            .setPositioning(24f, Pos.ParentPercent, 20f, Pos.ParentPixels)
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .setSizing(60f, Size.Pixels, 30f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(paddedRect)
+
+        Text("Child 2 (AfterSibling)")
+            .color(0xFFE5E7EB.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(paddedRect)
+
+        Rectangle()
+            .backgroundColor(0xFF10B981.toInt())
+            .setSizing(60f, Size.Pixels, 30f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(paddedRect)
+
+        Text("Variable padding test (top:30, right:10, bottom:30, left:10)")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
+
+        val variablePaddedRect = Rectangle()
+            .backgroundColor(0x80451A03.toInt())
+            .borderColor(0xFFF59E0B.toInt())
+            .borderThickness(2f)
+            .borderRadius(8f)
+            .setSizing(100f, Size.ParentPerc, 120f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .padding(30f, 10f, 30f, 10f)
+            .childOf(container)
+
+        Rectangle()
+            .backgroundColor(0xFFF59E0B.toInt())
+            .setSizing(100f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(variablePaddedRect)
+
+        Rectangle()
+            .backgroundColor(0xFFEF4444.toInt())
+            .setSizing(100f, Size.ParentPerc, 20f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
+            .childOf(variablePaddedRect)
+    }
+
+    private fun setupNestedPaddingTests(container: Rectangle) {
+        Text("Nested Padding Tests")
+            .color(0xFF8B5CF6.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
+
+        Text("3 levels of nested padding")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
+
+        val level1 = Rectangle()
+            .backgroundColor(0x80DC2626.toInt())
+            .borderColor(0xFFEF4444.toInt())
+            .borderThickness(2f)
+            .borderRadius(8f)
+            .setSizing(100f, Size.ParentPerc, 200f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .padding(15f)
+            .childOf(container)
+
+        Text("Level 1 (15px padding)")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(11f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(level1)
+
+        val level2 = Rectangle()
+            .backgroundColor(0x80D97706.toInt())
+            .borderColor(0xFFF59E0B.toInt())
             .borderThickness(2f)
             .borderRadius(6f)
-            .borderColor(0xFF7b7b84.toInt())
-            .dropShadow()
-            .childOf(base)
+            .setSizing(100f, Size.ParentPerc, 140f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .padding(12f)
+            .childOf(level1)
+
+        Text("Level 2 (12px padding)")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(11f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(level2)
+
+        val level3 = Rectangle()
+            .backgroundColor(0x80059669.toInt())
+            .borderColor(0xFF10B981.toInt())
+            .borderThickness(2f)
+            .borderRadius(4f)
+            .setSizing(100f, Size.ParentPerc, 80f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .padding(10f)
+            .childOf(level2)
+
+        Text("Level 3 (10px padding)")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(11f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(level3)
+
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .borderRadius(3f)
+            .setSizing(100f, Size.ParentPerc, 30f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(level3)
     }
 
-    var lastSelectedElement: Rectangle? = null
-    fun reloadCategories(categoriesElement: Rectangle) {
-        val categories = ConfigMenuManager.categories
+    private fun setupPositioningValidationTests(container: Rectangle) {
+        Text("Positioning Validation Tests")
+            .color(0xFFEC4899.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
 
-        for (category in categories) {
-            val unselectedBackground = 0x00000000
-            val unselectedTextColor = 0xFFAAAAAA.toInt()
-            val selectedBackground = 0x20FFFFFF
-            val selectedTextColor = 0xFFFFFFFF.toInt()
+        Text("Valid: ParentPixels with constraint")
+            .color(0xFF10B981.toInt())
+            .fontSize(14f)
+            .setPositioning(50f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
 
-            val categoryElement = Rectangle()
-                .backgroundColor(unselectedBackground)
-                .padding(10f)
-                .setSizing(80f, Size.ParentPerc, 0f, Size.Auto)
-                .setPositioning(0f, Pos.ParentCenter, 5f, Pos.AfterSibling)
-                .borderRadius(13f)
-                .childOf(categoriesElement)
+        Text("Valid: ParentPercent with constraint")
+            .color(0xFF10B981.toInt())
+            .fontSize(14f)
+            .setPositioning(50f, Pos.ParentPercent, 10f, Pos.AfterSibling)
+            .childOf(container)
 
-            val text = Text(category.name)
-                .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
-                .fontSize(25f)
-                .color(unselectedTextColor)
-                .childOf(categoryElement)
+        Text("Valid: ScreenCenter with constraint")
+            .color(0xFF10B981.toInt())
+            .fontSize(14f)
+            .setPositioning(100f, Pos.ScreenCenter, 10f, Pos.AfterSibling)
+            .childOf(container)
 
-            // Highlight if selected for the first time loading
-            if(selectedCategory == category.name) {
-                categoryElement.backgroundColor = selectedBackground
-                text.textColor = selectedTextColor
-                lastSelectedElement = categoryElement
-            }
+        Text("AfterSibling doesn't need constraint")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
 
-            categoryElement.onHover(
-                onExit = { mouseX, mouseY ->
-                    if(selectedCategory == category.name) return@onHover
-                    text.colorTo(0xFFAAAAAA.toInt(), 120, EasingType.EASE_OUT)
-                    categoryElement.colorTo(0x00000000, 120, EasingType.EASE_OUT)
-                },
-                onEnter = {mouseX, mouseY ->
-                    if(selectedCategory == category.name) return@onHover
-                    text.colorTo(0xFFFFFFFF.toInt(), 120, EasingType.EASE_OUT)
-                    categoryElement.colorTo(0x20FFFFFF, 120, EasingType.EASE_OUT)
-                }
-            )
+        Rectangle()
+            .backgroundColor(0xFF3B82F6.toInt())
+            .setSizing(80f, Size.Pixels, 30f, Size.Pixels)
+            .setPositioning(Pos.ParentPixels, Pos.AfterSibling)
+            .childOf(container)
 
-            // Add click event to load features of this category
-            categoryElement.onClick { _, _, _ ->
-                // Remove highlight from last selected
-                lastSelectedElement?.let { (lastSelectedElement as Rectangle).backgroundColor = 0x00000000; (it.children[0] as Text).textColor = 0xFFAAAAAA.toInt() }
+        Rectangle()
+            .backgroundColor(0xFF10B981.toInt())
+            .setSizing(80f, Size.Pixels, 30f, Size.Pixels)
+            .setPositioning(Pos.AfterSibling, Pos.MatchSibling)
+            .setOffset(10f, 0f)
+            .childOf(container)
 
-                // Highlight this element
-                categoryElement.backgroundColor = selectedBackground
-                text.textColor = selectedTextColor
-
-                selectedCategory = category.name
-                lastSelectedElement = categoryElement
-
-                // Populate features for this category
-                populateFeatures()
-                true
-            }
-        }
+        Rectangle()
+            .backgroundColor(0xFFEF4444.toInt())
+            .setSizing(80f, Size.Pixels, 30f, Size.Pixels)
+            .setPositioning(Pos.AfterSibling, Pos.MatchSibling)
+            .setOffset(10f, 0f)
+            .childOf(container)
     }
 
-    fun populateFeatures() {
-        featureArea.children.clear()
-        val category = ConfigMenuManager.categories.find { it.name == selectedCategory } ?: return
+    private fun setupContainerTests(container: Rectangle) {
+        Text("Container (vs Rectangle) Tests")
+            .color(0xFF06B6D4.toInt())
+            .fontSize(22f)
+            .setPositioning(0f, Pos.ParentPixels, 40f, Pos.AfterSibling)
+            .childOf(container)
 
-        category.features.forEach { feature ->
-            val featureElement = Rectangle()
-                .padding(20f)
-                .setSizing(100f, Size.ParentPerc, 0f, Size.Auto)
-                .setPositioning(0f, Pos.ParentPixels, 12f, Pos.AfterSibling)
-                .borderRadius(8f)
-                .borderThickness(3f)
-                .setGradientBorderColor(0xFF052846.toInt(), 0xFF093463.toInt())
-                .setBackgroundGradientColor(0xFF001534.toInt(), 0xFF00050c.toInt())
-                .childOf(featureArea)
-                .dropShadow()
+        Text("Container with padding + scrollable")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 15f, Pos.AfterSibling)
+            .childOf(container)
 
-            val text = Text(feature.featureName)
-                .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentCenter)
-                .fontSize(24f)
-                .color(0xFF007acc.toInt())
-                .childOf(featureElement)
+        val testContainer = Container(
+            padding = floatArrayOf(15f, 15f, 15f, 15f),
+            scrollable = true,
+            widthType = Size.ParentPerc,
+            heightType = Size.Pixels
+        )
+            .setSizing(100f, Size.ParentPerc, 200f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .childOf(container)
 
-            if(feature.options.isNotEmpty()) {
-                val optionsIcon = SvgImage(svgPath = "/assets/zen/options.svg", color = Color.GRAY)
-                    .setSizing(40f, Size.Pixels, 40f, Size.Pixels)
-                    .setPositioning(80f, Pos.ParentPercent, 0f, Pos.ParentCenter)
-                    .childOf(featureElement)
-            }
-
-            createFeatureConfig(feature, featureElement)
+        repeat(15) { i ->
+            Rectangle()
+                .backgroundColor(if (i % 2 == 0) 0xFF3B82F6.toInt() else 0xFF10B981.toInt())
+                .borderRadius(4f)
+                .setSizing(100f, Size.ParentPerc, 35f, Size.Pixels)
+                .setPositioning(0f, Pos.ParentPixels, if (i == 0) 0f else 8f, if (i == 0) Pos.ParentPixels else Pos.AfterSibling)
+                .childOf(testContainer)
         }
-    }
 
-    fun createFeatureConfig(feature: FeatureElement, featureElement: Rectangle) {
-        if(feature.configElement.type is ElementType.Switch) {
-            val switch = Switch(thumbWidth = 27f, thumbHeight = 27f)
-                .childOf(featureElement)
-                .thumbColor(0xFF042e57.toInt())
-                .thumbDisabledColor(0xFF042e57.toInt())
-                .trackDisabledColor(0xFF00050c.toInt())
-                .trackEnabledColor(0xFF00050c.toInt())
-                .borderThickness(2f)
-                .borderRadius(19f)
-                .borderColor(0xFF042e57.toInt())
-                .setSizing(80f, Size.Pixels, 35f, Size.Pixels)
-                .setEnabled(value = true, animated = false, silent = true)
+        Text("Container respects parent padding")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(14f)
+            .setPositioning(0f, Pos.ParentPixels, 20f, Pos.AfterSibling)
+            .childOf(container)
 
-            featureElement.updateWidth()
-            switch.setPositioning(featureElement.width - switch.width - 40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
-            return
-        }
-        if(feature.configElement.type is ElementType.Button) {
-            val button = Button(text = feature.configElement.type.text)
-                .childOf(featureElement)
+        val containerWithOffset = Container(
+            padding = floatArrayOf(10f, 10f, 10f, 10f),
+            widthType = Size.ParentPerc,
+            heightType = Size.Pixels
+        )
+            .setSizing(80f, Size.ParentPerc, 100f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
+            .setOffset(20f, 0f)
+            .childOf(container)
 
-            featureElement.updateWidth()
-            button.setPositioning(featureElement.width - button.width - 40f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        Text("Offset Container")
+            .color(0xFFFFFFFF.toInt())
+            .fontSize(12f)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .childOf(containerWithOffset)
 
-            button.onClick { _, _, _ ->
-                feature.configElement.type.onClick()
-                true
-            }
-            return
-        }
+        Rectangle()
+            .backgroundColor(0xFFF59E0B.toInt())
+            .borderRadius(4f)
+            .setSizing(100f, Size.ParentPerc, 40f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+            .childOf(containerWithOffset)
+
+        Text("End of Offset Tests")
+            .color(0xFF9CA3AF.toInt())
+            .fontSize(16f)
+            .setPositioning(0f, Pos.ParentCenter, 40f, Pos.AfterSibling)
+            .childOf(container)
     }
 }
 
 @Zen.Command
-object CanvasCommand : CommandUtils("canvas") {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        ConfigMenu().display()
-        return 1
+object OffsetTestCommand : Commodore("offsettest") {
+    init {
+        runs {
+            OffsetTestScreen().display()
+        }
     }
 }

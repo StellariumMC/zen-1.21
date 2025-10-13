@@ -1,46 +1,32 @@
 package xyz.meowing.zen.features.general
 
-import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.context.CommandContext
+import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.command.utils.GreedyString
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.CommandUtils
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 @Zen.Command
-object CalculatorCommand : CommandUtils(
-    "zencalc",
-    listOf("calc")
-) {
-    override fun execute(context: CommandContext<FabricClientCommandSource>): Int {
-        return try {
-            val eq = StringArgumentType.getString(context, "equation")
-            val clean = eq.replace(Regex("[^0-9+\\-*/().\\s]"), "").replace("\\s".toRegex(), "")
-            val result = eval(clean)
-            val display =
-                if (result == result.toInt().toDouble()) result.toInt().toString()
-                else "%.10f".format(result).trimEnd('0').trimEnd('.')
-            ChatUtils.addMessage("$prefix §b$eq §f= §b$display")
-            1
-        } catch (e: Exception) {
-            ChatUtils.addMessage("$prefix §fInvalid equation.")
-            0
+object CalculatorCommand : Commodore("zencalc", "calc") {
+    init {
+        runs { equation: GreedyString ->
+            try {
+                val eq = equation.string
+                val clean = eq.replace(Regex("[^0-9+\\-*/().\\s]"), "").replace("\\s".toRegex(), "")
+                val result = eval(clean)
+                val display = if (result == result.toInt().toDouble()) {
+                    result.toInt().toString()
+                } else {
+                    "%.10f".format(result).trimEnd('0').trimEnd('.')
+                }
+                ChatUtils.addMessage("$prefix §b$eq §f= §b$display")
+            } catch (e: Exception) {
+                ChatUtils.addMessage("$prefix §fInvalid equation.")
+            }
         }
     }
 
-    override fun buildCommand(builder: LiteralArgumentBuilder<FabricClientCommandSource>) {
-        builder.then(
-            ClientCommandManager.argument("equation", StringArgumentType.greedyString())
-                .executes {
-                    execute(it)
-                }
-        )
-    }
-
-    fun eval(s: String): Double {
+    private fun eval(s: String): Double {
         var i = 0
         fun next() = if (i < s.length) s[i++] else 0.toChar()
         fun peek() = if (i < s.length) s[i] else 0.toChar()
@@ -51,7 +37,10 @@ object CalculatorCommand : CommandUtils(
             if (peek() == '.') {
                 next()
                 var d = 0.1
-                while (peek().isDigit()) { n += (next() - '0') * d; d *= 0.1 }
+                while (peek().isDigit()) {
+                    n += (next() - '0') * d
+                    d *= 0.1
+                }
             }
             return n
         }

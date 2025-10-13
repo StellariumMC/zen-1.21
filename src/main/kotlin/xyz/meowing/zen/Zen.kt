@@ -77,13 +77,13 @@ class Zen : ClientModInitializer {
             executePending()
         })
 
-        EventBus.register<GuiEvent.Open> ({ event ->
+        EventBus.register<GuiEvent.Open> { event ->
             if (event.screen is InventoryScreen) isInInventory = true
-        })
+        }
 
-        EventBus.register<GuiEvent.Close> ({
+        EventBus.register<GuiEvent.Close> {
             isInInventory = false
-        })
+        }
 
         EventBus.register<AreaEvent.Main> ({
             TickUtils.scheduleServer(1) {
