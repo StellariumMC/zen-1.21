@@ -12,12 +12,12 @@ import xyz.meowing.zen.events.WorldEvent
 @Zen.Module
 object WorldAge : Feature("worldage") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "World age message", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("World age message", "Send world age", "General", xyz.meowing.zen.ui.ConfigElement(
                 "worldage",
-                "Send world age",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

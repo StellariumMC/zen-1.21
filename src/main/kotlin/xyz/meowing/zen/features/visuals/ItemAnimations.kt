@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.RotationAxis
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object ItemAnimations : Feature("itemanimations") {
@@ -22,57 +23,49 @@ object ItemAnimations : Feature("itemanimations") {
     val swingSpeed by ConfigDelegate<Double>("itemswingspeed")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Item Animations", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Item Animations", "Enable item animations", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "itemanimations",
-                "Enable item animations",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            ))
+            .addFeatureOption("Size", "Item size multiplier", "Size", xyz.meowing.zen.ui.ConfigElement(
                 "itemsize",
-                "Item size multiplier",
                 ElementType.Slider(-1.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("X Position", "Item X position", "Position", xyz.meowing.zen.ui.ConfigElement(
                 "itemx",
-                "Item X position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("Y Position", "Item Y position", "Position", xyz.meowing.zen.ui.ConfigElement(
                 "itemy",
-                "Item Y position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("Z Position", "Item Z position", "Position", xyz.meowing.zen.ui.ConfigElement(
                 "itemz",
-                "Item Z position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Pitch", "Item pitch rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
                 "itempitch",
-                "Item pitch rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Yaw", "Item yaw rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
                 "itemyaw",
-                "Item yaw rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Roll", "Item roll rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
                 "itemroll",
-                "Item roll rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Swing", ConfigElement(
-                "itemswingspeed",
-                "Swing speed multiplier",
-                ElementType.Slider(-2.0, 1.0, 0.0, true)
-            ))
-            .addElement("Visuals", "Item Animations", "Options", ConfigElement(
+            .addFeatureOption("Cancel Re-Equip", "Cancel item re-equip animations", "Other", xyz.meowing.zen.ui.ConfigElement(
                 "itemcancelrequip",
-                "Cancel item re-equip animation",
                 ElementType.Switch(false)
             ))
+            .addFeatureOption("Swing Speed", "Item swing speed multiplier", "Other", xyz.meowing.zen.ui.ConfigElement(
+                "itemswingspeed",
+                ElementType.Slider(-2.0, 1.0, 0.0, true)
+            ))
+
+        return configUI
     }
 
     fun getItemTransform(): ItemTransform {

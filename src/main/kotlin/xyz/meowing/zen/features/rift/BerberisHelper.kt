@@ -26,18 +26,18 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
     private val berberishelpercolor by ConfigDelegate<Color>("berberishelpercolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Rift", "Berberis Helper", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Berberis Helper", "Berberis highlight", "Rift", xyz.meowing.zen.ui.ConfigElement(
                 "berberishelper",
-                "Berberis highlight",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Rift", "Berberis Helper", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
                 "berberishelpercolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<PacketEvent.Received> { event ->

@@ -25,25 +25,23 @@ object AutoMeow : Feature("automeow") {
     private val automeowchannels by ConfigDelegate<Set<Int>>("automeowchannels")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Auto meow", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Auto meow", "Auto Meow", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "automeow",
-                "Auto Meow",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Meowing", "Auto meow", "", ConfigElement(
+            ))
+            .addFeatureOption("", "Replies to messages in chat with a random meow", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Replies to messages in chat with a random meow")
             ))
-            .addElement("Meowing", "Auto meow", "Options", ConfigElement(
+            .addFeatureOption("Auto Meow Response Channels", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "automeowchannels",
-                "Auto Meow Response Channels",
                 ElementType.MultiCheckbox(
                     options = listOf("Guild", "Party", "Officer", "Co-op", "Private Messages"),
                     default = setOf(0, 1, 2, 3, 4)
                 )
             ))
+        return configUI
     }
 
     override fun initialize() {

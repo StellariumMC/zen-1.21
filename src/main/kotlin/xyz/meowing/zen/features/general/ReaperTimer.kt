@@ -19,12 +19,12 @@ object ReaperTimer : Feature("reapertimer", true) {
     private var ticks = 120
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Reaper Timer", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Reaper Timer", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "reapertimer",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

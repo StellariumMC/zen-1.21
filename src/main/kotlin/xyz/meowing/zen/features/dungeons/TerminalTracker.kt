@@ -18,13 +18,14 @@ object TerminalTracker : Feature("termtracker", area = "catacombs") {
     private val pattern = Pattern.compile("^(\\w{1,16}) (?:activated|completed) a (\\w+)! \\(\\d/\\d\\)$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Terminal Tracker", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Terminal Tracker", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "termtracker",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

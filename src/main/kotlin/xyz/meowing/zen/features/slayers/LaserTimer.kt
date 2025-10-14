@@ -18,13 +18,14 @@ object LaserTimer : Feature("lasertimer", true) {
     private val totaltime = 8.2
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Laser phase timer", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Laser phase timer", "Laser phase timer", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "lasertimer",
-                "Laser phase timer",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         createCustomEvent<RenderEvent.Entity.Post>("render") {

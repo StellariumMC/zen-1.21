@@ -1,7 +1,11 @@
 package xyz.meowing.zen.ui
 
+import kotlinx.serialization.Serializable
+import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.ConfigData
 import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.ui.ConfigMenuManager.printCategoriesJson
 
 //override fun addConfig(configUI: ConfigUI): ConfigUI {
 //    return configUI
@@ -23,6 +27,33 @@ import xyz.meowing.zen.config.ui.types.ElementType
 object ConfigMenuManager {
     val categories = mutableListOf<CategoryElement>()
     private val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "meowing", "rift")
+
+    fun printCategoriesJson() {
+        val json = buildString {
+            append("[")
+            categories.forEachIndexed { cIdx, category ->
+                append("{\"name\":\"${category.name}\",\"features\":[")
+                category.features.forEachIndexed { fIdx, feature ->
+                    append("{\"featureName\":\"${feature.featureName}\",\"description\":\"${feature.description}\",\"options\":{")
+                    feature.options.entries.forEachIndexed { oIdx, (section, options) ->
+                        append("\"$section\":[")
+                        options.forEachIndexed { i, option ->
+                            append("{\"optionName\":\"${option.optionName}\",\"description\":\"${option.description}\",\"configKey\":\"${option.configElement.configKey}\"}")
+                            if (i < options.size - 1) append(",")
+                        }
+                        append("]")
+                        if (oIdx < feature.options.size - 1) append(",")
+                    }
+                    append("}}")
+                    if (fIdx < category.features.size - 1) append(",")
+                }
+                append("]}")
+                if (cIdx < categories.size - 1) append(",")
+            }
+            append("]")
+        }
+        println(json)
+    }
 
     fun addFeature(
         featureName: String,
@@ -57,6 +88,7 @@ object ConfigMenuManager {
     }
 }
 
+@Serializable
 class FeatureElement(
     val featureName: String,
     val description: String,
@@ -70,6 +102,9 @@ class FeatureElement(
         optionsSection: String = "Options",
         element: ConfigElement
     ): FeatureElement {
+        // Change config key to be like "feature.optionthing"
+        element.configKey = this.configElement.configKey + "." + element.configKey
+
         val option = OptionElement(optionName, description, optionsSection, element)
         val optionsList = options.getOrPut(optionsSection) { mutableListOf() }
         if(!optionsList.any { it.optionName == optionName }) optionsList.add(option)
@@ -78,6 +113,7 @@ class FeatureElement(
     }
 }
 
+@Serializable
 class OptionElement(
     val optionName: String,
     val description: String = "",
@@ -85,12 +121,23 @@ class OptionElement(
     val configElement: ConfigElement
 )
 
+@Serializable
 data class ConfigElement(
-    val configKey: String,
+    var configKey: String,
     val type: ElementType,
     val shouldShow: (ConfigData) -> Boolean = { true }
 )
 
+@Serializable
 data class CategoryElement(val name: String) {
     val features: MutableList<FeatureElement> = mutableListOf()
+}
+
+@Zen.Command
+object ConfigTestCommand : Commodore("configtest") {
+    init {
+        runs {
+            printCategoriesJson()
+        }
+    }
 }

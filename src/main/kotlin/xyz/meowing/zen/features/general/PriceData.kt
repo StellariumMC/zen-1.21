@@ -34,23 +34,22 @@ object PriceData : Feature("pricedata", true) {
     private val tooltipCache = mutableMapOf<String, CacheEntry>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Price Data", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Price Data", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "pricedata",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Price Data", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Price information to show", "Price information to show", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "pricedatadisplay",
-                "Price information to show",
                 ElementType.MultiCheckbox(displayOptions, setOf(0, 1, 2, 3, 4))
             ))
-            .addElement("General", "Price Data", "Options", ConfigElement(
+            .addFeatureOption("Use abbreviated numbers (1.2M instead of 1,200,000)", "Use abbreviated numbers (1.2M instead of 1,200,000)", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "abbreviatenumbers",
-                "Use abbreviated numbers (1.2M instead of 1,200,000)",
                 ElementType.Switch(false)
             ))
+        return configUI
     }
+
 
     private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviateNumber() else formatNumber()
 

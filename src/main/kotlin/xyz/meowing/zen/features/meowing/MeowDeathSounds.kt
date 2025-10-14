@@ -13,18 +13,18 @@ import net.minecraft.sound.SoundEvents
 @Zen.Module
 object MeowDeathSounds : Feature("meowdeathsounds") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Meow Death Sounds", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Meow Death Sounds", "Meow Death Sounds", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowdeathsounds",
-                "Meow Death Sounds",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Meowing", "Meow Death Sounds", "", ConfigElement(
+            ))
+            .addFeatureOption("", "Plays a meow sound when a mob dies.", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Plays a meow sound when a mob dies.")
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<EntityEvent.Death> { event ->

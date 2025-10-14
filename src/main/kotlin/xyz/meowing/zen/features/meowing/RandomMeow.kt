@@ -16,13 +16,14 @@ import kotlin.random.Random
 @Zen.Module
 object RandomMeow : Feature("randommeow") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Random Meows", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Random Meows", "", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "randommeow",
-                null,
                 ElementType.Switch(true)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         setupLoops {

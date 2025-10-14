@@ -42,22 +42,22 @@ object KeyShortcuts : Feature("keyshortcuts") {
     private val pressedKeys = mutableSetOf<Int>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Key Shortcuts", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Key Shortcuts", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "keyshortcuts",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Key Shortcuts", "GUI", ConfigElement(
+            ))
+            .addFeatureOption("Open Keybind Manager", "Open Keybind Manager", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "keyshortcutsgui",
-                "Open Keybind Manager",
                 ElementType.Button("Open Manager") {
                     TickUtils.schedule(2) {
                         mc.setScreen(KeybindGui())
                     }
                 }
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<KeyEvent.Press> { event ->

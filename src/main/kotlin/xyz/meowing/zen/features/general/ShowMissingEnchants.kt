@@ -40,12 +40,12 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Show Missing Enchants", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Show Missing Enchants", "Show Missing Enchants", "General", xyz.meowing.zen.ui.ConfigElement(
                 "showmissingenchants",
-                "Show Missing Enchants",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

@@ -16,12 +16,12 @@ object guildmessage : Feature("guildmessage") {
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Clean guild messages", "Clean guild messages", "Clean messages", xyz.meowing.zen.ui.ConfigElement(
                 "guildmessage",
-                "Clean guild messages",
                 ElementType.Switch(false)
             ))
+        return configUI
     }
 
     override fun initialize() {
@@ -60,12 +60,12 @@ object partymessage : Feature("partymessage") {
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Clean party messages", "Clean party messages", "Clean messages", xyz.meowing.zen.ui.ConfigElement(
                 "partymessage",
-                "Clean party messages",
                 ElementType.Switch(false)
             ))
+        return configUI
     }
 
     override fun initialize() {

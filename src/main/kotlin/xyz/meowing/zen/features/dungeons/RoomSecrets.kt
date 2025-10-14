@@ -20,13 +20,14 @@ object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
     private const val name = "Secrets Display"
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Room Secrets Hud", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Room Secrets Hud", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "roomsecrets",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)

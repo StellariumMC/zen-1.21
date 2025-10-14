@@ -7,6 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.LocationUtils
@@ -19,17 +20,17 @@ object CryptReminder : Feature("cryptreminder") {
     private val cryptreminderdelay by ConfigDelegate<Double>("cryptreminderdelay")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Crypt reminder", "Options", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Crypt reminder", "Crypt reminder", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "cryptreminder",
-                "Crypt reminder",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Crypt reminder", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Crypt reminder delay", "Crypt reminder delay", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "cryptreminderdelay",
-                "Crypt reminder delay",
                 ElementType.Slider(1.0, 5.0, 2.0, false)
             ))
+
+        return configUI
     }
 
     override fun initialize() {

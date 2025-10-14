@@ -36,58 +36,50 @@ object DamageSplash : Feature("damagesplash", true) {
     private val cancelAll by ConfigDelegate<Boolean>("damagesplashcancelall")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Damage Splash", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Damage Splash", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplash",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Damage Splash", "Display", ConfigElement(
+            ))
+            .addFeatureOption("Show formatted numbers", "Show formatted numbers", "Display", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashformatted",
-                "Show formatted numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Damage Splash", "Display", ConfigElement(
+            .addFeatureOption("Use comma separators", "Use comma separators", "Display", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashcommas",
-                "Use comma separators",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Damage Splash", "Cancellation", ConfigElement(
+            .addFeatureOption("Cancel all damage splash", "Cancel all damage splash", "Cancellation", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashcancelall",
-                "Cancel all damage splash",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Damage Splash", "Cancellation", ConfigElement(
+            .addFeatureOption("Cancel specific damage types", "Cancel specific damage types", "Cancellation", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashcancel",
-                "Cancel specific damage types",
                 ElementType.MultiCheckbox(
                     options = DamageType.entries.map { it.displayName },
                     default = setOf()
                 )
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Rainbow damage with symbols", "Rainbow damage with symbols", "Colors", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashrainbow",
-                "Rainbow damage with symbols",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Normal damage color", "Normal damage color", "Colors", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashnormalcolor",
-                "Normal damage color",
                 ElementType.MCColorPicker(MCColorCode.AQUA)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Symbol damage color", "Symbol damage color", "Colors", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashcriticalcolor",
-                "Symbol damage color",
                 ElementType.MCColorPicker(MCColorCode.WHITE)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Rainbow colors to use", "Rainbow colors to use", "Colors", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplashcolors",
-                "Rainbow colors to use",
                 ElementType.MultiCheckbox(
                     options = listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"),
                     default = setOf(0, 1, 2, 3)
                 )
             ))
+        return configUI
     }
 
     override fun initialize() {

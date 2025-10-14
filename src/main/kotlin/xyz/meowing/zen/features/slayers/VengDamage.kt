@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -20,12 +21,13 @@ object VengDamage : Feature("vengdmg", true) {
     private val veng = Pattern.compile("^\\d+(,\\d+)*ﬗ$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Vengeance damage tracker", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Vengeance damage tracker", "Vengeance damager tracker", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "vengdmg",
-                "Vengeance damager tracker",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+
+        return configUI
     }
 
     override fun initialize() {

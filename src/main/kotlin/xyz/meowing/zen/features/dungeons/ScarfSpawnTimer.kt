@@ -29,12 +29,12 @@ object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea
     private val boss = listOf(TimerData("§6Scarf", 0.4, Vec3d(-7.5, 72.0, -10.5)))
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Scarf Spawn Timers", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Scarf Spawn Timers", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "scarfspawntimers",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

@@ -45,12 +45,12 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
     })
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Mask cooldown display", "Options", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Mask cooldown display", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "masktimers",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

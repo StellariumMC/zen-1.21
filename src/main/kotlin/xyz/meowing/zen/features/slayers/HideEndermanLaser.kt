@@ -20,21 +20,21 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
     private val spawnerCache = ConcurrentHashMap<Int, String>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Hide Enderman Laser", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Hide Enderman Laser", "", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "hideendermanlaser",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Hide Enderman Laser", "Options", ConfigElement(
+            ))
+            .addFeatureOption("", "Hide For", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hideendermanlaserboss",
-                "Hide For",
                 ElementType.Dropdown(
                     listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),
                     0
                 )
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<RenderEvent.GuardianLaser> { event ->

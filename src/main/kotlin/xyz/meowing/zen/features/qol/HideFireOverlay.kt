@@ -13,11 +13,12 @@ import xyz.meowing.zen.features.Feature
 @Zen.Module
 object HideFireOverlay : Feature("hidefireoverlay") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("QoL", "Hide Fire Overlay", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Hide Fire Overlay", "", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "hidefireoverlay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
+
     }
 }

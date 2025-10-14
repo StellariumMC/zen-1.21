@@ -29,26 +29,25 @@ object SlayerStats : Feature("slayerstats", true) {
     private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerstatslines")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer stats", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Slayer stats", "Slayer stats", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerstats",
-                "Slayer stats",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Slayer stats", "", ConfigElement(
+            ))
+            .addFeatureOption("", "", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
             ))
-            .addElement("Slayers", "Slayer stats", "Options", ConfigElement(
+            .addFeatureOption("", "Options", "", xyz.meowing.zen.ui.ConfigElement(
                 "slayerstatslines",
-                "",
                 ElementType.MultiCheckbox(
                     options = listOf("Show Bosses Killed", "Show Bosses/hr", "Show Average kill time", "Show Average spawn time", "Show Total Session time", "Show XP/hr"),
                     default = setOf(0, 1, 4, 5)
                 )
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         HUDManager.register("SlayerStats", "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")

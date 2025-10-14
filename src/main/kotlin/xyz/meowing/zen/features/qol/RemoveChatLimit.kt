@@ -9,11 +9,12 @@ import xyz.meowing.zen.features.Feature
 @Zen.Module
 object RemoveChatLimit : Feature("removechatlimit") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("QoL", "Remove chat history limit", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Remove chat history limit", "", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "removechatlimit",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 }

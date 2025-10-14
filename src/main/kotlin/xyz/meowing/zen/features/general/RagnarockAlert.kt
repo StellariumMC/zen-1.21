@@ -21,17 +21,16 @@ object RagnarockAlert : Feature("ragalert", true) {
     private val ragparty by ConfigDelegate<Boolean>("ragparty")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Ragnarok alert", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Ragnarok alert", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "ragalert",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Ragnarok alert", "Options", ConfigElement(
-                "ragparty",
-                "Send party message",
                 ElementType.Switch(false)
             ))
+            .addFeatureOption("Send party message", "Send party message", "Options", xyz.meowing.zen.ui.ConfigElement(
+                "ragparty",
+                ElementType.Switch(false)
+            ))
+        return configUI
     }
 
     override fun initialize() {

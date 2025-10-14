@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
@@ -30,17 +31,17 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
     private val effectiveareaoverlaycolor by ConfigDelegate<Color>("effectiveareaoverlaycolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Effective Area Overlay", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Effective Area Overlay", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "effectiveareaoverlay",
-                "Effective Area Overlay",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Effective Area Overlay", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "effectiveareaoverlaycolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+
+        return configUI
     }
 
     override fun initialize() {

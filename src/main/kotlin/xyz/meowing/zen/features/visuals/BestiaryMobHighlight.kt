@@ -9,6 +9,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.MouseEvent
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
@@ -21,22 +22,17 @@ object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
     private val highlightcolor by ConfigDelegate<Color>("bestiarymobhighlightcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Bestiary Mob Highlight", "Options", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Bestiary Mob Highlight", "Middle click on a mob in the world to toggle highlighting for it", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "bestiarymobhighlighter",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Bestiary Mob Highlight", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Highlight Color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "bestiarymobhighlightcolor",
-                "Highlight color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addElement("Visuals", "Bestiary Mob Highlight", "", ConfigElement(
-                "",
-                null,
-                ElementType.TextParagraph("Middle click on a mob in the world to toggle highlighting for it")
-            ))
+
+        return configUI
     }
 
     override fun initialize() {

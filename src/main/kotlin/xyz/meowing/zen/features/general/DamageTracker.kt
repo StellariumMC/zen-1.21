@@ -60,44 +60,39 @@ object DamageTracker : Feature("damagetracker", true) {
     private var lastHitTime = 0L
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Damage Tracker", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Damage Tracker", "Track damage dealt to mobs", "General", xyz.meowing.zen.ui.ConfigElement(
                 "damagetracker",
-                "Track damage dealt to mobs",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Damage Tracker", "", ConfigElement(
+            ))
+            .addFeatureOption("Damage Tracker Info", "", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("This does not track the damage done by arrows shot using duplex or the extra arrows from Terminator")
             ))
-            .addElement("General", "Damage Tracker", "Options", ConfigElement(
+            .addFeatureOption("Hit detection types", "Hit detection types", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "damagetrackertype",
-                "Hit detection types",
                 ElementType.MultiCheckbox(
                     options = DamageType.entries.map { it.displayName },
                     default = setOf(0)
                 )
             ))
-            .addElement("General", "Damage Tracker", "Options", ConfigElement(
+            .addFeatureOption("Show damage in chat", "Show damage in chat", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "damagetrackersend",
-                "Show damage in chat",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Damage Tracker", "GUI", ConfigElement(
+            .addFeatureOption("Damage Stats GUI", "Damage Stats GUI", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "damagetrackergui",
-                "Damage Stats GUI",
                 ElementType.Button("Open Stats") {
                     TickUtils.schedule(2) {
                         mc.setScreen(DamageTrackerGui())
                     }
                 }
             ))
-            .addElement("General", "Damage Tracker", "GUI", ConfigElement(
+            .addFeatureOption("Damage Tracker GUI Info", "", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Use the command §c/damagetracker §rto open the Stats GUI. §7§oAlias: /zendt, /dmg")
             ))
+        return configUI
     }
 
     override fun initialize() {

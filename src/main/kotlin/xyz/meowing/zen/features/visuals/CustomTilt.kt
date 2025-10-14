@@ -9,6 +9,7 @@ import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
 import kotlin.math.sin
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object CustomTilt : Feature("customtilt") {
@@ -20,43 +21,37 @@ object CustomTilt : Feature("customtilt") {
     private val tiltspeed by ConfigDelegate<Double>("tiltspeed")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Custom tilt", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Custom tilt", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customtilt",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Tilt X", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "tiltx",
-                "Tilt X",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt Y", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "tilty",
-                "Tilt Y",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt Z", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "tiltz",
-                "Tilt Z",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt everyone", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "tilteveryone",
-                "Tilt everyone",
-                ElementType.Switch(false)
+                ElementType.Switch(true)
             ))
-            .addElement("Visuals", "Custom tilt", "Animate Tilt", ConfigElement(
+            .addFeatureOption("Animated tilt", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "animatedtilt",
-                "Animated tilt",
                 ElementType.Switch(false)
             ))
-            .addElement("Visuals", "Custom tilt", "Animate Tilt", ConfigElement(
+            .addFeatureOption("Tilt speed", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "tiltspeed",
-                "Tilt speed",
-                ElementType.Slider(0.1, 5.0, 1.0, true),
-                { config -> config["customtilt"] as? Boolean == true }
+                ElementType.Slider(0.1, 10.0, 1.0, true)
             ))
+
+        return configUI
     }
 
     override fun initialize() {

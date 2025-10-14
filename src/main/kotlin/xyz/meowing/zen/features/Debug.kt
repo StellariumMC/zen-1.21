@@ -37,6 +37,7 @@ import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.ui.ConfigMenuManager
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.collections.forEachIndexed
@@ -72,78 +73,69 @@ object Debug : Feature() {
             return configUI
         }
 
-        return configUI
-            .addElement("Debug", "Config Test", "Debug GUI", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Config Test", "Debug GUI", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "debuggui",
-                "Debug Information GUI",
                 ElementType.Button("Open Debug GUI") {
                     TickUtils.schedule(2) {
                         mc.setScreen(DebugGui())
                     }
                 }
             ))
-            .addElement("Debug", "Config Test", "Switch", ConfigElement(
+            .addFeatureOption("Switch", "Switch test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_switch",
-                "Switch test",
                 ElementType.Switch(false)
             ))
-            .addElement("Debug", "Config Test", "Button", ConfigElement(
+            .addFeatureOption("Button", "Button test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_button",
-                "Button test",
                 ElementType.Button("Click Me!") {
                     LOGGER.info("Button clicked!")
                 }
             ))
-            .addElement("Debug", "Config Test", "Slider", ConfigElement(
+            .addFeatureOption("Slider", "Slider test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_slider",
-                "Slider test",
                 ElementType.Slider(0.0, 100.0, 50.0, false)
             ))
-            .addElement("Debug", "Config Test", "Slider Double", ConfigElement(
+            .addFeatureOption("Slider Double", "Slider double test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_slider_double",
-                "Slider double test",
                 ElementType.Slider(0.0, 10.0, 5.5, true)
             ))
-            .addElement("Debug", "Config Test", "Dropdown", ConfigElement(
+            .addFeatureOption("Dropdown", "Dropdown test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_dropdown",
-                "Dropdown test",
                 ElementType.Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4"), 0)
             ))
-            .addElement("Debug", "Config Test", "Text Input", ConfigElement(
+            .addFeatureOption("Text Input", "Text input test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_textinput",
-                "Text input test",
                 ElementType.TextInput("Default text", "Enter text here...", 50)
             ))
-            .addElement("Debug", "Config Test", "Text Input Empty", ConfigElement(
+            .addFeatureOption("Text Input Empty", "Empty text input test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_textinput_empty",
-                "Empty text input test",
                 ElementType.TextInput("", "Type something...", 100)
             ))
-            .addElement("Debug", "Config Test", "Text Paragraph", ConfigElement(
+            .addFeatureOption("Text Paragraph", "Text paragraph test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_paragraph",
-                null,
                 ElementType.TextParagraph("This is a text paragraph element used for displaying information or instructions to the user. It can contain multiple lines of text.")
             ))
-            .addElement("Debug", "Config Test", "Color Picker", ConfigElement(
+            .addFeatureOption("Color Picker", "Color picker test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_colorpicker",
-                "Color picker test",
                 ElementType.ColorPicker(Color(100, 200, 255))
             ))
-            .addElement("Debug", "Config Test", "Keybind", ConfigElement(
+            .addFeatureOption("Keybind", "Keybind test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_keybind",
-                "Keybind test",
                 ElementType.Keybind(82)
             ))
-            .addElement("Debug", "Config Test", "Multi Checkbox", ConfigElement(
+            .addFeatureOption("Multi Checkbox", "Multi checkbox test", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "test_multicheckbox",
-                "Multi checkbox test",
                 ElementType.MultiCheckbox(
                     options = listOf("Feature A", "Feature B", "Feature C", "Feature D", "Feature E"),
                     default = setOf(0, 2)
                 )
             ))
+
+        return configUI
     }
 }
+
 @Zen.Command
 object DebugCommand : Commodore("zendebug", "zd") {
     init {

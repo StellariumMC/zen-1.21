@@ -21,6 +21,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object SlayerDisplay : Feature("slayerdisplay", true) {
@@ -47,30 +48,25 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer Display", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Slayer Display", "Shows slayer boss information", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerdisplay",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayusefullname",
-                "Use Full Mob Name",
                 ElementType.Switch(false)
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayshowkilltimer",
-                "Show Kill Timer",
-                ElementType.Switch(true)
+            .addFeatureOption("Shown Bosses", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+                "slayerdisplaybossshown",
+                ElementType.Dropdown(
+                    listOf(
+                        "Show All",
+                        "Show Carries Only",
+                        "Show Own Only",
+                        "Show Own and Carries"
+                    ),
+                    0
+                )
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayhideoriginalnametags",
-                "Hide Original Nametags",
-                ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
+            .addFeatureOption("Display Options", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "slayerdisplayoptions",
-                "Display Options",
                 ElementType.MultiCheckbox(
                     listOf(
                         "Show Mob Name",
@@ -83,19 +79,19 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
                     setOf(0, 1, 2, 3, 4)
                 )
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplaybossshown",
-                "Show Slayers For",
-                ElementType.Dropdown(
-                    listOf(
-                        "Show for all bosses",
-                        "Only for carries",
-                        "Only for mine",
-                        "Mine and carries"
-                    ),
-                    0
-                )
+            .addFeatureOption("Use Full Mob Name", "", "Display", xyz.meowing.zen.ui.ConfigElement(
+                "slayerdisplayusefullname",
+                ElementType.Switch(false)
             ))
+            .addFeatureOption("Show Kill Timer", "", "Display", xyz.meowing.zen.ui.ConfigElement(
+                "slayerdisplayshowkilltimer",
+                ElementType.Switch(true)
+            ))
+            .addFeatureOption("Hide Original Nametags", "", "Display", xyz.meowing.zen.ui.ConfigElement(
+                "slayerdisplayhideoriginalnametags",
+                ElementType.Switch(false)
+            ))
+        return configUI
     }
 
     override fun initialize() {

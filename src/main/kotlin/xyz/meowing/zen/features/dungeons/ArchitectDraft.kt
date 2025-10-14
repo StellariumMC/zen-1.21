@@ -12,6 +12,7 @@ import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.text.ClickEvent
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
@@ -21,22 +22,21 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
     private val selfdraft by ConfigDelegate<Boolean>("selfdraft")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Architect Draft Message", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "architectdraft",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Only get drafts on your fails", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "selfdraft",
-                "Only get drafts on your fails",
                 ElementType.Switch(false)
             ))
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
+            .addFeatureOption("Automatically get architect drafts", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "autogetdraft",
-                "Automatically get architect drafts",
                 ElementType.Switch(false)
             ))
+
+        return configUI
     }
 
     override fun initialize() {

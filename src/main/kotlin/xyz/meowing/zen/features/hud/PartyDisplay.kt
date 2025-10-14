@@ -18,13 +18,14 @@ object PartyDisplay : Feature("partydisplay") {
     private var partyMembers = mapOf<String, PartyTracker.PartyMember>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Party Display HUD", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Party Display HUD", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "partydisplay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         HUDManager.register(name, "§9§lParty Members §r§7(5)\n §e• §3MrFast §6♚\n §e• §3MrFast §e(Archer 20)\n §e• §3MrFast §e(Mage 20)\n §e• §3MrFast §e(Berserker 20)\n §e• §3MrFast §e(Tank 20)")
