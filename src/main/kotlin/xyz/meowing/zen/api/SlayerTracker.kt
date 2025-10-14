@@ -12,9 +12,11 @@ import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.SpiderEntity
+import xyz.meowing.zen.Zen
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+@Zen.Module
 object SlayerTracker {
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
