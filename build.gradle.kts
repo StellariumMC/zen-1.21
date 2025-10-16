@@ -1,5 +1,4 @@
 import dev.deftu.gradle.utils.version.MinecraftVersions
-import dev.deftu.gradle.utils.includeOrShade
 
 plugins {
     java
@@ -14,7 +13,9 @@ plugins {
 }
 
 repositories {
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://api.modrinth.com/maven")
 }
 
 toolkitMultiversion {
@@ -29,9 +30,28 @@ toolkitLoomHelper {
 dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
-    modImplementation(includeOrShade("gg.essential:elementa:710")!!)
-    modImplementation(includeOrShade("gg.essential:universalcraft-${mcData}:430")!!)
+    modImplementation(include("gg.essential:elementa:710")!!)
+    modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
     modImplementation(include("xyz.meowing:vexel-${mcData}:105")!!)
+
+    val clocheAction: Action<ExternalModuleDependency> = Action {
+        attributes {
+            attribute(Attribute.of("earth.terrarium.cloche.modLoader", String::class.java), "fabric")
+            attribute(Attribute.of("earth.terrarium.cloche.minecraftVersion", String::class.java),
+                when (mcData.version) {
+                    MinecraftVersions.VERSION_1_21_7 -> "1.21.8"
+                    else -> mcData.toString().substringBefore("-")
+                }
+            )
+        }
+    }
+
+    modImplementation("me.owdding:item-data-fixer:1.0.3", clocheAction)
+    modImplementation("tech.thatgravyboat:skyblock-api:3.0.9") {
+        exclude("me.owdding")
+        clocheAction.execute(this)
+    }
+    include("tech.thatgravyboat:skyblock-api:3.0.9", clocheAction)
 
     when (mcData.version) {
         MinecraftVersions.VERSION_1_21_7 -> {
