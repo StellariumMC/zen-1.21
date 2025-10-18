@@ -12,11 +12,14 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
 import java.awt.Color
+import xyz.meowing.zen.utils.Render3D
+import net.minecraft.util.math.Box
 
 //#if MC < 1.21.9
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
+    private val blockoverlayfilled by ConfigDelegate<Boolean>("blockoverlayfilled")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
         return configUI
@@ -30,6 +33,11 @@ object BlockOverlay : Feature("blockoverlay") {
                 "Block overlay color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+            .addElement("Visuals", "Block overlay", "Options", ConfigElement(
+                "blockoverlayfilled",
+                "Filled block overlay",
+                ElementType.Switch(false)
+            ))
     }
 
     override fun initialize() {
@@ -42,15 +50,25 @@ object BlockOverlay : Feature("blockoverlay") {
 
             val camPos = camera.pos
             event.cancel()
-            VertexRendering.drawOutline(
-                event.worldContext.matrixStack(),
-                consumers.getBuffer(RenderLayer.getLines()),
-                blockShape,
-                blockPos.x - camPos.x,
-                blockPos.y - camPos.y,
-                blockPos.z - camPos.z,
-                blockoverlaycolor.rgb
-            )
+            if(blockoverlayfilled == false) {
+                VertexRendering.drawOutline(
+                    event.worldContext.matrixStack(),
+                    consumers.getBuffer(RenderLayer.getLines()),
+                    blockShape,
+                    blockPos.x - camPos.x,
+                    blockPos.y - camPos.y,
+                    blockPos.z - camPos.z,
+                    blockoverlaycolor.rgb
+                )
+            }
+            else {
+                Render3D.drawFilledBB(
+                    Box(blockPos),
+                    blockoverlaycolor,
+                    event.worldContext,
+                    0.6F
+                )
+            }
         }
     }
 }
