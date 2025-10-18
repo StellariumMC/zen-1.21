@@ -50,7 +50,7 @@ object BlockOverlay : Feature("blockoverlay") {
 
             val camPos = camera.pos
             event.cancel()
-            if(blockoverlayfilled == false) {
+            if (!blockoverlayfilled) {
                 VertexRendering.drawOutline(
                     event.worldContext.matrixStack(),
                     consumers.getBuffer(RenderLayer.getLines()),
@@ -60,13 +60,12 @@ object BlockOverlay : Feature("blockoverlay") {
                     blockPos.z - camPos.z,
                     blockoverlaycolor.rgb
                 )
-            }
-            else {
+            } else {
                 Render3D.drawFilledBB(
                     blockShape.boundingBox.offset(blockPos),
                     blockoverlaycolor,
                     event.worldContext,
-                    blockoverlaycolor.alpha / 255F
+                    blockoverlaycolor.alpha / 255f
                 )
             }
         }
