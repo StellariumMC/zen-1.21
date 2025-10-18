@@ -62,13 +62,12 @@ object SlayerHUD : Feature("slayerhud", true) {
     }
 
     private fun render(context: DrawContext) {
-        val time = timerEntity?.name?.string ?: return
-        val hp = hpEntity?.name?.string ?: return
+        val timeText = timerEntity?.name ?: return
+        val hpText = hpEntity?.name ?: return
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
         val scale = HUDManager.getScale(name)
         val matrices = context.matrices
-
         //#if MC >= 1.21.7
         //$$ matrices.pushMatrix()
         //$$ matrices.translate(x, y)
@@ -76,10 +75,13 @@ object SlayerHUD : Feature("slayerhud", true) {
         matrices.push()
         matrices.translate(x, y, 0f)
         //#endif
-        val hpWidth = hp.removeFormatting().width()
-        val timeWidth = time.removeFormatting().width()
-        Render2D.renderStringWithShadow(context, time, (hpWidth - timeWidth) / 2f, 0f, scale)
-        Render2D.renderStringWithShadow(context, hp, 0f, 10f, scale)
+
+        val hpWidth = hpText.string.removeFormatting().width()
+        val timeWidth = timeText.string.removeFormatting().width()
+
+        context.drawText(mc.textRenderer, timeText, (hpWidth - timeWidth) / 2, 0, -1, false)
+        context.drawText(mc.textRenderer, hpText, 0, 10, -1, false)
+
         //#if MC >= 1.21.7
         //$$ matrices.popMatrix()
         //#else

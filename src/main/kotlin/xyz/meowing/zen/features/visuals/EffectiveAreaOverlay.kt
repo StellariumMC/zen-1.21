@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.visuals
 
-//#if MC < 1.21.9
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.ConfigUI
@@ -15,6 +14,7 @@ import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.zen.utils.ChatUtils
 import java.awt.Color
 
 @Zen.Module
@@ -51,7 +51,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                 if (lookingAt.type == HitResult.Type.BLOCK) {
                     val blockHit = lookingAt as BlockHitResult
                     Render3D.drawFilledCircle(
-                        event.context!!,
+                        event.consumers,
+                        event.matrixStack,
                         Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                         7f,
                         72,
@@ -63,4 +64,3 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
         }
     }
 }
-//#endif

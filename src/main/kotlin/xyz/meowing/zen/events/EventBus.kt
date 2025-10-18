@@ -84,11 +84,15 @@ object EventBus {
 
         //#if MC < 1.21.9
         WorldRenderEvents.LAST.register { context ->
-            post(RenderEvent.World(context))
+            post(RenderEvent.World(context.consumers(), context.matrixStack()))
         }
 
         WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderEvent.WorldPostEntities(context))
+            post(RenderEvent.WorldPostEntities(context.consumers(), context.matrixStack()))
+        }
+
+        WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
+            !post(RenderEvent.BlockOutline(blockContext.blockPos(), blockContext.blockState(), worldContext.consumers(), worldContext.matrixStack()))
         }
         //#endif
 
@@ -135,12 +139,6 @@ object EventBus {
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (screen != null) post(GuiEvent.Open(screen))
         }
-
-        //#if MC < 1.21.9
-        WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
-            !post(RenderEvent.BlockOutline(worldContext, blockContext))
-        }
-        //#endif
 
         ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
             post(GameEvent.Load())

@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.rift
 
-//#if MC < 1.21.9
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.ConfigUI
@@ -57,7 +56,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
 
         register<RenderEvent.World> { event ->
             val targetPos = blockPos ?: return@register
-            val consumers = event.context?.consumers() ?: return@register
+            val consumers = event.consumers ?: return@register
             val blockState = world?.getBlockState(targetPos) ?: return@register
             val camera = mc.gameRenderer.camera
             val blockShape = blockState.getOutlineShape(world, targetPos, ShapeContext.of(camera.focusedEntity))
@@ -65,7 +64,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
 
             val camPos = camera.pos
             VertexRendering.drawOutline(
-                event.context.matrixStack(),
+                event.matrixStack,
                 consumers.getBuffer(RenderLayer.getLines()),
                 blockShape,
                 targetPos.x - camPos.x,
@@ -76,4 +75,3 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
         }
     }
 }
-//#endif
