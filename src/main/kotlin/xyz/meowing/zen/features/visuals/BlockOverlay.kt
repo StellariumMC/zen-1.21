@@ -63,10 +63,10 @@ object BlockOverlay : Feature("blockoverlay") {
             }
             else {
                 Render3D.drawFilledBB(
-                    Box(blockPos),
+                    blockShape.boundingBox.offset(blockPos),
                     blockoverlaycolor,
                     event.worldContext,
-                    0.6F
+                    blockoverlaycolor.alpha / 255F
                 )
             }
         }
