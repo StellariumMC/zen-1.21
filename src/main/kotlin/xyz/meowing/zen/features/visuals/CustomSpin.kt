@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object CustomSpin : Feature("customspin") {
@@ -16,27 +17,25 @@ object CustomSpin : Feature("customspin") {
     private val spindirection by ConfigDelegate<Int>("spindirection")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Custom spin", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Custom spin", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customspin",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Custom spin", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Spin everyone", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "spineveryone",
-                "Spin everyone",
                 ElementType.Switch(true)
             ))
-            .addElement("Visuals", "Custom spin", "Options", ConfigElement(
+            .addFeatureOption("Custom spin direction", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "spindirection",
-                "Custom spin direction",
                 ElementType.Dropdown(listOf("Right", "Left"), 1)
             ))
-            .addElement("Visuals", "Custom spin", "Options", ConfigElement(
+            .addFeatureOption("Custom spin speed", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "customspinspeed",
-                "Custom spin speed",
                 ElementType.Slider(1.0, 20.0, 5.0, true)
             ))
+
+        return configUI
     }
 
     override fun initialize() {

@@ -15,18 +15,18 @@ object MeowSounds : Feature("meowsounds") {
     private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Meow Sounds", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Meow Sounds", "Meow Sounds", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowsounds",
-                "Meow Sounds",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Meowing", "Meow Sounds", "", ConfigElement(
+            ))
+            .addFeatureOption("", "Plays a meow sound when a message containing 'meow' is received in chat.", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Plays a meow sound when a message containing 'meow' is received in chat.")
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

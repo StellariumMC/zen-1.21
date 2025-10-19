@@ -59,27 +59,26 @@ object ChatCleaner : Feature("chatcleaner") {
     val dataUtils = DataUtils("chatcleaner", ChatPatterns())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Chat Cleaner", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Chat Cleaner", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "chatcleaner",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Chat Cleaner", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Keybind to add message to filter", "Keybind to add message to filter", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "chatcleanerkey",
-                "Keybind to add message to filter",
                 ElementType.Keybind(GLFW.GLFW_KEY_H)
             ))
-            .addElement("General", "Chat Cleaner", "GUI", ConfigElement(
+            .addFeatureOption("Chat Cleaner Filter GUI", "Chat Cleaner Filter GUI", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "chatcleanergui",
-                "Chat Cleaner Filter GUI",
                 ElementType.Button("Open Filter GUI") {
                     TickUtils.schedule(2) {
                         mc.setScreen(ChatCleanerGui())
                     }
                 }
             ))
+        return configUI
     }
+
 
     init {
         loadDefault()

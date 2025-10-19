@@ -82,31 +82,28 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
     }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Trash Highlighter", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Trash Highlighter", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "trashhighlighter",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Trash Highlighter", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight color", "Highlight color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "trashhighlightercolor",
-                "Highlight color",
                 ElementType.ColorPicker(Color(255, 0, 0, 127))
             ))
-            .addElement("General", "Trash Highlighter", "Type", ConfigElement(
+            .addFeatureOption("Highlight type", "Highlight type", "Type", xyz.meowing.zen.ui.ConfigElement(
                 "trashhighlighttype",
-                "Highlight type",
                 ElementType.Dropdown(listOf("Slot", "Border"), 0)
             ))
-            .addElement("General", "Trash Highlighter", "GUI", ConfigElement(
+            .addFeatureOption("Trash Highlighter Filter GUI", "Trash Highlighter Filter GUI", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "trashhighlightguibutton",
-                "Trash Highlighter Filter GUI",
                 ElementType.Button("Open Filter GUI") {
                     TickUtils.schedule(2) {
                         mc.setScreen(TrashFilterGui())
                     }
                 }
             ))
+        return configUI
     }
 
     override fun initialize() {

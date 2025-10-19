@@ -23,37 +23,32 @@ object EntityHighlight : Feature("entityhighlight") {
     private val entityhighlightothercolor by ConfigDelegate<Color>("entityhighlightothercolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Entity highlight", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Entity highlight", "Entity highlight", "General", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlight",
-                "Entity highlight",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Entity highlight", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Player color", "Player color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlightplayercolor",
-                "Player color",
                 ElementType.ColorPicker(Color(0, 255, 255, 255))
             ))
-            .addElement("General", "Entity highlight", "Color", ConfigElement(
+            .addFeatureOption("Mob color", "Mob color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlightmobcolor",
-                "Mob color",
                 ElementType.ColorPicker(Color(255, 0, 0, 255))
             ))
-            .addElement("General", "Entity highlight", "Color", ConfigElement(
+            .addFeatureOption("Animal color", "Animal color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlightanimalcolor",
-                "Animal color",
                 ElementType.ColorPicker(Color(0, 255, 0, 255))
             ))
-            .addElement("General", "Entity highlight", "Color", ConfigElement(
+            .addFeatureOption("Other entity color", "Other entity color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlightothercolor",
-                "Other entity color",
                 ElementType.ColorPicker(Color(255, 255, 255, 255))
             ))
-            .addElement("General", "Entity highlight", "Width", ConfigElement(
+            .addFeatureOption("Entity highlight width", "Entity highlight width", "Width", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlightwidth",
-                "Entity highlight width",
                 ElementType.Slider(1.0, 10.0, 2.0, false)
             ))
+        return configUI
     }
 
     override fun initialize() {

@@ -11,13 +11,14 @@ import net.minecraft.entity.Entity
 @Zen.Module
 object HideDeathAnimation : Feature("hidedeathanimation") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("QoL", "Hide death animation", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Hide death animation", "Hide death animation", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "hidedeathanimation",
-                "Hide death animation",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<EntityEvent.Death> { event ->

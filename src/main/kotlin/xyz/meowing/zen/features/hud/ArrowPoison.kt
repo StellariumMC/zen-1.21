@@ -24,13 +24,14 @@ object ArrowPoison : Feature("arrowpoison", true) {
     private var toxic = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Arrow poison tracker", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Arrow poison tracker", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "arrowpoison",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         HUDManager.registerCustom(name, 85, 17, this::HUDEditorRender)

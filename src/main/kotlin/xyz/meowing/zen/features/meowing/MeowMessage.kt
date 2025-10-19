@@ -14,13 +14,14 @@ object MeowMessage : Feature("meowmessage") {
     private val variants = listOf("meow", "mew", "mrow", "nyaa", "purr", "mrrp", "meoww", "nya")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Cat Speak", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Cat Speak", "Cat Speak", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowmessage",
-                "Cat Speak",
                 ElementType.Switch(false)
-            ), true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<ChatEvent.Send> { event ->

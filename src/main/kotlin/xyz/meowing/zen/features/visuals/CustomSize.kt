@@ -7,6 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object CustomSize : Feature("customsize") {
@@ -16,32 +17,29 @@ object CustomSize : Feature("customsize") {
     private val scaleeveryone by ConfigDelegate<Boolean>("scaleeveryone")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Custom size", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Custom size", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customsize",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Custom size", "Size", ConfigElement(
+            ))
+            .addFeatureOption("Custom X", "", "Size", xyz.meowing.zen.ui.ConfigElement(
                 "customX",
-                "Custom X",
                 ElementType.Slider(0.1, 5.0, 1.0, true)
             ))
-            .addElement("Visuals", "Custom size", "Size", ConfigElement(
+            .addFeatureOption("Custom Y", "", "Size", xyz.meowing.zen.ui.ConfigElement(
                 "customY",
-                "Custom Y",
                 ElementType.Slider(0.1, 5.0, 1.0, true)
             ))
-            .addElement("Visuals", "Custom size", "Size", ConfigElement(
+            .addFeatureOption("Custom Z", "", "Size", xyz.meowing.zen.ui.ConfigElement(
                 "customZ",
-                "Custom Z",
                 ElementType.Slider(0.1, 5.0, 1.0, true)
             ))
-            .addElement("Visuals", "Custom size", "Other Options", ConfigElement(
+            .addFeatureOption("Scale everyone", "", "Other Options", xyz.meowing.zen.ui.ConfigElement(
                 "scaleeveryone",
-                "Scale everyone",
                 ElementType.Switch(true)
             ))
+
+        return configUI
     }
 
     override fun initialize() {

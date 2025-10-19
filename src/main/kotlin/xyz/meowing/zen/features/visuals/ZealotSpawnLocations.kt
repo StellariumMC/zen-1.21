@@ -9,6 +9,7 @@ import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.SimpleTimeMark
@@ -72,23 +73,22 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
     private val drawzealotspawncolor by ConfigDelegate<Color>("drawzealotspawncolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Zealot Spawn Locations", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Zealot Spawn Locations", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "zealotspawnvisual",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Zealot Spawn Locations", "Options", ConfigElement(
-                "drawzealotspawnbox",
-                "Zealot Spawn Location Boxes",
                 ElementType.Switch(false)
             ))
-            .addElement("Visuals", "Zealot Spawn Locations", "Options", ConfigElement(
+            .addFeatureOption("Zealot Spawn Location Boxes", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+                "drawzealotspawnbox",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Box color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "drawzealotspawncolor",
-                "Box color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127)),
                 { config -> config["drawzealotspawnbox"] as? Boolean == true }
             ))
+
+        return configUI
     }
 
     override fun initialize() {

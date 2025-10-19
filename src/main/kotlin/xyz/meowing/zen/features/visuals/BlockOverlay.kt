@@ -12,23 +12,24 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
 import java.awt.Color
+import xyz.meowing.zen.ui.ConfigMenuManager
 
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Block overlay", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Block overlay", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "blockoverlay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Block overlay", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Block overlay color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "blockoverlaycolor",
-                "Block overlay color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+
+        return configUI
     }
 
     override fun initialize() {

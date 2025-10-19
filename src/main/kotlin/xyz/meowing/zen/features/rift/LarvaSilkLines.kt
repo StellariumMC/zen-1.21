@@ -25,18 +25,18 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
     private val larvasilklinescolor by ConfigDelegate<Color>("larvasilklinescolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Rift", "Larva silk display", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Larva silk display", "Larva silk lines display", "Rift", xyz.meowing.zen.ui.ConfigElement(
                 "larvasilklines",
-                "Larva silk lines display",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Rift", "Larva silk display", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
                 "larvasilklinescolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         createCustomEvent<RenderEvent.World>("render") { event ->

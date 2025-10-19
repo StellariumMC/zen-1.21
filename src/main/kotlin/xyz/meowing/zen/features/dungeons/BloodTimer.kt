@@ -7,6 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TitleUtils.showTitle
@@ -22,12 +23,13 @@ object BloodTimer : Feature("bloodtimer", area = "catacombs") {
     private var starttime = TimeUtils.zero
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Blood helper", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Blood helper", "Blood camp helper", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "bloodtimer",
-                "Blood camp helper",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+
+        return configUI
     }
 
     override fun initialize() {

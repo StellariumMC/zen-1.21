@@ -40,23 +40,18 @@ object ChatEmotes : Feature("chatemotes") {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Chat Emotes", "Automatically replace emote codes with Unicode symbols in chat messages", "General", xyz.meowing.zen.ui.ConfigElement(
+                "chatemotes",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Chat Emotes Info", "", "", xyz.meowing.zen.ui.ConfigElement(
+                "",
+                ElementType.TextParagraph("Automatically replace emote codes with Unicode symbols in chat messages, example: <3 becomes ❤, use /emotes to see all supported emotes.")
+            ))
         return configUI
-            .addElement(
-                "General", "Chat Emotes", ConfigElement(
-                    "chatemotes",
-                    "Automatically replace emote codes with Unicode symbols in chat messages",
-                    ElementType.Switch(false)
-                ), true
-            )
-            .addElement(
-                "General", "Chat Emotes", "", ConfigElement(
-                    "",
-                    null,
-                    ElementType.TextParagraph("Automatically replace emote codes with Unicode symbols in chat messages, example: <3 becomes ❤, use /emotes to see all supported emotes.")
-                )
-            )
-
     }
+
 
     override fun initialize() {
         val emotePattern = HYPIXEL_EMOTES.keys

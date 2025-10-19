@@ -18,18 +18,18 @@ object meowcount : Feature("meowcount") {
     private val dataUtils = DataUtils("meowcount", Data())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Meow count", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Meow count", "Meow count", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowcount",
-                "Meow count",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Meowing", "Meow count", "", ConfigElement(
+            ))
+            .addFeatureOption("", "Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.")
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<ChatEvent.Send> { event ->

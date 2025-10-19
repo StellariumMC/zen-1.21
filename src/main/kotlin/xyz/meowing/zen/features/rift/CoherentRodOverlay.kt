@@ -17,18 +17,18 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
     private val coherentrodoverlaycolor by ConfigDelegate<Color>("coherentrodoverlaycolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Rift", "Coherent rod", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Coherent rod", "Coherent rod radius display", "Rift", xyz.meowing.zen.ui.ConfigElement(
                 "coherentrodoverlay",
-                "Coherent rod radius display",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Rift", "Coherent rod", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
                 "coherentrodoverlaycolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<RenderEvent.World> { event ->

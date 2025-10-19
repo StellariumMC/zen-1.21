@@ -44,24 +44,22 @@ object ProtectItem : Feature("protectitem", true) {
     val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Item Protection", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Item Protection", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "protectitem",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Item Protection", "", ConfigElement(
+            ))
+            .addFeatureOption("Item Protection Info", "", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi")
             ))
-            .addElement("General", "Item Protection", "GUI", ConfigElement(
+            .addFeatureOption("Protect Item GUI", "Protect Item GUI", "GUI", xyz.meowing.zen.ui.ConfigElement(
                 "protectItem.GuiButton",
-                "Protect Item GUI",
                 ElementType.Button("Open GUI") {
                     mc.setScreen(ItemProtectGUI())
                 }
             ))
+        return configUI
     }
 
     override fun initialize() {

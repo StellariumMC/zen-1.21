@@ -22,13 +22,14 @@ object SlayerHUD : Feature("slayerhud", true) {
     private var bossID: Int? = null
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer HUD", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Slayer HUD", "Slayer HUD", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerhud",
-                "Slayer HUD",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         HUDManager.register(name, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤")

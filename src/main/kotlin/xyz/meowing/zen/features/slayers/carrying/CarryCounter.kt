@@ -23,6 +23,7 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
+import xyz.meowing.zen.ui.ConfigMenuManager
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -55,57 +56,49 @@ object CarryCounter : Feature("carrycounter") {
     private val carrywebhook by ConfigDelegate<String>("carrywebhookurl")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Carrying", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Carrying", "Carry counter", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "carrycounter",
-                "Carry counter",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Carrying", "", ConfigElement(
+            ))
+            .addFeatureOption("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help", "", "", xyz.meowing.zen.ui.ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help")
             ))
-            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
+            .addFeatureOption("Send count", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
                 "carrycountsend",
-                "Send count",
                 ElementType.Switch(true)
             ))
-            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
+            .addFeatureOption("Send boss spawn message", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
                 "carrysendmsg",
-                "Send boss spawn message",
                 ElementType.Switch(true)
             ))
-            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
+            .addFeatureOption("Carry value", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
                 "carryvalue",
-                "Carry value",
                 ElementType.TextInput("1.3", "1.3")
             ))
-            .addElement("Slayers", "Carrying", "QOL", ConfigElement(
+            .addFeatureOption("Carry webhook URL", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
                 "carrywebhookurl",
-                "Carry webhook URL",
                 ElementType.TextInput("", "None")
             ))
-            .addElement("Slayers", "Carrying", "Carry Boss", ConfigElement(
+            .addFeatureOption("Boss highlight", "", "Boss", xyz.meowing.zen.ui.ConfigElement(
                 "carrybosshighlight",
-                "Carry boss highlight",
                 ElementType.Switch(false)
             ))
-            .addElement("Slayers", "Carrying", "Carry Boss", ConfigElement(
-                "carrybosscolor"
-                , "Carry boss highlight color",
+            .addFeatureOption("Boss color", "", "Boss", xyz.meowing.zen.ui.ConfigElement(
+                "carrybosscolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addElement("Slayers", "Carrying", "Carry Client", ConfigElement(
+            .addFeatureOption("Client highlight", "", "Client", xyz.meowing.zen.ui.ConfigElement(
                 "carryclienthighlight",
-                "Carry client highlight",
                 ElementType.Switch(false)
             ))
-            .addElement("Slayers", "Carrying", "Carry Client", ConfigElement(
+            .addFeatureOption("Client color", "", "Client", xyz.meowing.zen.ui.ConfigElement(
                 "carryclientcolor",
-                "Carry client highlight color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+
+        return configUI
     }
 
     override fun initialize() {

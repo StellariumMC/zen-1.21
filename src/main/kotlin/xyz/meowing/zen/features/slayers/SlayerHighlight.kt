@@ -16,18 +16,18 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
     private val slayerhighlightcolor by ConfigDelegate<Color>("slayerhighlightcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer highlight", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Slayer highlight", "Slayer highlight", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerhighlight",
-                "Slayer highlight",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Slayer highlight", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
                 "slayerhighlightcolor",
-                "Slayer highlight color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<RenderEvent.EntityGlow> { event ->

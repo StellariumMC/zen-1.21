@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
@@ -26,17 +27,17 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
     private val firefreezeoverlaycolor by ConfigDelegate<Color>("firefreezeoverlaycolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Fire freeze overlay", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Fire freeze overlay", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "firefreezeoverlay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Fire freeze overlay", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "firefreezeoverlaycolor",
-                "Fire Freeze Overlay color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+
+        return configUI
     }
 
     override fun initialize() {

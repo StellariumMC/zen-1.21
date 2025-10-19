@@ -7,6 +7,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.*
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
@@ -25,12 +26,12 @@ object VengTimer : Feature("vengtimer", true) {
     private var cachedNametag: Entity? = null
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Vengeance proc timer", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Vengeance proc timer", "Vengeance proc timer", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "vengtimer",
-                "Vengeance proc timer",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
 
     override fun initialize() {

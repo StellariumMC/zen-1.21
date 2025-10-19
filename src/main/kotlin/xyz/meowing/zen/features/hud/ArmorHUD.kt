@@ -29,25 +29,23 @@ object ArmorHUD : Feature("armorhud") {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Armor HUD", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Armor HUD", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "armorhud",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("HUD", "Armor HUD", "Options", ConfigElement(
-                "armorhudvert",
-                "Vertical Armor HUD",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Armor HUD", "Options", ConfigElement(
+            .addFeatureOption("Vertical Armor HUD", "Vertical Armor HUD", "Options", xyz.meowing.zen.ui.ConfigElement(
+                "armorhudvert",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Armor pieces to render", "Armor pieces to render", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "armorpieces",
-                "Armor pieces to render",
                 ElementType.MultiCheckbox(
                     listOf("Helmet", "Chestplate", "Leggings", "Boots"),
                     setOf(0, 1, 2, 3)
                 )
             ))
+        return configUI
     }
 
     override fun initialize() {

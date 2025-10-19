@@ -7,6 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
@@ -16,17 +17,17 @@ object LeapAnnounce : Feature("leapannounce") {
     private val leapmessage by ConfigDelegate<String>("leapmessage")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Leap announce", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Leap announce", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "leapannounce",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Leap announce", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Leap announce message", "Leap announce message", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "leapmessage",
-                "Leap announce message",
                 ElementType.TextInput("Leaping to", "Leaping to")
             ))
+
+        return configUI
     }
 
     override fun initialize() {

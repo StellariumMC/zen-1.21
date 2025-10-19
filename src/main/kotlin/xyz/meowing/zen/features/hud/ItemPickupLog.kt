@@ -28,18 +28,18 @@ object ItemPickupLog : Feature("itempickuplog") {
     private val abbreviateNumbers by ConfigDelegate<Boolean>("itempickuplogabbreviate")
     private val npcSellingStackRegex = """(.*) §8x\d+""".toRegex()
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Item Pickup Log", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Item Pickup Log", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "itempickuplog",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("HUD", "Item Pickup Log", "Options", ConfigElement(
-                "itempickuplogabbreviate",
-                "Abbreviate Numbers",
                 ElementType.Switch(false)
             ))
+            .addFeatureOption("Abbreviate Numbers", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+                "itempickuplogabbreviate",
+                ElementType.Switch(false)
+            ))
+        return configUI
     }
+
 
     private var previousInventory = mutableMapOf<String, Int>()
     private var currentInventory = mutableMapOf<String, Int>()

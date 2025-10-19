@@ -21,6 +21,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
 import net.minecraft.util.math.BlockPos
+import xyz.meowing.zen.ui.ConfigMenuManager
 import java.awt.Color
 
 @Zen.Module
@@ -62,28 +63,27 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
     private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Highlight Livid", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Highlight Livid", "Highlight correct livid", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "highlightlivid",
-                "Highlight correct livid",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Highlight Livid", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight correct livid color", "Highlight correct livid color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "highlightlividcolor",
-                "Highlight correct livid color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
+            .addFeatureOption("Hide incorrect livid entity", "Hide incorrect livid entity", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hidewronglivid",
-                "Hide incorrect livid entity",
                 ElementType.Switch(false)
             ))
-            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
+            .addFeatureOption("Line to correct livid entity", "Line to correct livid entity", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "highlightlividline",
-                "Line to correct livid entity",
                 ElementType.Switch(false)
             ))
+
+        return configUI
     }
+
 
     override fun initialize() {
         createCustomEvent<RenderEvent.EntityGlow>("renderLivid") { event ->

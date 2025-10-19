@@ -22,13 +22,14 @@ object ServerLagTimer : Feature("serverlagtimer", area = "catacombs") {
     private var servertick: Long = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Server lag timer", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Server lag timer", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "serverlagtimer",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
+        return configUI
     }
+
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

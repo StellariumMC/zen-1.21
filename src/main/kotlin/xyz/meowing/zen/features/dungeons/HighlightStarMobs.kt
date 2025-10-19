@@ -12,6 +12,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
+import xyz.meowing.zen.ui.ConfigMenuManager
 import java.awt.Color
 
 @Zen.Module
@@ -20,17 +21,17 @@ object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
     private val entities = mutableListOf<Int>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Highlight star mobs", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Highlight star mobs", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "boxstarmobs",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Highlight star mobs", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight star mobs color", "Highlight star mobs color", "Color", xyz.meowing.zen.ui.ConfigElement(
                 "boxstarmobscolor",
-                "Highlight star mobs color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
+
+        return configUI
     }
 
     override fun initialize() {

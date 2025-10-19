@@ -8,6 +8,7 @@ import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.ui.ConfigMenuManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
@@ -20,17 +21,13 @@ object SlayerTimer : Feature("slayertimer", true) {
     val slayerRecord = DataUtils("slayerRecords", JsonObject())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer timer", ConfigElement(
+        ConfigMenuManager
+            .addFeature("Slayer timer", "Logs your time to kill slayer bosses to chat.", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayertimer",
-                "Slayer timer",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Slayer timer", "", ConfigElement(
-                "",
-                null,
-                ElementType.TextParagraph("Logs your time to kill slayer bosses to chat.")
             ))
+
+        return configUI
     }
 
     fun sendTimerMessage(action: String, timeTaken: Duration, ticks: Int) {

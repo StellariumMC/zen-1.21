@@ -78,155 +78,127 @@ object StatsDisplay : Feature("statsdisplay", true) {
     }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Stats Display", ConfigElement(
+        xyz.meowing.zen.ui.ConfigMenuManager
+            .addFeature("Stats Display", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "statsdisplay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("HUD", "Stats Display", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Clean Action Bar", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "cleanactionbar",
-                "Clean Action Bar",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Options", ConfigElement(
+            .addFeatureOption("Hide Vanilla HP and Saturation", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hidevanillahp",
-                "Hide Vanilla HP and Saturation",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Options", ConfigElement(
+            .addFeatureOption("Hide Armor Icon", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hidevanillaarmor",
-                "Hide Armor Icon",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Options", ConfigElement(
+            .addFeatureOption("Hide Experience Bar", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hideexpbar",
-                "Hide Experience Bar",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Options", ConfigElement(
+            .addFeatureOption("Hide Stats", "", "Options", xyz.meowing.zen.ui.ConfigElement(
                 "hiddenstats",
-                "Hide Stats",
                 ElementType.MultiCheckbox(
                     options = StatType.entries.map { it.displayName },
                     default = emptySet()
                 )
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Show Health Bar", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "showhealthbar",
-                "Show Health Bar",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Health Bar Fill Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "healthbarmaincolor",
-                "Health Bar Fill Color",
                 ElementType.ColorPicker(MCColorCode.RED.color)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Health Bar Absorption Fill Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "healthbarextracolor",
-                "Health Bar Absorption Fill Color",
                 ElementType.ColorPicker(MCColorCode.YELLOW.color)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Show Health Numbers", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "showhealthtext",
-                "Show Health Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Health Text Style", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "healthtextstyle",
-                "Health Text Style",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Show Max Health", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "showmaxhealth",
-                "Show Max Health",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Health Text Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "healthtextcolor",
-                "Health Text Color",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("HUD", "Stats Display", "Health Display", ConfigElement(
+            .addFeatureOption("Max Health Text Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
                 "maxhealthtextcolor",
-                "Max Health Text Color",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Show Mana Bar", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "showmanabar",
-                "Show Mana Bar",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Health Bar Fill Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "manabarmaincolor",
-                "Health Bar Fill Color",
                 ElementType.ColorPicker(MCColorCode.BLUE.color)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Show Mana Numbers", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "showmanatext",
-                "Show Mana Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Mana Text Style", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "manatextstyle",
-                "Mana Text Style",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Show Max Mana", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "showmaxmana",
-                "Show Max Mana",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Mana Text Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "manatextcolor",
-                "Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addElement("HUD", "Stats Display", "Mana Display", ConfigElement(
+            .addFeatureOption("Max Mana Text Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
                 "maxmanatextcolor",
-                "Max Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addElement("HUD", "Stats Display", "Overflow Mana", ConfigElement(
+            .addFeatureOption("Show Overflow Mana", "", "Overflow Mana", xyz.meowing.zen.ui.ConfigElement(
                 "showoverflowmanatext",
-                "Show Overflow Mana",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Overflow Mana", ConfigElement(
+            .addFeatureOption("Overflow Mana Text Color", "", "Overflow Mana", xyz.meowing.zen.ui.ConfigElement(
                 "overflowmanatextcolor",
-                "Overflow Mana Text Color",
                 ElementType.MCColorPicker(MCColorCode.DARK_AQUA)
             ))
-            .addElement("HUD", "Stats Display", "Rift Time Bar", ConfigElement(
+            .addFeatureOption("Show Rift Time Text", "", "Rift Time Bar", xyz.meowing.zen.ui.ConfigElement(
                 "showrifttimetext",
-                "Show Rift Time Text",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Rift Time Bar", ConfigElement(
+            .addFeatureOption("Rift Time Text Color", "", "Rift Time Bar", xyz.meowing.zen.ui.ConfigElement(
                 "rifttimetextcolor",
-                "Rift Time Text Color",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
             ))
-            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addFeatureOption("Show Drill Fuel Numbers", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
                 "showdrillfueltext",
-                "Show Drill Fuel Numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addFeatureOption("Show Max Drill Fuel", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
                 "showmaxdrillfuel",
-                "Show Max Drill Fuel",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addFeatureOption("Drill Fuel Text Color", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
                 "drillfueltextcolor",
-                "Drill Fuel Text Color",
                 ElementType.MCColorPicker(MCColorCode.DARK_GREEN)
             ))
-            .addElement("HUD", "Stats Display", "Drill Fuel Bar", ConfigElement(
+            .addFeatureOption("Max Drill Fuel Text Color", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
                 "maxdrillfueltextcolor",
-                "Max Drill Fuel Text Color",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
             ))
+        return configUI
     }
 
     override fun initialize() {
