@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.visuals
 
-//#if MC < 1.21.9
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.ConfigUI
@@ -116,7 +115,7 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
             val positions = if (LocationUtils.checkSubarea("dragon's nest")) zealotSpawns else bruiserSpawns
             positions.forEach { pos ->
                 val aabb = Box(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
-                if (drawzealotspawnbox && event.context != null) Render3D.drawSpecialBB(aabb, drawzealotspawncolor, event.context)
+                if (drawzealotspawnbox) Render3D.drawSpecialBB(aabb, drawzealotspawncolor, event.consumers, event.matrixStack)
                 Render3D.drawString(
                     displayText,
                     Vec3d(pos).add(0.0, 1.5, 0.0),
@@ -126,4 +125,3 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
         }
     }
 }
-//#endif

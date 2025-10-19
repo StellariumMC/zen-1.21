@@ -71,13 +71,12 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
         }
 
         register<RenderEvent.World> { event ->
-            //#if MC < 1.21.9
-            val context = event.context ?: return@register
             val timer = overlayTimerId?.let { getTimer(it) } ?: return@register
             val pos = activatedPos ?: return@register
 
             Render3D.drawFilledCircle(
-                context,
+                event.consumers,
+                event.matrixStack,
                 pos,
                 5f,
                 72,
@@ -91,7 +90,6 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
                 activatedPos?.add(0.0, 1.0, 0.0) ?: return@register,
                 0x000000
             )
-            //#endif
         }
 
         register<RenderEvent.World> { event ->

@@ -24,10 +24,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-//#endif
+import net.minecraft.block.BlockState
 
 abstract class Event
 
@@ -93,22 +90,20 @@ enum class PartyChangeType {
 
 abstract class RenderEvent {
     class World(
-        //#if MC < 1.21.9
-        val context: WorldRenderContext?
-        //#endif
+        val consumers: VertexConsumerProvider?,
+        val matrixStack: MatrixStack?
     ) : Event()
 
     class WorldPostEntities(
-        //#if MC < 1.21.9
-        val context: WorldRenderContext?
-        //#endif
+        val consumers: VertexConsumerProvider?,
+        val matrixStack: MatrixStack?
     ) : Event()
 
     class BlockOutline(
-        //#if MC < 1.21.9
-        val worldContext: WorldRenderContext,
-        val blockContext: WorldRenderContext.BlockOutlineContext
-        //#endif
+        val blockPos: BlockPos,
+        val blockState: BlockState,
+        val consumers: VertexConsumerProvider?,
+        val matrixStack: MatrixStack?
     ) : CancellableEvent()
 
     class EntityGlow(val entity: net.minecraft.entity.Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()

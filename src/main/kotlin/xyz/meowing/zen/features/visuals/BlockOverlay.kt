@@ -15,7 +15,6 @@ import java.awt.Color
 import xyz.meowing.zen.utils.Render3D
 import net.minecraft.util.math.Box
 
-//#if MC < 1.21.9
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
@@ -42,17 +41,17 @@ object BlockOverlay : Feature("blockoverlay") {
 
     override fun initialize() {
         register<RenderEvent.BlockOutline> { event ->
-            val blockPos = event.blockContext.blockPos()
-            val consumers = event.worldContext.consumers() ?: return@register
+            val blockPos = event.blockPos
+            val consumers = event.consumers ?: return@register
             val camera = mc.gameRenderer.camera
-            val blockShape = event.blockContext.blockState().getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
+            val blockShape = event.blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
             if (blockShape.isEmpty) return@register
 
             val camPos = camera.pos
             event.cancel()
             if (!blockoverlayfilled) {
                 VertexRendering.drawOutline(
-                    event.worldContext.matrixStack(),
+                    event.matrixStack,
                     consumers.getBuffer(RenderLayer.getLines()),
                     blockShape,
                     blockPos.x - camPos.x,
@@ -64,7 +63,8 @@ object BlockOverlay : Feature("blockoverlay") {
                 Render3D.drawFilledBB(
                     blockShape.boundingBox.offset(blockPos),
                     blockoverlaycolor,
-                    event.worldContext,
+                    event.consumers,
+                    event.matrixStack,
                     blockoverlaycolor.alpha / 255f
                 )
             }

@@ -32,7 +32,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(include("gg.essential:elementa:710")!!)
     modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
-    modImplementation(include("xyz.meowing:vexel-${mcData}:105")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:106")!!)
 
     val clocheAction: Action<ExternalModuleDependency> = Action {
         attributes {

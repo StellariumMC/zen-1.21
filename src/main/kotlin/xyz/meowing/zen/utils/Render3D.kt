@@ -24,10 +24,6 @@ import kotlin.math.min
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
-//#endif
-
 object Render3D {
     private fun getValidLineWidth(width: Float): Float {
         val range = FloatArray(2)
@@ -47,30 +43,6 @@ object Render3D {
             a
         )
     }
-
-    //#if MC < 1.21.9
-    fun drawEntityOutline(matrices: MatrixStack?, vertex: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Double, height: Float, r: Float, g: Float, b: Float, a: Float) {
-        val halfWidth = width / 2
-        VertexRendering.drawBox(
-            //#if MC >= 1.21.9
-            //$$ matrices?.peek()
-            //#else
-            matrices,
-            //#endif
-            vertex!!.getBuffer(RenderLayer.getLines()),
-            x - halfWidth,
-            y,
-            z - halfWidth,
-            x + halfWidth,
-            y + height,
-            z + halfWidth,
-            r,
-            g,
-            b,
-            a
-        )
-    }
-    //#endif
 
     fun drawString(
         text: String,
@@ -164,36 +136,43 @@ object Render3D {
         consumers.draw()
     }
 
-    //#if MC < 1.21.9
-    fun drawLineToEntity(entity: Entity, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
+    fun drawLineToEntity(entity: Entity, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
         val player = mc.player ?: return
         if (!player.canSee(entity)) return
 
+        //#if MC >= 1.21.9
+        //$$ val entityPos = entity.entityPos.add(0.0, entity.standingEyeHeight.toDouble(), 0.0)
+        //#else
         val entityPos = entity.pos.add(0.0, entity.standingEyeHeight.toDouble(), 0.0)
-        drawLineToPos(entityPos, context, colorComponents, alpha)
+        //#endif
+        drawLineToPos(entityPos, consumers, matrixStack, colorComponents, alpha)
     }
 
-    fun drawLineToPos(pos: Vec3d, context: WorldRenderContext, colorComponents: FloatArray, alpha: Float) {
+    fun drawLineToPos(pos: Vec3d, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
         val player = mc.player ?: return
-        val playerPos = player.getCameraPosVec(context.tickCounter().getTickProgress(false))
+        val playerPos = player.getCameraPosVec(Utils.partialTicks)
         val toTarget = pos.subtract(playerPos).normalize()
-        val lookVec = player.getRotationVec(context.tickCounter().getTickProgress(false)).normalize()
+        val lookVec = player.getRotationVec(Utils.partialTicks).normalize()
 
         if (toTarget.dotProduct(lookVec) < 0.3) return
 
+        //#if MC >= 1.21.9
+        //$$ val result = player.entityWorld.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
+        //#else
         val result = player.world.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
+        //#endif
         if (result.type == HitResult.Type.BLOCK) return
 
-        drawLineFromCursor(context, pos, colorComponents, alpha)
+        drawLineFromCursor(consumers, matrixStack, pos, colorComponents, alpha)
     }
 
-    fun drawLine(start: Vec3d, finish: Vec3d, thickness: Float, color: Color, context: WorldRenderContext) {
-        val camera = context.camera().pos
-        val matrices = context.matrixStack() ?: return
+    fun drawLine(start: Vec3d, finish: Vec3d, thickness: Float, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+        val cameraPos = mc.gameRenderer.camera.pos
+        val matrices = matrixStack ?: return
         matrices.push()
-        matrices.translate(-camera.x, -camera.y, -camera.z)
+        matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
         val entry = matrices.peek()
-        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val consumers = consumers as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getLines())
 
         val validThickness = getValidLineWidth(thickness)
@@ -218,17 +197,17 @@ object Render3D {
         matrices.pop()
     }
 
-    fun drawLineFromCursor(context: WorldRenderContext, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
-        val camera = context.camera().pos
-        val matrices = context.matrixStack()
-        matrices?.push()
-        matrices?.translate(-camera.x, -camera.y, -camera.z)
-        val entry = matrices?.peek()
-        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+    fun drawLineFromCursor(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
+        val camera = mc.gameRenderer.camera
+        val cameraPos = camera.pos
+        matrixStack?.push()
+        matrixStack?.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
+        val entry = matrixStack?.peek()
+        val consumers = consumers as VertexConsumerProvider.Immediate
         val layer = RenderLayer.getLines()
         val buffer = consumers.getBuffer(layer)
 
-        val cameraPoint = camera.add(Vec3d.fromPolar(context.camera().pitch, context.camera().yaw))
+        val cameraPoint = cameraPos.add(Vec3d.fromPolar(camera.pitch, camera.yaw))
         val normal = point.toVector3f().sub(cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat()).normalize()
 
         buffer.vertex(entry, cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat())
@@ -240,16 +219,15 @@ object Render3D {
             .normal(entry, normal)
 
         consumers.draw(layer)
-        matrices?.pop()
+        matrixStack?.pop()
     }
 
-    fun drawFilledCircle(context: WorldRenderContext, center: Vec3d, radius: Float, segments: Int, borderColor: Int, fillColor: Int) {
-        val camera = context.camera().pos
-        val matrices = context.matrixStack()
-        matrices?.push()
-        matrices?.translate(-camera.x, -camera.y, -camera.z)
-        val entry = matrices?.peek()
-        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+    fun drawFilledCircle(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, center: Vec3d, radius: Float, segments: Int, borderColor: Int, fillColor: Int) {
+        val camera = mc.gameRenderer.camera.pos
+        matrixStack?.push()
+        matrixStack?.translate(-camera.x, -camera.y, -camera.z)
+        val entry = matrixStack?.peek()
+        val consumers = consumers as VertexConsumerProvider.Immediate
 
         val centerX = center.x.toFloat()
         val centerY = center.y.toFloat() + 0.01f
@@ -306,25 +284,25 @@ object Render3D {
         }
 
         consumers.draw()
-        matrices?.pop()
+        matrixStack?.pop()
     }
 
-    fun drawSpecialBB(pos: BlockPos, fillColor: Color, context: WorldRenderContext) {
+    fun drawSpecialBB(pos: BlockPos, fillColor: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
         val bb = Box(pos).expand(0.002, 0.002, 0.002)
-        drawSpecialBB(bb, fillColor, context)
+        drawSpecialBB(bb, fillColor, consumers, matrixStack)
     }
 
-    fun drawSpecialBB(bb: Box, fillColor: Color, context: WorldRenderContext) {
-        drawFilledBB(bb, fillColor.withAlpha(0.6f), context)
-        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), context)
+    fun drawSpecialBB(bb: Box, fillColor: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+        drawFilledBB(bb, fillColor.withAlpha(0.6f), consumers, matrixStack)
+        drawOutlinedBB(bb, fillColor.withAlpha(0.9f), consumers, matrixStack)
     }
 
-    fun drawOutlinedBB(bb: Box, color: Color, context: WorldRenderContext) {
-        val camera = context.camera().pos
-        val matrices = context.matrixStack() ?: return
+    fun drawOutlinedBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+        val camera = mc.gameRenderer.camera.pos
+        val matrices = matrixStack ?: return
         matrices.push()
         matrices.translate(-camera.x, -camera.y, -camera.z)
-        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val consumers = consumers as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getLines())
 
         val r = color.red / 255f
@@ -333,24 +311,36 @@ object Render3D {
         val a = color.alpha / 255f
 
         VertexRendering.drawBox(
-            matrices, buffer,
-            bb.minX, bb.minY, bb.minZ,
-            bb.maxX, bb.maxY, bb.maxZ,
-            r, g, b, a
+            //#if MC >= 1.21.9
+            //$$ matrices.peek(),
+            //#else
+            matrices,
+            //#endif
+            buffer,
+            bb.minX,
+            bb.minY,
+            bb.minZ,
+            bb.maxX,
+            bb.maxY,
+            bb.maxZ,
+            r,
+            g,
+            b,
+            a
         )
 
         consumers.draw(RenderLayer.getLines())
         matrices.pop()
     }
 
-    fun drawFilledBB(bb: Box, color: Color, context: WorldRenderContext, customAlpha: Float = 0.15f) {
+    fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
         val aabb = bb.expand(0.004, 0.005, 0.004)
-        val camera = context.camera().pos
-        val matrices = context.matrixStack() ?: return
+        val camera = mc.gameRenderer.camera.pos
+        val matrices = matrixStack ?: return
         matrices.push()
         matrices.translate(-camera.x, -camera.y, -camera.z)
         val entry = matrices.peek()
-        val consumers = context.consumers() as VertexConsumerProvider.Immediate
+        val consumers = consumers as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getDebugFilledBox())
 
         val a = (color.alpha / 255f * customAlpha)
@@ -422,7 +412,6 @@ object Render3D {
         consumers.draw(RenderLayer.getDebugFilledBox())
         matrices.pop()
     }
-    //#endif
 
     private fun Color.withAlpha(alpha: Float) = Color(red, green, blue, (alpha * 255).toInt())
 }

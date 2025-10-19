@@ -1,21 +1,25 @@
 package xyz.meowing.zen.features.meowing
 
-//#if MC < 1.21.9
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.NetworkUtils
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.BlockModelRenderer
 import net.minecraft.client.render.model.BlockStateManagers
 import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
+
+//#if MC < 1.21.9
+import xyz.meowing.zen.mixins.AccessorWorldRenderer
+//#endif
 import java.io.File
 
 @Zen.Module
@@ -29,7 +33,7 @@ object Rat : Feature(area = "Hub") {
         loadTexture()
         register<RenderEvent.WorldPostEntities> { event ->
             if (textureLoaded) {
-                render(event.context!!)
+                render(event.consumers, event.matrixStack)
             }
         }
     }
@@ -59,17 +63,22 @@ object Rat : Feature(area = "Hub") {
         )
     }
 
-    private fun render(context: WorldRenderContext) {
-        val cameraPos = context.camera().pos
-        val frustum = context.frustum()
+    private fun render(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+        val camera = mc.gameRenderer.camera
+        val cameraPos = camera.pos
+
+        //TODO: Add frustum impl for 1.21.9
+        //#if MC < 1.21.9
+        val frustum = (mc.worldRenderer as AccessorWorldRenderer).frustum
 
         if (position.distanceTo(cameraPos) > 96.0) return
-        if (frustum != null && !frustum.isVisible(culling)) return
+        if (!frustum.isVisible(culling)) return
+        //#endif
 
         val itemFrameState = BlockStateManagers.getStateForItemFrame(false, true)
         val blockModel = mc.blockRenderManager.getModel(itemFrameState)
-        val consumers = context.consumers() ?: return
-        val matrices = context.matrixStack() ?: return
+        val consumers = consumers ?: return
+        val matrices = matrixStack ?: return
 
         matrices.push()
         matrices.translate(
@@ -108,4 +117,3 @@ object Rat : Feature(area = "Hub") {
         matrices.pop()
     }
 }
-//#endif
