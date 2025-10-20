@@ -7,7 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object CustomSize : Feature("customsize") {
@@ -17,7 +17,7 @@ object CustomSize : Feature("customsize") {
     private val scaleeveryone by ConfigDelegate<Boolean>("scaleeveryone")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Custom size", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customsize",
                 ElementType.Switch(false)

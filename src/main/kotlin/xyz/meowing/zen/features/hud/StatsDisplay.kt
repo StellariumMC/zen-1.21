@@ -78,7 +78,7 @@ object StatsDisplay : Feature("statsdisplay", true) {
     }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Stats Display", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "statsdisplay",
                 ElementType.Switch(false)

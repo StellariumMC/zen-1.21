@@ -23,7 +23,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
     private var lastCacheUpdate = 0L
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Hide Enderman Laser", "", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "hideendermanlaser",
                 ElementType.Switch(false)

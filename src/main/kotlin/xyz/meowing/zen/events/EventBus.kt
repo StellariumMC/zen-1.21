@@ -29,6 +29,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import xyz.meowing.zen.ui.ConfigManager
+
 //#endif
 
 object EventBus {
@@ -305,7 +307,7 @@ inline fun <reified T : Event> configRegister(
     }
 
     val checkAndUpdate = {
-        val configValues = keys.associateWith { configUI.getConfigValue(it) }
+        val configValues = keys.associateWith { ConfigManager.getConfigValue(it) }
         val configEnabled = enabledCheck(configValues)
         val skyblockEnabled = !skyblockOnly || LocationUtils.inSkyblock
         val areaEnabled = areas.isEmpty() || areas.any { LocationUtils.checkArea(it) }

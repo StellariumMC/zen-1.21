@@ -6,6 +6,7 @@ import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.events.Event
 import xyz.meowing.zen.events.EventBus
+import xyz.meowing.zen.ui.ConfigManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.LoopUtils
@@ -47,7 +48,7 @@ open class Feature(
     private fun checkConfig(): Boolean {
         return try {
             val configEnabled = configKey?.let {
-                configUI.getConfigValue(it) as? Boolean ?: false
+                ConfigManager.getConfigValue(it) as? Boolean ?: false
             } ?: true
             configEnabled
         } catch (e: Exception) {

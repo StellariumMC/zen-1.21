@@ -18,7 +18,7 @@ object meowcount : Feature("meowcount") {
     private val dataUtils = DataUtils("meowcount", Data())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Meow count", "Meow count", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowcount",
                 ElementType.Switch(false)

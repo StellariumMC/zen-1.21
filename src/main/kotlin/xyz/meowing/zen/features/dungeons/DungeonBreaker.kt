@@ -13,7 +13,7 @@ import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
@@ -23,7 +23,7 @@ object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
     private var max = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Breaker Charge Display", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "dungeonbreaker",
                 ElementType.Switch(false)

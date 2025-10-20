@@ -34,7 +34,7 @@ object PriceData : Feature("pricedata", true) {
     private val tooltipCache = mutableMapOf<String, CacheEntry>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Price Data", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "pricedata",
                 ElementType.Switch(false)

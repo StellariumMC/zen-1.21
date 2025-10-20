@@ -28,7 +28,7 @@ object ItemPickupLog : Feature("itempickuplog") {
     private val abbreviateNumbers by ConfigDelegate<Boolean>("itempickuplogabbreviate")
     private val npcSellingStackRegex = """(.*) §8x\d+""".toRegex()
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Item Pickup Log", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "itempickuplog",
                 ElementType.Switch(false)

@@ -23,7 +23,7 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -56,7 +56,7 @@ object CarryCounter : Feature("carrycounter") {
     private val carrywebhook by ConfigDelegate<String>("carrywebhookurl")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Carrying", "Carry counter", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "carrycounter",
                 ElementType.Switch(false)

@@ -2,6 +2,7 @@ package xyz.meowing.zen.ui
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.vexel.components.base.DimensionValue
 import xyz.meowing.vexel.components.base.Offset
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
@@ -41,6 +42,7 @@ class OffsetTestScreen : VexelScreen() {
             .padding(30f)
             .scrollable(true)
             .childOf(rootContainer)
+            .enableDebugRendering()
 
         setupPixelOffsetTests(mainScrollArea)
         setupPercentOffsetTests(mainScrollArea)
@@ -67,8 +69,9 @@ class OffsetTestScreen : VexelScreen() {
         Rectangle()
             .backgroundColor(0xFF3B82F6.toInt())
             .setSizing(100f, Size.Pixels, 40f, Size.Pixels)
-            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
             .childOf(container)
+            .setPositioning(DimensionValue.Percent(80f), Pos.ParentPixels, 0f, Pos.AfterSibling)
+//            .setPositioning(0f, Pos.ParentPixels, 10f, Pos.AfterSibling)
 
         Text("With 20px X offset")
             .color(0xFF9CA3AF.toInt())

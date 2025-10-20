@@ -21,7 +21,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
 import net.minecraft.util.math.BlockPos
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -63,7 +63,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
     private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Highlight Livid", "Highlight correct livid", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "highlightlivid",
                 ElementType.Switch(false)

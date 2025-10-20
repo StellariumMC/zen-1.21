@@ -14,7 +14,7 @@ object guildjoinleave : Feature("guildjoinleave") {
     private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Clean guild join/leave", "Clean guild join/leave", "Clean messages", xyz.meowing.zen.ui.ConfigElement(
                 "guildjoinleave",
                 ElementType.Switch(false)
@@ -46,7 +46,7 @@ object friendjoinleave : Feature("friendjoinleave") {
     private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Clean friend join/leave", "Clean friend join/leave", "Clean messages", xyz.meowing.zen.ui.ConfigElement(
                 "friendjoinleave",
                 ElementType.Switch(false)

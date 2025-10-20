@@ -8,7 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object CustomSpin : Feature("customspin") {
@@ -17,7 +17,7 @@ object CustomSpin : Feature("customspin") {
     private val spindirection by ConfigDelegate<Int>("spindirection")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Custom spin", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customspin",
                 ElementType.Switch(false)

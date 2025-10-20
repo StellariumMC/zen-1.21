@@ -29,7 +29,7 @@ object SlayerStats : Feature("slayerstats", true) {
     private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerstatslines")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Slayer stats", "Slayer stats", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerstats",
                 ElementType.Switch(false)

@@ -24,7 +24,7 @@ object ArrowPoison : Feature("arrowpoison", true) {
     private var toxic = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Arrow poison tracker", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "arrowpoison",
                 ElementType.Switch(false)

@@ -22,7 +22,7 @@ object SlayerHUD : Feature("slayerhud", true) {
     private var bossID: Int? = null
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Slayer HUD", "Slayer HUD", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerhud",
                 ElementType.Switch(false)

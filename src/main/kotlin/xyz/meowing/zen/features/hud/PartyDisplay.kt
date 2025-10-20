@@ -18,7 +18,7 @@ object PartyDisplay : Feature("partydisplay") {
     private var partyMembers = mapOf<String, PartyTracker.PartyMember>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Party Display HUD", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "partydisplay",
                 ElementType.Switch(false)

@@ -40,7 +40,7 @@ object ChatEmotes : Feature("chatemotes") {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Chat Emotes", "Automatically replace emote codes with Unicode symbols in chat messages", "General", xyz.meowing.zen.ui.ConfigElement(
                 "chatemotes",
                 ElementType.Switch(false)

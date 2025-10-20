@@ -20,7 +20,7 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
     private val classSetPattern = Regex("^Party Finder > (.+?) set their class to (\\w+) Level (\\d+)!$")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Custom PF Messages", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "partyfindermsgs",
                 ElementType.Switch(false)

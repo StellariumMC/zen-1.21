@@ -13,7 +13,7 @@ import xyz.meowing.zen.features.Feature
 @Zen.Module
 object HideFallingBlocks : Feature("hidefallingblocks") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Hide falling blocks", "Hide falling blocks", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "hidefallingblocks",
                 ElementType.Switch(false)

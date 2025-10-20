@@ -37,7 +37,7 @@ import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.collections.forEachIndexed
@@ -73,7 +73,7 @@ object Debug : Feature() {
             return configUI
         }
 
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Config Test", "Debug GUI", "Debug", xyz.meowing.zen.ui.ConfigElement(
                 "debuggui",
                 ElementType.Button("Open Debug GUI") {

@@ -8,7 +8,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.RotationAxis
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object ItemAnimations : Feature("itemanimations") {
@@ -23,7 +23,7 @@ object ItemAnimations : Feature("itemanimations") {
     val swingSpeed by ConfigDelegate<Double>("itemswingspeed")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Item Animations", "Enable item animations", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "itemanimations",
                 ElementType.Switch(false)

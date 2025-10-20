@@ -9,7 +9,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.MouseEvent
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
@@ -22,7 +22,7 @@ object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
     private val highlightcolor by ConfigDelegate<Color>("bestiarymobhighlightcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Bestiary Mob Highlight", "Middle click on a mob in the world to toggle highlighting for it", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "bestiarymobhighlighter",
                 ElementType.Switch(false)

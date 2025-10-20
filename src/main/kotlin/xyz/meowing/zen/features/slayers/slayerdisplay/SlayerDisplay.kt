@@ -21,7 +21,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.util.math.Vec3d
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object SlayerDisplay : Feature("slayerdisplay", true) {
@@ -48,7 +48,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Slayer Display", "Shows slayer boss information", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerdisplay",
                 ElementType.Switch(false)

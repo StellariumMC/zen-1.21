@@ -28,6 +28,7 @@ import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.text.ClickEvent
 import org.apache.logging.log4j.LogManager
+import xyz.meowing.knit.api.loader.KnitModInfo
 
 data class firstInstall(val isFirstInstall: Boolean = true)
 
@@ -132,6 +133,9 @@ class Zen : ClientModInitializer {
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
         var isInInventory = false
         var mayorData: ApiMayor? = null
+
+        // CHANGE THIS, I DIDNT KNOW HOW TO USE IT
+        var modInfo = KnitModInfo("zen", "Zen", "1.1.8")
 
         private fun executePending() {
             pendingCallbacks.forEach { (configKey, callback) ->

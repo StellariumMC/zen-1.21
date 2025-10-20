@@ -44,7 +44,7 @@ object ProtectItem : Feature("protectitem", true) {
     val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Item Protection", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "protectitem",
                 ElementType.Switch(false)

@@ -9,7 +9,7 @@ import xyz.meowing.zen.features.Feature
 @Zen.Module
 object RemoveSelfieCam : Feature("removeselfiecam") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Remove selfie camera", "", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "removeselfiecam",
                 ElementType.Switch(false)

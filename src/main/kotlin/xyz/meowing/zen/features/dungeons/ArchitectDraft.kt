@@ -12,7 +12,7 @@ import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.text.ClickEvent
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
@@ -22,7 +22,7 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
     private val selfdraft by ConfigDelegate<Boolean>("selfdraft")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Architect Draft Message", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "architectdraft",
                 ElementType.Switch(false)

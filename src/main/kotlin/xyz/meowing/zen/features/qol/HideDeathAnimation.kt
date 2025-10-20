@@ -11,7 +11,7 @@ import net.minecraft.entity.Entity
 @Zen.Module
 object HideDeathAnimation : Feature("hidedeathanimation") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Hide death animation", "Hide death animation", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "hidedeathanimation",
                 ElementType.Switch(false)

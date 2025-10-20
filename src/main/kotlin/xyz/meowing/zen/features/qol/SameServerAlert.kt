@@ -16,7 +16,7 @@ object SameServerAlert : Feature("serveralert") {
     private val servers = mutableMapOf<String, Long>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Same server alert", "", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "serveralert",
                 ElementType.Switch(false)

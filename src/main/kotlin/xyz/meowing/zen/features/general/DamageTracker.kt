@@ -60,7 +60,7 @@ object DamageTracker : Feature("damagetracker", true) {
     private var lastHitTime = 0L
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Damage Tracker", "Track damage dealt to mobs", "General", xyz.meowing.zen.ui.ConfigElement(
                 "damagetracker",
                 ElementType.Switch(false)

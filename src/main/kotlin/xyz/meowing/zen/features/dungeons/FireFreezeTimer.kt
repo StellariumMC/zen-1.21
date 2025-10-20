@@ -13,14 +13,14 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Fire Freeze Timer", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "firefreeze",
                 ElementType.Switch(false)

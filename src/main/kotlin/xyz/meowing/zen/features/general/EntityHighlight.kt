@@ -23,7 +23,7 @@ object EntityHighlight : Feature("entityhighlight") {
     private val entityhighlightothercolor by ConfigDelegate<Color>("entityhighlightothercolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Entity highlight", "Entity highlight", "General", xyz.meowing.zen.ui.ConfigElement(
                 "entityhighlight",
                 ElementType.Switch(false)

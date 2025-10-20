@@ -19,7 +19,7 @@ object ReaperTimer : Feature("reapertimer", true) {
     private var ticks = 120
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Reaper Timer", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "reapertimer",
                 ElementType.Switch(false)

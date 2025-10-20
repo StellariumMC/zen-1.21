@@ -14,7 +14,7 @@ object MeowMessage : Feature("meowmessage") {
     private val variants = listOf("meow", "mew", "mrow", "nyaa", "purr", "mrrp", "meoww", "nya")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Cat Speak", "Cat Speak", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowmessage",
                 ElementType.Switch(false)

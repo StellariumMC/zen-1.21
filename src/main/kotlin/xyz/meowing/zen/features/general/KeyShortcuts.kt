@@ -42,7 +42,7 @@ object KeyShortcuts : Feature("keyshortcuts") {
     private val pressedKeys = mutableSetOf<Int>()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Key Shortcuts", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "keyshortcuts",
                 ElementType.Switch(false)

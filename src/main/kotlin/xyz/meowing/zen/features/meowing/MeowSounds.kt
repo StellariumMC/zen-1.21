@@ -15,7 +15,7 @@ object MeowSounds : Feature("meowsounds") {
     private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Meow Sounds", "Meow Sounds", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowsounds",
                 ElementType.Switch(false)

@@ -7,7 +7,7 @@ import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
@@ -17,7 +17,7 @@ object LeapAnnounce : Feature("leapannounce") {
     private val leapmessage by ConfigDelegate<String>("leapmessage")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Leap announce", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "leapannounce",
                 ElementType.Switch(false)

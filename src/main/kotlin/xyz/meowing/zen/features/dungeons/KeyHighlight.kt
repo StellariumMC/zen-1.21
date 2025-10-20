@@ -11,7 +11,7 @@ import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.Utils.toColorFloat
 import net.minecraft.entity.decoration.ArmorStandEntity
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -19,7 +19,7 @@ object KeyHighlight : Feature("keyhighlight", area = "catacombs") {
     private val keyhighlightcolor by ConfigDelegate<Color>("keyhighlightcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Key Highlight", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "keyhighlight",
                 ElementType.Switch(false)

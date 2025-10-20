@@ -24,7 +24,7 @@ object LividIceSpray : Feature("lividicespray", area = "catacombs", subarea = li
     }, false)
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Livid Ice Spray Timer", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "lividicespray",
                 ElementType.Switch(false)

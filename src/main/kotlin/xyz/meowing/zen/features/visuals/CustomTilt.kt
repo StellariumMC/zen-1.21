@@ -9,7 +9,7 @@ import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
 import kotlin.math.sin
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object CustomTilt : Feature("customtilt") {
@@ -21,7 +21,7 @@ object CustomTilt : Feature("customtilt") {
     private val tiltspeed by ConfigDelegate<Double>("tiltspeed")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Custom tilt", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "customtilt",
                 ElementType.Switch(false)

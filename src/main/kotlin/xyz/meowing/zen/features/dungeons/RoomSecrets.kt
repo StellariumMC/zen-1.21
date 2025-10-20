@@ -20,7 +20,7 @@ object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
     private const val name = "Secrets Display"
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Room Secrets Hud", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "roomsecrets",
                 ElementType.Switch(false)

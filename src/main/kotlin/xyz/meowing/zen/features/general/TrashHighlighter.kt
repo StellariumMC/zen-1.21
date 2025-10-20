@@ -82,7 +82,7 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
     }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Trash Highlighter", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "trashhighlighter",
                 ElementType.Switch(false)

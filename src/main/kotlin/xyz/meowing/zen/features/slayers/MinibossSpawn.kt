@@ -30,7 +30,7 @@ object MinibossSpawn : Feature("minibossspawn", true) {
     private val regex = "\\d[\\d.,]*[kKmMbBtT]?❤?$".toRegex()
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Miniboss spawn alert", "Miniboss spawn alert", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "minibossspawn",
                 ElementType.Switch(false)

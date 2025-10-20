@@ -16,7 +16,7 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
     private val slayerhighlightcolor by ConfigDelegate<Color>("slayerhighlightcolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Slayer highlight", "Slayer highlight", "Slayers", xyz.meowing.zen.ui.ConfigElement(
                 "slayerhighlight",
                 ElementType.Switch(false)

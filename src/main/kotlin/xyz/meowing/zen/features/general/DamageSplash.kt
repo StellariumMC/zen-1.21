@@ -36,7 +36,7 @@ object DamageSplash : Feature("damagesplash", true) {
     private val cancelAll by ConfigDelegate<Boolean>("damagesplashcancelall")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Damage Splash", "", "General", xyz.meowing.zen.ui.ConfigElement(
                 "damagesplash",
                 ElementType.Switch(false)

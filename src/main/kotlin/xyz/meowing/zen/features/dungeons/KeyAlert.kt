@@ -11,14 +11,14 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.entity.decoration.ArmorStandEntity
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 
 @Zen.Module
 object KeyAlert : Feature("keyalert", area = "catacombs") {
     private var bloodOpen = false
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Key Spawn Alert", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "keyalert",
                 ElementType.Switch(false)

@@ -13,7 +13,7 @@ import net.minecraft.sound.SoundEvents
 @Zen.Module
 object MeowDeathSounds : Feature("meowdeathsounds") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Meow Death Sounds", "Meow Death Sounds", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "meowdeathsounds",
                 ElementType.Switch(false)

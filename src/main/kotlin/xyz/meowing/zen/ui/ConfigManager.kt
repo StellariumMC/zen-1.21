@@ -1,11 +1,9 @@
 package xyz.meowing.zen.ui
 
-import kotlinx.serialization.Serializable
-import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.ConfigData
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.ui.ConfigMenuManager.printCategoriesJson
+import xyz.meowing.zen.utils.DataUtils
+import xyz.meowing.zen.utils.Utils.toColorFromMap
 
 //override fun addConfig(configUI: ConfigUI): ConfigUI {
 //    return configUI
@@ -24,36 +22,12 @@ import xyz.meowing.zen.ui.ConfigMenuManager.printCategoriesJson
 //        ))
 //}
 
-object ConfigMenuManager {
-    val categories = mutableListOf<CategoryElement>()
-    private val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "meowing", "rift")
+object ConfigManager {
+    private val dataUtils = DataUtils("config", mutableMapOf<String, Any>())
+    val configValueMap: MutableMap<String, Any> = dataUtils.getData()
 
-    fun printCategoriesJson() {
-        val json = buildString {
-            append("[")
-            categories.forEachIndexed { cIdx, category ->
-                append("{\"name\":\"${category.name}\",\"features\":[")
-                category.features.forEachIndexed { fIdx, feature ->
-                    append("{\"featureName\":\"${feature.featureName}\",\"description\":\"${feature.description}\",\"options\":{")
-                    feature.options.entries.forEachIndexed { oIdx, (section, options) ->
-                        append("\"$section\":[")
-                        options.forEachIndexed { i, option ->
-                            append("{\"optionName\":\"${option.optionName}\",\"description\":\"${option.description}\",\"configKey\":\"${option.configElement.configKey}\"}")
-                            if (i < options.size - 1) append(",")
-                        }
-                        append("]")
-                        if (oIdx < feature.options.size - 1) append(",")
-                    }
-                    append("}}")
-                    if (fIdx < category.features.size - 1) append(",")
-                }
-                append("]}")
-                if (cIdx < categories.size - 1) append(",")
-            }
-            append("]")
-        }
-        println(json)
-    }
+    private val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "meowing", "rift")
+    val configTree = mutableListOf<CategoryElement>()
 
     fun addFeature(
         featureName: String,
@@ -62,12 +36,12 @@ object ConfigMenuManager {
         element: ConfigElement
     ): FeatureElement {
         // Find or create category
-        val category = categories.firstOrNull { it.name.equals(categoryName, ignoreCase = true) } ?: CategoryElement(
+        val category = configTree.firstOrNull { it.name.equals(categoryName, ignoreCase = true) } ?: CategoryElement(
             categoryName
-        ).also { categories.add(it) }
+        ).also { configTree.add(it) }
 
         // Sort categories by predefined order, then alphabetically
-        categories.sortWith(
+        configTree.sortWith(
             compareBy<CategoryElement> { cat ->
                 categoryOrder.indexOf(cat.name.lowercase()).takeIf { it >= 0 } ?: Int.MAX_VALUE
             }.thenBy { it.name }
@@ -79,6 +53,8 @@ object ConfigMenuManager {
             description,
             element
         )
+        // Set parent reference on the feature's ConfigElement
+        featureElement.configElement.parent = featureElement
 
         if(!category.features.any { it.featureName == featureName }) {
             category.features.add(featureElement)
@@ -86,14 +62,28 @@ object ConfigMenuManager {
 
         return featureElement
     }
+
+    fun saveConfig() {
+        dataUtils.setData(configValueMap)
+    }
+
+    fun getConfigValue(configKey: String): Any? {
+        return when (val value = configValueMap[configKey]) {
+            is Map<*, *> -> value.toColorFromMap()
+            is List<*> -> value.mapNotNull { (it as? Number)?.toInt() }.toSet()
+            else -> value
+        }
+    }
 }
 
-@Serializable
+// Marker interface for containers of ConfigElement
+interface ConfigContainer
+
 class FeatureElement(
     val featureName: String,
     val description: String,
     val configElement: ConfigElement
-) {
+) : ConfigContainer {
     val options: MutableMap<String, MutableList<OptionElement>> = mutableMapOf()
 
     fun addFeatureOption(
@@ -102,10 +92,10 @@ class FeatureElement(
         optionsSection: String = "Options",
         element: ConfigElement
     ): FeatureElement {
-        // Change config key to be like "feature.optionthing"
-        element.configKey = this.configElement.configKey + "." + element.configKey
-
         val option = OptionElement(optionName, description, optionsSection, element)
+        // Wire parent reference for the option's ConfigElement
+        option.configElement.parent = option
+        option.configElement.value
         val optionsList = options.getOrPut(optionsSection) { mutableListOf() }
         if(!optionsList.any { it.optionName == optionName }) optionsList.add(option)
 
@@ -113,31 +103,22 @@ class FeatureElement(
     }
 }
 
-@Serializable
 class OptionElement(
     val optionName: String,
     val description: String = "",
     val optionsSection: String = "Options",
     val configElement: ConfigElement
-)
+) : ConfigContainer
 
-@Serializable
 data class ConfigElement(
-    var configKey: String,
+    val configKey: String,
     val type: ElementType,
-    val shouldShow: (ConfigData) -> Boolean = { true }
-)
-
-@Serializable
-data class CategoryElement(val name: String) {
-    val features: MutableList<FeatureElement> = mutableListOf()
+    val shouldShow: (ConfigData) -> Boolean = { true },
+    val value: Any? = null,
+) {
+    var parent: ConfigContainer? = null
 }
 
-@Zen.Command
-object ConfigTestCommand : Commodore("configtest") {
-    init {
-        runs {
-            printCategoriesJson()
-        }
-    }
+data class CategoryElement(val name: String) {
+    val features: MutableList<FeatureElement> = mutableListOf()
 }

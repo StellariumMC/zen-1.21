@@ -57,7 +57,7 @@ object InventorySearch : Feature("inventorysearch") {
     }
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Inventory Search", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "inventorysearch",
                 ElementType.Switch(false)

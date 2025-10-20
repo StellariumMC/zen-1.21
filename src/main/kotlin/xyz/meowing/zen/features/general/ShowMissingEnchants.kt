@@ -40,7 +40,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
     )
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Show Missing Enchants", "Show Missing Enchants", "General", xyz.meowing.zen.ui.ConfigElement(
                 "showmissingenchants",
                 ElementType.Switch(false)

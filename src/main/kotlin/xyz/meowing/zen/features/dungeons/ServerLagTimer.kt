@@ -22,7 +22,7 @@ object ServerLagTimer : Feature("serverlagtimer", area = "catacombs") {
     private var servertick: Long = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Server lag timer", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
                 "serverlagtimer",
                 ElementType.Switch(false)

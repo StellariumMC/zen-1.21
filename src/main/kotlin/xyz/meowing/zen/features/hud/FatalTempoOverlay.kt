@@ -22,7 +22,7 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
     private var currentPercent = 0
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Fatal Tempo Overlay", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
                 "fataltempooverlay",
                 ElementType.Switch(false)

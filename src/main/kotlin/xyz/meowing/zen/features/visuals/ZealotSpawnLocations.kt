@@ -9,7 +9,7 @@ import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.ui.ConfigMenuManager
+import xyz.meowing.zen.ui.ConfigManager
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.SimpleTimeMark
@@ -73,7 +73,7 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
     private val drawzealotspawncolor by ConfigDelegate<Color>("drawzealotspawncolor")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        ConfigMenuManager
+        ConfigManager
             .addFeature("Zealot Spawn Locations", "", "Visuals", xyz.meowing.zen.ui.ConfigElement(
                 "zealotspawnvisual",
                 ElementType.Switch(false)

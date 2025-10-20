@@ -13,7 +13,7 @@ import xyz.meowing.zen.features.Feature
 @Zen.Module
 object HideStatusEffects : Feature("hidestatuseffects") {
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Hide status effects", "Hide status effects", "QoL", xyz.meowing.zen.ui.ConfigElement(
                 "hidestatuseffects",
                 ElementType.Switch(false)

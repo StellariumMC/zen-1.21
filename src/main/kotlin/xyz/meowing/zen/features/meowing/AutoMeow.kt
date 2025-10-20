@@ -25,7 +25,7 @@ object AutoMeow : Feature("automeow") {
     private val automeowchannels by ConfigDelegate<Set<Int>>("automeowchannels")
 
     override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigMenuManager
+        xyz.meowing.zen.ui.ConfigManager
             .addFeature("Auto meow", "Auto Meow", "Meowing", xyz.meowing.zen.ui.ConfigElement(
                 "automeow",
                 ElementType.Switch(false)
