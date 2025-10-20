@@ -12,7 +12,7 @@ object ScoreboardUtils {
     fun getSidebarLines(): List<String> {
         return try {
             //#if MC >= 1.21.9
-            //$$ val scoreboard = mc.world?.scoreboard ?: return emptyList()
+            //$$ val scoreboard = world?.scoreboard ?: return emptyList()
             //#else
             val scoreboard = player?.scoreboard ?: return emptyList()
             //#endif
