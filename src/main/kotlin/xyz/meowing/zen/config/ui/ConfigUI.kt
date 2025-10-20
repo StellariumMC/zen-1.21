@@ -14,7 +14,8 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import xyz.meowing.zen.Zen.Companion.mc
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.core.ConfigTheme
 import xyz.meowing.zen.config.ui.core.ConfigValidator
@@ -26,7 +27,8 @@ import xyz.meowing.zen.config.ui.elements.MultiCheckboxElement
 import xyz.meowing.zen.config.ui.elements.TextInputElement
 import xyz.meowing.zen.config.ui.types.*
 import xyz.meowing.zen.hud.HUDEditor
-import xyz.meowing.zen.utils.DataUtils
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.OptionElement
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.createBlock
 import xyz.meowing.zen.utils.Utils.toColorFromMap
@@ -38,9 +40,7 @@ typealias ConfigData = Map<String, Any>
  * Inspired by NoammAddons' Config GUI Design
  * https://github.com/Noamm9/NoammAddons
  */
-class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
-    private val dataUtils = DataUtils(configFileName, mutableMapOf<String, Any>())
-    private val config: MutableMap<String, Any> = dataUtils.getData()
+class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     private val validator = ConfigValidator()
     private val theme = ConfigTheme()
     private val factory = ElementFactory(theme)
@@ -204,7 +204,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         UIWrappedText("HUD Editor").constrain {
             x = CenterConstraint() + 4.pixels
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth("HUD Editor").pixels
+            width = KnitClient.client.textRenderer.getWidth("HUD Editor").pixels
             textScale = 0.8.pixels()
         }.setColor(theme.accent2) childOf editLocations
 
@@ -214,7 +214,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             editLocationsBorder.animate { setColorAnimation(Animations.OUT_QUAD, 0.2f, theme.accent2.toConstraint()) }
         }.onMouseClick {
             TickUtils.schedule(1) {
-                mc.setScreen(HUDEditor())
+                client?.setScreen(HUDEditor())
             }
         }
     }
@@ -314,9 +314,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
         toggleConfigKey?.let { key ->
             subcategories[sectionKey]?.flatMap { it.elements }?.find { it.configKey == key }?.takeIf { it.type is ElementType.Switch }?.let { toggleElement ->
-                val currentValue = getConfigValue(key) as? Boolean ?: (toggleElement.type as ElementType.Switch).default
-                val switchElement = ConfigElement(key, toggleElement.title ?: "", ElementType.Switch(currentValue))
-                factory.createSwitch(switchElement, config, 2f, 35f) { updateConfig(key, it) }.constrain {
+                val currentValue = ConfigManager.getConfigValue(key) as? Boolean ?: (toggleElement.type as ElementType.Switch).default
+                val switchElement = ConfigElement(key, ElementType.Switch(currentValue))
+                factory.createSwitch(switchElement, ConfigManager.configValueMap, 2f, 35f) { updateConfig(key, it) }.constrain {
                     x = RelativeConstraint(1f) - 30.pixels()
                     y = CenterConstraint()
                     width = 20.pixels()
@@ -493,9 +493,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             height = 100.percent - 1.pixels
         }.setColor(theme.bg) childOf card
 
-        element.title?.let { title ->
-            if (element.type !is ElementType.TextParagraph) {
-                UIText(title).constrain {
+        (element.parent!! as OptionElement).let { element ->
+            if (element.configElement.type !is ElementType.TextParagraph) {
+                UIText(element.optionName).constrain {
                     x = 8.pixels()
                     y = if (isFullWidth) 8.pixels() else CenterConstraint()
                     textScale = 0.8.pixels()
@@ -511,7 +511,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             height = if (isFullWidth) 18.pixels() else 16.pixels()
         } childOf card
 
-        widget.onMouseClick { it ->
+        widget.onMouseClick {
             it.stopPropagation()
             DropdownElement.closeAllDropdowns()
             MultiCheckboxElement.closeAllMultiCheckboxes()
@@ -525,15 +525,15 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     private fun createElementWidget(element: ConfigElement): UIComponent {
         return when (element.type) {
             is ElementType.Button -> factory.createButton(element)
-            is ElementType.Switch -> factory.createSwitch(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.Slider -> factory.createSlider(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.Dropdown -> factory.createDropdown(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.TextInput -> factory.createTextInput(element, config) { updateConfig(element.configKey, it) }
+            is ElementType.Switch -> factory.createSwitch(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.Slider -> factory.createSlider(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.Dropdown -> factory.createDropdown(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.TextInput -> factory.createTextInput(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
             is ElementType.TextParagraph -> factory.createTextParagraph(element)
-            is ElementType.ColorPicker -> factory.createColorPicker(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.Keybind -> factory.createKeybind(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.MultiCheckbox -> factory.createMultiCheckbox(element, config) { updateConfig(element.configKey, it) }
-            is ElementType.MCColorPicker -> factory.createMCColorPicker(element, config) { updateConfig(element.configKey, it) }
+            is ElementType.ColorPicker -> factory.createColorPicker(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.Keybind -> factory.createKeybind(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.MultiCheckbox -> factory.createMultiCheckbox(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
+            is ElementType.MCColorPicker -> factory.createMCColorPicker(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
         }
     }
 
@@ -552,8 +552,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
             else -> validatedValue
         }
 
-        config[configKey] = serializedValue
-        dataUtils.setData(config)
+        ConfigManager.configValueMap[configKey] = serializedValue
+        ConfigManager.saveConfig()
+
         updateElementVisibilities()
         configListeners[configKey]?.forEach { it(validatedValue) }
         updateSectionToggles()
@@ -562,7 +563,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     private fun updateSectionToggles() {
         sectionToggleRefs.forEach { (sectionKey, toggleRef) ->
             sectionToggleElements[sectionKey]?.let { toggleConfigKey ->
-                val newValue = getConfigValue(toggleConfigKey) as? Boolean ?: false
+                val newValue = ConfigManager.getConfigValue(toggleConfigKey) as? Boolean ?: false
                 factory.updateSwitchValue(toggleRef, newValue)
             }
         }
@@ -575,7 +576,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
     private fun updateElementVisibility(configKey: String) {
         val container = elementContainers[configKey] ?: return
         val element = elementRefs[configKey] ?: return
-        val visible = element.shouldShow(config)
+        val visible = element.shouldShow(ConfigManager.configValueMap)
         if (visible) container.unhide(true) else container.hide()
     }
 
@@ -624,21 +625,33 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         super.onKeyPressed(keyCode, typedChar, modifiers)
     }
 
+    var newConfigLoaded = false
     override fun initScreen(width: Int, height: Int) {
         super.initScreen(width, height)
         searchInput.grabFocus()
+
+        if(!newConfigLoaded) {
+            newConfigLoaded = true
+            ConfigManager.configTree.forEach { category ->
+                category.features.forEach { feature ->
+                    addElement(category.name, feature.featureName, "", feature.configElement, true)
+                    feature.options.forEach { subcategory ->
+                        subcategory.value.forEach {
+                            addElement(category.name, feature.featureName, subcategory.key, it.configElement, false)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
-        saveConfig()
+        ConfigManager.saveConfig()
         closeListeners.forEach { listener ->
             listener()
         }
     }
-
-    fun addElement(categoryName: String, sectionName: String, element: ConfigElement, isSectionToggle: Boolean = false) =
-        addElement(categoryName, sectionName, "Null", element, isSectionToggle)
 
     fun addElement(categoryName: String, sectionName: String, subcategoryName: String, element: ConfigElement, isSectionToggle: Boolean = false): ConfigUI {
         val isFirstCategory = categories.isEmpty()
@@ -668,9 +681,9 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         }
 
         getDefaultValue(element.type)?.let { defaultValue ->
-            if (!config.containsKey(element.configKey) && !ignoreConfig) {
-                config[element.configKey] = defaultValue
-                dataUtils.setData(config)
+            if (!ConfigManager.configValueMap.containsKey(element.configKey) && !ignoreConfig) {
+                ConfigManager.configValueMap[element.configKey] = defaultValue
+                ConfigManager.saveConfig()
                 configListeners[element.configKey]?.forEach { it(defaultValue) }
             }
         }
@@ -712,7 +725,7 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
 
     fun registerListener(configKey: String, listener: (Any) -> Unit): ConfigUI {
         configListeners.getOrPut(configKey) { mutableListOf() }.add(listener)
-        (getConfigValue(configKey) ?: getDefaultValue(elementRefs[configKey]?.type))?.let { currentValue ->
+        (ConfigManager.getConfigValue(configKey) ?: getDefaultValue(elementRefs[configKey]?.type))?.let { currentValue ->
             val resolvedValue = when (currentValue) {
                 is Map<*, *> -> currentValue.toColorFromMap()
                 is List<*> -> currentValue.mapNotNull { (it as? Number)?.toInt() }.toSet()
@@ -727,16 +740,6 @@ class ConfigUI(configFileName: String = "config") : WindowScreen(ElementaVersion
         closeListeners.add(listener)
         return this
     }
-
-    fun getConfigValue(configKey: String): Any? {
-        return when (val value = config[configKey]) {
-            is Map<*, *> -> value.toColorFromMap()
-            is List<*> -> value.mapNotNull { (it as? Number)?.toInt() }.toSet()
-            else -> value
-        }
-    }
-
-    fun saveConfig() = dataUtils.save()
 
     private fun Color.withAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 }

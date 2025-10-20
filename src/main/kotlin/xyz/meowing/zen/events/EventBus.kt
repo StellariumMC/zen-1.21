@@ -1,9 +1,10 @@
 package xyz.meowing.zen.events
 
 import xyz.meowing.zen.Zen.Companion.configUI
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.ScoreboardUtils
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.knit.api.KnitClient.client
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -125,7 +126,7 @@ object EventBus {
             }
             //#endif
 
-            GLFW.glfwSetCharCallback(mc.window.handle) { window, codepoint ->
+            GLFW.glfwSetCharCallback(client.window.handle) { window, codepoint ->
                 val charTyped = codepoint.toChar()
 
                 !post(GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen))
@@ -305,7 +306,7 @@ inline fun <reified T : Event> configRegister(
     }
 
     val checkAndUpdate = {
-        val configValues = keys.associateWith { configUI.getConfigValue(it) }
+        val configValues = keys.associateWith { ConfigManager.getConfigValue(it) }
         val configEnabled = enabledCheck(configValues)
         val skyblockEnabled = !skyblockOnly || LocationUtils.inSkyblock
         val areaEnabled = areas.isEmpty() || areas.any { LocationUtils.checkArea(it) }

@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -21,6 +19,10 @@ import net.minecraft.entity.Entity
 import net.minecraft.text.Text
 import net.minecraft.util.DyeColor
 import net.minecraft.util.math.BlockPos
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -61,29 +63,26 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
     private val hidewronglivid by ConfigDelegate<Boolean>("hidewronglivid")
     private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Highlight Livid", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Highlight Livid", "Highlight correct livid", "Dungeons", ConfigElement(
                 "highlightlivid",
-                "Highlight correct livid",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Highlight Livid", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight correct livid color", "Highlight correct livid color", "Color", ConfigElement(
                 "highlightlividcolor",
-                "Highlight correct livid color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
+            .addFeatureOption("Hide incorrect livid entity", "Hide incorrect livid entity", "Options", ConfigElement(
                 "hidewronglivid",
-                "Hide incorrect livid entity",
                 ElementType.Switch(false)
             ))
-            .addElement("Dungeons", "Highlight Livid", "Options", ConfigElement(
+            .addFeatureOption("Line to correct livid entity", "Line to correct livid entity", "Options", ConfigElement(
                 "highlightlividline",
-                "Line to correct livid entity",
                 ElementType.Switch(false)
             ))
     }
+
 
     override fun initialize() {
         createCustomEvent<RenderEvent.EntityGlow>("renderLivid") { event ->
@@ -122,7 +121,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
 
         createCustomEvent<TickEvent.Server>("tick") {
             val world = world ?: return@createCustomEvent
-            val state: BlockState = mc.world?.getBlockState(lividPos) ?: return@createCustomEvent
+            val state: BlockState = world.getBlockState(lividPos) ?: return@createCustomEvent
             val color = stainedGlassBlocks[state.block] ?: return@createCustomEvent
             val lividType = lividTypes[color] ?: return@createCustomEvent
 

@@ -7,7 +7,7 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.Zen.Companion.mc
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.utils.Utils.createBlock
 import java.awt.Color
 import kotlin.math.max
@@ -53,7 +53,7 @@ class SliderElement(
         input = (UITextInput(formatDisplayValue(value)).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth(formatDisplayValue(value)).pixels()
+            width = client.textRenderer.getWidth(formatDisplayValue(value)).pixels()
         }.setColor(Color(170, 230, 240, 255)) childOf textContainer) as UITextInput
 
         setupMouseHandlers()
@@ -119,12 +119,12 @@ class SliderElement(
     private fun setupInputHandlers() {
         input.onKeyType { _, _ ->
             processInputValue()
-            input.setWidth(mc.textRenderer.getWidth(formatDisplayValue(value)).pixels())
+            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
         }
 
         input.onFocusLost {
             processInputValue()
-            input.setWidth(mc.textRenderer.getWidth(formatDisplayValue(value)).pixels())
+            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
         }
     }
 
@@ -152,7 +152,7 @@ class SliderElement(
         if (newValue != value) {
             value = newValue
             input.setText(formatDisplayValue(value))
-            input.setWidth(mc.textRenderer.getWidth(formatDisplayValue(value)).pixels())
+            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
             onChange?.invoke(value)
         }
 

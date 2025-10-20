@@ -7,11 +7,10 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.Utils.createBlock
-import xyz.meowing.zen.utils.Utils.MouseX
-import xyz.meowing.zen.utils.Utils.MouseY
 import java.awt.Color
 import kotlin.math.min
 
@@ -49,7 +48,7 @@ class DropdownElement(
         selectedText = (UIWrappedText(options.getOrNull(selectedIndex) ?: "", centered = true).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth(options.getOrNull(selectedIndex) ?: "").pixels()
+            width = client.textRenderer.getWidth(options.getOrNull(selectedIndex) ?: "").pixels()
         }.setColor(textColor) childOf container) as UIWrappedText
 
         container.onMouseClick { event ->
@@ -105,7 +104,7 @@ class DropdownElement(
         x >= component.getLeft() && x <= component.getRight() && y >= component.getTop() && y <= component.getBottom()
 
     private fun getScaledMousePos(): Pair<Float, Float> {
-        return MouseX.toFloat() to MouseY.toFloat()
+        return KnitMouse.Scaled.x.toFloat() to KnitMouse.Scaled.y.toFloat()
     }
 
     private fun findScrollComponentUnderMouse(): UIComponent? {
@@ -201,7 +200,7 @@ class DropdownElement(
                 x = CenterConstraint()
                 y = CenterConstraint()
                 textScale = 0.8.pixels()
-                width = mc.textRenderer.getWidth(option).pixels()
+                width = client.textRenderer.getWidth(option).pixels()
             }.setColor(textColor) childOf optionComponent
         }
     }
@@ -209,7 +208,7 @@ class DropdownElement(
     private fun selectOption(index: Int) {
         selectedIndex = index
         selectedText.setText(options[index])
-        selectedText.setWidth(mc.textRenderer.getWidth(options[index]).pixels)
+        selectedText.setWidth(client.textRenderer.getWidth(options[index]).pixels)
         onChange?.invoke(index)
         collapse()
     }

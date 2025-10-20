@@ -1,31 +1,28 @@
 package xyz.meowing.zen.features.slayers
 
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
-import xyz.meowing.zen.utils.TickUtils
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.util.math.Vec3d
 import java.util.regex.Pattern
+import xyz.meowing.zen.config.ConfigElement
 
 @Zen.Module
 object VengDamage : Feature("vengdmg", true) {
     private var nametagID = -1
     private val veng = Pattern.compile("^\\d+(,\\d+)*ﬗ$")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Vengeance damage tracker", ConfigElement(
-                "vengdmg",
-                "Vengeance damager tracker",
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Vengeance damage tracker", "Vengeance damager tracker", "Slayers", ConfigElement(
+                    "vengdmg",
+                    ElementType.Switch(false)
+            ))
     }
 
     override fun initialize() {
@@ -47,7 +44,7 @@ object VengDamage : Feature("vengdmg", true) {
             val numStr = name.replace(",", "")
             val num = numStr.toLongOrNull() ?: return@register
 
-            if (num > 500000) ChatUtils.addMessage("$prefix §fVeng DMG: §c${name}")
+            if (num > 500000) KnitChat.fakeMessage("$prefix §fVeng DMG: §c${name}")
         }
     }
 }

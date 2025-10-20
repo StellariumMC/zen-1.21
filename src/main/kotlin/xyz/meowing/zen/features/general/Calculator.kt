@@ -1,10 +1,10 @@
 package xyz.meowing.zen.features.general
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.command.utils.GreedyString
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.utils.ChatUtils
 
 @Zen.Command
 object CalculatorCommand : Commodore("zencalc", "calc") {
@@ -19,9 +19,9 @@ object CalculatorCommand : Commodore("zencalc", "calc") {
                 } else {
                     "%.10f".format(result).trimEnd('0').trimEnd('.')
                 }
-                ChatUtils.addMessage("$prefix §b$eq §f= §b$display")
-            } catch (e: Exception) {
-                ChatUtils.addMessage("$prefix §fInvalid equation.")
+                KnitChat.fakeMessage("$prefix §b$eq §f= §b$display")
+            } catch (_: Exception) {
+                KnitChat.fakeMessage("$prefix §fInvalid equation.")
             }
         }
     }

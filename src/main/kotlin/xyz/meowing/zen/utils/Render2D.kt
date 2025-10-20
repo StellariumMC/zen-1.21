@@ -1,10 +1,10 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.util.Colors
+import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
 
 object Render2D {
@@ -35,7 +35,7 @@ object Render2D {
 
         when (textStyle) {
             TextStyle.DROP_SHADOW -> {
-                context.drawText(mc.textRenderer, text, 0, 0, colors, true)
+                context.drawText(client.textRenderer, text, 0, 0, colors, true)
             }
             TextStyle.BLACK_OUTLINE -> {
                 val matrices = context.matrices
@@ -47,7 +47,7 @@ object Render2D {
                 matrices.push()
                 matrices.translate(-0.75f, 0f, 0f)
                 //#endif
-                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                context.drawText(client.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
                 //#if MC >= 1.21.7
                 //$$ context.matrices.popMatrix()
                 //#else
@@ -61,7 +61,7 @@ object Render2D {
                 matrices.push()
                 matrices.translate(0.75f, 0f, 0f)
                 //#endif
-                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                context.drawText(client.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
                 //#if MC >= 1.21.7
                 //$$ context.matrices.popMatrix()
                 //#else
@@ -75,7 +75,7 @@ object Render2D {
                 matrices.push()
                 matrices.translate(0f, -0.75f, 0f)
                 //#endif
-                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                context.drawText(client.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
                 //#if MC >= 1.21.7
                 //$$ context.matrices.popMatrix()
                 //#else
@@ -89,17 +89,17 @@ object Render2D {
                 matrices.push()
                 matrices.translate(0f, 0.75f, 0f)
                 //#endif
-                context.drawText(mc.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
+                context.drawText(client.textRenderer, text.removeFormatting(), 0, 0, 0x000000, false)
                 //#if MC >= 1.21.7
                 //$$ context.matrices.popMatrix()
                 //#else
                 context.matrices.pop()
                 //#endif
 
-                context.drawText(mc.textRenderer, text, 0, 0, colors, false)
+                context.drawText(client.textRenderer, text, 0, 0, colors, false)
             }
             TextStyle.DEFAULT -> {
-                context.drawText(mc.textRenderer, text, 0, 0, colors, false)
+                context.drawText(client.textRenderer, text, 0, 0, colors, false)
             }
         }
 
@@ -136,12 +136,12 @@ object Render2D {
 
     fun String.width(): Int {
         val lines = split('\n')
-        return lines.maxOf { mc.textRenderer.getWidth(it.removeFormatting()) }
+        return lines.maxOf { client.textRenderer.getWidth(it.removeFormatting()) }
     }
 
     fun String.height(): Int {
         val lineCount = count { it == '\n' } + 1
-        return mc.textRenderer.fontHeight * lineCount
+        return client.textRenderer.fontHeight * lineCount
     }
 
     fun Color.toABGR(): Color {

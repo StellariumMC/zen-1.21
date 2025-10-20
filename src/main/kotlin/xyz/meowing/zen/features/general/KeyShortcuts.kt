@@ -12,20 +12,23 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
+import net.minecraft.client.gui.screen.ChatScreen
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.KeyEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.createBlock
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 data class KeybindEntry(
@@ -41,26 +44,27 @@ object KeyShortcuts : Feature("keyshortcuts") {
     val dataUtils = DataUtils("keybind", KeybindData())
     private val pressedKeys = mutableSetOf<Int>()
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Key Shortcuts", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Key Shortcuts", "", "General", ConfigElement(
                 "keyshortcuts",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Key Shortcuts", "GUI", ConfigElement(
+            ))
+            .addFeatureOption("Open Keybind Manager", "Open Keybind Manager", "GUI", ConfigElement(
                 "keyshortcutsgui",
-                "Open Keybind Manager",
                 ElementType.Button("Open Manager") {
                     TickUtils.schedule(2) {
-                        mc.setScreen(KeybindGui())
+                        client.setScreen(KeybindGui())
                     }
                 }
             ))
     }
 
+
     override fun initialize() {
         register<KeyEvent.Press> { event ->
+            if (client.currentScreen is HandledScreen<*> || client.currentScreen is ChatScreen) return@register
+
             if (event.keyCode > 0) {
                 pressedKeys.add(event.keyCode)
                 checkKeybindMatch()
@@ -74,12 +78,12 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     private fun checkKeybindMatch() {
         bindings.find { binding ->
-            binding.keys.isNotEmpty() && binding.keys.all { it in pressedKeys } && binding.keys.size == pressedKeys.size
+            binding.keys.isNotEmpty() && binding.keys.all { it in pressedKeys }
         }?.let { binding ->
             if (binding.command.isNotEmpty() && binding.command.startsWith("/")) {
-                ChatUtils.command(binding.command)
+                KnitChat.sendCommand(binding.command)
             } else {
-                ChatUtils.chat(binding.command)
+                KnitChat.fakeMessage(binding.command)
             }
         }
     }
@@ -109,7 +113,7 @@ object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
     init {
         runs {
             TickUtils.schedule(2) {
-                mc.setScreen(KeybindGui())
+                client.setScreen(KeybindGui())
             }
         }
     }

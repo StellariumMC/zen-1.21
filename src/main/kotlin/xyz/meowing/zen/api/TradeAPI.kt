@@ -3,7 +3,6 @@ package xyz.meowing.zen.api
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.GuiEvent
@@ -15,6 +14,8 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.screen.ScreenHandler
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitClient.world
 
 @Zen.Module
 object TradeAPI {
@@ -31,11 +32,11 @@ object TradeAPI {
 
     init {
         TickUtils.loop(20) {
-            if (mc.world == null) return@loop
-            if (mc.currentScreen == null) inTradeMenu = false
+            if (world == null) return@loop
+            if (client.currentScreen == null) inTradeMenu = false
 
             if (tradingWithSub.isNotEmpty()) {
-                mc.world!!.players.find { it.name.string.contains(tradingWithSub) }?.let {
+                world!!.players.find { it.name.string.contains(tradingWithSub) }?.let {
                     tradingWith = it.name.string
                 }
             }

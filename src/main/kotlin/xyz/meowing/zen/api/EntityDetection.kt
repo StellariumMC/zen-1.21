@@ -1,7 +1,6 @@
 package xyz.meowing.zen.api
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.EventBus
@@ -13,6 +12,8 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.Entity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.projectile.ArrowEntity
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
 
 @Zen.Module
 object EntityDetection {
@@ -33,8 +34,8 @@ object EntityDetection {
 
     init {
         TickUtils.loop(5) {
-            val world = mc.world ?: return@loop
-            val player = mc.player ?: return@loop
+            val world = world ?: return@loop
+            val player = player ?: return@loop
 
             world.entities.forEach { entity ->
                 if (player.distanceTo(entity) > 30 || entity !is ArmorStandEntity || !entity.hasCustomName() || hashMap.containsKey(entity)) return@forEach
@@ -56,7 +57,7 @@ object EntityDetection {
 
         TickUtils.loop(100) {
             bossID?.let { id ->
-                val world = mc.world ?: return@loop
+                val world = world ?: return@loop
                 val boss = world.getEntityById(id)
                 if (boss == null || !boss.isAlive) {
                     post(SkyblockEvent.Slayer.Cleanup())
@@ -67,8 +68,8 @@ object EntityDetection {
 
         EventBus.register<EntityEvent.Metadata> { event ->
             if (inSlayerFight) return@register
-            val world = mc.world ?: return@register
-            val player = mc.player ?: return@register
+            val world = world ?: return@register
+            val player = player ?: return@register
 
             val name = event.name
             if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {

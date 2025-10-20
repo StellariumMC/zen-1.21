@@ -3,15 +3,17 @@ package xyz.meowing.zen.features.dungeons
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.text.ClickEvent
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.knit.api.text.core.ClickEvent
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
@@ -20,21 +22,18 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
     private val autogetdraft by ConfigDelegate<Boolean>("autogetdraft")
     private val selfdraft by ConfigDelegate<Boolean>("selfdraft")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Architect Draft Message", "", "Dungeons", ConfigElement(
                 "architectdraft",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
-                "selfdraft",
-                "Only get drafts on your fails",
                 ElementType.Switch(false)
             ))
-            .addElement("Dungeons", "Architect Draft Message", "Options", ConfigElement(
+            .addFeatureOption("Only get drafts on your fails", "", "Options", ConfigElement(
+                "selfdraft",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Automatically get architect drafts", "", "Options", ConfigElement(
                 "autogetdraft",
-                "Automatically get architect drafts",
                 ElementType.Switch(false)
             ))
     }
@@ -48,14 +47,14 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
 
             if (autogetdraft) {
                 TickUtils.schedule(40) {
-                    ChatUtils.command("/gfs architect's first draft 1")
+                    KnitChat.sendCommand("/gfs architect's first draft 1")
                 }
             } else {
-                ChatUtils.addMessage(
-                    "$prefix §bClick to get Architect's First Draft from Sack.",
-                    clickAction = ClickEvent.Action.RUN_COMMAND,
-                    clickValue = "/gfs architect's first draft 1"
-                )
+                val archMessage = KnitText
+                    .literal("$prefix §bClick to get Architect's First Draft from Sack.")
+                    .onClick(ClickEvent.RunCommand("/gfs architect's first draft 1"))
+                    .toVanilla()
+                KnitChat.fakeMessage(archMessage)
             }
         }
     }

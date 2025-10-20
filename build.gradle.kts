@@ -32,26 +32,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
     modImplementation(include("gg.essential:elementa:710")!!)
     modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
-    modImplementation(include("xyz.meowing:vexel-${mcData}:106")!!)
-
-    val clocheAction: Action<ExternalModuleDependency> = Action {
-        attributes {
-            attribute(Attribute.of("earth.terrarium.cloche.modLoader", String::class.java), "fabric")
-            attribute(Attribute.of("earth.terrarium.cloche.minecraftVersion", String::class.java),
-                when (mcData.version) {
-                    MinecraftVersions.VERSION_1_21_7 -> "1.21.8"
-                    else -> mcData.toString().substringBefore("-")
-                }
-            )
-        }
-    }
-
-    modImplementation("me.owdding:item-data-fixer:1.0.3", clocheAction)
-    modImplementation("tech.thatgravyboat:skyblock-api:3.0.9") {
-        exclude("me.owdding")
-        clocheAction.execute(this)
-    }
-    include("tech.thatgravyboat:skyblock-api:3.0.9", clocheAction)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:107")!!)
 
     when (mcData.version) {
         MinecraftVersions.VERSION_1_21_7 -> {

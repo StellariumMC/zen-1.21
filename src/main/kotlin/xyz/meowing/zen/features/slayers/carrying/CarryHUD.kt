@@ -1,16 +1,15 @@
 package xyz.meowing.zen.features.slayers.carrying
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.GuiEvent
-import xyz.meowing.zen.utils.Utils.MouseX
-import xyz.meowing.zen.utils.Utils.MouseY
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Colors
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.input.KnitMouse
 
 object CarryHUD {
     private data class Button(val x: Float, val y: Float, val width: Float, val height: Float, val action: String, val carryee: CarryCounter.Carryee, val tooltip: String)
@@ -39,7 +38,7 @@ object CarryHUD {
         val lines = getLines()
         if (lines.isNotEmpty()) {
             var currentY = y
-            val lineHeight = (mc.textRenderer.fontHeight + 2) * scale
+            val lineHeight = (client.textRenderer.fontHeight + 2) * scale
             for (line in lines) {
                 Render2D.renderString(context, line, x, currentY, scale)
                 currentY += lineHeight
@@ -92,7 +91,7 @@ object CarryHUD {
 
         val scale = HUDManager.getScale(name)
         buttons.find {
-            MouseX >= it.x && MouseX <= it.x + it.width * scale && MouseY >= it.y && MouseY <= it.y + it.height * scale
+            KnitMouse.Scaled.x >= it.x && KnitMouse.Scaled.x <= it.x + it.width * scale && KnitMouse.Scaled.y >= it.y && KnitMouse.Scaled.y <= it.y + it.height * scale
         }?.let { button ->
             when (button.action) {
                 "add" -> if (button.carryee.count < button.carryee.total) button.carryee.count++
@@ -117,7 +116,7 @@ object CarryHUD {
         CarryCounter.carryees.forEachIndexed { i, carryee ->
             val lineY = y + (12f * scale) + i * (12f * scale)
             val str = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
-            val textWidth = mc.textRenderer.getWidth(str) * scale
+            val textWidth = client.textRenderer.getWidth(str) * scale
             val btnX = x + textWidth + (4f * scale)
 
             renderItems.add(RenderItem(str, x, lineY, Colors.WHITE, true))
@@ -143,8 +142,11 @@ object CarryHUD {
 
     private fun render(context: DrawContext) {
         val scale = HUDManager.getScale(name)
+        val mouseX = KnitMouse.Scaled.x
+        val mouseY = KnitMouse.Scaled.y
+
         hoveredButton = buttons.find {
-            MouseX >= it.x && MouseX <= it.x + it.width * scale && MouseY >= it.y && MouseY <= it.y + it.height * scale
+            mouseX >= it.x && mouseX <= it.x + it.width * scale && mouseY >= it.y && mouseY <= it.y + it.height * scale
         }
 
         renderItems.forEach { item ->
@@ -152,15 +154,15 @@ object CarryHUD {
             Render2D.renderString(context, item.text, item.x, item.y, scale, color, if (item.shadow) Render2D.TextStyle.DROP_SHADOW else Render2D.TextStyle.DEFAULT)
         }
 
-        renderTooltip(context, MouseY, MouseY)
+        renderTooltip(context, mouseX, mouseY)
     }
 
     private fun renderTooltip(context: DrawContext, mouseX: Double, mouseY: Double) {
         hoveredButton?.let { button ->
             val scale = HUDManager.getScale(name)
-            val tooltipWidth = (mc.textRenderer.getWidth(button.tooltip) + 8) * scale
+            val tooltipWidth = (client.textRenderer.getWidth(button.tooltip) + 8) * scale
             val tooltipHeight = 16 * scale
-            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (mc.window.scaledWidth - tooltipWidth - 2).toDouble()).toInt()
+            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (client.window.scaledWidth - tooltipWidth - 2).toDouble()).toInt()
             val tooltipY = (mouseY - tooltipHeight - 8 * scale).coerceAtLeast(2.0).toInt()
 
             context.fill(tooltipX, tooltipY, (tooltipX + tooltipWidth).toInt(), (tooltipY + tooltipHeight).toInt(), 0xC8000000.toInt())

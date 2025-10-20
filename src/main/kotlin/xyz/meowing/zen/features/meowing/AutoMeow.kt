@@ -1,13 +1,14 @@
 package xyz.meowing.zen.features.meowing
 
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
@@ -24,21 +25,18 @@ object AutoMeow : Feature("automeow") {
     )
     private val automeowchannels by ConfigDelegate<Set<Int>>("automeowchannels")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Meowing", "Auto meow", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Auto meow", "Auto Meow", "Meowing", ConfigElement(
                 "automeow",
-                "Auto Meow",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Meowing", "Auto meow", "", ConfigElement(
-                "",
-                null,
-                ElementType.TextParagraph("Replies to messages in chat with a random meow")
             ))
-            .addElement("Meowing", "Auto meow", "Options", ConfigElement(
+            .addFeatureOption("", "Replies to messages in chat with a random meow", "", ConfigElement(
+                    "",
+                    ElementType.TextParagraph("Replies to messages in chat with a random meow")
+            ))
+            .addFeatureOption("Auto Meow Response Channels", "", "Options", ConfigElement(
                 "automeowchannels",
-                "Auto Meow Response Channels",
                 ElementType.MultiCheckbox(
                     options = listOf("Guild", "Party", "Officer", "Co-op", "Private Messages"),
                     default = setOf(0, 1, 2, 3, 4)
@@ -49,15 +47,16 @@ object AutoMeow : Feature("automeow") {
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             val text = event.message.string.removeFormatting()
+            val player = player ?: return@register
 
-            if (text.contains(player?.name!!.string) || !text.endsWith("meow")) return@register
+            if (text.contains(player.name.string) || !text.endsWith("meow")) return@register
 
             val (cmd, channelIndex) = channels.entries.firstOrNull { text.startsWith(it.key) }?.value ?: ("ac" to -1)
 
             if (channelIndex !in automeowchannels) return@register
 
             TickUtils.schedule(Random.nextLong(10, 50)) {
-                ChatUtils.command("$cmd ${meows.random()}")
+                KnitChat.sendCommand("$cmd ${meows.random()}")
             }
         }
     }

@@ -3,8 +3,6 @@ package xyz.meowing.zen.features.general
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ItemTooltipEvent
 import xyz.meowing.zen.features.Feature
@@ -13,6 +11,8 @@ import xyz.meowing.zen.utils.ItemUtils.displayName
 import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import xyz.meowing.zen.utils.Utils.formatNumber
 import net.minecraft.text.Text
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object PriceData : Feature("pricedata", true) {
@@ -33,24 +33,22 @@ object PriceData : Feature("pricedata", true) {
 
     private val tooltipCache = mutableMapOf<String, CacheEntry>()
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Price Data", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Price Data", "", "General", ConfigElement(
                 "pricedata",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Price Data", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Price information to show", "Price information to show", "Options", ConfigElement(
                 "pricedatadisplay",
-                "Price information to show",
                 ElementType.MultiCheckbox(displayOptions, setOf(0, 1, 2, 3, 4))
             ))
-            .addElement("General", "Price Data", "Options", ConfigElement(
+            .addFeatureOption("Use abbreviated numbers (1.2M instead of 1,200,000)", "Use abbreviated numbers (1.2M instead of 1,200,000)", "Options", ConfigElement(
                 "abbreviatenumbers",
-                "Use abbreviated numbers (1.2M instead of 1,200,000)",
                 ElementType.Switch(false)
             ))
     }
+
 
     private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviateNumber() else formatNumber()
 

@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.MouseEvent
@@ -14,6 +12,9 @@ import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object FatalTempoOverlay : Feature("fataltempooverlay",true) {
@@ -21,14 +22,14 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
     private var level = 0
     private var currentPercent = 0
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Fatal Tempo Overlay", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Fatal Tempo Overlay", "", "HUD", ConfigElement(
                 "fataltempooverlay",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
+
 
     override fun initialize() {
         HUDManager.register("Fatal Tempo", "§eFatal Tempo: §a200%")
@@ -47,7 +48,7 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
     }
 
     private fun checkFatal() {
-        val item = player?.mainHandStack ?: return
+        val item = KnitPlayer.heldItem ?: return
         val extraAttributes = item.extraAttributes ?: return
         val ftLevel = extraAttributes.getCompound("enchantments")
             .map { it.getInt("ultimate_fatal_tempo") }

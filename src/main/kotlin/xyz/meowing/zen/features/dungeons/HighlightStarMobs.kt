@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -12,6 +10,9 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -19,16 +20,14 @@ object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
     private val boxstarmobscolor by ConfigDelegate<Color>("boxstarmobscolor")
     private val entities = mutableListOf<Int>()
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Highlight star mobs", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Highlight star mobs", "", "Dungeons", ConfigElement(
                 "boxstarmobs",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Dungeons", "Highlight star mobs", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight star mobs color", "Highlight star mobs color", "Color", ConfigElement(
                 "boxstarmobscolor",
-                "Highlight star mobs color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }

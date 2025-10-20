@@ -18,25 +18,26 @@ import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.toConstraint
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.UpdateChecker
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.features
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.collections.forEachIndexed
@@ -67,76 +68,58 @@ object Debug : Feature() {
         }
     }
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        if (!debugmode) {
-            return configUI
-        }
+    override fun addConfig() {
+        if (!debugmode) return
 
-        return configUI
-            .addElement("Debug", "Config Test", "Debug GUI", ConfigElement(
-                "debuggui",
-                "Debug Information GUI",
-                ElementType.Button("Open Debug GUI") {
-                    TickUtils.schedule(2) {
-                        mc.setScreen(DebugGui())
-                    }
-                }
-            ))
-            .addElement("Debug", "Config Test", "Switch", ConfigElement(
-                "test_switch",
-                "Switch test",
+        ConfigManager
+            .addFeature("Config Test", "", "Debug", ConfigElement(
+                "debug",
                 ElementType.Switch(false)
             ))
-            .addElement("Debug", "Config Test", "Button", ConfigElement(
+            .addFeatureOption("Switch", "Switch test", "Debug", ConfigElement(
+                "test_switch",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Button", "Button test", "Debug", ConfigElement(
                 "test_button",
-                "Button test",
                 ElementType.Button("Click Me!") {
-                    LOGGER.info("Button clicked!")
+                    Zen.LOGGER.info("Button clicked!")
                 }
             ))
-            .addElement("Debug", "Config Test", "Slider", ConfigElement(
+            .addFeatureOption("Slider", "Slider test", "Debug", ConfigElement(
                 "test_slider",
-                "Slider test",
                 ElementType.Slider(0.0, 100.0, 50.0, false)
             ))
-            .addElement("Debug", "Config Test", "Slider Double", ConfigElement(
+            .addFeatureOption("Slider Double", "Slider double test", "Debug", ConfigElement(
                 "test_slider_double",
-                "Slider double test",
                 ElementType.Slider(0.0, 10.0, 5.5, true)
             ))
-            .addElement("Debug", "Config Test", "Dropdown", ConfigElement(
+            .addFeatureOption("Dropdown", "Dropdown test", "Debug", ConfigElement(
                 "test_dropdown",
-                "Dropdown test",
                 ElementType.Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4"), 0)
             ))
-            .addElement("Debug", "Config Test", "Text Input", ConfigElement(
+            .addFeatureOption("Text Input", "Text input test", "Debug", ConfigElement(
                 "test_textinput",
-                "Text input test",
                 ElementType.TextInput("Default text", "Enter text here...", 50)
             ))
-            .addElement("Debug", "Config Test", "Text Input Empty", ConfigElement(
-                "test_textinput_empty",
-                "Empty text input test",
-                ElementType.TextInput("", "Type something...", 100)
+            .addFeatureOption("Text Input Empty", "Empty text input test", "Debug", ConfigElement(
+                    "test_textinput_empty",
+                    ElementType.TextInput("", "Type something...", 100)
             ))
-            .addElement("Debug", "Config Test", "Text Paragraph", ConfigElement(
+            .addFeatureOption("Text Paragraph", "Text paragraph test", "Debug", ConfigElement(
                 "test_paragraph",
-                null,
                 ElementType.TextParagraph("This is a text paragraph element used for displaying information or instructions to the user. It can contain multiple lines of text.")
             ))
-            .addElement("Debug", "Config Test", "Color Picker", ConfigElement(
+            .addFeatureOption("Color Picker", "Color picker test", "Debug", ConfigElement(
                 "test_colorpicker",
-                "Color picker test",
                 ElementType.ColorPicker(Color(100, 200, 255))
             ))
-            .addElement("Debug", "Config Test", "Keybind", ConfigElement(
+            .addFeatureOption("Keybind", "Keybind test", "Debug", ConfigElement(
                 "test_keybind",
-                "Keybind test",
                 ElementType.Keybind(82)
             ))
-            .addElement("Debug", "Config Test", "Multi Checkbox", ConfigElement(
+            .addFeatureOption("Multi Checkbox", "Multi checkbox test", "Debug", ConfigElement(
                 "test_multicheckbox",
-                "Multi checkbox test",
                 ElementType.MultiCheckbox(
                     options = listOf("Feature A", "Feature B", "Feature C", "Feature D", "Feature E"),
                     default = setOf(0, 2)
@@ -144,6 +127,7 @@ object Debug : Feature() {
             ))
     }
 }
+
 @Zen.Command
 object DebugCommand : Commodore("zendebug", "zd") {
     init {
@@ -158,10 +142,10 @@ object DebugCommand : Commodore("zendebug", "zd") {
                         } else {
                             Debug.unregisterEvent("mobid")
                         }
-                        ChatUtils.addMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
+                        KnitChat.fakeMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
                     }
                     "stats" -> {
-                        ChatUtils.addMessage(
+                        KnitChat.fakeMessage(
                             "§cHealth: ${PlayerStats.health} | Max: ${PlayerStats.maxHealth} | §6Absorb: ${PlayerStats.absorption}\n" +
                                     "§9Mana: ${PlayerStats.mana} | Max: ${PlayerStats.maxMana} | §3Overflow: ${PlayerStats.overflowMana}\n" +
                                     "§dRift Time: ${PlayerStats.riftTimeSeconds} | Max: ${PlayerStats.maxRiftTime}\n" +
@@ -169,7 +153,7 @@ object DebugCommand : Commodore("zendebug", "zd") {
                         )
                     }
                     "dgutils" -> {
-                        ChatUtils.addMessage(
+                        KnitChat.fakeMessage(
                             "Crypt Count: ${DungeonUtils.getCryptCount()}\n" +
                                     "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
                                     "isMage: ${DungeonUtils.isMage()}\n" +
@@ -177,9 +161,9 @@ object DebugCommand : Commodore("zendebug", "zd") {
                         )
                     }
                     "regfeats" -> {
-                        ChatUtils.addMessage("Features registered:")
+                        KnitChat.fakeMessage("Features registered:")
                         features.forEach {
-                            if (it.isEnabled()) ChatUtils.addMessage("§f> §c${it.configKey}")
+                            if (it.isEnabled()) KnitChat.fakeMessage("§f> §c${it.configKey}")
                         }
                     }
                     "forceupdate" -> {
@@ -187,9 +171,9 @@ object DebugCommand : Commodore("zendebug", "zd") {
                         UpdateChecker.checkForUpdates()
                     }
                     else -> {
-                        ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
+                        KnitChat.fakeMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
                         TickUtils.schedule(2) {
-                            mc.setScreen(DebugGui())
+                            client.setScreen(DebugGui())
                         }
                     }
                 }
@@ -197,7 +181,7 @@ object DebugCommand : Commodore("zendebug", "zd") {
         }
 
         runs {
-            ChatUtils.addMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
+            KnitChat.fakeMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")
         }
     }
 }
@@ -342,7 +326,7 @@ class DebugGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }.onMouseLeave {
             animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, theme.element.toConstraint()) }
         }.onMouseClick {
-            mc.setScreen(null)
+            KnitClient.client.setScreen(null)
         }
 
         UIText("Close").constrain {

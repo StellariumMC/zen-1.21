@@ -2,13 +2,14 @@ package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
 import kotlin.math.sin
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object CustomTilt : Feature("customtilt") {
@@ -19,43 +20,35 @@ object CustomTilt : Feature("customtilt") {
     private val animatedtilt by ConfigDelegate<Boolean>("animatedtilt")
     private val tiltspeed by ConfigDelegate<Double>("tiltspeed")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Custom tilt", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Custom tilt", "", "Visuals", ConfigElement(
                 "customtilt",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Tilt X", "", "Options", ConfigElement(
                 "tiltx",
-                "Tilt X",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt Y", "", "Options", ConfigElement(
                 "tilty",
-                "Tilt Y",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt Z", "", "Options", ConfigElement(
                 "tiltz",
-                "Tilt Z",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Custom tilt", "Options", ConfigElement(
+            .addFeatureOption("Tilt everyone", "", "Options", ConfigElement(
                 "tilteveryone",
-                "Tilt everyone",
-                ElementType.Switch(false)
+                ElementType.Switch(true)
             ))
-            .addElement("Visuals", "Custom tilt", "Animate Tilt", ConfigElement(
+            .addFeatureOption("Animated tilt", "", "Options", ConfigElement(
                 "animatedtilt",
-                "Animated tilt",
                 ElementType.Switch(false)
             ))
-            .addElement("Visuals", "Custom tilt", "Animate Tilt", ConfigElement(
+            .addFeatureOption("Tilt speed", "", "Options", ConfigElement(
                 "tiltspeed",
-                "Tilt speed",
-                ElementType.Slider(0.1, 5.0, 1.0, true),
-                { config -> config["customtilt"] as? Boolean == true }
+                ElementType.Slider(0.1, 10.0, 1.0, true)
             ))
     }
 

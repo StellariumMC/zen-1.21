@@ -1,4 +1,5 @@
 package xyz.meowing.zen.config
+
 import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import java.awt.Color
@@ -46,7 +47,7 @@ class Handler<T>(private val key: String, private val clazz: Class<T>) {
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (!isInitialized) {
-            configUI.getConfigValue(key)?.let { currentValue ->
+            ConfigManager.getConfigValue(key)?.let { currentValue ->
                 @Suppress("UNCHECKED_CAST")
                 cachedValue = convertValue(currentValue) as T
                 isInitialized = true

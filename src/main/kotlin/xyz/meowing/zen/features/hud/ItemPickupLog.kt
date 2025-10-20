@@ -3,8 +3,6 @@ package xyz.meowing.zen.features.hud
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.PacketEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -18,6 +16,9 @@ import xyz.meowing.zen.utils.Utils.getRegexGroups
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 import kotlin.math.abs
 
@@ -27,19 +28,19 @@ object ItemPickupLog : Feature("itempickuplog") {
     private var ignoreStacksRegex = listOf("""^§8Quiver.*""".toRegex(), """^§aSkyBlock Menu §7\(Click\)""".toRegex(), """^§bMagical Map""".toRegex())
     private val abbreviateNumbers by ConfigDelegate<Boolean>("itempickuplogabbreviate")
     private val npcSellingStackRegex = """(.*) §8x\d+""".toRegex()
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Item Pickup Log", ConfigElement(
+
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Item Pickup Log", "", "HUD", ConfigElement(
                 "itempickuplog",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("HUD", "Item Pickup Log", "Options", ConfigElement(
+            ))
+            .addFeatureOption("Abbreviate Numbers", "", "Options", ConfigElement(
                 "itempickuplogabbreviate",
-                "Abbreviate Numbers",
                 ElementType.Switch(false)
             ))
     }
+
 
     private var previousInventory = mutableMapOf<String, Int>()
     private var currentInventory = mutableMapOf<String, Int>()

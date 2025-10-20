@@ -1,7 +1,7 @@
 package xyz.meowing.zen.config
 
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.openConfig
 import xyz.meowing.zen.hud.HUDEditor
 import xyz.meowing.zen.utils.TickUtils
@@ -13,8 +13,8 @@ object ConfigCommand : Commodore("zen", "ma", "meowaddons") {
         literal("hud") {
             runs {
                 TickUtils.schedule(1) {
-                    mc.execute {
-                        mc.setScreen(HUDEditor())
+                    client.execute {
+                        client.setScreen(HUDEditor())
                     }
                 }
             }

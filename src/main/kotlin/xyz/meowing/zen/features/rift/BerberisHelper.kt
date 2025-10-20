@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.rift
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.PacketEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -16,6 +14,11 @@ import net.minecraft.client.render.VertexRendering
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
 import net.minecraft.particle.ParticleTypes
 import net.minecraft.util.math.BlockPos
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 import kotlin.math.hypot
 
@@ -24,19 +27,18 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
     private var blockPos: BlockPos? = null
     private val berberishelpercolor by ConfigDelegate<Color>("berberishelpercolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Rift", "Berberis Helper", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Berberis Helper", "Berberis highlight", "Rift", ConfigElement(
                 "berberishelper",
-                "Berberis highlight",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Rift", "Berberis Helper", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", ConfigElement(
                 "berberishelpercolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
+
 
     override fun initialize() {
         register<PacketEvent.Received> { event ->
@@ -58,7 +60,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
             val targetPos = blockPos ?: return@register
             val consumers = event.consumers ?: return@register
             val blockState = world?.getBlockState(targetPos) ?: return@register
-            val camera = mc.gameRenderer.camera
+            val camera = client.gameRenderer.camera
             val blockShape = blockState.getOutlineShape(world, targetPos, ShapeContext.of(camera.focusedEntity))
             if (blockShape.isEmpty) return@register
 

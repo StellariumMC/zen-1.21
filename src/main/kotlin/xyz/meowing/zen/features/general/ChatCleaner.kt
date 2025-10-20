@@ -14,24 +14,28 @@ import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.mixins.AccessorChatHud
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.screen.ChatScreen
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.input.KnitKey
+import xyz.meowing.knit.api.input.KnitMouse
+import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.KeyEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -58,28 +62,26 @@ object ChatCleaner : Feature("chatcleaner") {
     val patterns get() = dataUtils.getData().patterns
     val dataUtils = DataUtils("chatcleaner", ChatPatterns())
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Chat Cleaner", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Chat Cleaner", "", "General", ConfigElement(
                 "chatcleaner",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Chat Cleaner", "Options", ConfigElement(
-                "chatcleanerkey",
-                "Keybind to add message to filter",
-                ElementType.Keybind(GLFW.GLFW_KEY_H)
             ))
-            .addElement("General", "Chat Cleaner", "GUI", ConfigElement(
+            .addFeatureOption("Keybind to add message to filter", "Keybind to add message to filter", "Options", ConfigElement(
+                    "chatcleanerkey",
+                    ElementType.Keybind(GLFW.GLFW_KEY_H)
+            ))
+            .addFeatureOption("Chat Cleaner Filter GUI", "Chat Cleaner Filter GUI", "GUI", ConfigElement(
                 "chatcleanergui",
-                "Chat Cleaner Filter GUI",
                 ElementType.Button("Open Filter GUI") {
                     TickUtils.schedule(2) {
-                        mc.setScreen(ChatCleanerGui())
+                        client.setScreen(ChatCleanerGui())
                     }
                 }
             ))
     }
+
 
     init {
         loadDefault()
@@ -91,18 +93,18 @@ object ChatCleaner : Feature("chatcleaner") {
             if (patterns.any { it.matches(message) }) event.cancel()
         }
 
-        register<GuiEvent.Key> { event ->
-            if (event.screen !is ChatScreen || GLFW.glfwGetKey(mc.window.handle, chatcleanerkey) != GLFW.GLFW_PRESS) return@register
+        register<KeyEvent.Press> { _ ->
+            if (client.currentScreen !is ChatScreen || !KnitKey(chatcleanerkey).isPressed) return@register
 
-            val chat = mc.inGameHud.chatHud as AccessorChatHud
-            val line = chat.getMessageLineIdx(chat.toChatLineMX(mouseX), chat.toChatLineMY(mouseY))
+            val chat = client.inGameHud.chatHud as AccessorChatHud
+            val line = chat.getMessageLineIdx(chat.toChatLineMX(KnitMouse.Scaled.x), chat.toChatLineMY(KnitMouse.Scaled.y))
 
             if (line >= 0 && line < chat.visibleMessages.size && line < chat.messages.size) {
                 val text = chat.messages[line].content().string.removeFormatting()
 
                 if (text.isNotEmpty()) {
                     addPattern(text, ChatFilterType.EQUALS)
-                    ChatUtils.addMessage("$prefix §fAdded §7\"§c$text§7\" §fto filter.")
+                    KnitChat.fakeMessage("$prefix §fAdded §7\"§c$text§7\" §fto filter.")
                 }
             }
         }
@@ -162,7 +164,7 @@ object ChatCleanerCommand : Commodore("chatcleaner", "zencc", "zenchatcleaner") 
     init {
         runs {
             TickUtils.schedule(2) {
-                mc.setScreen(ChatCleanerGui())
+                client.setScreen(ChatCleanerGui())
             }
         }
     }
@@ -550,7 +552,7 @@ class ChatCleanerGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private fun addPattern() {
         val pattern = inputField.text.trim()
         if (pattern.isEmpty()) {
-            ChatUtils.addMessage("§cEnter a pattern!")
+            KnitChat.fakeMessage("§cEnter a pattern!")
             return
         }
 

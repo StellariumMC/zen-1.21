@@ -7,10 +7,10 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.Zen.Companion.mc
-import xyz.meowing.zen.utils.Utils.MouseX
-import xyz.meowing.zen.utils.Utils.MouseY
 import xyz.meowing.zen.utils.Utils.createBlock
 import java.awt.Color
 
@@ -48,7 +48,7 @@ class MultiCheckboxElement(
         titleText = (UIWrappedText(getDisplayText(), centered = true).constrain {
             x = CenterConstraint()
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth(getDisplayText()).pixels()
+            width = client.textRenderer.getWidth(getDisplayText()).pixels()
         }.setColor(textColor) childOf container) as UIWrappedText
 
         container.onMouseClick { event ->
@@ -70,7 +70,7 @@ class MultiCheckboxElement(
     private fun updateDisplayText() {
         val newText = getDisplayText()
         titleText.setText(newText)
-        titleText.setWidth(mc.textRenderer.getWidth(newText).pixels)
+        titleText.setWidth(client.textRenderer.getWidth(newText).pixels)
     }
 
     private fun createClickInterceptor() {
@@ -112,7 +112,7 @@ class MultiCheckboxElement(
         x >= component.getLeft() && x <= component.getRight() && y >= component.getTop() && y <= component.getBottom()
 
     private fun getScaledMousePos(): Pair<Float, Float> {
-        return MouseX.toFloat() to MouseY.toFloat()
+        return KnitMouse.Scaled.x.toFloat() to KnitMouse.Scaled.y.toFloat()
     }
 
     private fun findScrollComponentUnderMouse(): UIComponent? {

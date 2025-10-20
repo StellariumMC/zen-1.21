@@ -17,7 +17,6 @@ import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UMatrixStack
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.api.TradeAPI
 import xyz.meowing.zen.events.EventBus
@@ -32,7 +31,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.input.KnitKeyboard
 import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -43,7 +45,7 @@ object TradeHistoryCommand : Commodore("tradelogs", "zentl", "zentrades") {
     init {
         runs {
             TickUtils.schedule(2) {
-                mc.setScreen(TradeHistoryHUD())
+                client.setScreen(TradeHistoryHUD())
             }
         }
     }
@@ -81,7 +83,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         for (element in tooltipElements.keys) {
             if (element.isHovered()) {
                 val tooltip = tooltipElements[element]?.map { Text.literal(it) } ?: mutableListOf()
-                drawContext?.drawTooltip(mc.textRenderer, tooltip, mouseX, mouseY)
+                drawContext?.drawTooltip(KnitClient.client.textRenderer, tooltip, mouseX, mouseY)
             }
         }
     }
@@ -258,15 +260,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         } childOf tradesContainer
 
         horizontalScroll.onMouseScroll {
-            if (
-                !InputUtil.isKeyPressed(
-                    //#if MC >= 1.21.9
-                    //$$ mc.window,
-                    //#else
-                    mc.window.handle,
-                    //#endif
-                    GLFW.GLFW_KEY_LEFT_SHIFT)
-                ) {
+            if (KnitKeyboard.isShiftKeyPressed) {
                 it.stopImmediatePropagation()
                 scrollComponent.scrollTo(verticalOffset = (scrollComponent.verticalOffset + it.delta * 20).toFloat())
             }

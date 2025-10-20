@@ -4,10 +4,8 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
-import xyz.meowing.zen.Zen.Companion.mc
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.screen.GenericContainerScreenHandler
@@ -17,6 +15,7 @@ import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.SystemUtils
+import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -35,10 +34,8 @@ object Utils {
         1000000000000000000L to "e"
     )
 
-    inline val partialTicks get() = mc.renderTickCounter.getTickProgress(true)
-    inline val window get() = mc.window
-    inline val MouseX get() = mc.mouse.x * window.scaledWidth / window.width
-    inline val MouseY get() = mc.mouse.y * window.scaledWidth / window.width
+    inline val partialTicks get() = client.renderTickCounter.getTickProgress(true)
+    inline val window get() = client.window
 
     fun playSound(sound: SoundEvent, volume: Float, pitch: Float) {
         MinecraftClient.getInstance().player?.playSound(sound, volume, pitch)

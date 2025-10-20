@@ -1,6 +1,6 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.zen.Zen.Companion.mc
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.AreaEvent
 import xyz.meowing.zen.events.TablistEvent
@@ -44,7 +44,7 @@ object DungeonUtils {
 
                             players[playerName] = PlayerData(playerName, className, level)
 
-                            if (playerName == mc.player?.name?.string) {
+                            if (playerName == player?.name?.string) {
                                 currentClass = className
                                 currentLevel = level
                             }
