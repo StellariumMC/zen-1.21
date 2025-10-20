@@ -19,7 +19,6 @@ import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.mixins.AccessorChatHud
 import xyz.meowing.zen.utils.DataUtils

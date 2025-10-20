@@ -63,7 +63,7 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     override fun initialize() {
         register<KeyEvent.Press> { event ->
-            if (client.currentScreen is HandledScreen<*> || client.currentScreen is ChatScreen) return@register
+            if (client.currentScreen != null) return@register
 
             if (event.keyCode > 0) {
                 pressedKeys.add(event.keyCode)
