@@ -12,12 +12,6 @@ plugins {
     id("dev.deftu.gradle.tools.minecraft.releases")
 }
 
-repositories {
-    maven("https://maven.teamresourceful.com/repository/maven-public/")
-    maven("https://repo.hypixel.net/repository/Hypixel/")
-    maven("https://api.modrinth.com/maven")
-}
-
 toolkitMultiversion {
     moveBuildsToRootProject.set(true)
 }
@@ -35,12 +29,9 @@ dependencies {
     modImplementation(include("xyz.meowing:vexel-${mcData}:107")!!)
 
     when (mcData.version) {
-        MinecraftVersions.VERSION_1_21_7 -> {
-            modImplementation("com.terraformersmc:modmenu:15.0.0-beta.3")
-        }
-        MinecraftVersions.VERSION_1_21_5 -> {
-            modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-        }
+        MinecraftVersions.VERSION_1_21_9 -> modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
+        MinecraftVersions.VERSION_1_21_7 -> modImplementation("com.terraformersmc:modmenu:15.0.0")
+        MinecraftVersions.VERSION_1_21_5 -> modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
         else -> {}
     }
 }

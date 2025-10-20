@@ -1,6 +1,5 @@
 package xyz.meowing.zen.compat
 
-//#if MC < 1.21.9
 import com.terraformersmc.modmenu.api.ConfigScreenFactory
 import com.terraformersmc.modmenu.api.ModMenuApi
 import xyz.meowing.zen.config.ModMenuCompat
@@ -11,4 +10,3 @@ class ModMenu : ModMenuApi {
         return ConfigScreenFactory { parent: Screen? -> ModMenuCompat.createConfigScreen(parent) }
     }
 }
-//#endif
