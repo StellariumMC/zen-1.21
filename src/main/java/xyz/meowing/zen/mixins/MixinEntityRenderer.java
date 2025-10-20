@@ -88,12 +88,6 @@ public class MixinEntityRenderer {
     private TextRenderer textRenderer;
 
     //#if MC >= 1.21.9
-    //$$ @WrapOperation(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;submitLabel(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/util/math/Vec3d;ILnet/minecraft/text/Text;ZIDLnet/minecraft/client/render/state/CameraRenderState;)V"))
-    //$$ private void zen$shadowedNametags(OrderedRenderCommandQueue instance, MatrixStack matrixStack, Vec3d vec3d, int i, Text text, boolean b, int i2, double v, CameraRenderState cameraRenderState, Operation<Void> original) {
-    //$$      OrderedText replacedText = replaceText(text.asOrderedText());
-    //$$      vec3d = new Vec3d(-textRenderer.getWidth(replacedText) / 2f, vec3d.y, vec3d.z);
-    //$$      original.call(instance, matrixStack, vec3d, i, text, b, i2, v, cameraRenderState);
-    //$$ }
     //#elseif MC >= 1.21.7
     //$$ @WrapOperation(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/font/TextRenderer;draw(Lnet/minecraft/text/Text;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/render/VertexConsumerProvider;Lnet/minecraft/client/font/TextRenderer$TextLayerType;II)V"))
     //$$ private void zen$shadowedNametags(TextRenderer textRenderer, Text text, float x, float y, int colour, boolean shadow, Matrix4f matrix, VertexConsumerProvider vertexConsumers, TextRenderer.TextLayerType layerType, int backgroundColour, int light, Operation<Void> original) {

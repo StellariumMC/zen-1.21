@@ -17,9 +17,6 @@ import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 
-//#if MC < 1.21.9
-import xyz.meowing.zen.mixins.AccessorWorldRenderer
-//#endif
 import java.io.File
 
 @Zen.Module
@@ -67,13 +64,14 @@ object Rat : Feature(area = "Hub") {
         val camera = mc.gameRenderer.camera
         val cameraPos = camera.pos
 
-        //TODO: Add frustum impl for 1.21.9
-        //#if MC < 1.21.9
-        val frustum = (mc.worldRenderer as AccessorWorldRenderer).frustum
+        //#if MC >= 1.21.9
+        //$$ val frustum = (mc.worldRenderer as xyz.meowing.zen.FrustumStorage).`zen$getFrustum`()
+        //#else
+        val frustum = (mc.worldRenderer as xyz.meowing.zen.mixins.AccessorWorldRenderer).frustum
+        //#endif
 
         if (position.distanceTo(cameraPos) > 96.0) return
         if (!frustum.isVisible(culling)) return
-        //#endif
 
         val itemFrameState = BlockStateManagers.getStateForItemFrame(false, true)
         val blockModel = mc.blockRenderManager.getModel(itemFrameState)
