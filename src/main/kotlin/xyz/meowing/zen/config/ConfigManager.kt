@@ -95,7 +95,6 @@ class FeatureElement(
         val option = OptionElement(optionName, description, optionsSection, element)
         // Wire parent reference for the option's ConfigElement
         option.configElement.parent = option
-        option.configElement.value
         val optionsList = options.getOrPut(optionsSection) { mutableListOf() }
         if(!optionsList.any { it.optionName == optionName }) optionsList.add(option)
 

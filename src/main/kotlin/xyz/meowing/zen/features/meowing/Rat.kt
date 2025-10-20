@@ -16,6 +16,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitClient.client
 
 //#if MC < 1.21.9
 import xyz.meowing.zen.mixins.AccessorWorldRenderer
@@ -39,18 +40,18 @@ object Rat : Feature(area = "Hub") {
     }
 
     private fun loadTexture() {
-        val cacheFile = File(mc.runDirectory, "cache/zen_rat.png")
+        val cacheFile = File(client.runDirectory, "cache/zen_rat.png")
         cacheFile.parentFile.mkdirs()
 
         NetworkUtils.downloadFile(
             url = "https://github.com/meowing-xyz/zen-data/raw/main/assets/rat.png",
             outputFile = cacheFile,
             onComplete = { file ->
-                mc.execute {
+                client.execute {
                     try {
                         val image = NativeImage.read(file.inputStream())
                         val texture = NativeImageBackedTexture({ "zen_rat" }, image)
-                        mc.textureManager.registerTexture(textureId, texture)
+                        client.textureManager.registerTexture(textureId, texture)
                         textureLoaded = true
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -64,19 +65,19 @@ object Rat : Feature(area = "Hub") {
     }
 
     private fun render(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val camera = mc.gameRenderer.camera
+        val camera = client.gameRenderer.camera
         val cameraPos = camera.pos
 
         //TODO: Add frustum impl for 1.21.9
         //#if MC < 1.21.9
-        val frustum = (mc.worldRenderer as AccessorWorldRenderer).frustum
+        val frustum = (client.worldRenderer as AccessorWorldRenderer).frustum
 
         if (position.distanceTo(cameraPos) > 96.0) return
         if (!frustum.isVisible(culling)) return
         //#endif
 
         val itemFrameState = BlockStateManagers.getStateForItemFrame(false, true)
-        val blockModel = mc.blockRenderManager.getModel(itemFrameState)
+        val blockModel = client.blockRenderManager.getModel(itemFrameState)
         val consumers = consumers ?: return
         val matrices = matrixStack ?: return
 

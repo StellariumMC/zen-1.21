@@ -220,7 +220,6 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     }
 
     private fun performSearch() {
-        println("Performing search with query: '$searchQuery'")
         if (searchQuery.isEmpty()) {
             filteredCategories.clear()
             filteredCategories.addAll(categories)
@@ -253,7 +252,6 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     }
 
     private fun createCategory(text: String, isActive: Boolean, onClick: () -> Unit): UIComponent {
-        println("Creating category: $text, isActive: $isActive")
         val item = createBlock(3f).constrain {
             x = (-100).percent()
             y = CramSiblingConstraint(2f)
@@ -332,7 +330,6 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     }
 
     private fun updateCategories() {
-        println("Updating categories, activeCategory: $activeCategory")
         categoryScroll.clearChildren()
         UIContainer().constrain {
             width = 100.percent()
