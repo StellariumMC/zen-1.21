@@ -1,25 +1,24 @@
 package xyz.meowing.zen.features.general
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
 @Zen.Module
-object guildmessage : Feature("guildmessage") {
+object GuildMessage : Feature("guildmessage") {
     private val guildPattern = Pattern.compile("Guild > (\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?: (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Clean guild messages", "Clean guild messages", "Clean messages", ConfigElement(
                 "guildmessage",
-                "Clean guild messages",
                 ElementType.Switch(false)
             ))
     }
@@ -36,7 +35,7 @@ object guildmessage : Feature("guildmessage") {
                 val msg = m.group(4) ?: ""
                 val grankText = if (grank.isNotEmpty()) "§8$grank " else ""
                 val formatted = "§2G §8> $grankText§${getRankColor(hrank)}$user§f: $msg"
-                ChatUtils.addMessage(formatted)
+                KnitChat.fakeMessage(formatted)
             }
         }
     }
@@ -55,15 +54,14 @@ object guildmessage : Feature("guildmessage") {
 }
 
 @Zen.Module
-object partymessage : Feature("partymessage") {
+object PartyMessage : Feature("partymessage") {
     private val partyPattern = Pattern.compile("Party > (\\[.+?])? ?(.+?): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Clean party messages", "Clean party messages", "Clean messages", ConfigElement(
                 "partymessage",
-                "Clean party messages",
                 ElementType.Switch(false)
             ))
     }
@@ -78,7 +76,7 @@ object partymessage : Feature("partymessage") {
                 val user = m.group(2) ?: ""
                 val msg = m.group(3) ?: ""
                 val formatted = "§9P §8> §${getRankColor(hrank)}$user§f: $msg"
-                ChatUtils.addMessage(formatted)
+                KnitChat.fakeMessage(formatted)
             }
         }
     }

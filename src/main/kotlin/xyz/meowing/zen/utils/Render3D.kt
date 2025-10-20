@@ -1,6 +1,5 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.zen.Zen.Companion.mc
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
@@ -17,6 +16,8 @@ import net.minecraft.util.math.Vec3d
 import net.minecraft.world.RaycastContext
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitPlayer.player
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.max
@@ -59,7 +60,7 @@ object Render3D {
         ignoreY: Boolean = false,
         shadow: Boolean = true
     ) {
-        val camera = mc.gameRenderer.camera
+        val camera = client.gameRenderer.camera
         val cameraPos = camera.pos
         val allocator = BufferAllocator(256)
         val consumers = VertexConsumerProvider.immediate(allocator)
@@ -71,7 +72,7 @@ object Render3D {
         val finalScale: Float
 
         if (dynamic) {
-            val player = mc.player ?: return
+            val player = player ?: return
             val eyeHeight = player.standingEyeHeight
             val x = playerOffsetPos.x
             val y = playerOffsetPos.y
@@ -103,7 +104,7 @@ object Render3D {
         }
 
         val lines = text.split("\n")
-        val fontHeight = mc.textRenderer.fontHeight.toFloat()
+        val fontHeight = client.textRenderer.fontHeight.toFloat()
         val scaledFontHeight = fontHeight * finalScale * 0.025f
         val totalHeight = lines.size * scaledFontHeight
         val startY = -(totalHeight / 2f) + yOffset
@@ -119,8 +120,8 @@ object Render3D {
                 .rotate(camera.rotation)
                 .scale(finalScale * 0.025f, -(finalScale * 0.025f), finalScale * 0.025f)
 
-            val xOffset = -mc.textRenderer.getWidth(line) / 2f
-            mc.textRenderer.draw(
+            val xOffset = -client.textRenderer.getWidth(line) / 2f
+            client.textRenderer.draw(
                 line,
                 xOffset,
                 0f,
@@ -137,7 +138,7 @@ object Render3D {
     }
 
     fun drawLineToEntity(entity: Entity, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
-        val player = mc.player ?: return
+        val player = player ?: return
         if (!player.canSee(entity)) return
 
         //#if MC >= 1.21.9
@@ -149,7 +150,7 @@ object Render3D {
     }
 
     fun drawLineToPos(pos: Vec3d, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
-        val player = mc.player ?: return
+        val player = player ?: return
         val playerPos = player.getCameraPosVec(Utils.partialTicks)
         val toTarget = pos.subtract(playerPos).normalize()
         val lookVec = player.getRotationVec(Utils.partialTicks).normalize()
@@ -167,7 +168,7 @@ object Render3D {
     }
 
     fun drawLine(start: Vec3d, finish: Vec3d, thickness: Float, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val cameraPos = mc.gameRenderer.camera.pos
+        val cameraPos = client.gameRenderer.camera.pos
         val matrices = matrixStack ?: return
         matrices.push()
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
@@ -198,7 +199,7 @@ object Render3D {
     }
 
     fun drawLineFromCursor(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
-        val camera = mc.gameRenderer.camera
+        val camera = client.gameRenderer.camera
         val cameraPos = camera.pos
         matrixStack?.push()
         matrixStack?.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
@@ -223,7 +224,7 @@ object Render3D {
     }
 
     fun drawFilledCircle(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, center: Vec3d, radius: Float, segments: Int, borderColor: Int, fillColor: Int) {
-        val camera = mc.gameRenderer.camera.pos
+        val camera = client.gameRenderer.camera.pos
         matrixStack?.push()
         matrixStack?.translate(-camera.x, -camera.y, -camera.z)
         val entry = matrixStack?.peek()
@@ -298,7 +299,7 @@ object Render3D {
     }
 
     fun drawOutlinedBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val camera = mc.gameRenderer.camera.pos
+        val camera = client.gameRenderer.camera.pos
         val matrices = matrixStack ?: return
         matrices.push()
         matrices.translate(-camera.x, -camera.y, -camera.z)
@@ -335,7 +336,7 @@ object Render3D {
 
     fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
         val aabb = bb.expand(0.004, 0.005, 0.004)
-        val camera = mc.gameRenderer.camera.pos
+        val camera = client.gameRenderer.camera.pos
         val matrices = matrixStack ?: return
         matrices.push()
         matrices.translate(-camera.x, -camera.y, -camera.z)

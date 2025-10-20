@@ -3,8 +3,6 @@ package xyz.meowing.zen.features.slayers
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.EntityDetection
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.WorldEvent
@@ -13,6 +11,10 @@ import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.mob.EndermanEntity
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.util.concurrent.ConcurrentHashMap
 
 @Zen.Module
@@ -22,22 +24,21 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
     private val spawnerCache = ConcurrentHashMap<Int, String>()
     private var lastCacheUpdate = 0L
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Hide Enderman Laser", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Hide Enderman Laser", "", "Slayers", ConfigElement(
                 "hideendermanlaser",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Hide Enderman Laser", "Options", ConfigElement(
+            ))
+            .addFeatureOption("", "Hide For", "Options", ConfigElement(
                 "hideendermanlaserboss",
-                "Hide For",
                 ElementType.Dropdown(
                     listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),
                     0
                 )
             ))
     }
+
 
     override fun initialize() {
         register<RenderEvent.GuardianLaser> { event ->
@@ -78,16 +79,16 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
 
         return when (hideForOption) {
             1 -> CarryCounter.carryees.any {
-                val carryeeName = it.name?.removeFormatting() ?: ""
+                val carryeeName = it.name.removeFormatting()
                 cleanSpawnerName.endsWith("by: $carryeeName")
             }
             2 -> cleanSpawnerName.endsWith("by: $cleanPlayerName")
             3 -> cleanSpawnerName.endsWith("by: $cleanPlayerName") || CarryCounter.carryees.any {
-                val carryeeName = it.name?.removeFormatting() ?: ""
+                val carryeeName = it.name.removeFormatting()
                 cleanSpawnerName.endsWith("by: $carryeeName")
             }
             4 -> !cleanSpawnerName.endsWith("by: $cleanPlayerName") && !CarryCounter.carryees.any {
-                val carryeeName = it.name?.removeFormatting() ?: ""
+                val carryeeName = it.name.removeFormatting()
                 cleanSpawnerName.endsWith("by: $carryeeName")
             }
             else -> false

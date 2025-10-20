@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.slayers.slayerdisplay
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -21,6 +19,10 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
 
 @Zen.Module
 object SlayerDisplay : Feature("slayerdisplay", true) {
@@ -46,31 +48,26 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
         var bossType: BossTypes? = null
     )
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer Display", ConfigElement(
-                "slayerdisplay",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayusefullname",
-                "Use Full Mob Name",
-                ElementType.Switch(false)
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Slayer Display", "Shows slayer boss information", "Slayers", ConfigElement(
+                    "slayerdisplay",
+                    ElementType.Switch(false)
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayshowkilltimer",
-                "Show Kill Timer",
-                ElementType.Switch(true)
+            .addFeatureOption("Shown Bosses", "", "Options", ConfigElement(
+                "slayerdisplaybossshown",
+                ElementType.Dropdown(
+                    listOf(
+                        "Show All",
+                        "Show Carries Only",
+                        "Show Own Only",
+                        "Show Own and Carries"
+                    ),
+                    0
+                )
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplayhideoriginalnametags",
-                "Hide Original Nametags",
-                ElementType.Switch(false)
-            ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
+            .addFeatureOption("Display Options", "", "Options", ConfigElement(
                 "slayerdisplayoptions",
-                "Display Options",
                 ElementType.MultiCheckbox(
                     listOf(
                         "Show Mob Name",
@@ -83,18 +80,17 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
                     setOf(0, 1, 2, 3, 4)
                 )
             ))
-            .addElement("Slayers", "Slayer Display", "Options", ConfigElement(
-                "slayerdisplaybossshown",
-                "Show Slayers For",
-                ElementType.Dropdown(
-                    listOf(
-                        "Show for all bosses",
-                        "Only for carries",
-                        "Only for mine",
-                        "Mine and carries"
-                    ),
-                    0
-                )
+            .addFeatureOption("Use Full Mob Name", "", "Display", ConfigElement(
+                "slayerdisplayusefullname",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Show Kill Timer", "", "Display", ConfigElement(
+                "slayerdisplayshowkilltimer",
+                ElementType.Switch(true)
+            ))
+            .addFeatureOption("Hide Original Nametags", "", "Display", ConfigElement(
+                "slayerdisplayhideoriginalnametags",
+                ElementType.Switch(false)
             ))
     }
 

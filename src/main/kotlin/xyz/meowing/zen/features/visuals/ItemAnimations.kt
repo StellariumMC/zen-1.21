@@ -2,12 +2,12 @@ package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.RotationAxis
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ItemAnimations : Feature("itemanimations") {
@@ -21,57 +21,47 @@ object ItemAnimations : Feature("itemanimations") {
     val cancelReEquip by ConfigDelegate<Boolean>("itemcancelrequip")
     val swingSpeed by ConfigDelegate<Double>("itemswingspeed")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Item Animations", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Item Animations", "Enable item animations", "Visuals", ConfigElement(
                 "itemanimations",
-                "Enable item animations",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            ))
+            .addFeatureOption("Size", "Item size multiplier", "Size", ConfigElement(
                 "itemsize",
-                "Item size multiplier",
                 ElementType.Slider(-1.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("X Position", "Item X position", "Position", ConfigElement(
                 "itemx",
-                "Item X position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("Y Position", "Item Y position", "Position", ConfigElement(
                 "itemy",
-                "Item Y position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Size", ConfigElement(
+            .addFeatureOption("Z Position", "Item Z position", "Position", ConfigElement(
                 "itemz",
-                "Item Z position",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Pitch", "Item pitch rotation", "Rotation", ConfigElement(
                 "itempitch",
-                "Item pitch rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Yaw", "Item yaw rotation", "Rotation", ConfigElement(
                 "itemyaw",
-                "Item yaw rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Rotation", ConfigElement(
+            .addFeatureOption("Roll", "Item roll rotation", "Rotation", ConfigElement(
                 "itemroll",
-                "Item roll rotation",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addElement("Visuals", "Item Animations", "Swing", ConfigElement(
-                "itemswingspeed",
-                "Swing speed multiplier",
-                ElementType.Slider(-2.0, 1.0, 0.0, true)
+            .addFeatureOption("Cancel Re-Equip", "Cancel item re-equip animations", "Other", ConfigElement(
+                    "itemcancelrequip",
+                    ElementType.Switch(false)
             ))
-            .addElement("Visuals", "Item Animations", "Options", ConfigElement(
-                "itemcancelrequip",
-                "Cancel item re-equip animation",
-                ElementType.Switch(false)
+            .addFeatureOption("Swing Speed", "Item swing speed multiplier", "Other", ConfigElement(
+                    "itemswingspeed",
+                    ElementType.Slider(-2.0, 1.0, 0.0, true)
             ))
     }
 

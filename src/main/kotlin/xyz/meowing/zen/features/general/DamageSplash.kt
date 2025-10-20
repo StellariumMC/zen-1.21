@@ -2,15 +2,15 @@ package xyz.meowing.zen.features.general
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.elements.MCColorCode
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.format
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.text.Text
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.text.DecimalFormat
 
 @Zen.Module
@@ -35,54 +35,45 @@ object DamageSplash : Feature("damagesplash", true) {
     private val cancelTypes by ConfigDelegate<Set<Int>>("damagesplashcancel")
     private val cancelAll by ConfigDelegate<Boolean>("damagesplashcancelall")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Damage Splash", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Damage Splash", "", "General", ConfigElement(
                 "damagesplash",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Damage Splash", "Display", ConfigElement(
+            ))
+            .addFeatureOption("Show formatted numbers", "Show formatted numbers", "Display", ConfigElement(
                 "damagesplashformatted",
-                "Show formatted numbers",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Damage Splash", "Display", ConfigElement(
+            .addFeatureOption("Use comma separators", "Use comma separators", "Display", ConfigElement(
                 "damagesplashcommas",
-                "Use comma separators",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Damage Splash", "Cancellation", ConfigElement(
+            .addFeatureOption("Cancel all damage splash", "Cancel all damage splash", "Cancellation", ConfigElement(
                 "damagesplashcancelall",
-                "Cancel all damage splash",
                 ElementType.Switch(false)
             ))
-            .addElement("General", "Damage Splash", "Cancellation", ConfigElement(
+            .addFeatureOption("Cancel specific damage types", "Cancel specific damage types", "Cancellation", ConfigElement(
                 "damagesplashcancel",
-                "Cancel specific damage types",
                 ElementType.MultiCheckbox(
                     options = DamageType.entries.map { it.displayName },
                     default = setOf()
                 )
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Rainbow damage with symbols", "Rainbow damage with symbols", "Colors", ConfigElement(
                 "damagesplashrainbow",
-                "Rainbow damage with symbols",
                 ElementType.Switch(true)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Normal damage color", "Normal damage color", "Colors", ConfigElement(
                 "damagesplashnormalcolor",
-                "Normal damage color",
                 ElementType.MCColorPicker(MCColorCode.AQUA)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Symbol damage color", "Symbol damage color", "Colors", ConfigElement(
                 "damagesplashcriticalcolor",
-                "Symbol damage color",
                 ElementType.MCColorPicker(MCColorCode.WHITE)
             ))
-            .addElement("General", "Damage Splash", "Colors", ConfigElement(
+            .addFeatureOption("Rainbow colors to use", "Rainbow colors to use", "Colors", ConfigElement(
                 "damagesplashcolors",
-                "Rainbow colors to use",
                 ElementType.MultiCheckbox(
                     options = listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"),
                     default = setOf(0, 1, 2, 3)

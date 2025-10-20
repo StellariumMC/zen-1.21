@@ -1,15 +1,11 @@
 package xyz.meowing.zen.features.general
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.uuid
@@ -25,7 +21,12 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.item.ItemStack
 import net.minecraft.text.Text
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 //#if MC >= 1.21.9
@@ -43,23 +44,20 @@ object ProtectItem : Feature("protectitem", true) {
     val protectedItems = DataUtils("protected_items", mutableSetOf<String>())
     val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Item Protection", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Item Protection", "", "General", ConfigElement(
                 "protectitem",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Item Protection", "", ConfigElement(
+            ))
+            .addFeatureOption("Item Protection Info", "", "", ConfigElement(
                 "",
-                null,
                 ElementType.TextParagraph("Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi")
             ))
-            .addElement("General", "Item Protection", "GUI", ConfigElement(
+            .addFeatureOption("Protect Item GUI", "Protect Item GUI", "GUI", ConfigElement(
                 "protectItem.GuiButton",
-                "Protect Item GUI",
                 ElementType.Button("Open GUI") {
-                    mc.setScreen(ItemProtectGUI())
+                    client.setScreen(ItemProtectGUI())
                 }
             ))
     }
@@ -78,7 +76,7 @@ object ProtectItem : Feature("protectitem", true) {
             if (isProtected(item)) {
                 for (slot in event.handler.slots) {
                     if (slot.inventory !== player?.inventory || slot.hasStack() || !slot.canInsert(item)) continue
-                    mc.interactionManager?.clickSlot(event.handler.syncId, slot.id, 0, SlotActionType.PICKUP, player)
+                    client.interactionManager?.clickSlot(event.handler.syncId, slot.id, 0, SlotActionType.PICKUP, player)
                     sendProtectionMessage("dropping", item.name.string)
                     event.cancel()
                     return@register
@@ -114,7 +112,7 @@ object ProtectItem : Feature("protectitem", true) {
                 val sellItem = inv.getStack(49)
                 val isSellGui = sellItem?.item === Blocks.HOPPER.asItem() && (sellItem.name.string.contains("Sell Item") || sellItem.lore.any { it.contains("buyback") })
 
-                if (isSellGui && event.slotId != 49 && slot.inventory === mc.player?.inventory) {
+                if (isSellGui && event.slotId != 49 && slot.inventory === player?.inventory) {
                     sendProtectionMessage("selling", item.name.string)
                     event.cancel()
                 }
@@ -151,7 +149,7 @@ object ProtectItem : Feature("protectitem", true) {
     }
 
     private fun sendProtectionMessage(action: String, itemName: String) {
-        ChatUtils.addMessage("$prefix §fStopped you from $action $itemName§r!")
+        KnitChat.fakeMessage("$prefix §fStopped you from $action $itemName§r!")
     }
 }
 
@@ -161,15 +159,15 @@ object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zen
         literal("gui") {
             runs {
                 TickUtils.schedule(2) {
-                    mc.setScreen(ItemProtectGUI())
+                    client.setScreen(ItemProtectGUI())
                 }
             }
         }
 
         runs {
-            val heldItem = mc.player?.mainHandStack
+            val heldItem = player?.mainHandStack
             if (heldItem == null || heldItem.isEmpty) {
-                ChatUtils.addMessage("$prefix §cYou must be holding an item!")
+                KnitChat.fakeMessage("$prefix §cYou must be holding an item!")
                 return@runs
             }
             val itemUuid = heldItem.uuid
@@ -178,20 +176,20 @@ object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zen
                 ProtectItem.protectedTypes.update {
                     if (itemId in this) {
                         remove(itemId)
-                        ChatUtils.addMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
+                        KnitChat.fakeMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
                     } else {
                         add(itemId)
-                        ChatUtils.addMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
+                        KnitChat.fakeMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
                     }
                 }
             } else {
                 ProtectItem.protectedItems.update {
                     if (itemUuid in this) {
                         remove(itemUuid)
-                        ChatUtils.addMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
+                        KnitChat.fakeMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
                     } else {
                         add(itemUuid)
-                        ChatUtils.addMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
+                        KnitChat.fakeMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
                     }
                 }
             }
@@ -237,7 +235,7 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
 
     private fun loadInventory() {
         slots.clear()
-        val player = mc.player ?: return
+        val player = player ?: return
         val protectedSet = ProtectItem.protectedItems()
         val protectedTypeSet = ProtectItem.protectedTypes()
 

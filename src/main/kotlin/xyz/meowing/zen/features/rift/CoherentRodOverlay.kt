@@ -1,9 +1,10 @@
 package xyz.meowing.zen.features.rift
 
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
@@ -16,19 +17,18 @@ import java.awt.Color
 object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
     private val coherentrodoverlaycolor by ConfigDelegate<Color>("coherentrodoverlaycolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Rift", "Coherent rod", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Coherent rod", "Coherent rod radius display", "Rift", ConfigElement(
                 "coherentrodoverlay",
-                "Coherent rod radius display",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Rift", "Coherent rod", "Color", ConfigElement(
+            ))
+            .addFeatureOption("", "Color", "", ConfigElement(
                 "coherentrodoverlaycolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }
+
 
     override fun initialize() {
         register<RenderEvent.World> { event ->

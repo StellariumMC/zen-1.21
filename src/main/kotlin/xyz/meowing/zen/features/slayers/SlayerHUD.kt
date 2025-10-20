@@ -1,18 +1,19 @@
 package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.entity.Entity
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
 
 @Zen.Module
 object SlayerHUD : Feature("slayerhud", true) {
@@ -21,14 +22,14 @@ object SlayerHUD : Feature("slayerhud", true) {
     private var hpEntity: Entity? = null
     private var bossID: Int? = null
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Slayers", "Slayer HUD", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Slayer HUD", "Slayer HUD", "Slayers", ConfigElement(
                 "slayerhud",
-                "Slayer HUD",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
+
 
     override fun initialize() {
         HUDManager.register(name, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤")
@@ -79,8 +80,8 @@ object SlayerHUD : Feature("slayerhud", true) {
         val hpWidth = hpText.string.removeFormatting().width()
         val timeWidth = timeText.string.removeFormatting().width()
 
-        context.drawText(mc.textRenderer, timeText, (hpWidth - timeWidth) / 2, 0, -1, false)
-        context.drawText(mc.textRenderer, hpText, 0, 10, -1, false)
+        context.drawText(client.textRenderer, timeText, (hpWidth - timeWidth) / 2, 0, -1, false)
+        context.drawText(client.textRenderer, hpText, 0, 10, -1, false)
 
         //#if MC >= 1.21.7
         //$$ matrices.popMatrix()

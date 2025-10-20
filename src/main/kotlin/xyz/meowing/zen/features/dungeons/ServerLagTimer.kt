@@ -1,13 +1,13 @@
 package xyz.meowing.zen.features.dungeons
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.events.TickEvent
@@ -21,14 +21,14 @@ object ServerLagTimer : Feature("serverlagtimer", area = "catacombs") {
     private var clienttick: Long = 0
     private var servertick: Long = 0
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Server lag timer", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Server lag timer", "", "Dungeons", ConfigElement(
                 "serverlagtimer",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
+
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -44,7 +44,7 @@ object ServerLagTimer : Feature("serverlagtimer", area = "catacombs") {
                     ticking = false
                     sent = true
                     TickUtils.schedule(2, {
-                        ChatUtils.addMessage("$prefix §fServer lagged for §c${"%.1f".format(lagtime)}s §7| §c${lagtick} ticks§f.")
+                        KnitChat.fakeMessage("$prefix §fServer lagged for §c${"%.1f".format(lagtime)}s §7| §c${lagtick} ticks§f.")
                     })
                 }
                 else -> {}

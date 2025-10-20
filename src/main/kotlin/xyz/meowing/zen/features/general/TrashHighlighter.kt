@@ -16,18 +16,20 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
 import net.minecraft.item.ItemStack
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 enum class FilterType { REGEX, EQUALS, CONTAINS }
@@ -81,29 +83,25 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
         }
     }
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Trash Highlighter", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Trash Highlighter", "", "General", ConfigElement(
                 "trashhighlighter",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("General", "Trash Highlighter", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Highlight color", "Highlight color", "Color", ConfigElement(
                 "trashhighlightercolor",
-                "Highlight color",
                 ElementType.ColorPicker(Color(255, 0, 0, 127))
             ))
-            .addElement("General", "Trash Highlighter", "Type", ConfigElement(
+            .addFeatureOption("Highlight type", "Highlight type", "Type", ConfigElement(
                 "trashhighlighttype",
-                "Highlight type",
                 ElementType.Dropdown(listOf("Slot", "Border"), 0)
             ))
-            .addElement("General", "Trash Highlighter", "GUI", ConfigElement(
+            .addFeatureOption("Trash Highlighter Filter GUI", "Trash Highlighter Filter GUI", "GUI", ConfigElement(
                 "trashhighlightguibutton",
-                "Trash Highlighter Filter GUI",
                 ElementType.Button("Open Filter GUI") {
                     TickUtils.schedule(2) {
-                        mc.setScreen(TrashFilterGui())
+                        client.setScreen(TrashFilterGui())
                     }
                 }
             ))
@@ -294,7 +292,7 @@ class TrashFilterGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }.onMouseClick {
             TrashHighlighter.resetToDefault()
             renderFilters()
-            ChatUtils.addMessage("§aReset filters to default!")
+            KnitChat.fakeMessage("§aReset filters to default!")
         }
 
         UIText("⟲").constrain {
@@ -577,7 +575,7 @@ class TrashFilterGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private fun addFilter() {
         val pattern = inputField.text.trim()
         if (pattern.isEmpty()) {
-            ChatUtils.addMessage("§cEnter a pattern!")
+            KnitChat.fakeMessage("§cEnter a pattern!")
             return
         }
 

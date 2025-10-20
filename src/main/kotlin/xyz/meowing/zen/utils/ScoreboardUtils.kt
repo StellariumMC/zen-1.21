@@ -1,18 +1,20 @@
 package xyz.meowing.zen.utils
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
 
 object ScoreboardUtils {
     // Modified from Skyblocker https://github.com/SkyblockerMod/Skyblocker
     fun getSidebarLines(): List<String> {
         return try {
             //#if MC >= 1.21.9
-            //$$ val scoreboard = mc.world?.scoreboard ?: return emptyList()
+            //$$ val scoreboard = world?.scoreboard ?: return emptyList()
             //#else
-            val scoreboard = mc.player?.scoreboard ?: return emptyList()
+            val scoreboard = player?.scoreboard ?: return emptyList()
             //#endif
 
             val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
@@ -49,7 +51,7 @@ object ScoreboardUtils {
 
 
     fun getScoreboardTitle(cleanColor: Boolean = true): String? {
-        val scoreboard = mc.world?.scoreboard ?: return null
+        val scoreboard = world?.scoreboard ?: return null
         val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return null
 
         return objective.displayName?.string?.let {
@@ -64,12 +66,12 @@ object ScoreboardUtils {
      **/
     private fun stripAlienCharacters(text: String): String {
         return text.filter {
-            mc.textRenderer.getWidth(it.toString()) > 0 || it == '§'
+            client.textRenderer.getWidth(it.toString()) > 0 || it == '§'
         }
     }
 
     fun getTabListEntries(): List<String> {
-        val playerList = mc.networkHandler?.playerList ?: return emptyList()
+        val playerList = client.networkHandler?.playerList ?: return emptyList()
         return playerList.map { playerInfo ->
             playerInfo.displayName?.string ?: playerInfo.profile.name
         }

@@ -2,13 +2,12 @@ package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.SimpleTimeMark
@@ -18,6 +17,7 @@ import xyz.meowing.zen.utils.Utils.toFormattedDuration
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.zen.config.ConfigElement
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -68,24 +68,21 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
     private var spawnTime = SimpleTimeMark(0)
     private var displayText = "§dZealot Spawn: §510s"
 
-    private val drawzealotspawnbox by ConfigDelegate<Boolean>("drawzealotspawnbox")
-    private val drawzealotspawncolor by ConfigDelegate<Color>("drawzealotspawncolor")
+    private val drawZealotSpawnBox by ConfigDelegate<Boolean>("drawzealotspawnbox")
+    private val zealotSpawnColor by ConfigDelegate<Color>("drawzealotspawncolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Zealot Spawn Locations", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Zealot Spawn Locations", "", "Visuals", ConfigElement(
                 "zealotspawnvisual",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Zealot Spawn Locations", "Options", ConfigElement(
-                "drawzealotspawnbox",
-                "Zealot Spawn Location Boxes",
                 ElementType.Switch(false)
             ))
-            .addElement("Visuals", "Zealot Spawn Locations", "Options", ConfigElement(
+            .addFeatureOption("Zealot Spawn Location Boxes", "", "Options", ConfigElement(
+                "drawzealotspawnbox",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Box color", "", "Options", ConfigElement(
                 "drawzealotspawncolor",
-                "Box color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127)),
                 { config -> config["drawzealotspawnbox"] as? Boolean == true }
             ))
@@ -115,7 +112,7 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
             val positions = if (LocationUtils.checkSubarea("dragon's nest")) zealotSpawns else bruiserSpawns
             positions.forEach { pos ->
                 val aabb = Box(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
-                if (drawzealotspawnbox) Render3D.drawSpecialBB(aabb, drawzealotspawncolor, event.consumers, event.matrixStack)
+                if (drawZealotSpawnBox) Render3D.drawSpecialBB(aabb, zealotSpawnColor, event.consumers, event.matrixStack)
                 Render3D.drawString(
                     displayText,
                     Vec3d(pos).add(0.0, 1.5, 0.0),

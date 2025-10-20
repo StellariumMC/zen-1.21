@@ -1,5 +1,6 @@
 package xyz.meowing.zen.config.ui.types
 
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.ConfigData
 
 data class ConfigElement(

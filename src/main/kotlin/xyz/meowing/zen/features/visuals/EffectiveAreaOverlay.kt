@@ -2,11 +2,10 @@ package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
@@ -14,7 +13,8 @@ import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.Vec3d
-import xyz.meowing.zen.utils.ChatUtils
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
 import java.awt.Color
 
 @Zen.Module
@@ -29,16 +29,14 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
     )
     private val effectiveareaoverlaycolor by ConfigDelegate<Color>("effectiveareaoverlaycolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Visuals", "Effective Area Overlay", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Effective Area Overlay", "", "Visuals", ConfigElement(
                 "effectiveareaoverlay",
-                "Effective Area Overlay",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("Visuals", "Effective Area Overlay", "Color", ConfigElement(
+            ))
+            .addFeatureOption("Color", "", "Options", ConfigElement(
                 "effectiveareaoverlaycolor",
-                "Color",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
     }

@@ -1,8 +1,9 @@
 package xyz.meowing.zen.features.general
 
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.TickEvent
@@ -18,13 +19,12 @@ object ReaperTimer : Feature("reapertimer", true) {
     private var reaped = false
     private var ticks = 120
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Reaper Timer", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Reaper Timer", "", "General", ConfigElement(
                 "reapertimer",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
 
     override fun initialize() {
@@ -39,7 +39,7 @@ object ReaperTimer : Feature("reapertimer", true) {
         }
 
         register<TickEvent.Server> {
-            if (player == null || reaped || !player!!.isSneaking) return@register
+            if (reaped || player?.isSneaking == false) return@register
 
             if (indices.all { player!!.inventory.getStack(it).skyblockID.contains("REAPER", true) }) {
                 reaped = true

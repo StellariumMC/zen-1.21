@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.ClientTick
@@ -13,11 +11,14 @@ import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
+import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ArmorHUD : Feature("armorhud") {
     private const val name = "Armor HUD"
-    private var armor = emptyList<ItemStack>()
+    private var armor = emptyList<ItemStack?>()
     private val armorhudvert by ConfigDelegate<Boolean>("armorhudvert")
     private val armorpieces by ConfigDelegate<Set<Int>>("armorpieces")
 
@@ -28,21 +29,18 @@ object ArmorHUD : Feature("armorhud") {
         ItemStack(Items.DIAMOND_BOOTS)
     )
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Armor HUD", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Armor HUD", "", "HUD", ConfigElement(
                 "armorhud",
-                null,
-                ElementType.Switch(false)
-            ), isSectionToggle = true)
-            .addElement("HUD", "Armor HUD", "Options", ConfigElement(
-                "armorhudvert",
-                "Vertical Armor HUD",
                 ElementType.Switch(false)
             ))
-            .addElement("HUD", "Armor HUD", "Options", ConfigElement(
+            .addFeatureOption("Vertical Armor HUD", "Vertical Armor HUD", "Options", ConfigElement(
+                "armorhudvert",
+                ElementType.Switch(false)
+            ))
+            .addFeatureOption("Armor pieces to render", "Armor pieces to render", "Options", ConfigElement(
                 "armorpieces",
-                "Armor pieces to render",
                 ElementType.MultiCheckbox(
                     listOf("Helmet", "Chestplate", "Leggings", "Boots"),
                     setOf(0, 1, 2, 3)
@@ -55,10 +53,7 @@ object ArmorHUD : Feature("armorhud") {
 
         setupLoops {
             loop<ClientTick>(20) {
-                val player = player ?: return@loop
-                armor = (0..3).map { slot ->
-                    player.inventory.getStack(36 + slot)
-                }.reversed()
+                armor = KnitPlayer.armor.toList()
             }
         }
 
@@ -90,7 +85,6 @@ object ArmorHUD : Feature("armorhud") {
 
         armorToRender.forEachIndexed { index, item ->
             if (selectedPieces.contains(index)) {
-                @Suppress("SENSELESS_COMPARISON")
                 if (item != null) Render2D.renderItem(context, item, currentX, currentY, scale)
                 if (armorhudvert) currentY += iconSize + spacing
                 else currentX += iconSize + spacing

@@ -1,13 +1,13 @@
 package xyz.meowing.zen.features.dungeons
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -21,13 +21,12 @@ object BloodTimer : Feature("bloodtimer", area = "catacombs") {
     private var bloodopen = false
     private var starttime = TimeUtils.zero
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("Dungeons", "Blood helper", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Blood helper", "Blood camp helper", "Dungeons", ConfigElement(
                 "bloodtimer",
-                "Blood camp helper",
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
 
     override fun initialize() {
@@ -41,11 +40,11 @@ object BloodTimer : Feature("bloodtimer", area = "catacombs") {
                 dialogue.matcher(text).matches() -> {
                     val diftime = starttime.since.inWholeSeconds.toDouble()
                     showTitle("§c§l!", "§cWatcher reached dialogue!", 3000)
-                    ChatUtils.addMessage("$prefix §fWatcher took §c${"%.2f".format(diftime)}s §fto reach dialogue!")
+                    KnitChat.fakeMessage("$prefix §fWatcher took §c${"%.2f".format(diftime)}s §fto reach dialogue!")
                 }
                 bloodcamp.matcher(text).matches() -> {
                     val camptime = starttime.since.inWholeSeconds.toDouble()
-                    ChatUtils.addMessage("$prefix §fBlood camp took §c${"%.2f".format(camptime)}s")
+                    KnitChat.fakeMessage("$prefix §fBlood camp took §c${"%.2f".format(camptime)}s")
                     bloodopen = false
                 }
             }

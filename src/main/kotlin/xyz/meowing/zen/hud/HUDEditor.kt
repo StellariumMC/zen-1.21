@@ -108,7 +108,7 @@ class HUDEditor : Screen(Text.literal("HUD Editor")) {
                 hoveredToolbarIndex = -1
             }
 
-            iconContainer.onMouseClick { event ->
+            iconContainer.onMouseClick { _ ->
                 when (index) {
                     0 -> showGrid = !showGrid
                     1 -> snapToGrid = !snapToGrid

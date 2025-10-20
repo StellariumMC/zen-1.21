@@ -1,6 +1,5 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.AreaEvent
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.GameEvent
@@ -10,6 +9,7 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket
 import net.minecraft.network.packet.s2c.play.TeamS2CPacket
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
+import xyz.meowing.knit.api.KnitClient.world
 
 /*
  * Modified from Devonian code
@@ -99,9 +99,9 @@ object LocationUtils {
         }
 
         TickUtils.loop(20) {
-            if (mc.world != null) {
+            if (world != null) {
                 val old = inSkyblock
-                inSkyblock = mc.world?.scoreboard?.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR)?.name == "SBScoreboard"
+                inSkyblock = world?.scoreboard?.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR)?.name == "SBScoreboard"
                 if (old != inSkyblock) EventBus.post(AreaEvent.Skyblock(inSkyblock))
             }
         }

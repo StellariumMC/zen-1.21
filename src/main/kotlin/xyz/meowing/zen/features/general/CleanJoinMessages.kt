@@ -1,23 +1,22 @@
 package xyz.meowing.zen.features.general
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import java.util.regex.Pattern
 
 @Zen.Module
-object guildjoinleave : Feature("guildjoinleave") {
+object GuildJoinLeave : Feature("guildjoinleave") {
     private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Clean guild join/leave", "Clean guild join/leave", "Clean messages", ConfigElement(
                 "guildjoinleave",
-                "Clean guild join/leave",
                 ElementType.Switch(false)
             ))
     }
@@ -35,7 +34,7 @@ object guildjoinleave : Feature("guildjoinleave") {
                     "left" -> "§8G §c<< $color$user"
                     else -> return@register
                 }
-                ChatUtils.addMessage(message)
+                KnitChat.fakeMessage(message)
             }
         }
     }
@@ -45,14 +44,14 @@ object guildjoinleave : Feature("guildjoinleave") {
 object friendjoinleave : Feature("friendjoinleave") {
     private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("General", "Clean Chat", "Clean messages", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Clean friend join/leave", "Clean friend join/leave", "Clean messages", ConfigElement(
                 "friendjoinleave",
-                "Clean friend join/leave",
                 ElementType.Switch(false)
             ))
     }
+
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -67,7 +66,7 @@ object friendjoinleave : Feature("friendjoinleave") {
                     "left" -> "§8F §c<< $color$user"
                     else -> return@register
                 }
-                ChatUtils.addMessage(message)
+                KnitChat.fakeMessage(message)
             }
         }
     }

@@ -1,7 +1,6 @@
 package xyz.meowing.zen.utils
 
 import com.mojang.authlib.GameProfile
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.Utils.getPlayerTexture
 import xyz.meowing.zen.utils.Utils.getPlayerUuid
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -13,6 +12,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.text.Text
+import xyz.meowing.knit.api.KnitPlayer.player
 import java.util.UUID
 import kotlin.random.Random
 
@@ -41,7 +41,7 @@ object ItemUtils {
 
     inline val ItemStack?.isShortbow: Boolean get() = this?.lore?.any { "Shortbow: Instantly shoots!" in it } == true
 
-    fun isHolding(vararg id: String): Boolean = mc.player?.mainHandStack?.skyblockID in id
+    fun isHolding(vararg id: String): Boolean = player?.mainHandStack?.skyblockID in id
 
     fun ItemStack.displayName(): String = this.get(DataComponentTypes.CUSTOM_NAME)?.string ?: this.name.string
 

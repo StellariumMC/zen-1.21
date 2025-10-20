@@ -2,7 +2,6 @@ package xyz.meowing.zen.mixins;
 
 import xyz.meowing.zen.events.EntityEvent;
 import xyz.meowing.zen.events.EventBus;
-import xyz.meowing.zen.utils.ChatUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.util.hit.EntityHitResult;

@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.PacketEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -16,6 +14,10 @@ import net.minecraft.item.Items
 import net.minecraft.network.packet.s2c.play.InventoryS2CPacket
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import net.minecraft.network.packet.s2c.play.SetPlayerInventoryS2CPacket
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ArrowPoison : Feature("arrowpoison", true) {
@@ -23,14 +25,14 @@ object ArrowPoison : Feature("arrowpoison", true) {
     private var twilight = 0
     private var toxic = 0
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        return configUI
-            .addElement("HUD", "Arrow poison tracker", ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Arrow poison tracker", "", "HUD", ConfigElement(
                 "arrowpoison",
-                null,
                 ElementType.Switch(false)
-            ), isSectionToggle = true)
+            ))
     }
+
 
     override fun initialize() {
         HUDManager.registerCustom(name, 85, 17, this::HUDEditorRender)
@@ -83,10 +85,10 @@ object ArrowPoison : Feature("arrowpoison", true) {
         currentX += iconSize + spacing
         Render2D.renderStringWithShadow(drawContext, twilightStr, currentX, textY, scale)
 
-        currentX += fontRenderer.getWidth(twilightStr) * scale + spacing * 2
+        currentX += client.textRenderer.getWidth(twilightStr) * scale + spacing * 2
         Render2D.renderStringWithShadow(drawContext, "§7|", currentX, textY, scale)
 
-        currentX += fontRenderer.getWidth("|") * scale + spacing
+        currentX += client.textRenderer.getWidth("|") * scale + spacing
         Render2D.renderItem(drawContext, toxicPotion, currentX, y, scale)
 
         currentX += iconSize + spacing
