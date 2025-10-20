@@ -1,13 +1,12 @@
 package xyz.meowing.zen.features
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.events.Event
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.ui.ConfigManager
-import xyz.meowing.zen.utils.ChatUtils
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.TickUtils
@@ -52,20 +51,10 @@ open class Feature(
             } ?: true
             configEnabled
         } catch (e: Exception) {
-            LOGGER.warn("Caught exception in checkConfig(): $e")
+            Zen.LOGGER.warn("Caught exception in checkConfig(): $e")
             false
         }
     }
-
-    protected val LOGGER = Zen.LOGGER
-    protected val mc = Zen.mc
-    protected val fontRenderer = mc.textRenderer
-    protected inline val scope get() = Zen.scope
-    protected inline val player get() = mc.player
-    protected inline val world get() = mc.world
-    protected inline val window get() = mc.window
-    protected inline val mouseX get() = mc.mouse.x * window.scaledWidth / window.width
-    protected inline val mouseY get() = mc.mouse.y * window.scaledWidth / window.width
 
     open fun initialize() {}
 
@@ -74,16 +63,16 @@ open class Feature(
     }
 
     open fun onRegister() {
-        if (Debug.debugmode) ChatUtils.addMessage("$prefix §fRegistering §b$configKey")
+        if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fRegistering §b$configKey")
         setupLoops?.invoke()
     }
 
     open fun onUnregister() {
-        if (Debug.debugmode) ChatUtils.addMessage("$prefix §fUnregistering §b$configKey")
+        if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fUnregistering §b$configKey")
         cancelLoops()
     }
 
-    open fun addConfig(configUI: ConfigUI): ConfigUI = configUI
+    open fun addConfig() {}
 
     fun isEnabled(): Boolean = checkConfig() && inSkyblock() && inArea() && inSubarea()
 

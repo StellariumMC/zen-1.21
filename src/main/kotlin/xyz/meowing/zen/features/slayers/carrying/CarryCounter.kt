@@ -3,15 +3,12 @@ package xyz.meowing.zen.features.slayers.carrying
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.NetworkUtils
@@ -22,8 +19,14 @@ import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.ClickEvent
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.knit.api.text.core.ClickEvent
+import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -55,50 +58,49 @@ object CarryCounter : Feature("carrycounter") {
     private val carryclientcolor by ConfigDelegate<Color>("carryclientcolor")
     private val carrywebhook by ConfigDelegate<String>("carrywebhookurl")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Carrying", "Carry counter", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Carrying", "Carry counter", "Slayers", ConfigElement(
                 "carrycounter",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help", "", "", xyz.meowing.zen.ui.ConfigElement(
-                "",
-                ElementType.TextParagraph("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help")
+            .addFeatureOption("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help", "", "", ConfigElement(
+                    "",
+                    ElementType.TextParagraph("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help")
             ))
-            .addFeatureOption("Send count", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Send count", "", "QOL", ConfigElement(
                 "carrycountsend",
                 ElementType.Switch(true)
-            ))
-            .addFeatureOption("Send boss spawn message", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
+            )
+            )
+            .addFeatureOption("Send boss spawn message", "", "QOL", ConfigElement(
                 "carrysendmsg",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Carry value", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Carry value", "", "QOL", ConfigElement(
                 "carryvalue",
                 ElementType.TextInput("1.3", "1.3")
             ))
-            .addFeatureOption("Carry webhook URL", "", "QOL", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Carry webhook URL", "", "QOL", ConfigElement(
                 "carrywebhookurl",
                 ElementType.TextInput("", "None")
             ))
-            .addFeatureOption("Boss highlight", "", "Boss", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Boss highlight", "", "Boss", ConfigElement(
                 "carrybosshighlight",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Boss color", "", "Boss", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Boss color", "", "Boss", ConfigElement(
                 "carrybosscolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-            .addFeatureOption("Client highlight", "", "Client", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Client highlight", "", "Client", ConfigElement(
                 "carryclienthighlight",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Client color", "", "Client", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Client color", "", "Client", ConfigElement(
                 "carryclientcolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-
-        return configUI
     }
 
     override fun initialize() {
@@ -134,12 +136,12 @@ object CarryCounter : Feature("carrycounter") {
                         .find { abs(coins / it - round(coins / it)) < 1e-6 } ?: return@let
                     val count = round(coins / carry).toInt()
                     lasttradeuser?.let { user ->
-                        ChatUtils.addMessage(
-                            "$prefix §fAdd §b$user §ffor §b$count §fcarries? ",
-                            "§aAdd",
-                            ClickEvent.Action.RUN_COMMAND,
-                            "/zencarry add $user $count"
-                        )
+                        val message = KnitText
+                            .literal("$prefix §fClick here to add §b$user §ffor §b$count §fcarries")
+                            .onClick(ClickEvent.RunCommand("/zencarry add $user $count"))
+                            .toVanilla()
+
+                        KnitChat.fakeMessage(message)
                     }
                 }
             }
@@ -169,7 +171,7 @@ object CarryCounter : Feature("carrycounter") {
         createCustomEvent<EntityEvent.Death>("entityDeath") { event ->
             carryeesByBossId[event.entity.id]?.let {
                 val seconds = (it.startTime.since.millis / 1000.0)
-                ChatUtils.addMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(seconds)}s")
+                KnitChat.fakeMessage("$prefix §fYou killed §b${it.name}§f's boss in §b${"%.1f".format(seconds)}s")
                 it.onDeath()
             }
         }
@@ -290,7 +292,7 @@ object CarryCounter : Feature("carrycounter") {
                 carryeesByBossId[id] = this
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
                 showTitle("§bBoss spawned", "§bby §c$name", 1000)
-                if (carrysendmsg) ChatUtils.addMessage("$prefix §fBoss spawned by §c$name")
+                if (carrysendmsg) KnitChat.fakeMessage("$prefix §fBoss spawned by §c$name")
             }
         }
 
@@ -341,7 +343,7 @@ object CarryCounter : Feature("carrycounter") {
                 )
             }
 
-            if (carrycountsend) ChatUtils.command("/pc $name: $count/$total")
+            if (carrycountsend) KnitChat.sendCommand("/pc $name: $count/$total")
         }
 
         fun reset() {
@@ -399,7 +401,7 @@ object CarryCounter : Feature("carrycounter") {
             else carriesList.add(updatedCarry)
 
             dataUtils.save()
-            ChatUtils.addMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime}s")
+            KnitChat.fakeMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime}s")
             Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
             showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000)
 

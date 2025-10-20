@@ -1,4 +1,4 @@
-package xyz.meowing.zen.ui
+package xyz.meowing.zen.config
 
 import xyz.meowing.zen.config.ui.ConfigData
 import xyz.meowing.zen.config.ui.types.ElementType

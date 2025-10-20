@@ -1,10 +1,11 @@
 package xyz.meowing.zen.features.slayers
 
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.EntityDetection.getSlayerEntity
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
@@ -15,17 +16,16 @@ import java.awt.Color
 object SlayerHighlight : Feature("slayerhighlight", true) {
     private val slayerhighlightcolor by ConfigDelegate<Color>("slayerhighlightcolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Slayer highlight", "Slayer highlight", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Slayer highlight", "Slayer highlight", "Slayers", ConfigElement(
                 "slayerhighlight",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("", "Color", "", ConfigElement(
                 "slayerhighlightcolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-        return configUI
     }
 
 

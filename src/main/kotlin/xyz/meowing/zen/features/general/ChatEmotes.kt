@@ -1,12 +1,13 @@
 package xyz.meowing.zen.features.general
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 
 @Zen.Module
 object ChatEmotes : Feature("chatemotes") {
@@ -39,17 +40,16 @@ object ChatEmotes : Feature("chatemotes") {
         ":cat:" to "ᓚᘏᗢ",
     )
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Chat Emotes", "Automatically replace emote codes with Unicode symbols in chat messages", "General", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Chat Emotes", "Automatically replace emote codes with Unicode symbols in chat messages", "General", ConfigElement(
                 "chatemotes",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Chat Emotes Info", "", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Chat Emotes Info", "", "", ConfigElement(
                 "",
                 ElementType.TextParagraph("Automatically replace emote codes with Unicode symbols in chat messages, example: <3 becomes ❤, use /emotes to see all supported emotes.")
             ))
-        return configUI
     }
 
 
@@ -67,7 +67,8 @@ object ChatEmotes : Feature("chatemotes") {
 
             if (newMessage != event.message) {
                 event.cancel()
-                ChatUtils.chat(newMessage)
+                KnitChat.fakeMessage(newMessage)
+                EventBus.messages.add(newMessage)
             }
         }
     }

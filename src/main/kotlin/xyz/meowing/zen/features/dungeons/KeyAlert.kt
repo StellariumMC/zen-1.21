@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
@@ -11,20 +9,20 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.entity.decoration.ArmorStandEntity
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.WorldEvent
 
 @Zen.Module
 object KeyAlert : Feature("keyalert", area = "catacombs") {
     private var bloodOpen = false
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Key Spawn Alert", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Key Spawn Alert", "", "Dungeons", ConfigElement(
                 "keyalert",
                 ElementType.Switch(false)
             ))
-
-        return configUI
     }
 
     override fun initialize() {
@@ -43,6 +41,8 @@ object KeyAlert : Feature("keyalert", area = "catacombs") {
                 }
             }
         }
+
+        register<WorldEvent.Change> { bloodOpen = false }
     }
 
     override fun onRegister() {

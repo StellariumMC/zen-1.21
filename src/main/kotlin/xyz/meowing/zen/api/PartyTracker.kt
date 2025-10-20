@@ -1,9 +1,9 @@
 package xyz.meowing.zen.api
 
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.*
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.LoopUtils.setTimeout
 import xyz.meowing.zen.utils.Utils.chestName
@@ -69,7 +69,7 @@ object PartyTracker {
 
             setTimeout(1000) {
                 if (hadProblemJoiningParty) return@setTimeout
-                partyMembers.entries.removeIf { it.key != mc.player?.name?.string }
+                partyMembers.entries.removeIf { it.key != player?.name?.string }
                 addSelfToParty(false)
                 val stackLore = stack.lore
                 for (line in stackLore) {
@@ -96,7 +96,7 @@ object PartyTracker {
 
     private fun addSelfToParty(selfLeader: Boolean) {
         playerInParty = true
-        val playerName = mc.player?.name?.string ?: return
+        val playerName = player?.name?.string ?: return
         if (!partyMembers.containsKey(playerName)) partyMembers[playerName] = PartyMember(playerName, selfLeader)
     }
 
@@ -106,7 +106,7 @@ object PartyTracker {
                 val playerName = partyJoinRegex.find(clean)?.groupValues?.get(1) ?: return
                 partyMembers[playerName] = PartyMember(playerName)
                 addSelfToParty(true)
-                ChatUtils.command("/p list")
+                KnitChat.sendCommand("/p list")
                 hidePartyList = true
                 EventBus.post(PartyEvent.Changed(PartyChangeType.MEMBER_JOINED, playerName, partyMembers.toMap()))
             }
@@ -186,10 +186,10 @@ object PartyTracker {
                 }
 
                 addSelfToParty(false)
-                ChatUtils.command("/p list")
+                KnitChat.sendCommand("/p list")
                 hidePartyList = true
 
-                if (playerName == mc.player?.name?.string) partyMembers[playerName]?.leader = false
+                if (playerName == player?.name?.string) partyMembers[playerName]?.leader = false
                 EventBus.post(PartyEvent.Changed(PartyChangeType.PARTY_FINDER, playerName, partyMembers.toMap()))
             }
 

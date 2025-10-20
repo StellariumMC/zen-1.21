@@ -4,17 +4,17 @@ import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.SlayerTracker
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sound.SoundEvents
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object MinibossSpawn : Feature("minibossspawn", true) {
@@ -29,13 +29,12 @@ object MinibossSpawn : Feature("minibossspawn", true) {
     )
     private val regex = "\\d[\\d.,]*[kKmMbBtT]?❤?$".toRegex()
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Miniboss spawn alert", "Miniboss spawn alert", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Miniboss spawn alert", "Miniboss spawn alert", "Slayers", ConfigElement(
                 "minibossspawn",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {
@@ -45,7 +44,7 @@ object MinibossSpawn : Feature("minibossspawn", true) {
             val name = event.name.removeFormatting().replace(regex, "")
             if (names.contains(name)) {
                 Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 1f, 1f)
-                ChatUtils.addMessage("$prefix §b$name§fspawned.")
+                KnitChat.fakeMessage("$prefix §b$name§fspawned.")
                 entities.add(event.packet.id)
             }
         }

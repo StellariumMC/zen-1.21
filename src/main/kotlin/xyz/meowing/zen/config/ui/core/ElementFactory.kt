@@ -3,30 +3,29 @@ package xyz.meowing.zen.config.ui.core
 import gg.essential.elementa.UIComponent
 import xyz.meowing.zen.config.ui.ConfigData
 import xyz.meowing.zen.config.ui.elements.*
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.utils.Utils.toColorFromList
 import xyz.meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
 
 class ElementFactory(private val theme: ConfigTheme) {
-    fun createButton(element: xyz.meowing.zen.ui.ConfigElement): UIComponent {
+    fun createButton(element: xyz.meowing.zen.config.ConfigElement): UIComponent {
         val type = element.type as ElementType.Button
         return ButtonElement(type.text) { type.onClick() }
     }
 
-    fun createSwitch(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, roundness: Float = 3f, handleWidth: Float = 25f, onUpdate: (Any) -> Unit): UIComponent {
+    fun createSwitch(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, roundness: Float = 3f, handleWidth: Float = 25f, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.Switch
         return SwitchElement(config[element.configKey] as? Boolean ?: type.default, roundness, handleWidth, onChange = onUpdate)
     }
 
-    fun createSlider(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createSlider(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.Slider
         val value = config[element.configKey] as? Double ?: type.default
         return SliderElement(type.min, type.max, value, type.showDouble, onUpdate)
     }
 
-    fun createDropdown(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createDropdown(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.Dropdown
         val index = when (val v = config[element.configKey]) {
             is Int -> v
@@ -36,17 +35,17 @@ class ElementFactory(private val theme: ConfigTheme) {
         return DropdownElement(type.options, index, onUpdate)
     }
 
-    fun createTextInput(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createTextInput(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.TextInput
         return TextInputElement(config[element.configKey] as? String ?: type.default, type.placeholder, onUpdate)
     }
 
-    fun createTextParagraph(element: xyz.meowing.zen.ui.ConfigElement): UIComponent {
+    fun createTextParagraph(element: xyz.meowing.zen.config.ConfigElement): UIComponent {
         val type = element.type as ElementType.TextParagraph
         return TextParagraphElement(type.text, true, theme.accent)
     }
 
-    fun createColorPicker(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createColorPicker(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.ColorPicker
         val value = config[element.configKey]?.let { configValue ->
             when (configValue) {
@@ -79,10 +78,9 @@ class ElementFactory(private val theme: ConfigTheme) {
         }
     }
 
-    fun createKeybind(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createKeybind(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.Keybind
-        val confKey = config[element.configKey]
-        val keyCode = when (confKey) {
+        val keyCode = when (val confKey = config[element.configKey]) {
             is Int -> confKey
             is Double -> confKey.toInt()
             else -> type.default
@@ -90,11 +88,9 @@ class ElementFactory(private val theme: ConfigTheme) {
         return KeybindElement(keyCode, onUpdate, theme)
     }
 
-    fun createMultiCheckbox(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createMultiCheckbox(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.MultiCheckbox
-        val configValue = config[element.configKey]
-
-        val selectedIndices = when (configValue) {
+        val selectedIndices = when (val configValue = config[element.configKey]) {
             is List<*> -> configValue.mapNotNull { (it as? Number)?.toInt() }.toSet()
             is Set<*> -> configValue.mapNotNull { (it as? Number)?.toInt() }.toSet()
             is Array<*> -> configValue.mapNotNull { (it as? Number)?.toInt() }.toSet()
@@ -105,7 +101,7 @@ class ElementFactory(private val theme: ConfigTheme) {
         return MultiCheckboxElement(type.options, selectedIndices, onUpdate)
     }
 
-    fun createMCColorPicker(element: xyz.meowing.zen.ui.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
+    fun createMCColorPicker(element: xyz.meowing.zen.config.ConfigElement, config: ConfigData, onUpdate: (Any) -> Unit): UIComponent {
         val type = element.type as ElementType.MCColorPicker
         val value = config[element.configKey]?.let { configValue ->
             when (configValue) {

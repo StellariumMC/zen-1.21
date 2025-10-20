@@ -1,14 +1,13 @@
 package xyz.meowing.zen.features.dungeons
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.ui.ConfigManager
-import xyz.meowing.zen.utils.ChatUtils
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.LoopUtils.setTimeout
@@ -19,18 +18,16 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 object CryptReminder : Feature("cryptreminder") {
     private val cryptreminderdelay by ConfigDelegate<Double>("cryptreminderdelay")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Crypt reminder", "Crypt reminder", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Crypt reminder", "Crypt reminder", "Dungeons", ConfigElement(
                 "cryptreminder",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Crypt reminder delay", "Crypt reminder delay", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Crypt reminder delay", "Crypt reminder delay", "Options", ConfigElement(
                 "cryptreminderdelay",
                 ElementType.Slider(1.0, 5.0, 2.0, false)
             ))
-
-        return configUI
     }
 
     override fun initialize() {
@@ -38,7 +35,7 @@ object CryptReminder : Feature("cryptreminder") {
             if (event.message.string.removeFormatting() == "[NPC] Mort: Good luck.") {
                 setTimeout(1000 * 60 * cryptreminderdelay.toLong()) {
                     if (DungeonUtils.getCryptCount() == 5 || !LocationUtils.checkArea("catacombs")) return@setTimeout
-                    ChatUtils.command("/pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")
+                    KnitChat.sendCommand("/pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")
                     showTitle("§c${DungeonUtils.getCryptCount()}§7/§c5 §fcrypts", null, 3000)
                 }
             }

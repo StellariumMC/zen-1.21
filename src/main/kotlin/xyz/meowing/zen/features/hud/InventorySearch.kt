@@ -2,22 +2,19 @@ package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.features.general.CalculatorCommand
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.item.AirBlockItem
-import xyz.meowing.vexel.animations.EasingType
-import xyz.meowing.vexel.animations.colorTo
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.elements.TextInput
 import xyz.meowing.vexel.utils.render.NVGRenderer
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -49,32 +46,31 @@ object InventorySearch : Feature("inventorysearch") {
             onExit = { mouseX, mouseY ->
                 searchIn.borderColor(Color(60, 60, 60).rgb)
             },
-            onEnter = {mouseX, mouseY ->
+            onEnter = { mouseX, mouseY ->
                 searchIn.borderColor(Color(70, 120, 140).rgb)
                 searchIn.backgroundColor(Color(20, 20, 20).rgb)
             }
         )
     }
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Inventory Search", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Inventory Search", "", "HUD", ConfigElement(
                 "inventorysearch",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Search lore", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Search lore", "", "Options", ConfigElement(
                 "inventorysearchlore",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Highlight color", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Highlight color", "", "Options", ConfigElement(
                 "inventorysearchcolor",
                 ElementType.ColorPicker(Color(0, 127, 127, 127))
             ))
-            .addFeatureOption("Highlight type", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Highlight type", "", "Options", ConfigElement(
                 "inventorysearchtype",
                 ElementType.Dropdown(listOf("Slot", "Border"), 0)
             ))
-        return configUI
     }
 
 

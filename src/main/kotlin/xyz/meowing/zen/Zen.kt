@@ -6,10 +6,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import xyz.meowing.zen.compat.OldConfig
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
-import net.minecraft.client.MinecraftClient
 import xyz.meowing.zen.config.ZenConfig
 import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.features.Feature
@@ -21,14 +19,15 @@ import xyz.meowing.zen.events.GameEvent
 import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Debug
 import xyz.meowing.zen.features.FeatureLoader
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.NetworkUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
-import net.minecraft.text.ClickEvent
 import org.apache.logging.log4j.LogManager
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.loader.KnitModInfo
+import xyz.meowing.knit.api.text.KnitText
 
 data class firstInstall(val isFirstInstall: Boolean = true)
 
@@ -47,21 +46,30 @@ class Zen : ClientModInitializer {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
 
-            ChatUtils.addMessage(
-                "$prefix §fMod loaded.",
-                "§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands"
-            )
+            val loadMessage = KnitText
+                .literal("$prefix §fMod loaded.")
+                .onHover("§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands")
+                .toVanilla()
+
+            KnitChat.fakeMessage(loadMessage)
 
             val data = dataUtils.getData()
 
             if (data.isFirstInstall) {
-                ChatUtils.addMessage("$prefix §fThanks for installing Zen!")
-                ChatUtils.addMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
-                ChatUtils.addMessage("§7> §cDiscord:§b [Discord]", "Discord server", ClickEvent.Action.OPEN_URL, "https://discord.gg/KPmHQUC97G")
+                KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
+                KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+
+                val discordMessage = KnitText
+                    .literal("§7> §cDiscord:§b [Discord]")
+                    .onHover("Discord server")
+                    .onClick("https://discord.gg/KPmHQUC97G")
+                    .toVanilla()
+
+                KnitChat.fakeMessage(discordMessage)
                 dataUtils.setData(data.copy(isFirstInstall = false))
                 dataUtils.save()
             }
-            if (Debug.debugmode) ChatUtils.addMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
+            if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
             LoopUtils.setTimeout(5000) {
                 UpdateChecker.checkForUpdates()
@@ -71,7 +79,6 @@ class Zen : ClientModInitializer {
         }
 
         EventBus.register<GameEvent.Load> ({
-            OldConfig.convertConfig(FabricLoader.getInstance().configDir.toFile())
             configUI = ZenConfig()
             FeatureLoader.init()
             initializeFeatures()
@@ -129,7 +136,6 @@ class Zen : ClientModInitializer {
         lateinit var configUI: ConfigUI
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
-        val mc = MinecraftClient.getInstance()
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
         var isInInventory = false
         var mayorData: ApiMayor? = null
@@ -160,7 +166,7 @@ class Zen : ClientModInitializer {
                 if (feature.hasAreas()) areaFeatures.add(feature)
                 if (feature.hasSubareas()) subareaFeatures.add(feature)
                 if (feature.skyblockOnly) skyblockFeatures.add(feature)
-                feature.addConfig(configUI)
+                feature.addConfig()
                 feature.initialize()
                 feature.configKey?.let { registerListener(it, feature) }
                 feature.update()
@@ -170,8 +176,8 @@ class Zen : ClientModInitializer {
 
         fun openConfig() {
             TickUtils.schedule(2) {
-                mc.execute {
-                    if (::configUI.isInitialized) mc.setScreen(configUI)
+                client.execute {
+                    if (::configUI.isInitialized) client.setScreen(configUI)
                 }
             }
         }

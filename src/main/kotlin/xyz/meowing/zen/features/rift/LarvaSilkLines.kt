@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.rift
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.EntityEvent
@@ -17,6 +15,9 @@ import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -24,17 +25,16 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
     private var startingSilkPos: BlockPos? = null
     private val larvasilklinescolor by ConfigDelegate<Color>("larvasilklinescolor")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Larva silk display", "Larva silk lines display", "Rift", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Larva silk display", "Larva silk lines display", "Rift", ConfigElement(
                 "larvasilklines",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("", "Color", "", ConfigElement(
                 "larvasilklinescolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
-        return configUI
     }
 
 
@@ -43,7 +43,7 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
             if (startingSilkPos == null) return@createCustomEvent
 
             if (isHolding("LARVA_SILK")) {
-                val lookingAt = mc.crosshairTarget
+                val lookingAt = client.crosshairTarget
                 Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, event.consumers, event.matrixStack)
 
                 if (lookingAt is BlockHitResult && lookingAt.type == HitResult.Type.BLOCK) {

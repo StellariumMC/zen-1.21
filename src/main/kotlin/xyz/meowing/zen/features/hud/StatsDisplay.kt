@@ -5,9 +5,7 @@ import gg.essential.universal.UMatrixStack
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PlayerStats
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.elements.MCColorCode
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.GameEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -18,6 +16,9 @@ import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 
 @Zen.Module
@@ -77,128 +78,127 @@ object StatsDisplay : Feature("statsdisplay", true) {
         DRILL_FUEL("Drill Fuel", """§2(?<currentFuel>[\d,]+)/(?<maxFuel>[\d,k]+) Drill Fuel""".toRegex()),
     }
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Stats Display", "", "HUD", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Stats Display", "", "HUD", ConfigElement(
                 "statsdisplay",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Clean Action Bar", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Clean Action Bar", "", "Options", ConfigElement(
                 "cleanactionbar",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Hide Vanilla HP and Saturation", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Hide Vanilla HP and Saturation", "", "Options", ConfigElement(
                 "hidevanillahp",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Hide Armor Icon", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Hide Armor Icon", "", "Options", ConfigElement(
                 "hidevanillaarmor",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Hide Experience Bar", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Hide Experience Bar", "", "Options", ConfigElement(
                 "hideexpbar",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Hide Stats", "", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Hide Stats", "", "Options", ConfigElement(
                 "hiddenstats",
                 ElementType.MultiCheckbox(
                     options = StatType.entries.map { it.displayName },
                     default = emptySet()
                 )
             ))
-            .addFeatureOption("Show Health Bar", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Health Bar", "", "Health Display", ConfigElement(
                 "showhealthbar",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Health Bar Fill Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Health Bar Fill Color", "", "Health Display", ConfigElement(
                 "healthbarmaincolor",
                 ElementType.ColorPicker(MCColorCode.RED.color)
             ))
-            .addFeatureOption("Health Bar Absorption Fill Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Health Bar Absorption Fill Color", "", "Health Display", ConfigElement(
                 "healthbarextracolor",
                 ElementType.ColorPicker(MCColorCode.YELLOW.color)
             ))
-            .addFeatureOption("Show Health Numbers", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Health Numbers", "", "Health Display", ConfigElement(
                 "showhealthtext",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Health Text Style", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Health Text Style", "", "Health Display", ConfigElement(
                 "healthtextstyle",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addFeatureOption("Show Max Health", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Max Health", "", "Health Display", ConfigElement(
                 "showmaxhealth",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Health Text Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Health Text Color", "", "Health Display", ConfigElement(
                 "healthtextcolor",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addFeatureOption("Max Health Text Color", "", "Health Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Max Health Text Color", "", "Health Display", ConfigElement(
                 "maxhealthtextcolor",
                 ElementType.MCColorPicker(MCColorCode.RED)
             ))
-            .addFeatureOption("Show Mana Bar", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Mana Bar", "", "Mana Display", ConfigElement(
                 "showmanabar",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Health Bar Fill Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Health Bar Fill Color", "", "Mana Display", ConfigElement(
                 "manabarmaincolor",
                 ElementType.ColorPicker(MCColorCode.BLUE.color)
             ))
-            .addFeatureOption("Show Mana Numbers", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Mana Numbers", "", "Mana Display", ConfigElement(
                 "showmanatext",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Mana Text Style", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Mana Text Style", "", "Mana Display", ConfigElement(
                 "manatextstyle",
                 ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
             ))
-            .addFeatureOption("Show Max Mana", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Max Mana", "", "Mana Display", ConfigElement(
                 "showmaxmana",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Mana Text Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Mana Text Color", "", "Mana Display", ConfigElement(
                 "manatextcolor",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addFeatureOption("Max Mana Text Color", "", "Mana Display", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Max Mana Text Color", "", "Mana Display", ConfigElement(
                 "maxmanatextcolor",
                 ElementType.MCColorPicker(MCColorCode.BLUE)
             ))
-            .addFeatureOption("Show Overflow Mana", "", "Overflow Mana", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Overflow Mana", "", "Overflow Mana", ConfigElement(
                 "showoverflowmanatext",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Overflow Mana Text Color", "", "Overflow Mana", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Overflow Mana Text Color", "", "Overflow Mana", ConfigElement(
                 "overflowmanatextcolor",
                 ElementType.MCColorPicker(MCColorCode.DARK_AQUA)
             ))
-            .addFeatureOption("Show Rift Time Text", "", "Rift Time Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Rift Time Text", "", "Rift Time Bar", ConfigElement(
                 "showrifttimetext",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Rift Time Text Color", "", "Rift Time Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Rift Time Text Color", "", "Rift Time Bar", ConfigElement(
                 "rifttimetextcolor",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
             ))
-            .addFeatureOption("Show Drill Fuel Numbers", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Drill Fuel Numbers", "", "Drill Fuel Bar", ConfigElement(
                 "showdrillfueltext",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Show Max Drill Fuel", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show Max Drill Fuel", "", "Drill Fuel Bar", ConfigElement(
                 "showmaxdrillfuel",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Drill Fuel Text Color", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Drill Fuel Text Color", "", "Drill Fuel Bar", ConfigElement(
                 "drillfueltextcolor",
                 ElementType.MCColorPicker(MCColorCode.DARK_GREEN)
             ))
-            .addFeatureOption("Max Drill Fuel Text Color", "", "Drill Fuel Bar", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Max Drill Fuel Text Color", "", "Drill Fuel Bar", ConfigElement(
                 "maxdrillfueltextcolor",
                 ElementType.MCColorPicker(MCColorCode.GREEN)
             ))
-        return configUI
     }
 
     override fun initialize() {
@@ -271,17 +271,17 @@ object StatsDisplay : Feature("statsdisplay", true) {
         //$$ }
         //#else
         val radius = 2f * scale
-        if (!initedShadersUI) UIRoundedRectangle.Companion.initShaders()
-        UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
-        UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
+        if (!initedShadersUI) UIRoundedRectangle.initShaders()
+        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
+        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
         val availableWidth = scaledWidth - 2 * borderWidth
         val primaryWidth = (availableWidth * primaryFill).toFloat()
         val secondaryWidth = (availableWidth * secondaryFill).toFloat()
         if (primaryWidth > 0) {
-            UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
+            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
         }
         if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
-            UIRoundedRectangle.Companion.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
+            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
         }
         //#endif
     }

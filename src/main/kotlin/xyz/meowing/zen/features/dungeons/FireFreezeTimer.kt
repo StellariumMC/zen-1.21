@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -13,20 +11,20 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.WorldEvent
 
 @Zen.Module
 object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
     var ticks = 0
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Fire Freeze Timer", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Fire Freeze Timer", "", "Dungeons", ConfigElement(
                 "firefreeze",
                 ElementType.Switch(false)
             ))
-
-        return configUI
     }
 
     override fun initialize() {
@@ -48,6 +46,8 @@ object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = lis
         }
 
         register<RenderEvent.HUD> { renderHUD(it.context) }
+
+        register<WorldEvent.Change> { ticks = 0 }
     }
 
     override fun onRegister() {

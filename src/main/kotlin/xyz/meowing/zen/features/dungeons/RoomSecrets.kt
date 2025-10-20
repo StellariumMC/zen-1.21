@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
@@ -11,6 +9,8 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 /**
@@ -19,13 +19,12 @@ import net.minecraft.client.gui.DrawContext
 object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
     private const val name = "Secrets Display"
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Room Secrets Hud", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Room Secrets Hud", "", "Dungeons", ConfigElement(
                 "roomsecrets",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
 

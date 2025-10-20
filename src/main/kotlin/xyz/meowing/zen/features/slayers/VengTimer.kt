@@ -1,13 +1,12 @@
 package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.*
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
@@ -16,6 +15,8 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.BlazeEntity
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
 import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
@@ -25,13 +26,12 @@ object VengTimer : Feature("vengtimer", true) {
     private var isFighting = false
     private var cachedNametag: Entity? = null
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Vengeance proc timer", "Vengeance proc timer", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Vengeance proc timer", "Vengeance proc timer", "Slayers", ConfigElement(
                 "vengtimer",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {

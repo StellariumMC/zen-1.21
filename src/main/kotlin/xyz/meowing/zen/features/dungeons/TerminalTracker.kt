@@ -1,14 +1,14 @@
 package xyz.meowing.zen.features.dungeons
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
@@ -17,13 +17,12 @@ object TerminalTracker : Feature("termtracker", area = "catacombs") {
     private var completed: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val pattern = Pattern.compile("^(\\w{1,16}) (?:activated|completed) a (\\w+)! \\(\\d/\\d\\)$")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Terminal Tracker", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Terminal Tracker", "", "Dungeons", ConfigElement(
                 "termtracker",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
 
@@ -35,7 +34,7 @@ object TerminalTracker : Feature("termtracker", area = "catacombs") {
             when {
                 msg == "The Core entrance is opening!" -> {
                     completed.forEach { (user, data) ->
-                        ChatUtils.addMessage("$prefix §b$user§7 - §b${data["lever"] ?: 0} §flevers §7| §b${data["terminal"] ?: 0} §fterminals §7| §b${data["device"] ?: 0} §fdevices")
+                        KnitChat.fakeMessage("$prefix §b$user§7 - §b${data["lever"] ?: 0} §flevers §7| §b${data["terminal"] ?: 0} §fterminals §7| §b${data["device"] ?: 0} §fdevices")
                     }
                 }
                 matcher.matches() -> {

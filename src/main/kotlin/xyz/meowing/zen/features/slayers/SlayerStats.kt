@@ -4,21 +4,22 @@ import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.SlayerTracker
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.toFormattedDuration
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -28,24 +29,30 @@ object SlayerStats : Feature("slayerstats", true) {
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerstatslines")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Slayer stats", "Slayer stats", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Slayer stats", "Slayer stats", "Slayers", ConfigElement(
                 "slayerstats",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("", "", "", ConfigElement(
                 "",
                 ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
             ))
-            .addFeatureOption("", "Options", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("", "Options", "", ConfigElement(
                 "slayerstatslines",
                 ElementType.MultiCheckbox(
-                    options = listOf("Show Bosses Killed", "Show Bosses/hr", "Show Average kill time", "Show Average spawn time", "Show Total Session time", "Show XP/hr"),
+                    options = listOf(
+                        "Show Bosses Killed",
+                        "Show Bosses/hr",
+                        "Show Average kill time",
+                        "Show Average spawn time",
+                        "Show Total Session time",
+                        "Show XP/hr"
+                    ),
                     default = setOf(0, 1, 4, 5)
                 )
             ))
-        return configUI
     }
 
 
@@ -58,7 +65,7 @@ object SlayerStats : Feature("slayerstats", true) {
 
         register<SkyblockEvent.Slayer.Death> {
             if (!slayertimer) {
-                ChatUtils.addMessage("$prefix §cYou must enable the §eSlayer Timer§c feature for Slayer Stats to work.")
+                KnitChat.fakeMessage("$prefix §cYou must enable the §eSlayer Timer§c feature for Slayer Stats to work.")
             }
         }
     }
@@ -73,7 +80,7 @@ object SlayerStats : Feature("slayerstats", true) {
 
     fun reset() {
         SlayerTracker.reset()
-        ChatUtils.addMessage("$prefix §fSlayer stats reset!")
+        KnitChat.fakeMessage("$prefix §fSlayer stats reset!")
     }
 
     private fun render(context: DrawContext) {
@@ -86,7 +93,7 @@ object SlayerStats : Feature("slayerstats", true) {
             var currentY = y
             for (line in lines) {
                 Render2D.renderString(context, line, x, currentY, scale)
-                currentY += fontRenderer.fontHeight + 2
+                currentY += client.textRenderer.fontHeight + 2
             }
         }
     }
@@ -143,13 +150,13 @@ object SlayerStatsCommand : Commodore("slayerstats", "zenslayerstats") {
                 if (action == "reset") {
                     SlayerStats.reset()
                 } else {
-                    ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
+                    KnitChat.fakeMessage("$prefix §fPlease use §c/slayerstats reset")
                 }
             }
         }
 
         runs {
-            ChatUtils.addMessage("$prefix §fPlease use §c/slayerstats reset")
+            KnitChat.fakeMessage("$prefix §fPlease use §c/slayerstats reset")
         }
     }
 }

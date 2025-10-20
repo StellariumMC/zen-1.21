@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -11,6 +9,8 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea = listOf("F2", "M2")) {
@@ -28,13 +28,12 @@ object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea
 
     private val boss = listOf(TimerData("§6Scarf", 0.4, Vec3d(-7.5, 72.0, -10.5)))
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Scarf Spawn Timers", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Scarf Spawn Timers", "", "Dungeons", ConfigElement(
                 "scarfspawntimers",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {

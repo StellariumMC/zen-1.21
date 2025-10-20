@@ -9,16 +9,15 @@ import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.NetworkUtils.createConnection
 import xyz.meowing.zen.utils.TickUtils
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.util.Util
-import org.lwjgl.system.Platform
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
 import java.awt.Desktop
 import java.io.File
@@ -60,7 +59,7 @@ object UpdateChecker {
                 githubDownloadUrl = github?.third
                 modrinthUrl = modrinth?.second
                 modrinthDownloadUrl = modrinth?.third
-                TickUtils.schedule(2) { mc.setScreen(UpdateGUI()) }
+                TickUtils.schedule(2) { client.setScreen(UpdateGUI()) }
             }
         }
     }
@@ -268,7 +267,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
 
         createButton("Don't Show Again", colors["element"]!!, colors["elementHover"]!!) {
             UpdateChecker.setDontShowForVersion(UpdateChecker.getLatestVersion() ?: "")
-            mc.setScreen(null)
+            client?.setScreen(null)
         }.apply {
             setX(0.percent())
             setY(0.percent())
@@ -277,7 +276,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         } childOf bottomButtonContainer
 
         createButton("Later", colors["element"]!!, colors["elementHover"]!!) {
-            mc.setScreen(null)
+            client?.setScreen(null)
         }.apply {
             setX(52.percent())
             setY(0.percent())
@@ -389,7 +388,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
             setColor(colors["element"]!!)
             onMouseEnter { setColor(colors["closeHover"]!!) }
             onMouseLeave { setColor(colors["element"]!!) }
-            onMouseClick { mc.setScreen(null) }
+            onMouseClick { client?.setScreen(null) }
 
             UIText("✕").apply {
                 setX(CenterConstraint())
@@ -569,8 +568,8 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
                     progressBar?.parent?.hide(true)
 
                     TickUtils.schedule(40) {
-                        ChatUtils.addMessage("$prefix §aUpdate downloaded! New version will be loaded when the game restarts.")
-                        mc.setScreen(null)
+                        KnitChat.fakeMessage("$prefix §aUpdate downloaded! New version will be loaded when the game restarts.")
+                        client?.setScreen(null)
                     }
                 }
                 downloadState = DownloadState.Complete
@@ -581,7 +580,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
                     if (downloadButtonIcon is UIText) (downloadButtonIcon as UIText).setText("✗")
                     downloadButton?.setColor(Color(220, 38, 38))
                     progressBar?.parent?.hide(true)
-                    ChatUtils.addMessage("$prefix §cDownload error: ${exception.message}")
+                    KnitChat.fakeMessage("$prefix §cDownload error: ${exception.message}")
 
                     TickUtils.schedule(60) {
                         resetDownloadButton()
@@ -610,9 +609,9 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
     private fun openUrl(url: String) {
         try {
             Desktop.getDesktop().browse(URI(url))
-            mc.setScreen(null)
+            client?.setScreen(null)
         } catch (_: Exception) {
-            mc.setScreen(null)
+            client?.setScreen(null)
         }
     }
 }

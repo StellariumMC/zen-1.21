@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.PacketEvent
 import xyz.meowing.zen.events.RenderEvent
@@ -13,7 +11,8 @@ import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
@@ -22,14 +21,12 @@ object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
     private var charges = 0
     private var max = 0
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Breaker Charge Display", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Breaker Charge Display", "", "Dungeons", ConfigElement(
                 "dungeonbreaker",
                 ElementType.Switch(false)
             ))
-
-        return configUI
     }
 
     override fun initialize() {

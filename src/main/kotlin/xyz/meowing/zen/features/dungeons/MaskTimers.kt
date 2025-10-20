@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PetTracker
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.EventBus
@@ -19,6 +17,9 @@ import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object MaskTimers : Feature("masktimers", area = "catacombs") {
@@ -38,19 +39,17 @@ object MaskTimers : Feature("masktimers", area = "catacombs") {
 
     data class MaskData(val mask: ItemStack, val timeStr: String, val color: String, val isWearing: Boolean)
 
-    // Active even when catacombs so the timers actually tick down - register/unregister properly
     private val tickCall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({
         updateTimers()
         updateHelmetStatus()
     })
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Mask cooldown display", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Mask cooldown display", "", "Dungeons", ConfigElement(
                 "masktimers",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {

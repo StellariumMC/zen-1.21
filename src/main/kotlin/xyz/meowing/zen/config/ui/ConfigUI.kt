@@ -14,7 +14,8 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import xyz.meowing.zen.Zen.Companion.mc
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.core.ConfigTheme
 import xyz.meowing.zen.config.ui.core.ConfigValidator
@@ -26,10 +27,8 @@ import xyz.meowing.zen.config.ui.elements.MultiCheckboxElement
 import xyz.meowing.zen.config.ui.elements.TextInputElement
 import xyz.meowing.zen.config.ui.types.*
 import xyz.meowing.zen.hud.HUDEditor
-import xyz.meowing.zen.ui.ConfigManager
-import xyz.meowing.zen.ui.FeatureElement
-import xyz.meowing.zen.ui.OptionElement
-import xyz.meowing.zen.utils.DataUtils
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.config.OptionElement
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.createBlock
 import xyz.meowing.zen.utils.Utils.toColorFromMap
@@ -50,7 +49,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     private val sections = mutableMapOf<String, MutableList<ConfigSection>>()
     private val subcategories = mutableMapOf<String, MutableList<ConfigSubcategory>>()
     private val elementContainers = mutableMapOf<String, UIComponent>()
-    private val elementRefs = mutableMapOf<String, xyz.meowing.zen.ui.ConfigElement>()
+    private val elementRefs = mutableMapOf<String, ConfigElement>()
     private val closeListeners = mutableListOf<() -> Unit>()
     private val configListeners = mutableMapOf<String, MutableList<(Any) -> Unit>>()
     private val sectionToggleElements = mutableMapOf<String, String>()
@@ -205,7 +204,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         UIWrappedText("HUD Editor").constrain {
             x = CenterConstraint() + 4.pixels
             y = CenterConstraint()
-            width = mc.textRenderer.getWidth("HUD Editor").pixels
+            width = KnitClient.client.textRenderer.getWidth("HUD Editor").pixels
             textScale = 0.8.pixels()
         }.setColor(theme.accent2) childOf editLocations
 
@@ -215,7 +214,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
             editLocationsBorder.animate { setColorAnimation(Animations.OUT_QUAD, 0.2f, theme.accent2.toConstraint()) }
         }.onMouseClick {
             TickUtils.schedule(1) {
-                mc.setScreen(HUDEditor())
+                client?.setScreen(HUDEditor())
             }
         }
     }
@@ -318,7 +317,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         toggleConfigKey?.let { key ->
             subcategories[sectionKey]?.flatMap { it.elements }?.find { it.configKey == key }?.takeIf { it.type is ElementType.Switch }?.let { toggleElement ->
                 val currentValue = ConfigManager.getConfigValue(key) as? Boolean ?: (toggleElement.type as ElementType.Switch).default
-                val switchElement = xyz.meowing.zen.ui.ConfigElement(key, ElementType.Switch(currentValue))
+                val switchElement = ConfigElement(key, ElementType.Switch(currentValue))
                 factory.createSwitch(switchElement, ConfigManager.configValueMap, 2f, 35f) { updateConfig(key, it) }.constrain {
                     x = RelativeConstraint(1f) - 30.pixels()
                     y = CenterConstraint()
@@ -462,7 +461,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         }.setColor(theme.accent2) childOf dividerContainer
     }
 
-    private fun createElementUI(parent: UIComponent, element: xyz.meowing.zen.ui.ConfigElement) {
+    private fun createElementUI(parent: UIComponent, element: ConfigElement) {
         val isFullWidth = element.type is ElementType.Slider ||
                 element.type is ElementType.TextInput ||
                 element.type is ElementType.TextParagraph ||
@@ -515,7 +514,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
             height = if (isFullWidth) 18.pixels() else 16.pixels()
         } childOf card
 
-        widget.onMouseClick { it ->
+        widget.onMouseClick {
             it.stopPropagation()
             DropdownElement.closeAllDropdowns()
             MultiCheckboxElement.closeAllMultiCheckboxes()
@@ -526,7 +525,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         updateElementVisibility(element.configKey)
     }
 
-    private fun createElementWidget(element: xyz.meowing.zen.ui.ConfigElement): UIComponent {
+    private fun createElementWidget(element: ConfigElement): UIComponent {
         return when (element.type) {
             is ElementType.Button -> factory.createButton(element)
             is ElementType.Switch -> factory.createSwitch(element, ConfigManager.configValueMap) { updateConfig(element.configKey, it) }
@@ -657,7 +656,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         }
     }
 
-    fun addElement(categoryName: String, sectionName: String, subcategoryName: String, element: xyz.meowing.zen.ui.ConfigElement, isSectionToggle: Boolean = false): ConfigUI {
+    fun addElement(categoryName: String, sectionName: String, subcategoryName: String, element: ConfigElement, isSectionToggle: Boolean = false): ConfigUI {
         val isFirstCategory = categories.isEmpty()
         val ignoreConfig = element.configKey.isEmpty()
 
@@ -712,7 +711,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         return this
     }
 
-    private fun registerValidator(element: xyz.meowing.zen.ui.ConfigElement) {
+    private fun registerValidator(element: ConfigElement) {
         val configValue = when (val type = element.type) {
             is ElementType.Switch -> ConfigValue.BooleanValue(type.default)
             is ElementType.Slider -> ConfigValue.DoubleValue(type.default, type.min, type.max)

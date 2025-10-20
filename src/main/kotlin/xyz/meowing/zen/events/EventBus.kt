@@ -1,9 +1,10 @@
 package xyz.meowing.zen.events
 
 import xyz.meowing.zen.Zen.Companion.configUI
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.ScoreboardUtils
+import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.knit.api.KnitClient.client
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -29,8 +30,6 @@ import java.util.concurrent.ConcurrentHashMap
 
 //#if MC < 1.21.9
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import xyz.meowing.zen.ui.ConfigManager
-
 //#endif
 
 object EventBus {
@@ -127,7 +126,7 @@ object EventBus {
             }
             //#endif
 
-            GLFW.glfwSetCharCallback(mc.window.handle) { window, codepoint ->
+            GLFW.glfwSetCharCallback(client.window.handle) { window, codepoint ->
                 val charTyped = codepoint.toChar()
 
                 !post(GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen))

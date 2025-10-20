@@ -1,31 +1,27 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.text.Text
-import net.minecraft.text.ClickEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.Style
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object PartyFinderMessage : Feature("partyfindermsgs") {
-    private val playerName get() = player?.name?.string ?: ""
     private val joinedPattern = Regex("^Party Finder > (.+?) joined the dungeon group! \\((\\w+) Level (\\d+)\\)$")
     private val classSetPattern = Regex("^Party Finder > (.+?) set their class to (\\w+) Level (\\d+)!$")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Custom PF Messages", "", "Dungeons", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Custom PF Messages", "", "Dungeons", ConfigElement(
                 "partyfindermsgs",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
 
@@ -36,51 +32,46 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
             when {
                 text == "Party Finder > Your party has been queued in the dungeon finder!" -> {
                     event.cancel()
-                    ChatUtils.addMessage("§c§lParty finder §7> §fParty queued.")
+                    KnitChat.fakeMessage("§c§lParty finder §7> §fParty queued.")
                 }
 
                 text == "Party Finder > Your group has been de-listed!" -> {
                     event.cancel()
-                    ChatUtils.addMessage("§c§lParty finder §7> §fParty delisted.")
+                    KnitChat.fakeMessage("§c§lParty finder §7> §fParty delisted.")
                 }
 
                 joinedPattern.matches(text) -> {
                     event.cancel()
                     val (user, cls, lvl) = joinedPattern.find(text)!!.destructured
 
-                    if (user == playerName) {
-                        ChatUtils.addMessage("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
+                    if (user == player?.name?.string) {
+                        KnitChat.fakeMessage("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
                     } else {
-                        val player = player ?: return@register
+                        val base = KnitText.literal("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
+                            .append(KnitText.literal(" §8| "))
+                            .append(
+                                KnitText.literal("[✖]")
+                                    .green()
+                                    .runCommand("/p kick $user")
+                                    .onHover(KnitText.fromFormatted("§cKick §b$user"))
+                            )
+                            .append(KnitText.literal(" §8| "))
+                            .append(
+                                KnitText.literal("[PV]")
+                                    .green()
+                                    .runCommand("/pv $user")
+                                    .onHover(KnitText.fromFormatted("§cPV §b$user"))
+                            )
+                            .toVanilla()
 
-                        val base = Text.literal("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
-
-                        base.append(Text.literal(" §8| "))
-
-                        val kickButton = Text.literal("§a[✖]").setStyle(
-                            Style.EMPTY
-                                .withClickEvent(ClickEvent.RunCommand("/p kick $user"))
-                                .withHoverEvent(HoverEvent.ShowText(Text.literal("§cKick §b$user")))
-                        )
-                        base.append(kickButton)
-
-                        base.append(Text.literal(" §8| "))
-
-                        val pvButton = Text.literal("§a[PV]").setStyle(
-                            Style.EMPTY
-                                .withClickEvent(ClickEvent.RunCommand("/pv $user"))
-                                .withHoverEvent(HoverEvent.ShowText(Text.literal("§cPV §b$user")))
-                        )
-                        base.append(pvButton)
-
-                        player.sendMessage(base, false)
+                        KnitChat.fakeMessage(base)
                     }
                 }
 
                 classSetPattern.matches(text) -> {
                     event.cancel()
                     val (user, cls, lvl) = classSetPattern.find(text)!!.destructured
-                    ChatUtils.addMessage("§c§lParty finder §7> §b$user §fchanged to §b$cls §7- §b$lvl")
+                    KnitChat.fakeMessage("§c§lParty finder §7> §b$user §fchanged to §b$cls §7- §b$lvl")
                 }
             }
         }

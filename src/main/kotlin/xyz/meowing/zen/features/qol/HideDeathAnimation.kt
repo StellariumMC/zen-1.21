@@ -1,29 +1,30 @@
 package xyz.meowing.zen.features.qol
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.entity.Entity
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object HideDeathAnimation : Feature("hidedeathanimation") {
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Hide death animation", "Hide death animation", "QoL", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Hide death animation", "Hide death animation", "QoL", ConfigElement(
                 "hidedeathanimation",
                 ElementType.Switch(false)
-            ))
-        return configUI
+            )
+            )
     }
 
 
     override fun initialize() {
         register<EntityEvent.Death> { event ->
-            if (world != null && !event.entity.name.string.contains(" Livid")) {
-                world!!.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
+            if (!event.entity.name.string.contains(" Livid")) {
+                world?.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
             }
         }
     }

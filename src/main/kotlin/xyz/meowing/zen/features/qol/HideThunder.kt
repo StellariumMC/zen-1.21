@@ -1,8 +1,8 @@
 package xyz.meowing.zen.features.qol
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 
@@ -12,13 +12,11 @@ import xyz.meowing.zen.features.Feature
  */
 @Zen.Module
 object HideThunder : Feature("hidethunder") {
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Hide thunder", "Hide thunder", "QoL", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Hide thunder", "Hide thunder", "QoL", ConfigElement(
                 "hidethunder",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
-
 }

@@ -4,20 +4,19 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.NEUApi
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.InternalEvent
 import xyz.meowing.zen.events.ItemTooltipEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.util.InputUtil.GLFW_KEY_LEFT_SHIFT
 import net.minecraft.nbt.NbtElement
 import net.minecraft.text.Text
 import org.apache.commons.lang3.StringUtils
-import org.lwjgl.glfw.GLFW.GLFW_PRESS
-import org.lwjgl.glfw.GLFW.glfwGetKey
+import xyz.meowing.knit.api.input.KnitKeys
+import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 /**
  * Module contains modified code from NEU
@@ -39,13 +38,12 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
         val enchantIds: Set<String>
     )
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Show Missing Enchants", "Show Missing Enchants", "General", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Show Missing Enchants", "Show Missing Enchants", "General", ConfigElement(
                 "showmissingenchants",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {
@@ -61,7 +59,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
         }
 
         register<ItemTooltipEvent> { event ->
-            if (glfwGetKey(window.handle, GLFW_KEY_LEFT_SHIFT) != GLFW_PRESS || enchantsData == null || enchantPools == null) return@register
+            if (!KnitKeys.KEY_LEFT_SHIFT.isPressed || enchantsData == null || enchantPools == null) return@register
             val extraAttributes = event.stack.extraAttributes ?: return@register
             if (!extraAttributes.contains("enchantments") || extraAttributes.get("enchantments")?.type != NbtElement.COMPOUND_TYPE) return@register
             val enchantments = extraAttributes.getCompound("enchantments").orElse(null) ?: return@register

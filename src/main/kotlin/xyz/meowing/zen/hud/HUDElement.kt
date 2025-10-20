@@ -1,10 +1,9 @@
 package xyz.meowing.zen.hud
 
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
-import xyz.meowing.zen.utils.Utils
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
 import kotlin.math.pow
 
@@ -116,8 +115,8 @@ class HUDElement(
         val textColor = Color(220, 240, 255, textAlpha).rgb
 
         lines.forEachIndexed { index, line ->
-            val textY = 5f + (index * mc.textRenderer.fontHeight)
-            context.drawTextWithShadow(mc.textRenderer, line, 5, textY.toInt(), textColor)
+            val textY = 5f + (index * client.textRenderer.fontHeight)
+            context.drawTextWithShadow(client.textRenderer, line, 5, textY.toInt(), textColor)
         }
     }
 

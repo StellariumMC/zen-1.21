@@ -2,13 +2,12 @@ package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.RotationAxis
-import xyz.meowing.zen.ui.ConfigManager
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object ItemAnimations : Feature("itemanimations") {
@@ -22,50 +21,48 @@ object ItemAnimations : Feature("itemanimations") {
     val cancelReEquip by ConfigDelegate<Boolean>("itemcancelrequip")
     val swingSpeed by ConfigDelegate<Double>("itemswingspeed")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
+    override fun addConfig() {
         ConfigManager
-            .addFeature("Item Animations", "Enable item animations", "Visuals", xyz.meowing.zen.ui.ConfigElement(
+            .addFeature("Item Animations", "Enable item animations", "Visuals", ConfigElement(
                 "itemanimations",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Size", "Item size multiplier", "Size", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Size", "Item size multiplier", "Size", ConfigElement(
                 "itemsize",
                 ElementType.Slider(-1.0, 2.0, 0.0, true)
             ))
-            .addFeatureOption("X Position", "Item X position", "Position", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("X Position", "Item X position", "Position", ConfigElement(
                 "itemx",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addFeatureOption("Y Position", "Item Y position", "Position", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Y Position", "Item Y position", "Position", ConfigElement(
                 "itemy",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addFeatureOption("Z Position", "Item Z position", "Position", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Z Position", "Item Z position", "Position", ConfigElement(
                 "itemz",
                 ElementType.Slider(-2.0, 2.0, 0.0, true)
             ))
-            .addFeatureOption("Pitch", "Item pitch rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Pitch", "Item pitch rotation", "Rotation", ConfigElement(
                 "itempitch",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addFeatureOption("Yaw", "Item yaw rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Yaw", "Item yaw rotation", "Rotation", ConfigElement(
                 "itemyaw",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addFeatureOption("Roll", "Item roll rotation", "Rotation", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Roll", "Item roll rotation", "Rotation", ConfigElement(
                 "itemroll",
                 ElementType.Slider(-180.0, 180.0, 0.0, true)
             ))
-            .addFeatureOption("Cancel Re-Equip", "Cancel item re-equip animations", "Other", xyz.meowing.zen.ui.ConfigElement(
-                "itemcancelrequip",
-                ElementType.Switch(false)
+            .addFeatureOption("Cancel Re-Equip", "Cancel item re-equip animations", "Other", ConfigElement(
+                    "itemcancelrequip",
+                    ElementType.Switch(false)
             ))
-            .addFeatureOption("Swing Speed", "Item swing speed multiplier", "Other", xyz.meowing.zen.ui.ConfigElement(
-                "itemswingspeed",
-                ElementType.Slider(-2.0, 1.0, 0.0, true)
+            .addFeatureOption("Swing Speed", "Item swing speed multiplier", "Other", ConfigElement(
+                    "itemswingspeed",
+                    ElementType.Slider(-2.0, 1.0, 0.0, true)
             ))
-
-        return configUI
     }
 
     fun getItemTransform(): ItemTransform {

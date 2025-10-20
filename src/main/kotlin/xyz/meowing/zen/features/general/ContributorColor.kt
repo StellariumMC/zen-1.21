@@ -2,7 +2,6 @@ package xyz.meowing.zen.features.general
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.utils.NetworkUtils
@@ -11,6 +10,7 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
+import xyz.meowing.knit.api.KnitPlayer.player
 import java.awt.Color
 
 @Zen.Module
@@ -58,7 +58,7 @@ object ContributorColor {
 
         EventBus.register<RenderEvent.EntityGlow> ({ event ->
             contributorData?.get(event.entity.name?.string?.removeFormatting())?.let { info ->
-                if (mc.player?.canSee(event.entity) == true) {
+                if (player?.canSee(event.entity) == true) {
                     event.shouldGlow = true
                     event.glowColor = info.glowColor
                 }

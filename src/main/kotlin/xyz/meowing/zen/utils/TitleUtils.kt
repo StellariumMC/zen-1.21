@@ -1,10 +1,10 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.utils.TimeUtils.millis
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.knit.api.KnitClient.client
 import java.util.*
 
 object TitleUtils {
@@ -57,36 +57,36 @@ object TitleUtils {
         }
 
         val scale = title.scale * (0.8f + 0.2f * alpha)
-        val centerX = mc.window.scaledWidth / 2f
-        val centerY = mc.window.scaledHeight / 2f
+        val centerX = client.window.scaledWidth / 2f
+        val centerY = client.window.scaledHeight / 2f
 
         val hasTitle = title.title != null
         val hasSubtitle = title.subtitle != null
 
         when {
             hasTitle && hasSubtitle -> {
-                val titleWidth = mc.textRenderer.getWidth(title.title) * scale
+                val titleWidth = client.textRenderer.getWidth(title.title) * scale
                 val titleX = centerX - titleWidth / 2
-                val titleY = centerY - (mc.textRenderer.fontHeight * scale) / 2 - 2 * scale
+                val titleY = centerY - (client.textRenderer.fontHeight * scale) / 2 - 2 * scale
                 Render2D.renderStringWithShadow(context, title.title, titleX, titleY, scale)
 
                 val subScale = scale * 0.7f
-                val subtitleWidth = mc.textRenderer.getWidth(title.subtitle) * subScale
+                val subtitleWidth = client.textRenderer.getWidth(title.subtitle) * subScale
                 val subtitleX = centerX - subtitleWidth / 2
-                val subtitleY = centerY + (mc.textRenderer.fontHeight * subScale) / 2 + 2 * scale
+                val subtitleY = centerY + (client.textRenderer.fontHeight * subScale) / 2 + 2 * scale
                 Render2D.renderStringWithShadow(context, title.subtitle, subtitleX, subtitleY, subScale)
             }
             hasTitle -> {
-                val titleWidth = mc.textRenderer.getWidth(title.title) * scale
+                val titleWidth = client.textRenderer.getWidth(title.title) * scale
                 val titleX = centerX - titleWidth / 2
-                val titleY = centerY - (mc.textRenderer.fontHeight * scale) / 2
+                val titleY = centerY - (client.textRenderer.fontHeight * scale) / 2
                 Render2D.renderStringWithShadow(context, title.title, titleX, titleY, scale)
             }
             hasSubtitle -> {
                 val subScale = scale * 0.7f
-                val subtitleWidth = mc.textRenderer.getWidth(title.subtitle) * subScale
+                val subtitleWidth = client.textRenderer.getWidth(title.subtitle) * subScale
                 val subtitleX = centerX - subtitleWidth / 2
-                val subtitleY = centerY - (mc.textRenderer.fontHeight * subScale) / 2
+                val subtitleY = centerY - (client.textRenderer.fontHeight * subScale) / 2
                 Render2D.renderStringWithShadow(context, title.subtitle, subtitleX, subtitleY, subScale)
             }
         }

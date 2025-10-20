@@ -1,25 +1,25 @@
 package xyz.meowing.zen.features.meowing
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import kotlin.random.Random
 
 @Zen.Module
 object MeowMessage : Feature("meowmessage") {
     private val variants = listOf("meow", "mew", "mrow", "nyaa", "purr", "mrrp", "meoww", "nya")
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Cat Speak", "Cat Speak", "Meowing", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Cat Speak", "Cat Speak", "Meowing", ConfigElement(
                 "meowmessage",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
 
@@ -30,10 +30,18 @@ object MeowMessage : Feature("meowmessage") {
 
             if (event.message.startsWith("/")) {
                 val parts = event.message.split(" ")
-                if (parts.size > 1) ChatUtils.command("${parts[0]} ${transform(parts.drop(1).joinToString(" "))}")
-                else ChatUtils.command(event.message)
+                if (parts.size > 1) {
+                    val message = "${parts[0]} ${transform(parts.drop(1).joinToString(" "))}"
+                    KnitChat.sendCommand(message)
+                    EventBus.messages.add(message)
+                } else {
+                    KnitChat.sendCommand(event.message)
+                    EventBus.messages.add(event.message)
+                }
             } else {
-                ChatUtils.chat(transform(event.message))
+                val message = transform(event.message)
+                KnitChat.fakeMessage(message)
+                EventBus.messages.add(message)
             }
         }
     }

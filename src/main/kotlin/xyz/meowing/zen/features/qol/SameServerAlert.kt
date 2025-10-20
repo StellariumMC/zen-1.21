@@ -1,12 +1,13 @@
 package xyz.meowing.zen.features.qol
 
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
@@ -15,13 +16,12 @@ object SameServerAlert : Feature("serveralert") {
     private val regex = "Sending to server (.+)\\.\\.\\.".toRegex()
     private val servers = mutableMapOf<String, Long>()
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Same server alert", "", "QoL", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Same server alert", "", "QoL", ConfigElement(
                 "serveralert",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
     override fun initialize() {
@@ -31,7 +31,7 @@ object SameServerAlert : Feature("serveralert") {
                 val currentTime = TimeUtils.now.toMillis
 
                 servers[server]?.let { lastJoined ->
-                    ChatUtils.addMessage("${Zen.Companion.prefix} §fLast joined §b$server §f- §b${(currentTime - lastJoined) / 1000}s §fago")
+                    KnitChat.fakeMessage("$prefix §fLast joined §b$server §f- §b${(currentTime - lastJoined) / 1000}s §fago")
                 }
 
                 servers[server] = currentTime

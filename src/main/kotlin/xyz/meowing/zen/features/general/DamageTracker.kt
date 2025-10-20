@@ -12,22 +12,23 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.mc
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
-import xyz.meowing.zen.config.ui.types.ConfigElement
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.ChatUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.Entity
 import net.minecraft.util.math.Vec3d
+import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
 import java.text.DecimalFormat
 
@@ -59,40 +60,39 @@ object DamageTracker : Feature("damagetracker", true) {
     private var lastHitEntity: Entity? = null
     private var lastHitTime = 0L
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Damage Tracker", "Track damage dealt to mobs", "General", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Damage Tracker", "Track damage dealt to mobs", "General", ConfigElement(
                 "damagetracker",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Damage Tracker Info", "", "", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Damage Tracker Info", "", "", ConfigElement(
                 "",
                 ElementType.TextParagraph("This does not track the damage done by arrows shot using duplex or the extra arrows from Terminator")
             ))
-            .addFeatureOption("Hit detection types", "Hit detection types", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Hit detection types", "Hit detection types", "Options", ConfigElement(
                 "damagetrackertype",
                 ElementType.MultiCheckbox(
                     options = DamageType.entries.map { it.displayName },
                     default = setOf(0)
                 )
             ))
-            .addFeatureOption("Show damage in chat", "Show damage in chat", "Options", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Show damage in chat", "Show damage in chat", "Options", ConfigElement(
                 "damagetrackersend",
                 ElementType.Switch(true)
             ))
-            .addFeatureOption("Damage Stats GUI", "Damage Stats GUI", "GUI", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Damage Stats GUI", "Damage Stats GUI", "GUI", ConfigElement(
                 "damagetrackergui",
                 ElementType.Button("Open Stats") {
                     TickUtils.schedule(2) {
-                        mc.setScreen(DamageTrackerGui())
+                        client.setScreen(DamageTrackerGui())
                     }
                 }
             ))
-            .addFeatureOption("Damage Tracker GUI Info", "", "GUI", xyz.meowing.zen.ui.ConfigElement(
+            .addFeatureOption("Damage Tracker GUI Info", "", "GUI", ConfigElement(
                 "",
                 ElementType.TextParagraph("Use the command §c/damagetracker §rto open the Stats GUI. §7§oAlias: /zendt, /dmg")
             ))
-        return configUI
     }
 
     override fun initialize() {
@@ -103,7 +103,7 @@ object DamageTracker : Feature("damagetracker", true) {
         }
 
         register<EntityEvent.Attack> { event ->
-            val player = mc.player ?: return@register
+            val player = player ?: return@register
             if (event.player.name.string != player.name.string) return@register
 
             lastHitEntity = event.target
@@ -111,7 +111,7 @@ object DamageTracker : Feature("damagetracker", true) {
         }
 
         register<EntityEvent.ArrowHit> { event ->
-            val player = mc.player ?: return@register
+            val player = player ?: return@register
             if (event.shooterName != player.name.string) return@register
 
             lastHitEntity = event.hitEntity
@@ -134,7 +134,7 @@ object DamageTracker : Feature("damagetracker", true) {
             if (damagetrackersend) {
                 val formattedDamage = formatter.format(event.damage)
                 val message = "${type.chatColor}${type.symbol} §r${type.chatColor}$formattedDamage §8[${type.displayName}]"
-                ChatUtils.addMessage("$prefix $message")
+                KnitChat.fakeMessage("$prefix $message")
             }
         }
     }
@@ -181,7 +181,7 @@ object DamageTrackerCommand : Commodore("damagetracker", "dt", "dmg") {
     init {
         runs {
             TickUtils.schedule(2) {
-                mc.setScreen(DamageTrackerGui())
+                client.setScreen(DamageTrackerGui())
             }
         }
     }

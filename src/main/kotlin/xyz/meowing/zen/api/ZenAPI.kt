@@ -3,6 +3,8 @@ package xyz.meowing.zen.api
 import xyz.meowing.zen.Zen
 import java.security.MessageDigest
 import net.fabricmc.loader.api.FabricLoader
+import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.zen.Zen.Companion.LOGGER
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -16,7 +18,7 @@ object ZenAPI {
     private var ws: WebSocket? = null
 
     init {
-        val uuid = (Zen.mc.session.uuidOrNull?: Zen.mc.session.username).toString()
+        val uuid = (client.session.uuidOrNull ?: client.session.username).toString()
         val hashedUUID = MessageDigest.getInstance("MD5")
             .digest(uuid.toByteArray())
             .joinToString("") { "%02x".format(it) }
@@ -40,17 +42,16 @@ object ZenAPI {
                 }
 
                 override fun onText(webSocket: WebSocket, data: CharSequence, last: Boolean): CompletionStage<*> {
-                    // Handle server messages if needed
                     webSocket.request(1)
                     return CompletableFuture.completedFuture(null)
                 }
 
                 override fun onError(webSocket: WebSocket?, error: Throwable) {
-                    println("WebSocket error: $error")
+                    LOGGER.info("WebSocket error: $error")
                 }
 
                 override fun onClose(webSocket: WebSocket, statusCode: Int, reason: String?): CompletionStage<*> {
-                    println("WebSocket closed: $statusCode ${reason ?: ""}")
+                    LOGGER.info("WebSocket closed: $statusCode ${reason ?: ""}")
                     return CompletableFuture.completedFuture(null)
                 }
             })

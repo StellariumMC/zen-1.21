@@ -1,11 +1,11 @@
 package xyz.meowing.zen.features.slayers
 
+import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.ConfigUI
-import xyz.meowing.zen.config.ui.types.ConfigElement
+import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
@@ -17,13 +17,12 @@ object LaserTimer : Feature("lasertimer", true) {
     private var bossID = 0
     private val totaltime = 8.2
 
-    override fun addConfig(configUI: ConfigUI): ConfigUI {
-        xyz.meowing.zen.ui.ConfigManager
-            .addFeature("Laser phase timer", "Laser phase timer", "Slayers", xyz.meowing.zen.ui.ConfigElement(
+    override fun addConfig() {
+        ConfigManager
+            .addFeature("Laser phase timer", "Laser phase timer", "Slayers", ConfigElement(
                 "lasertimer",
                 ElementType.Switch(false)
             ))
-        return configUI
     }
 
 
