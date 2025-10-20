@@ -11,7 +11,9 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,11 +21,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xyz.meowing.zen.FrustumStorage;
 import xyz.meowing.zen.events.EventBus;
 import xyz.meowing.zen.events.RenderEvent;
 
 @Mixin(WorldRenderer.class)
-public class MixinWorldRenderer {
+public class MixinWorldRenderer implements FrustumStorage {
 
     @Shadow
     private ClientWorld world;
@@ -35,6 +39,14 @@ public class MixinWorldRenderer {
     @Unique
     @Nullable
     private MatrixStack capturedMatrixStack;
+
+    @Unique
+    private Frustum zen$frustum;
+
+    @Override
+    public Frustum zen$getFrustum() {
+        return this.zen$frustum;
+    }
 
     @Inject(
             method = "renderTargetBlockOutline",
@@ -87,5 +99,12 @@ public class MixinWorldRenderer {
         RenderEvent.EntityGlow event = new RenderEvent.EntityGlow(entity, original, -1);
         EventBus.INSTANCE.post(event);
         return event.getShouldGlow();
+    }
+
+    @Inject(method = "setupFrustum", at = @At("RETURN"))
+    private void zen$onSetupFrustum(
+            Matrix4f posMatrix, Matrix4f projMatrix, Vec3d pos, CallbackInfoReturnable<Frustum> cir
+    ) {
+        this.zen$frustum = cir.getReturnValue();
     }
 }
