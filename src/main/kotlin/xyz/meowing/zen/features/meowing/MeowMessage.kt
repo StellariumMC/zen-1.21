@@ -32,16 +32,16 @@ object MeowMessage : Feature("meowmessage") {
                 val parts = event.message.split(" ")
                 if (parts.size > 1) {
                     val message = "${parts[0]} ${transform(parts.drop(1).joinToString(" "))}"
-                    KnitChat.sendCommand(message)
                     EventBus.messages.add(message)
+                    KnitChat.sendCommand(message)
                 } else {
-                    KnitChat.sendCommand(event.message)
                     EventBus.messages.add(event.message)
+                    KnitChat.sendCommand(event.message)
                 }
             } else {
                 val message = transform(event.message)
-                KnitChat.fakeMessage(message)
                 EventBus.messages.add(message)
+                KnitChat.sendMessage(message)
             }
         }
     }

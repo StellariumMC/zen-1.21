@@ -27,7 +27,6 @@ import xyz.meowing.zen.Zen.Companion.features
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
@@ -70,14 +69,12 @@ object Debug : Feature() {
     }
 
     override fun addConfig() {
+        if (!debugmode) return
+
         ConfigManager
-            .addFeature("Config Test", "Debug GUI", "Debug", ConfigElement(
-                "debuggui",
-                ElementType.Button("Open Debug GUI") {
-                    TickUtils.schedule(2) {
-                        client.setScreen(DebugGui())
-                    }
-                }
+            .addFeature("Config Test", "", "Debug", ConfigElement(
+                "debug",
+                ElementType.Switch(false)
             ))
             .addFeatureOption("Switch", "Switch test", "Debug", ConfigElement(
                 "test_switch",

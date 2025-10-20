@@ -66,9 +66,9 @@ object Rat : Feature(area = "Hub") {
         val cameraPos = camera.pos
 
         //#if MC >= 1.21.9
-        //$$ val frustum = (mc.worldRenderer as xyz.meowing.zen.FrustumStorage).`zen$getFrustum`()
+        //$$ val frustum = (client.worldRenderer as xyz.meowing.zen.FrustumStorage).`zen$getFrustum`()
         //#else
-        val frustum = (mc.worldRenderer as xyz.meowing.zen.mixins.AccessorWorldRenderer).frustum
+        val frustum = (client.worldRenderer as xyz.meowing.zen.mixins.AccessorWorldRenderer).frustum
         //#endif
 
         if (position.distanceTo(cameraPos) > 96.0) return

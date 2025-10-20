@@ -17,7 +17,7 @@ object GuildMessage : Feature("guildmessage") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean guild messages", "Clean guild messages", "Clean messages", ConfigElement(
+            .addFeature("Clean guild messages", "Clean guild messages", "General", ConfigElement(
                 "guildmessage",
                 ElementType.Switch(false)
             ))
@@ -60,7 +60,7 @@ object PartyMessage : Feature("partymessage") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean party messages", "Clean party messages", "Clean messages", ConfigElement(
+            .addFeature("Clean party messages", "Clean party messages", "General", ConfigElement(
                 "partymessage",
                 ElementType.Switch(false)
             ))

@@ -35,6 +35,7 @@ import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.zen.Zen.Companion.LOGGER
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.KeyEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -92,8 +93,8 @@ object ChatCleaner : Feature("chatcleaner") {
             if (patterns.any { it.matches(message) }) event.cancel()
         }
 
-        register<GuiEvent.Key> { event ->
-            if (event.screen !is ChatScreen || !KnitKey(chatcleanerkey).isPressed) return@register
+        register<KeyEvent.Press> { _ ->
+            if (client.currentScreen !is ChatScreen || !KnitKey(chatcleanerkey).isPressed) return@register
 
             val chat = client.inGameHud.chatHud as AccessorChatHud
             val line = chat.getMessageLineIdx(chat.toChatLineMX(KnitMouse.Scaled.x), chat.toChatLineMY(KnitMouse.Scaled.y))

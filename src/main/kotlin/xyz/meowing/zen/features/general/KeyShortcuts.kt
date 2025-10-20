@@ -14,6 +14,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import net.minecraft.client.gui.screen.ChatScreen
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
+import net.minecraft.client.gui.screen.ingame.HandledScreen
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
@@ -62,7 +63,7 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     override fun initialize() {
         register<KeyEvent.Press> { event ->
-            if (client.currentScreen is ChatScreen || client.currentScreen is GenericContainerScreen) return@register
+            if (client.currentScreen is HandledScreen<*> || client.currentScreen is ChatScreen) return@register
 
             if (event.keyCode > 0) {
                 pressedKeys.add(event.keyCode)

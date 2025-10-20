@@ -67,8 +67,8 @@ object ChatEmotes : Feature("chatemotes") {
 
             if (newMessage != event.message) {
                 event.cancel()
-                KnitChat.fakeMessage(newMessage)
                 EventBus.messages.add(newMessage)
+                KnitChat.sendMessage(newMessage)
             }
         }
     }

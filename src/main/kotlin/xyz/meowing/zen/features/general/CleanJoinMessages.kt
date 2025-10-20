@@ -15,7 +15,7 @@ object GuildJoinLeave : Feature("guildjoinleave") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean guild join/leave", "Clean guild join/leave", "Clean messages", ConfigElement(
+            .addFeature("Clean guild join/leave", "Clean guild join/leave", "General", ConfigElement(
                 "guildjoinleave",
                 ElementType.Switch(false)
             ))
@@ -46,7 +46,7 @@ object friendjoinleave : Feature("friendjoinleave") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean friend join/leave", "Clean friend join/leave", "Clean messages", ConfigElement(
+            .addFeature("Clean friend join/leave", "Clean friend join/leave", "General", ConfigElement(
                 "friendjoinleave",
                 ElementType.Switch(false)
             ))
