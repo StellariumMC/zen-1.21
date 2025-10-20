@@ -22,7 +22,7 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
                 "slayerhighlight",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", ConfigElement(
+            .addFeatureOption("Color", "", "Options", ConfigElement(
                 "slayerhighlightcolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))

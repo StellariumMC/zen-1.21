@@ -33,7 +33,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
                 "berberishelper",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", ConfigElement(
+            .addFeatureOption("Color", "", "Options", ConfigElement(
                 "berberishelpercolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))

@@ -30,7 +30,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
                 "hideendermanlaser",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Hide For", "Options", ConfigElement(
+            .addFeatureOption("Hide For", "", "Options", ConfigElement(
                 "hideendermanlaserboss",
                 ElementType.Dropdown(
                     listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),

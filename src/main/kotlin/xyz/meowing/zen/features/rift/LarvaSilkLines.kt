@@ -31,7 +31,7 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
                 "larvasilklines",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", ConfigElement(
+            .addFeatureOption("Color", "", "Options", ConfigElement(
                 "larvasilklinescolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))

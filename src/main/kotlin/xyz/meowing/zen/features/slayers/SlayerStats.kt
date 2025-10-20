@@ -39,7 +39,7 @@ object SlayerStats : Feature("slayerstats", true) {
                 "",
                 ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
             ))
-            .addFeatureOption("", "Options", "", ConfigElement(
+            .addFeatureOption("Lines to show", "", "Options", ConfigElement(
                 "slayerstatslines",
                 ElementType.MultiCheckbox(
                     options = listOf(

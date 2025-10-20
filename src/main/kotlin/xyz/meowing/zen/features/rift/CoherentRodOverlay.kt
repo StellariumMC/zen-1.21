@@ -23,7 +23,7 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
                 "coherentrodoverlay",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("", "Color", "", ConfigElement(
+            .addFeatureOption("Color", "", "Options", ConfigElement(
                 "coherentrodoverlaycolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
