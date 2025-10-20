@@ -34,6 +34,7 @@ import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.input.KnitKeyboard
 import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -259,15 +260,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         } childOf tradesContainer
 
         horizontalScroll.onMouseScroll {
-            if (
-                !InputUtil.isKeyPressed(
-                    //#if MC >= 1.21.9
-                    //$$ mc.window,
-                    //#else
-                    KnitClient.client.window.handle,
-                    //#endif
-                    GLFW.GLFW_KEY_LEFT_SHIFT)
-                ) {
+            if (KnitKeyboard.isShiftKeyPressed) {
                 it.stopImmediatePropagation()
                 scrollComponent.scrollTo(verticalOffset = (scrollComponent.verticalOffset + it.delta * 20).toFloat())
             }
