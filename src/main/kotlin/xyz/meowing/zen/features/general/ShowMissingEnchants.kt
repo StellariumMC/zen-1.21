@@ -13,6 +13,7 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.nbt.NbtElement
 import net.minecraft.text.Text
 import org.apache.commons.lang3.StringUtils
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.input.KnitKeys
 import xyz.meowing.zen.Zen.Companion.LOGGER
 import xyz.meowing.zen.config.ConfigElement
@@ -48,20 +49,13 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
 
     override fun initialize() {
         register<InternalEvent.NeuAPI.Load> {
-            try {
-                val constants = NEUApi.NeuConstantData.getData().getAsJsonObject("enchants")
-                enchantsData = constants?.getAsJsonObject("enchants")
-                enchantPools = constants?.getAsJsonArray("enchant_pools")
-                LOGGER.info("Loaded enchants in ShowMissingEnchants")
-            } catch (e: Exception) {
-                LOGGER.warn("Failed to load enchants in ShowMissingEnchants: $e")
-            }
+            onRegister()
         }
 
         register<ItemTooltipEvent> { event ->
             if (!KnitKeys.KEY_LEFT_SHIFT.isPressed || enchantsData == null || enchantPools == null) return@register
             val extraAttributes = event.stack.extraAttributes ?: return@register
-            if (!extraAttributes.contains("enchantments") || extraAttributes.get("enchantments")?.type != NbtElement.COMPOUND_TYPE) return@register
+            if (extraAttributes.get("enchantments")?.type != NbtElement.COMPOUND_TYPE) return@register
             val enchantments = extraAttributes.getCompound("enchantments").orElse(null) ?: return@register
             val enchantIds = enchantments.keys
             if (enchantIds.isEmpty()) return@register
@@ -92,6 +86,17 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
                 tooltipCache[cacheKey] = ArrayList(event.lines)
                 if (tooltipCache.size > 50) tooltipCache.clear()
             }
+        }
+    }
+
+    override fun onRegister() {
+        try {
+            val constants = NEUApi.NeuConstantData.getData().getAsJsonObject("enchants")
+            enchantsData = constants?.getAsJsonObject("enchants")
+            enchantPools = constants?.getAsJsonArray("enchant_pools")
+            LOGGER.info("Loaded enchants in ShowMissingEnchants")
+        } catch (e: Exception) {
+            LOGGER.warn("Failed to load enchants in ShowMissingEnchants: $e")
         }
     }
 
@@ -137,7 +142,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
 
     private fun hasEnchantInTooltip(tooltip: List<Text>, enchantIds: Set<String>): Boolean {
         val enchantNames by lazy { enchantIds.map { StringUtils.capitalize(it.replace("_", " ")) } }
-        return tooltip.any { line -> enchantNames.any { line.string.contains(it) } }
+        return tooltip.any { line -> enchantNames.any { line.string.contains(it, true) } }
     }
 
     private fun findEmptyLineAfterEnchants(tooltip: List<Text>, enchantIds: Set<String>): Int {
