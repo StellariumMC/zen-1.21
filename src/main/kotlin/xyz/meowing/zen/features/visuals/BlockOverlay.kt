@@ -58,8 +58,8 @@ object BlockOverlay : Feature("blockoverlay") {
                     blockoverlaycolor.rgb
                 )
             } else {
-                Render3D.drawFilledBB(
-                    blockShape.boundingBox.offset(blockPos),
+                Render3D.drawFilledShapeVoxel(
+                    blockShape.offset(blockPos),
                     blockoverlaycolor,
                     event.consumers,
                     event.matrixStack,

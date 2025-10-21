@@ -1,5 +1,6 @@
 package xyz.meowing.zen.utils
 
+import net.minecraft.util.shape.VoxelShape
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
@@ -412,6 +413,18 @@ object Render3D {
 
         consumers.draw(RenderLayer.getDebugFilledBox())
         matrices.pop()
+    }
+
+    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
+        shape.boundingBoxes.forEach { box ->
+            drawFilledBB(
+                box,
+                color,
+                consumers,
+                matrixStack,
+                customAlpha
+            )
+        }
     }
 
     private fun Color.withAlpha(alpha: Float) = Color(red, green, blue, (alpha * 255).toInt())
