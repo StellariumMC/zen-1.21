@@ -12,13 +12,11 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import net.minecraft.client.gui.screen.ChatScreen
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.client.gui.screen.ingame.HandledScreen
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.KeyEvent
+import xyz.meowing.zen.events.MouseEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
@@ -27,6 +25,7 @@ import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.input.KnitInputs
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
@@ -43,6 +42,8 @@ object KeyShortcuts : Feature("keyshortcuts") {
     val bindings get() = dataUtils.getData().bindings
     val dataUtils = DataUtils("keybind", KeybindData())
     private val pressedKeys = mutableSetOf<Int>()
+    private val pressedMouseButtons = mutableSetOf<Int>()
+    private val triggeredBindings = mutableSetOf<KeybindEntry>()
 
     override fun addConfig() {
         ConfigManager
@@ -60,7 +61,6 @@ object KeyShortcuts : Feature("keyshortcuts") {
             ))
     }
 
-
     override fun initialize() {
         register<KeyEvent.Press> { event ->
             if (client.currentScreen != null) return@register
@@ -72,19 +72,45 @@ object KeyShortcuts : Feature("keyshortcuts") {
         }
 
         register<KeyEvent.Release> { event ->
-            if (event.keyCode > 0) pressedKeys.remove(event.keyCode)
+            if (event.keyCode > 0) {
+                pressedKeys.remove(event.keyCode)
+                resetTriggeredBindings()
+            }
+        }
+
+        register<MouseEvent.Click> { event ->
+            if (client.currentScreen != null) return@register
+
+            val mouseCode = -(event.button + 1)
+            pressedMouseButtons.add(mouseCode)
+            checkKeybindMatch()
+        }
+
+        register<MouseEvent.Release> { event ->
+            pressedMouseButtons.remove(-(event.button + 1))
+            resetTriggeredBindings()
         }
     }
 
     private fun checkKeybindMatch() {
-        bindings.find { binding ->
-            binding.keys.isNotEmpty() && binding.keys.all { it in pressedKeys }
-        }?.let { binding ->
-            if (binding.command.isNotEmpty() && binding.command.startsWith("/")) {
-                KnitChat.sendCommand(binding.command)
-            } else {
-                KnitChat.fakeMessage(binding.command)
+        val allPressed = pressedKeys + pressedMouseButtons
+
+        bindings.forEach { binding ->
+            if (binding.keys.isEmpty()) return@forEach
+            val isMatch = binding.keys.all { it in allPressed }
+
+            if (isMatch && binding !in triggeredBindings) {
+                triggeredBindings.add(binding)
+                val command = binding.command.takeIf { it.isNotEmpty() } ?: return
+                if (command.startsWith("/")) KnitChat.sendCommand(command) else KnitChat.sendMessage(command)
             }
+        }
+    }
+
+    private fun resetTriggeredBindings() {
+        val allPressed = pressedKeys + pressedMouseButtons
+        triggeredBindings.removeIf { binding ->
+            !binding.keys.all { it in allPressed }
         }
     }
 
@@ -206,15 +232,25 @@ class KeybindGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }
 
         private fun setupEventHandlers() {
-            onMouseClick {
-                if (!listening) startListening()
+            onMouseClick { event ->
+                if (!listening) {
+                    startListening()
+                } else {
+                    val mouseCode = -(event.mouseButton + 1)
+                    recordedKeys.add(mouseCode)
+                    keyText.setText(getKeysName(recordedKeys.toList()))
+                }
+            }
+
+            onMouseRelease {
+                if (listening && recordedKeys.isNotEmpty()) stopListening()
             }
         }
 
         fun startListening() {
             listening = true
             recordedKeys.clear()
-            keyText.setText("Press keys...")
+            keyText.setText("Press keys/buttons...")
             button.setColor(Color(40, 60, 80, 255))
         }
 
@@ -241,9 +277,7 @@ class KeybindGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
         private fun getKeysName(keyList: List<Int>): String {
             if (keyList.isEmpty()) return "None"
-            return keyList.joinToString(" + ") {
-                getKeyName(it)
-            }
+            return keyList.joinToString(" + ") { getKeyName(it) }
         }
     }
 
@@ -508,22 +542,30 @@ class KeybindGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 }
 
 fun getKeyName(keyCode: Int): String {
-    return when (keyCode) {
-        0 -> "None"
-        GLFW.GLFW_KEY_SPACE -> "Space"
-        GLFW.GLFW_KEY_ENTER -> "Enter"
-        GLFW.GLFW_KEY_TAB -> "Tab"
-        GLFW.GLFW_KEY_BACKSPACE -> "Backspace"
-        GLFW.GLFW_KEY_DELETE -> "Delete"
-        GLFW.GLFW_KEY_LEFT_SHIFT -> "LShift"
-        GLFW.GLFW_KEY_RIGHT_SHIFT -> "RShift"
-        GLFW.GLFW_KEY_LEFT_CONTROL -> "LCtrl"
-        GLFW.GLFW_KEY_RIGHT_CONTROL -> "RCtrl"
-        GLFW.GLFW_KEY_LEFT_ALT -> "LAlt"
-        GLFW.GLFW_KEY_RIGHT_ALT -> "RAlt"
-        in GLFW.GLFW_KEY_A..GLFW.GLFW_KEY_Z -> ('A' + (keyCode - GLFW.GLFW_KEY_A)).toString()
-        in GLFW.GLFW_KEY_0..GLFW.GLFW_KEY_9 -> (keyCode - GLFW.GLFW_KEY_0).toString()
-        in GLFW.GLFW_KEY_F1..GLFW.GLFW_KEY_F25 -> "F${keyCode - GLFW.GLFW_KEY_F1 + 1}"
-        else -> "Key$keyCode"
+    return when {
+        keyCode == 0 -> "None"
+        keyCode < 0 -> {
+            when (val button = -keyCode - 1) {
+                0 -> "LMB"
+                1 -> "RMB"
+                2 -> "MMB"
+                else -> "Mouse ${button + 1}"
+            }
+        }
+        keyCode == GLFW.GLFW_KEY_SPACE -> "Space"
+        keyCode == GLFW.GLFW_KEY_ENTER -> "Enter"
+        keyCode == GLFW.GLFW_KEY_TAB -> "Tab"
+        keyCode == GLFW.GLFW_KEY_BACKSPACE -> "Backspace"
+        keyCode == GLFW.GLFW_KEY_DELETE -> "Delete"
+        keyCode == GLFW.GLFW_KEY_LEFT_SHIFT -> "LShift"
+        keyCode == GLFW.GLFW_KEY_RIGHT_SHIFT -> "RShift"
+        keyCode == GLFW.GLFW_KEY_LEFT_CONTROL -> "LCtrl"
+        keyCode == GLFW.GLFW_KEY_RIGHT_CONTROL -> "RCtrl"
+        keyCode == GLFW.GLFW_KEY_LEFT_ALT -> "LAlt"
+        keyCode == GLFW.GLFW_KEY_RIGHT_ALT -> "RAlt"
+        keyCode in GLFW.GLFW_KEY_A..GLFW.GLFW_KEY_Z -> ('A' + (keyCode - GLFW.GLFW_KEY_A)).toString()
+        keyCode in GLFW.GLFW_KEY_0..GLFW.GLFW_KEY_9 -> (keyCode - GLFW.GLFW_KEY_0).toString()
+        keyCode in GLFW.GLFW_KEY_F1..GLFW.GLFW_KEY_F25 -> "F${keyCode - GLFW.GLFW_KEY_F1 + 1}"
+        else -> KnitInputs.getDisplayName(keyCode)
     }
 }

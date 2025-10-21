@@ -1,11 +1,10 @@
 package xyz.meowing.zen.mixins;
 
+import xyz.meowing.knit.api.render.KnitResolution;
 import xyz.meowing.zen.events.EventBus;
 import xyz.meowing.zen.events.MouseEvent;
 import net.minecraft.client.Mouse;
-import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,15 +15,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Mouse.class)
 public class MixinMouse {
-    @Unique MinecraftClient mc = MinecraftClient.getInstance();
-
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
     //#if MC >= 1.21.9
     //$$ private void zen$onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
     //#else
     private void zen$onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
     //#endif
-        if (window == mc.getWindow().getHandle()) {
+        if (window == KnitResolution.INSTANCE.getWindowHandle()) {
             boolean pressed = action == 1;
             if (pressed) {
                 //#if MC >= 1.21.9
