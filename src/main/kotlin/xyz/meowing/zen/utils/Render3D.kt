@@ -1,5 +1,6 @@
 package xyz.meowing.zen.utils
 
+import net.minecraft.util.shape.VoxelShape
 import net.minecraft.client.font.TextRenderer
 import net.minecraft.client.render.LightmapTextureManager
 import net.minecraft.client.render.RenderLayer
@@ -356,62 +357,35 @@ object Render3D {
         val maxY = aabb.maxY.toFloat()
         val maxZ = aabb.maxZ.toFloat()
 
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
         buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
         buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
         buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
         buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
         buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
+        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
 
         consumers.draw(RenderLayer.getDebugFilledBox())
         matrices.pop()
+    }
+
+    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
+        shape.boundingBoxes.forEach { box ->
+            drawFilledBB(
+                box,
+                color,
+                consumers,
+                matrixStack,
+                customAlpha
+            )
+        }
     }
 
     private fun Color.withAlpha(alpha: Float) = Color(red, green, blue, (alpha * 255).toInt())
