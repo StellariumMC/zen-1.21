@@ -26,6 +26,9 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitInputs
+import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.knit.api.text.core.ClickEvent
+import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
 import java.awt.Color
@@ -138,6 +141,17 @@ object KeyShortcuts : Feature("keyshortcuts") {
 object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
     init {
         runs {
+            if (!KeyShortcuts.isEnabled()) {
+                val message = KnitText
+                    .literal("$prefix §cYou do not have the feature §bKeyShortcuts §cenabled!")
+                    .onHover("Click to enable feature.")
+                    .onClick(ClickEvent.RunCommand("/zen updateConfig keyshortcuts true false"))
+                    .toVanilla()
+
+                KnitChat.fakeMessage(message)
+                return@runs
+            }
+
             TickUtils.schedule(2) {
                 client.setScreen(KeybindGui())
             }

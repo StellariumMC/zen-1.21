@@ -63,8 +63,9 @@ object ConfigManager {
         return featureElement
     }
 
-    fun saveConfig() {
+    fun saveConfig(saveToFile: Boolean) {
         dataUtils.setData(configValueMap)
+        if (saveToFile) dataUtils.save()
     }
 
     fun getConfigValue(configKey: String): Any? {

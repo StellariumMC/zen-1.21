@@ -14,6 +14,7 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
@@ -537,29 +538,6 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         }
     }
 
-    private fun updateConfig(configKey: String, newValue: Any) {
-        val validatedValue = validator.validate(configKey, newValue) ?: return
-
-        val serializedValue = when (validatedValue) {
-            is Color -> mapOf(
-                "r" to validatedValue.red,
-                "g" to validatedValue.green,
-                "b" to validatedValue.blue,
-                "a" to validatedValue.alpha
-            )
-            is Set<*> -> validatedValue.toList()
-            is MCColorCode -> validatedValue.code
-            else -> validatedValue
-        }
-
-        ConfigManager.configValueMap[configKey] = serializedValue
-        ConfigManager.saveConfig()
-
-        updateElementVisibilities()
-        configListeners[configKey]?.forEach { it(validatedValue) }
-        updateSectionToggles()
-    }
-
     private fun updateSectionToggles() {
         sectionToggleRefs.forEach { (sectionKey, toggleRef) ->
             sectionToggleElements[sectionKey]?.let { toggleConfigKey ->
@@ -647,10 +625,33 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
 
     override fun onScreenClose() {
         super.onScreenClose()
-        ConfigManager.saveConfig()
+        ConfigManager.saveConfig(true)
         closeListeners.forEach { listener ->
             listener()
         }
+    }
+
+    fun updateConfig(configKey: String, newValue: Any) {
+        val validatedValue = validator.validate(configKey, newValue) ?: return
+
+        val serializedValue = when (validatedValue) {
+            is Color -> mapOf(
+                "r" to validatedValue.red,
+                "g" to validatedValue.green,
+                "b" to validatedValue.blue,
+                "a" to validatedValue.alpha
+            )
+            is Set<*> -> validatedValue.toList()
+            is MCColorCode -> validatedValue.code
+            else -> validatedValue
+        }
+
+        ConfigManager.configValueMap[configKey] = serializedValue
+        ConfigManager.saveConfig(false)
+
+        updateElementVisibilities()
+        configListeners[configKey]?.forEach { it(validatedValue) }
+        updateSectionToggles()
     }
 
     fun addElement(categoryName: String, sectionName: String, subcategoryName: String, element: ConfigElement, isSectionToggle: Boolean = false): ConfigUI {
@@ -683,7 +684,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
         getDefaultValue(element.type)?.let { defaultValue ->
             if (!ConfigManager.configValueMap.containsKey(element.configKey) && !ignoreConfig) {
                 ConfigManager.configValueMap[element.configKey] = defaultValue
-                ConfigManager.saveConfig()
+                ConfigManager.saveConfig(false)
                 configListeners[element.configKey]?.forEach { it(defaultValue) }
             }
         }

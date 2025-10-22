@@ -31,6 +31,8 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitKey
 import xyz.meowing.knit.api.input.KnitMouse
+import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.zen.Zen.Companion.LOGGER
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
@@ -162,6 +164,17 @@ object ChatCleaner : Feature("chatcleaner") {
 object ChatCleanerCommand : Commodore("chatcleaner", "zencc", "zenchatcleaner") {
     init {
         runs {
+            if (!ChatCleaner.isEnabled()) {
+                val message = KnitText
+                    .literal("$prefix §cYou do not have the feature §bChatCleaner §cenabled!")
+                    .onHover("Click to enable feature.")
+                    .onClick(ClickEvent.RunCommand("/zen updateConfig chatcleaner true false"))
+                    .toVanilla()
+
+                KnitChat.fakeMessage(message)
+                return@runs
+            }
+
             TickUtils.schedule(2) {
                 client.setScreen(ChatCleanerGui())
             }
