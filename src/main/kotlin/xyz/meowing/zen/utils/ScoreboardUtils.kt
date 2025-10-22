@@ -1,8 +1,10 @@
 package xyz.meowing.zen.utils
 
+import net.minecraft.client.network.PlayerListEntry
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
+import net.minecraft.world.GameMode
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
@@ -70,10 +72,18 @@ object ScoreboardUtils {
         }
     }
 
-    fun getTabListEntries(): List<String> {
-        val playerList = client.networkHandler?.playerList ?: return emptyList()
-        return playerList.map { playerInfo ->
-            playerInfo.displayName?.string ?: playerInfo.profile.name
-        }
+    fun getTabListEntries(): List<PlayerListEntry> {
+        val networkHandler = client.networkHandler ?: return emptyList()
+        return networkHandler.playerList
+                .sortedWith(compareBy<PlayerListEntry> { it.gameMode == GameMode.SPECTATOR }
+                    .thenBy { it.scoreboardTeam?.name ?: "" }
+                    .thenBy { it.profile.name })
+
+    }
+
+    fun getTabListEntriesString() : List<String> {
+        return getTabListEntries()
+            .mapNotNull { it.displayName?.string }
+            .filter { it.isNotEmpty() }
     }
 }
