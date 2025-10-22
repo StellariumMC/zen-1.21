@@ -1,11 +1,6 @@
 package xyz.meowing.zen.features.mining
 
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayNetworkHandler
-import net.minecraft.client.network.PlayerListEntry
 import net.minecraft.sound.SoundEvents
-import net.minecraft.world.GameMode
-import xyz.meowing.knit.api.utils.StringUtils.remove
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ConfigElement
@@ -22,7 +17,6 @@ import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.math.max
 
 @Zen.Module
@@ -35,8 +29,7 @@ object MiningAbility : Feature("miningability", skyblockOnly = true) {
     private var hasWidget: Boolean = false
     private var wasOnCooldown: Boolean = false
     private val showTitle by ConfigDelegate<Boolean>("miningabilitytitle")
-
-    private val AbilitiyName = listOf("Mining Speed Boost", "Pickobolus", "Maniac Miner", "Tunnel Vision", "Gemstone Infusion", "Sheer Force")
+    private val COOLDOWN_REGEX = Regex("""(\d+(?:\.\d+)?)s""")
 
     override fun addConfig() {
         ConfigManager
@@ -95,7 +88,7 @@ object MiningAbility : Feature("miningability", skyblockOnly = true) {
             lastUpdateTime = TimeUtils.zero
         } else {
             if (lastUpdateTime == TimeUtils.zero) {
-                val match = Regex("""(\d+(?:\.\d+)?)s""").find(status)
+                val match = COOLDOWN_REGEX.find(status)
                 cooldownSeconds = match?.groupValues?.get(1)?.toFloatOrNull() ?: 0f
                 lastUpdateTime = TimeUtils.now
             }

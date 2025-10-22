@@ -11,7 +11,6 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.TextStyle
 import xyz.meowing.zen.utils.ScoreboardUtils
-import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Zen.Module
 object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
@@ -71,7 +70,7 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     }
 
     private fun getDisplayLines(): List<String> {
-        if (!hasData) return listOf("§9§lCommissions:", "§fGolbing Slayer: §c0%")
+        if (!hasData) return listOf("§9§lCommissions:", "§fGoblin Slayer: §c0%")
 
         val lines = mutableListOf("§9§lCommissions:")
         commissions.forEach { raw ->
