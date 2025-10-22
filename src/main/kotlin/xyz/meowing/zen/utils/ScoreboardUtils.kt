@@ -81,7 +81,7 @@ object ScoreboardUtils {
 
     }
 
-    fun getTabListEntriesString() : List<String> {
+    fun getTabListEntriesString(): List<String> {
         return getTabListEntries()
             .mapNotNull { it.displayName?.string }
             .filter { it.isNotEmpty() }

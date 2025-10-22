@@ -27,7 +27,7 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§9§lCommissions:\n§fGolbing Slayer: §c0%")
+        HUDManager.register(name, "§9§lCommissions:\n§fGoblin Slayer: §c0%")
 
         register<TablistEvent.Update> { parseTablist() }
 
@@ -54,19 +54,16 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
             return
         }
 
-        val newComms = mutableListOf<String>()
+        commissions.clear()
         for (i in index + 1 until entries.size) {
             val line = entries[i]
 
             if (line.isEmpty() || (line.contains(":") && !line.contains("%") && !line.contains("DONE"))) break
             if (line.contains("%") || line.contains("DONE")) {
-                newComms += line
+                commissions += line
             }
         }
-
-        hasData = newComms.isNotEmpty()
-        commissions.clear()
-        commissions.addAll(newComms)
+        hasData = commissions.isNotEmpty()
     }
 
     private fun getDisplayLines(): List<String> {

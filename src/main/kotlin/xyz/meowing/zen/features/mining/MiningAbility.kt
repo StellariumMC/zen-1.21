@@ -136,5 +136,6 @@ object MiningAbility : Feature("miningability", skyblockOnly = true) {
         abilityName = ""
         cooldownSeconds = 0f
         wasOnCooldown = false
+        lastUpdateTime = TimeUtils.zero
     }
 }
