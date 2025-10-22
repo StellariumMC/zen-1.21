@@ -4,7 +4,7 @@
 	"version": "${mod_version}",
 	"name": "${mod_name}",
 	"description": "QOL Mod",
-	"authors": ["Kiwi"],
+	"authors": ["Stellarium"],
 	"contact": {
 		"homepage": "https://meowing.xyz/",
 		"sources": "https://github.com/StellariumMC/zen-1.21"

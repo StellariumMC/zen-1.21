@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.hud
 
-import gg.essential.elementa.components.UIRoundedRectangle
-import gg.essential.universal.UMatrixStack
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PlayerStats
 import xyz.meowing.zen.config.ConfigDelegate
@@ -16,9 +14,14 @@ import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.text.Text
+import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.text.core.FormattingCodes
+import xyz.meowing.vexel.utils.render.NVGRenderer
+import xyz.meowing.vexel.utils.style.Font
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.awt.Color
 
 @Zen.Module
@@ -30,7 +33,13 @@ object StatsDisplay : Feature("statsdisplay", true) {
     private const val drillFuelBarName = "Drill Fuel Bar"
     private const val PROCESSED_MARKER = "§z§e§b"
 
-    private var initedShadersUI = false
+    private data class ColoredSegment(val text: String, val color: Int)
+
+    private val coloredTextCache = object : LinkedHashMap<String, List<ColoredSegment>>(100, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, List<ColoredSegment>>?): Boolean {
+            return size > 100
+        }
+    }
 
     private val hiddenstats by ConfigDelegate<Set<Int>>("hiddenstats")
     private val hideVanillaHp by ConfigDelegate<Boolean>("hidevanillahp")
@@ -224,11 +233,19 @@ object StatsDisplay : Feature("statsdisplay", true) {
         }
 
         register<RenderEvent.HUD> { event ->
+            val window = KnitClient.client.window
+            val guiScale = window.scaleFactor.toFloat()
+
+            NVGRenderer.beginFrame(window.width.toFloat(), window.height.toFloat())
+            NVGRenderer.push()
+            NVGRenderer.scale(guiScale, guiScale)
             renderHealthBar(event.context)
             renderManaBar(event.context)
             renderOverflowMana(event.context)
             renderRiftTimeBar(event.context)
             renderDrillFuelBar(event.context)
+            NVGRenderer.pop()
+            NVGRenderer.endFrame()
         }
     }
 
@@ -237,62 +254,35 @@ object StatsDisplay : Feature("statsdisplay", true) {
         val scaledHeight = height * scale
         val borderWidth = 1f * scale
         val fillHeight = 8f * scale
-
-        //#if MC >= 1.21.6
-        //$$ context.fill(
-        //$$     x.toInt(), y.toInt(),
-        //$$     (x + scaledWidth).toInt(), (y + scaledHeight).toInt(),
-        //$$     (Color.BLACK.alpha shl 24) or (Color.BLACK.red shl 16) or (Color.BLACK.green shl 8) or Color.BLACK.blue
-        //$$ )
-        //$$ context.fill(
-        //$$     (x + borderWidth).toInt(), (y + borderWidth).toInt(),
-        //$$     (x + scaledWidth - borderWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
-        //$$     (Color.DARK_GRAY.alpha shl 24) or (Color.DARK_GRAY.red shl 16) or (Color.DARK_GRAY.green shl 8) or Color.DARK_GRAY.blue
-        //$$ )
-        //$$
-        //$$ val availableWidth = scaledWidth - 2 * borderWidth
-        //$$ val primaryWidth = (availableWidth * primaryFill).toFloat()
-        //$$ val secondaryWidth = (availableWidth * secondaryFill).toFloat()
-        //$$
-        //$$ if (primaryWidth > 0) {
-        //$$     context.fill(
-        //$$         (x + borderWidth).toInt(), (y + borderWidth).toInt(),
-        //$$         (x + borderWidth + primaryWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
-        //$$         (primaryColor.alpha shl 24) or (primaryColor.red shl 16) or (primaryColor.green shl 8) or primaryColor.blue
-        //$$     )
-        //$$ }
-        //$$
-        //$$ if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
-        //$$     context.fill(
-        //$$         (x + borderWidth + primaryWidth).toInt(), (y + borderWidth).toInt(),
-        //$$         (x + borderWidth + primaryWidth + secondaryWidth).toInt(), (y + borderWidth + fillHeight).toInt(),
-        //$$         (secondaryColor.alpha shl 24) or (secondaryColor.red shl 16) or (secondaryColor.green shl 8) or secondaryColor.blue
-        //$$     )
-        //$$ }
-        //#else
         val radius = 2f * scale
-        if (!initedShadersUI) UIRoundedRectangle.initShaders()
-        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x, y, x + scaledWidth, y + scaledHeight, radius, Color.BLACK)
-        UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + scaledWidth - borderWidth, y + borderWidth + fillHeight, radius * 0.75f, Color.DARK_GRAY)
+
+        NVGRenderer.rect(x, y, scaledWidth, scaledHeight, Color.BLACK.rgb, radius)
+        NVGRenderer.rect(x + borderWidth, y + borderWidth, scaledWidth - 2 * borderWidth, fillHeight, Color.DARK_GRAY.rgb, radius * 0.75f)
+
         val availableWidth = scaledWidth - 2 * borderWidth
         val primaryWidth = (availableWidth * primaryFill).toFloat()
         val secondaryWidth = (availableWidth * secondaryFill).toFloat()
+
         if (primaryWidth > 0) {
-            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth, y + borderWidth, x + borderWidth + primaryWidth, y + borderWidth + fillHeight, radius * 0.75f, primaryColor)
+            NVGRenderer.rect(x + borderWidth, y + borderWidth, primaryWidth, fillHeight, primaryColor.rgb, radius * 0.75f)
         }
+
         if (secondaryFill > 0 && secondaryColor != null && secondaryWidth > 0) {
-            UIRoundedRectangle.drawRoundedRectangle(UMatrixStack(), x + borderWidth + primaryWidth, y + borderWidth, x + borderWidth + primaryWidth + secondaryWidth, y + borderWidth + fillHeight, radius * 0.75f, secondaryColor)
+            NVGRenderer.rect(x + borderWidth + primaryWidth, y + borderWidth, secondaryWidth, fillHeight, secondaryColor.rgb, radius * 0.75f)
         }
-        //#endif
     }
 
     private fun renderText(context: DrawContext, text: String, x: Float, y: Float, width: Int, scale: Float, style: Render2D.TextStyle = Render2D.TextStyle.DROP_SHADOW) {
-        val textWidth = text.width() * scale
+        val textWidth = NVGRenderer.textWidth(text.removeFormatting(), 8f * scale, NVGRenderer.defaultFont)
         val scaledWidth = width * scale
         val centerX = x + scaledWidth / 2f
         val textX = centerX - textWidth / 2f
         val textY = if (text.contains("ʬ")) y else y - (8f * scale)
-        Render2D.renderString(context, text, textX, textY, scale, textStyle = style)
+        var currentX = textX
+        parseColoredText(text).forEach { segment ->
+            NVGRenderer.textShadow(segment.text, currentX, textY, 8f * scale, segment.color, NVGRenderer.defaultFont)
+            currentX += NVGRenderer.textWidth(segment.text, 8f * scale, NVGRenderer.defaultFont)
+        }
     }
 
     private fun renderHealthBar(context: DrawContext) {
@@ -363,7 +353,7 @@ object StatsDisplay : Feature("statsdisplay", true) {
     }
 
     fun healthBarEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean, healthPerc: Double = 0.75, absorbPerc: Double = 0.25) {
-        if(showHealthBar) {
+        if (showHealthBar) {
             renderBar(context, x, y, width, height, scale, healthPerc, healthBarFillColor, absorbPerc, healthBarExtraColor)
         }
 
@@ -453,6 +443,37 @@ object StatsDisplay : Feature("statsdisplay", true) {
             } else "${drillFuelTextColor.code}$currentFuel"
 
             renderText(context, fuelText, x, y, width, scale)
+        }
+    }
+
+    private fun parseColoredText(text: String): List<ColoredSegment> {
+        return coloredTextCache.getOrPut(text) {
+            val segments = mutableListOf<ColoredSegment>()
+            var currentColor = -1
+            val currentText = StringBuilder()
+
+            var i = 0
+            while (i < text.length) {
+                if (i < text.length - 1 && text[i] == '§') {
+                    if (currentText.isNotEmpty()) {
+                        segments.add(ColoredSegment(currentText.toString(), currentColor))
+                        currentText.clear()
+                    }
+                    FormattingCodes.codeToColor(text[i + 1])?.let {
+                        currentColor = it or 0xFF000000.toInt()
+                    }
+                    i += 2
+                } else {
+                    currentText.append(text[i])
+                    i++
+                }
+            }
+
+            if (currentText.isNotEmpty()) {
+                segments.add(ColoredSegment(currentText.toString(), currentColor))
+            }
+
+            segments
         }
     }
 }

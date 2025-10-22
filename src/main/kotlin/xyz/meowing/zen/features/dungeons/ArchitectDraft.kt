@@ -47,7 +47,7 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
 
             if (autogetdraft) {
                 TickUtils.schedule(40) {
-                    KnitChat.sendCommand("/gfs architect's first draft 1")
+                    KnitChat.sendCommand("gfs architect's first draft 1")
                 }
             } else {
                 val archMessage = KnitText

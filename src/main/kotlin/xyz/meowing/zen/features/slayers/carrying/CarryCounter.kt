@@ -343,7 +343,7 @@ object CarryCounter : Feature("carrycounter") {
                 )
             }
 
-            if (carrycountsend) KnitChat.sendCommand("/pc $name: $count/$total")
+            if (carrycountsend) KnitChat.sendCommand("pc $name: $count/$total")
         }
 
         fun reset() {

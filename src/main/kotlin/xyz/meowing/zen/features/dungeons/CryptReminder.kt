@@ -35,7 +35,7 @@ object CryptReminder : Feature("cryptreminder") {
             if (event.message.string.removeFormatting() == "[NPC] Mort: Good luck.") {
                 setTimeout(1000 * 60 * cryptreminderdelay.toLong()) {
                     if (DungeonUtils.getCryptCount() == 5 || !LocationUtils.checkArea("catacombs")) return@setTimeout
-                    KnitChat.sendCommand("/pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")
+                    KnitChat.sendCommand("pc Zen » ${DungeonUtils.getCryptCount()}/5 crypts")
                     showTitle("§c${DungeonUtils.getCryptCount()}§7/§c5 §fcrypts", null, 3000)
                 }
             }

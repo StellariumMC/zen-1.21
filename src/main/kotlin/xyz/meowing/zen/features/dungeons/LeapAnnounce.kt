@@ -30,7 +30,7 @@ object LeapAnnounce : Feature("leapannounce") {
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             val result = regex.find(event.message.string.removeFormatting())
-            if (result != null) KnitChat.sendCommand("/pc $leapmessage ${result.groupValues[1]}")
+            if (result != null) KnitChat.sendCommand("pc $leapmessage ${result.groupValues[1]}")
         }
     }
 }

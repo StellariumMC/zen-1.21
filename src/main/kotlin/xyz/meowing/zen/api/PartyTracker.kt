@@ -106,7 +106,7 @@ object PartyTracker {
                 val playerName = partyJoinRegex.find(clean)?.groupValues?.get(1) ?: return
                 partyMembers[playerName] = PartyMember(playerName)
                 addSelfToParty(true)
-                KnitChat.sendCommand("/p list")
+                KnitChat.sendCommand("p list")
                 hidePartyList = true
                 EventBus.post(PartyEvent.Changed(PartyChangeType.MEMBER_JOINED, playerName, partyMembers.toMap()))
             }
@@ -186,7 +186,7 @@ object PartyTracker {
                 }
 
                 addSelfToParty(false)
-                KnitChat.sendCommand("/p list")
+                KnitChat.sendCommand("p list")
                 hidePartyList = true
 
                 if (playerName == player?.name?.string) partyMembers[playerName]?.leader = false
