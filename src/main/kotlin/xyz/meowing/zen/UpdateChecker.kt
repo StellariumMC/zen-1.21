@@ -25,7 +25,7 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 object UpdateChecker {
-    private const val current = "1.1.7"
+    private const val current = "1.1.8"
     private const val modrinthProjectId = "stWFyj4m"
     const val githubRepository = "StellariumMC/zen-1.21"
     private var isMessageShown = false
