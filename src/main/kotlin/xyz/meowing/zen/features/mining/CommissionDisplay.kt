@@ -16,7 +16,7 @@ import xyz.meowing.zen.utils.ScoreboardUtils
 object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     private const val name = "Commissions"
     private val commissions = mutableListOf<String>()
-    private var hasData = false
+    private val hasData get() = commissions.isNotEmpty()
 
     override fun addConfig() {
         ConfigManager
@@ -48,22 +48,22 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
         val entries = ScoreboardUtils.getTabListEntriesString()
         val index = entries.indexOfFirst { it.equals("Commissions:", ignoreCase = true) }
 
-        if (index == -1) {
-            hasData = false
-            commissions.clear()
-            return
-        }
 
         commissions.clear()
-        for (i in index + 1 until entries.size) {
-            val line = entries[i]
 
-            if (line.isEmpty() || (line.contains(":") && !line.contains("%") && !line.contains("DONE"))) break
-            if (line.contains("%") || line.contains("DONE")) {
-                commissions += line
-            }
-        }
-        hasData = commissions.isNotEmpty()
+        if (index == -1)
+            return
+
+        commissions.addAll(
+            entries
+                .drop(index + 1)
+                .takeWhile { line ->
+                    line.isNotEmpty() && !(line.contains(":") && !line.contains("%") && !line.contains("DONE"))
+                }
+                .filter { line ->
+                    line.contains("%") || line.contains("DONE")
+                }
+        )
     }
 
     private fun getDisplayLines(): List<String> {
