@@ -12,10 +12,10 @@ import net.minecraft.client.gui.DrawContext
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
 
-@Zen.Module
 /**
  * @author Eclipse-5214
  */
+@Zen.Module
 object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
     private const val name = "Secrets Display"
 
@@ -26,7 +26,6 @@ object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
                 ElementType.Switch(false)
             ))
     }
-
 
     override fun initialize() {
         HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)
