@@ -83,7 +83,7 @@ object ArmorHUD : Feature("armorhud") {
         var currentX = x
         var currentY = y
 
-        armorToRender.forEachIndexed { index, item ->
+        armorToRender.reversed().forEachIndexed { index, item ->
             if (selectedPieces.contains(index)) {
                 if (item != null) Render2D.renderItem(context, item, currentX, currentY, scale)
                 if (armorhudvert) currentY += iconSize + spacing
