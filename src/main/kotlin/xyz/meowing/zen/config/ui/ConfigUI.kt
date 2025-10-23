@@ -68,7 +68,7 @@ class ConfigUI() : WindowScreen(ElementaVersion.V10, true, false, true, 2) {
     private lateinit var sectionScroll: ScrollComponent
     private lateinit var elementScroll: ScrollComponent
 
-    private val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "meowing", "rift")
+    private val categoryOrder = listOf("general", "qol", "hud", "visuals", "slayers", "dungeons", "mining", "meowing", "rift")
 
     init {
         createGUI()
