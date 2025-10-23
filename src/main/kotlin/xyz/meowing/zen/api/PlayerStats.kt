@@ -1,12 +1,18 @@
 package xyz.meowing.zen.api
 
+import net.minecraft.component.DataComponentTypes
+import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.GameEvent
+import xyz.meowing.zen.events.PacketEvent
 import xyz.meowing.zen.events.TickEvent
 import xyz.meowing.zen.events.WorldEvent
+import xyz.meowing.zen.utils.ItemUtils.lore
+import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import kotlin.math.abs
 import kotlin.math.max
+import kotlin.text.startsWith
 
 @Zen.Module
 object PlayerStats {
@@ -36,6 +42,8 @@ object PlayerStats {
 
     var displayedHealth = 0f
     var displayedMana = 0f
+
+    var soulflow = ""
 
     private var lastHealth = 0f
     private var lastMana = 0f
@@ -82,6 +90,13 @@ object PlayerStats {
         EventBus.register<GameEvent.ActionBar> { event ->
             extractPlayerStats(event.message.string)
         }
+
+        EventBus.register<PacketEvent.Received> { event ->
+            if (event.packet !is ScreenHandlerSlotUpdateS2CPacket) return@register
+            if (event.packet.stack.skyblockID !in setOf("SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) return@register
+            soulflow = event.packet.stack.lore.firstOrNull { it.startsWith("Internalized: ") }?.removePrefix("Internalized: ")?.takeIf { it.isNotBlank() } ?: ""
+        }
+
     }
 
     private fun resetInterpolation(value: Float, isHealth: Boolean) {
