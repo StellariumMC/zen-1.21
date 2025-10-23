@@ -215,7 +215,7 @@ object Utils {
 
             if (!found) {
                 val styledChar = styledChars[idx]
-                result.append(Text.literal(styledChar.char.toString()).setStyle(styledChar.style))
+                result.append(Text.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(styledChar.style))
                 idx++
             }
 
@@ -284,7 +284,7 @@ object Utils {
 
             if (!found) {
                 val style = styleMap[idx] ?: Style.EMPTY
-                result.append(Text.literal(content[idx].toString()).setStyle(style))
+                result.append(Text.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(style))
                 idx++
             }
         }
