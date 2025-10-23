@@ -26,7 +26,6 @@ object BatDeathTitle : Feature("batdeadtitle", true, "catacombs") {
             if (event.packet is PlaySoundS2CPacket) {
                 val packet = event.packet
                 if (!packet.sound.toString().contains("minecraft:entity.bat.death") && !packet.sound.toString().contains("minecraft:entity.bat.hurt")) return@register
-                if (!isEnabled()) return@register
                 if (subarea?.lowercase()?.contains("boss") == true) return@register
                 showTitle("§cBat Dead!", null, 1000)
             }
