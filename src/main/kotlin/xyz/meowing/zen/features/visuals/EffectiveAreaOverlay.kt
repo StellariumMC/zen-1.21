@@ -85,19 +85,25 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                                 xLoop@ for (x in -radius..radius) {
                                     yLoop@ for (y in -radius..radius) {
                                         zLoop@ for (z in -radius..radius) {
-                                            val blockPos = center.add(x, y, z)
-                                            val blockState = KnitClient.world?.getBlockState(blockPos) ?: continue@zLoop
                                             val distance = Math.sqrt((x * x + y * y + z * z).toDouble())
 
-                                            if (distance <= radius) {
-                                                // Ignore plants
-                                                if(blockState.block is net.minecraft.block.PlantBlock) continue@zLoop
+                                            // Only include blocks near the sphere surface
+                                            if (distance < radius - 0.5 || distance > radius + 0.5) continue@zLoop
 
-                                                val blockShape = blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
-                                                if (blockShape.isEmpty) continue@zLoop
+                                            val blockPos = center.add(x, y, z)
+                                            val blockState = KnitClient.world?.getBlockState(blockPos) ?: continue@zLoop
 
-                                                cachedBlockShapes.add(blockShape.offset(blockPos))
-                                            }
+                                            // Ignore plants
+                                            if (blockState.block is net.minecraft.block.PlantBlock) continue@zLoop
+
+                                            val blockShape = blockState.getOutlineShape(
+                                                EmptyBlockView.INSTANCE,
+                                                blockPos,
+                                                ShapeContext.of(camera.focusedEntity)
+                                            )
+                                            if (blockShape.isEmpty) continue@zLoop
+
+                                            cachedBlockShapes.add(blockShape.offset(blockPos))
                                         }
                                     }
                                 }
