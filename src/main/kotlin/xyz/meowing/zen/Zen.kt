@@ -42,6 +42,7 @@ class Zen : ClientModInitializer {
     annotation class Command
 
     override fun onInitializeClient() {
+return
         dataUtils = DataUtils("zen-data", firstInstall())
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
@@ -79,6 +80,7 @@ class Zen : ClientModInitializer {
         }
 
         EventBus.register<GameEvent.Load> ({
+return
             configUI = ZenConfig()
             FeatureLoader.init()
             initializeFeatures()
@@ -161,6 +163,7 @@ class Zen : ClientModInitializer {
         fun addFeature(feature: Feature) = pendingFeatures.add(feature)
 
         fun initializeFeatures() {
+return
             pendingFeatures.forEach { feature ->
                 features.add(feature)
                 if (feature.hasAreas()) areaFeatures.add(feature)
