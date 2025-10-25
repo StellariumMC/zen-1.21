@@ -336,7 +336,7 @@ object Render3D {
     }
 
     fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val aabb = bb.expand(0.002, 0.005, 0.002)
+        val aabb = bb.expand(0.001, 0.001, 0.001)
         val camera = client.gameRenderer.camera.pos
         val matrices = matrixStack ?: return
         matrices.push()

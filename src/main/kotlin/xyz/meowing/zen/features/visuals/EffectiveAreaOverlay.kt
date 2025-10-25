@@ -13,7 +13,9 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
+import net.minecraft.util.shape.VoxelShape
 import net.minecraft.world.EmptyBlockView
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
@@ -50,6 +52,9 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
             ))
     }
 
+    var lastBlockHit: BlockPos? = null
+    val cachedBlockShapes = mutableSetOf<Any>()
+
     override fun initialize() {
         register<RenderEvent.World> { event ->
             val held = player?.mainHandStack?.skyblockID ?: return@register
@@ -71,32 +76,41 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                             )
                         }
                         1 -> {
+                            val camera = client.gameRenderer.camera
                             val radius = 6
                             val center = blockHit.blockPos
-                            val camera = client.gameRenderer.camera
 
-                            // Not sure if this is the most efficient but I can't think of a better way rn
-                            // Has an error with certain areas for some reason, will just not render after a certain x or z value but then works again after further away
-                            // 51 70 -108 is an example coord for the hub that causes issues
-                            for (x in -radius..radius) {
-                                for (y in -radius..radius) {
-                                    for (z in -radius..radius) {
-                                        val blockPos = center.add(x, y, z)
-                                        val blockState = KnitClient.world?.getBlockState(blockPos) ?: continue
-                                        val distance = Math.sqrt((x * x + y * y + z * z).toDouble())
-                                        if (distance <= radius && !blockState.isAir) {
-                                            val blockShape = blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
-                                            if (blockShape.isEmpty) return@register
+                            if(lastBlockHit != blockHit.blockPos) {
+                                cachedBlockShapes.clear()
+                                xLoop@ for (x in -radius..radius) {
+                                    yLoop@ for (y in -radius..radius) {
+                                        zLoop@ for (z in -radius..radius) {
+                                            val blockPos = center.add(x, y, z)
+                                            val blockState = KnitClient.world?.getBlockState(blockPos) ?: continue@zLoop
+                                            val distance = Math.sqrt((x * x + y * y + z * z).toDouble())
 
-                                            Render3D.drawFilledShapeVoxel(
-                                                blockShape.offset(blockPos),
-                                                effectiveareaoverlaycolor,
-                                                event.consumers,
-                                                event.matrixStack
-                                            )
+                                            if (distance <= radius) {
+                                                // Ignore plants
+                                                if(blockState.block is net.minecraft.block.PlantBlock) continue@zLoop
+
+                                                val blockShape = blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
+                                                if (blockShape.isEmpty) continue@zLoop
+
+                                                cachedBlockShapes.add(blockShape.offset(blockPos))
+                                            }
                                         }
                                     }
                                 }
+                            }
+                            lastBlockHit = blockHit.blockPos
+
+                            cachedBlockShapes.forEach {
+                                Render3D.drawFilledShapeVoxel(
+                                    it as VoxelShape,
+                                    effectiveareaoverlaycolor,
+                                    event.consumers,
+                                    event.matrixStack
+                                )
                             }
                         }
                     }
