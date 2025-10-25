@@ -247,6 +247,8 @@ object EventBus {
     }
 
     fun <T : Event> post(event: T): Boolean {
+        return false
+
         val eventClass = event::class.java
         val handlers = listeners[eventClass] ?: return false
         if (handlers.isEmpty()) return false
