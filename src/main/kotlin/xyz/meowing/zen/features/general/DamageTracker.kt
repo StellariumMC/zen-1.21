@@ -116,7 +116,7 @@ object DamageTracker : Feature("damagetracker", true) {
         register<EntityEvent.ArrowHit> { event ->
             val player = player ?: return@register
 
-            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+            val playerName = Utils.currentPlayerName
             if (event.shooterName != playerName) return@register
 
             lastHitEntity = event.hitEntity

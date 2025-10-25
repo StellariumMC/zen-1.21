@@ -50,7 +50,7 @@ object AutoMeow : Feature("automeow") {
             val text = event.message.string.removeFormatting()
             val player = player ?: return@register
 
-            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+            val playerName = Utils.currentPlayerName ?: return@register
 
             if (text.contains(playerName) || !text.endsWith("meow")) return@register
 
