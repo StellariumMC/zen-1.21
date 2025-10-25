@@ -43,7 +43,7 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
         register<ChatEvent.Receive> { event ->
             val text = event.message.string.removeFormatting()
             val matchResult = puzzlefail.find(text) ?: quizfail.find(text) ?: return@register
-            val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
+            val playerName = Utils.currentPlayerName
 
 
             if (matchResult.groupValues[1] != playerName && selfdraft) return@register

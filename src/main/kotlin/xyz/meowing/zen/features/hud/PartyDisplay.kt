@@ -54,7 +54,7 @@ object PartyDisplay : Feature("partydisplay") {
     private fun getDisplayLines(): List<String> {
         if (partyMembers.isEmpty()) return emptyList()
 
-        val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
+        val playerName = Utils.currentPlayerName
 
         if (partyMembers.size == 1 && partyMembers.keys.contains(playerName)) return emptyList()
 

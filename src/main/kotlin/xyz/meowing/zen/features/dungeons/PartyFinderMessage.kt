@@ -44,7 +44,7 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
                 joinedPattern.matches(text) -> {
                     event.cancel()
                     val (user, cls, lvl) = joinedPattern.find(text)!!.destructured
-                    val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
+                    val playerName = Utils.currentPlayerName
 
                     if (user == playerName) {
                         KnitChat.fakeMessage("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")

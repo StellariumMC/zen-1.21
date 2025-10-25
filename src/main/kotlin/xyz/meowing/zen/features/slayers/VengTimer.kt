@@ -62,7 +62,7 @@ object VengTimer : Feature("vengtimer", true) {
 
             val player = player ?: return@register
             val heldItem = player.mainHandStack ?: return@register
-            var playerName = if(Utils.nicked) Utils.nickedName else player.name.toString()
+            val playerName = Utils.currentPlayerName
 
             if (event.player.name?.string !=  playerName || !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
 

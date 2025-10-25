@@ -105,7 +105,7 @@ object DamageTracker : Feature("damagetracker", true) {
 
         register<EntityEvent.Attack> { event ->
             val player = player ?: return@register
-            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+            val playerName = Utils.currentPlayerName
 
             if (event.player.name.string != playerName) return@register
 

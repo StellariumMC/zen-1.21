@@ -401,10 +401,15 @@ object Utils {
         }
 
         val tabName = entries[1]
-        val playerName = client.player?.name.toString()
+        val playerName = client.player?.name?.string ?: run {
+            nicked = false
+            return
+        }
 
         if(tabName.contains(playerName)) {
             nicked = false
+            nickedName = ""
+            return
         }
 
         val firstIndex = tabName.indexOfFirst { it == ' ' }
@@ -417,6 +422,9 @@ object Utils {
 
         nicked = true
     }
+
+    val currentPlayerName: String?
+        get() = if (nicked) nickedName else client.player?.name?.string
 
     val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
 }

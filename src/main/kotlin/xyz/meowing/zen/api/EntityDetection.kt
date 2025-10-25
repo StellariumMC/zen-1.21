@@ -73,7 +73,7 @@ object EntityDetection {
             val player = player ?: return@register
 
             val name = event.name
-            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+            val playerName = Utils.currentPlayerName
 
             if (name.contains("Spawned by") && name.endsWith("by: ${playerName}")) {
                 val hasBlackhole = world.entities.any {
