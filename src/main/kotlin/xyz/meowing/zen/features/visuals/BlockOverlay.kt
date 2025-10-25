@@ -13,13 +13,14 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.config.ConfigElement
 import java.awt.Color
 import xyz.meowing.zen.utils.Render3D
-import net.minecraft.util.math.Box
 import xyz.meowing.zen.config.ConfigManager
 
 @Zen.Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
+    private val blockbordercolor by ConfigDelegate<Color>("blockbordercolor")
     private val blockoverlayfilled by ConfigDelegate<Boolean>("blockoverlayfilled")
+    private val blockoverlaybordered by ConfigDelegate<Boolean>("blockoverlaybordered")
 
     override fun addConfig() {
         ConfigManager
@@ -27,13 +28,21 @@ object BlockOverlay : Feature("blockoverlay") {
                 "blockoverlay",
                 ElementType.Switch(false)
             ))
-            .addFeatureOption("Block overlay color", "", "Options", ConfigElement(
+            .addFeatureOption("Block Fill Color", "", "Options", ConfigElement(
                 "blockoverlaycolor",
+                ElementType.ColorPicker(Color(0, 255, 255, 38))
+            ))
+            .addFeatureOption("Block Border Color", "", "Options", ConfigElement(
+                "blockbordercolor",
                 ElementType.ColorPicker(Color(0, 255, 255, 127))
             ))
             .addFeatureOption("Filled block overlay", "", "Options", ConfigElement(
                 "blockoverlayfilled",
                 ElementType.Switch(false)
+            ))
+            .addFeatureOption("Bordered block overlay", "", "Options", ConfigElement(
+                "blockoverlaybordered",
+                ElementType.Switch(true)
             ))
     }
 
@@ -47,7 +56,8 @@ object BlockOverlay : Feature("blockoverlay") {
 
             val camPos = camera.pos
             event.cancel()
-            if (!blockoverlayfilled) {
+
+            if (blockoverlaybordered) {
                 VertexRendering.drawOutline(
                     event.matrixStack,
                     consumers.getBuffer(RenderLayer.getLines()),
@@ -55,15 +65,16 @@ object BlockOverlay : Feature("blockoverlay") {
                     blockPos.x - camPos.x,
                     blockPos.y - camPos.y,
                     blockPos.z - camPos.z,
-                    blockoverlaycolor.rgb
+                    blockbordercolor.rgb
                 )
-            } else {
+            }
+
+            if(blockoverlayfilled) {
                 Render3D.drawFilledShapeVoxel(
                     blockShape.offset(blockPos),
                     blockoverlaycolor,
                     event.consumers,
-                    event.matrixStack,
-                    blockoverlaycolor.alpha / 255f
+                    event.matrixStack
                 )
             }
         }

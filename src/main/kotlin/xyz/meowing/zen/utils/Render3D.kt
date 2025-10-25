@@ -335,8 +335,8 @@ object Render3D {
         matrices.pop()
     }
 
-    fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
-        val aabb = bb.expand(0.004, 0.005, 0.004)
+    fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+        val aabb = bb.expand(0.002, 0.005, 0.002)
         val camera = client.gameRenderer.camera.pos
         val matrices = matrixStack ?: return
         matrices.push()
@@ -345,7 +345,7 @@ object Render3D {
         val consumers = consumers as VertexConsumerProvider.Immediate
         val buffer = consumers.getBuffer(RenderLayer.getDebugFilledBox())
 
-        val a = (color.alpha / 255f * customAlpha)
+        val a = color.alpha / 255f
         val r = color.red / 255f
         val g = color.green / 255f
         val b = color.blue / 255f
@@ -376,14 +376,13 @@ object Render3D {
         matrices.pop()
     }
 
-    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, customAlpha: Float = 0.15f) {
+    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
         shape.boundingBoxes.forEach { box ->
             drawFilledBB(
                 box,
                 color,
                 consumers,
-                matrixStack,
-                customAlpha
+                matrixStack
             )
         }
     }
