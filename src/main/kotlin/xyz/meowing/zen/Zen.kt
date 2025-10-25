@@ -80,7 +80,7 @@ return
         }
 
         EventBus.register<GameEvent.Load> ({
-return
+return@register
             configUI = ZenConfig()
             FeatureLoader.init()
             initializeFeatures()
