@@ -13,6 +13,7 @@ import net.minecraft.entity.mob.EndermanEntity
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils
 import java.util.concurrent.ConcurrentHashMap
 
 @Zen.Module
@@ -94,7 +95,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
 
         val playerName = player?.name?.string ?: return true
         val cleanSpawnerName = spawnerNametag.removeFormatting()
-        val cleanPlayerName = playerName.removeFormatting()
+        val cleanPlayerName = if(!Utils.nicked) playerName.removeFormatting() else Utils.nickedName
 
         val isMyBoss = cleanSpawnerName.endsWith("by: $cleanPlayerName")
         val isCarryBoss = CarryCounter.carryees.any {
