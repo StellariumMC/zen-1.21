@@ -10,6 +10,7 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils
 
 @Zen.Module
 object PartyFinderMessage : Feature("partyfindermsgs") {
@@ -43,8 +44,9 @@ object PartyFinderMessage : Feature("partyfindermsgs") {
                 joinedPattern.matches(text) -> {
                     event.cancel()
                     val (user, cls, lvl) = joinedPattern.find(text)!!.destructured
+                    val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
 
-                    if (user == player?.name?.string) {
+                    if (user == playerName) {
                         KnitChat.fakeMessage("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")
                     } else {
                         val base = KnitText.literal("§c§lParty finder §7> §b$user §8| §b$cls §7- §b$lvl")

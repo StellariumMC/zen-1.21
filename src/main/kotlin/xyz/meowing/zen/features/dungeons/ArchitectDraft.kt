@@ -14,6 +14,7 @@ import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils
 
 @Zen.Module
 object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
@@ -42,8 +43,10 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
         register<ChatEvent.Receive> { event ->
             val text = event.message.string.removeFormatting()
             val matchResult = puzzlefail.find(text) ?: quizfail.find(text) ?: return@register
+            val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
 
-            if (matchResult.groupValues[1] != player?.name?.string && selfdraft) return@register
+
+            if (matchResult.groupValues[1] != playerName && selfdraft) return@register
 
             if (autogetdraft) {
                 TickUtils.schedule(40) {

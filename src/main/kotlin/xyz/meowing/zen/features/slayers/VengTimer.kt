@@ -15,8 +15,10 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.BlazeEntity
+import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.utils.Utils
 import kotlin.time.Duration.Companion.seconds
 
 @Zen.Module
@@ -60,12 +62,13 @@ object VengTimer : Feature("vengtimer", true) {
 
             val player = player ?: return@register
             val heldItem = player.mainHandStack ?: return@register
+            var playerName = if(Utils.nicked) Utils.nickedName else player.name.toString()
 
-            if (event.player.name?.string != player.name?.string || !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
+            if (event.player.name?.string !=  playerName || !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
 
             val nametagEntity = cachedNametag ?: world?.entities?.find { entity ->
                 val name = entity.name?.string?.removeFormatting() ?: return@find false
-                name.contains("Spawned by") && name.endsWith("by: ${player.name?.string}")
+                name.contains("Spawned by") && name.endsWith("by: ${playerName}")
             }?.also { cachedNametag = it }
 
             if (nametagEntity != null && event.target.id == (nametagEntity.id - 3)) {

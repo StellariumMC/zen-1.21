@@ -16,6 +16,8 @@ import net.minecraft.text.Style
 import net.minecraft.text.Text
 import org.apache.commons.lang3.SystemUtils
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.zen.events.EventBus
+import xyz.meowing.zen.events.WorldEvent
 import java.awt.Color
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,6 +39,15 @@ object Utils {
 
     inline val partialTicks get() = client.renderTickCounter.getTickProgress(true)
     inline val window get() = client.window
+
+    var nicked = false
+    var nickedName = ""
+
+    init {
+        nickedName = ""
+        nicked = false
+        EventBus.register<WorldEvent.Change> { isNicked() }
+    }
 
     fun playSound(sound: SoundEvent, volume: Float, pitch: Float) {
         MinecraftClient.getInstance().player?.playSound(sound, volume, pitch)
@@ -378,6 +389,33 @@ object Utils {
             if (decimal.endsWith(".0")) decimal.dropLast(2) else decimal
         }
         return sign + formatted + suffix
+    }
+
+    fun isNicked() {
+        val entries = ScoreboardUtils.getTabListEntriesString()
+
+        //shouldn't ever happen but ill add the check
+        if(entries.size < 2) {
+            nicked = false
+            return
+        }
+
+        val tabName = entries[1]
+        val playerName = client.player?.name.toString()
+
+        if(tabName.contains(playerName)) {
+            nicked = false
+        }
+
+        val firstIndex = tabName.indexOfFirst { it == ' ' }
+        val lastIndex = tabName.lastIndexOf(' ')
+
+        nickedName = tabName.substring(
+            firstIndex + 1,
+            if(lastIndex != firstIndex) lastIndex else tabName.length
+        )
+
+        nicked = true
     }
 
     val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()

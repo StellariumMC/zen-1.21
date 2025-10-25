@@ -29,6 +29,7 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils
 import java.awt.Color
 import java.text.DecimalFormat
 
@@ -104,7 +105,9 @@ object DamageTracker : Feature("damagetracker", true) {
 
         register<EntityEvent.Attack> { event ->
             val player = player ?: return@register
-            if (event.player.name.string != player.name.string) return@register
+            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+
+            if (event.player.name.string != playerName) return@register
 
             lastHitEntity = event.target
             lastHitTime = System.currentTimeMillis()
@@ -112,7 +115,9 @@ object DamageTracker : Feature("damagetracker", true) {
 
         register<EntityEvent.ArrowHit> { event ->
             val player = player ?: return@register
-            if (event.shooterName != player.name.string) return@register
+
+            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+            if (event.shooterName != playerName) return@register
 
             lastHitEntity = event.hitEntity
         }

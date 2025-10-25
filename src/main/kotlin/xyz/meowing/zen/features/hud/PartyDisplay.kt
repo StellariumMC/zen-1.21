@@ -12,6 +12,7 @@ import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.utils.Utils
 
 @Zen.Module
 object PartyDisplay : Feature("partydisplay") {
@@ -52,7 +53,10 @@ object PartyDisplay : Feature("partydisplay") {
 
     private fun getDisplayLines(): List<String> {
         if (partyMembers.isEmpty()) return emptyList()
-        if (partyMembers.size == 1 && partyMembers.keys.contains(player?.name?.string)) return emptyList()
+
+        val playerName = if(Utils.nicked) Utils.nickedName else player?.name?.string
+
+        if (partyMembers.size == 1 && partyMembers.keys.contains(playerName)) return emptyList()
 
         val lines = mutableListOf<String>()
         lines.add("§9§lParty Members §r§7(${partyMembers.size})")

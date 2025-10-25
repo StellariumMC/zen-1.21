@@ -14,6 +14,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.projectile.ArrowEntity
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.utils.Utils
 
 @Zen.Module
 object EntityDetection {
@@ -72,7 +73,9 @@ object EntityDetection {
             val player = player ?: return@register
 
             val name = event.name
-            if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {
+            val playerName = if(Utils.nicked) Utils.nickedName else player.name.string
+
+            if (name.contains("Spawned by") && name.endsWith("by: ${playerName}")) {
                 val hasBlackhole = world.entities.any {
                     event.entity.distanceTo(it) <= 3f && it.name?.string?.removeFormatting()?.contains("black hole", true) == true
                 }
