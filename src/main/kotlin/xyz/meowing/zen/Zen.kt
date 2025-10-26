@@ -44,7 +44,7 @@ class Zen : ClientModInitializer {
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
         //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
-            if (shown) return@register
+            //if (shown) return@register
 
             val loadMessage = KnitText
                 .literal("$prefix §fMod loaded.")
