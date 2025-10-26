@@ -81,8 +81,8 @@ class Zen : ClientModInitializer {
         EventBus.register<GameEvent.Load> ({
             configUI = ZenConfig()
             FeatureLoader.init()
-            initializeFeatures()
-            executePending()
+            //initializeFeatures()
+            //executePending()
         })
 
         EventBus.register<GuiEvent.Open> { event ->
