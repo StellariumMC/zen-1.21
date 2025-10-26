@@ -51,13 +51,13 @@ class Zen : ClientModInitializer {
                 .onHover("§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands")
                 .toVanilla()
 
-            KnitChat.fakeMessage(loadMessage)
+            //KnitChat.fakeMessage(loadMessage)
 
             val data = dataUtils.getData()
 
             if (data.isFirstInstall) {
-                KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
-                KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+                //KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
+                //KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
 
                 val discordMessage = KnitText
                     .literal("§7> §cDiscord:§b [Discord]")
@@ -65,15 +65,15 @@ class Zen : ClientModInitializer {
                     .onClick("https://discord.gg/KPmHQUC97G")
                     .toVanilla()
 
-                KnitChat.fakeMessage(discordMessage)
+                //KnitChat.fakeMessage(discordMessage)
                 dataUtils.setData(data.copy(isFirstInstall = false))
                 dataUtils.save()
             }
             if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
-            LoopUtils.setTimeout(5000) {
-                UpdateChecker.checkForUpdates()
-            }
+            //LoopUtils.setTimeout(5000) {
+            //    UpdateChecker.checkForUpdates()
+            //}
 
             shown = true
         //}
