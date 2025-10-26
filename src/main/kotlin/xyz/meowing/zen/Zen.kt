@@ -43,7 +43,7 @@ class Zen : ClientModInitializer {
 
     override fun onInitializeClient() {
         dataUtils = DataUtils("zen-data", firstInstall())
-        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+        //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             if (shown) return@register
 
             val loadMessage = KnitText
@@ -76,7 +76,7 @@ class Zen : ClientModInitializer {
             }
 
             shown = true
-        }
+        //}
 
         EventBus.register<GameEvent.Load> ({
             configUI = ZenConfig()
