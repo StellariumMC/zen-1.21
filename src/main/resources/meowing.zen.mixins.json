@@ -3,36 +3,10 @@
   "package": "xyz.meowing.zen.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "AccessorChatHud",
-    "MixinChatHud",
-    "MixinClientConnection",
-    "MixinClientPlayerEntity",
-    "MixinClientPlayerInteraction",
-    "MixinClientPlayNetworkHandler",
-    "MixinEntityRenderer",
-    "MixinFallingBlockEntityRenderer",
-    "MixinGameRenderer",
-    "MixinGuardianEntityRenderer",
-    "MixinHandledScreen",
-    "MixinHeldItemRenderer",
-    "MixinInGameHud",
-    "MixinInGameOverlayRenderer",
-    "MixinKeyboard",
-    "MixinLightningEntityRenderer",
-    "MixinMouse",
-    "MixinPerspective",
-    "MixinPlayerEntityRenderer",
-    "MixinStatusEffectsDisplay",
-    "MixinTextRenderer",
-    "MixinWorldRenderer"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "mixins": [
-    "AccessorPlayerInventory",
-    "MixinLivingEntity",
-    "MixinPersistentProjectileEntity",
-    "MixinYggdrasil"
   ]
 }
