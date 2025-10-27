@@ -319,9 +319,9 @@ inline fun <reified T : Event> configRegister(
         }
     }
 
-    keys.forEach { configKey ->
-        configUI.registerListener(configKey) { checkAndUpdate() }
-    }
+    // keys.forEach { configKey ->
+    //     configUI.registerListener(configKey) { checkAndUpdate() }
+    // }
 
     if (areas.isNotEmpty()) {
         EventBus.register<AreaEvent.Main> { checkAndUpdate() }
