@@ -1,6 +1,6 @@
 package xyz.meowing.zen.events
 
-import xyz.meowing.zen.Zen.Companion.configUI
+// import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.ScoreboardUtils
 import xyz.meowing.zen.config.ConfigManager
