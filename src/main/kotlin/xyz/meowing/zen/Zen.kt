@@ -79,12 +79,12 @@ class Zen : ClientModInitializer {
             shown = true
         //}
 
-        EventBus.register<GameEvent.Load> ({
-            // configUI = ZenConfig()
-            //FeatureLoader.init()
-            //initializeFeatures()
-            //executePending()
-        })
+        // EventBus.register<GameEvent.Load> ({
+        //     // configUI = ZenConfig()
+        //     //FeatureLoader.init()
+        //     //initializeFeatures()
+        //     //executePending()
+        // })
 
         // EventBus.register<GuiEvent.Open> { event ->
         //     if (event.screen is InventoryScreen) isInInventory = true
