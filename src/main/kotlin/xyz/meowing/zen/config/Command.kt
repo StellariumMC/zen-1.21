@@ -7,7 +7,7 @@ import xyz.meowing.zen.Zen.Companion.openConfig
 import xyz.meowing.zen.hud.HUDEditor
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.Zen.Companion.configUI
+// import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.Zen.Companion.prefix
 import java.lang.Exception
 
@@ -28,7 +28,7 @@ object ConfigCommand : Commodore("zen", "ma", "meowaddons") {
             runs { configName: String, newValue: String, silent: Boolean ->
                 try {
                     val value = parseValue(newValue)
-                    configUI.updateConfig(configName, value)
+                    // configUI.updateConfig(configName, value)
                     if (!silent) KnitChat.fakeMessage("$prefix §fUpdated config §b$configName §fto §b$value§f.")
                     Zen.LOGGER.info("Updated config $configName to value $value [${value.javaClass}]")
                 } catch (e: Exception) {
