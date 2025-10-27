@@ -86,13 +86,13 @@ class Zen : ClientModInitializer {
             //executePending()
         })
 
-        EventBus.register<GuiEvent.Open> { event ->
-            if (event.screen is InventoryScreen) isInInventory = true
-        }
+        // EventBus.register<GuiEvent.Open> { event ->
+        //     if (event.screen is InventoryScreen) isInInventory = true
+        // }
 
-        EventBus.register<GuiEvent.Close> {
-            isInInventory = false
-        }
+        // EventBus.register<GuiEvent.Close> {
+        //     isInInventory = false
+        // }
 
         // EventBus.register<AreaEvent.Main> ({
         //     TickUtils.scheduleServer(1) {
@@ -112,19 +112,19 @@ class Zen : ClientModInitializer {
         //     }
         // })
 
-        NetworkUtils.getJson(
-            "https://api.hypixel.net/v2/resources/skyblock/election",
-            onSuccess = { jsonObject ->
-                if (jsonObject.get("success")?.asBoolean != true) return@getJson
+        // NetworkUtils.getJson(
+        //     "https://api.hypixel.net/v2/resources/skyblock/election",
+        //     onSuccess = { jsonObject ->
+        //         if (jsonObject.get("success")?.asBoolean != true) return@getJson
 
-                val dataElement = jsonObject.get("data") ?: return@getJson
-                val dataObj = JsonParser().parse(dataElement.toString()).asJsonObject
-                mayorData = com.google.gson.Gson().fromJson(dataObj, ApiMayor::class.java)
-            },
-            onError = { exception ->
-                LOGGER.warn("Failed to fetch election data: ${exception.message}")
-            }
-        )
+        //         val dataElement = jsonObject.get("data") ?: return@getJson
+        //         val dataObj = JsonParser().parse(dataElement.toString()).asJsonObject
+        //         mayorData = com.google.gson.Gson().fromJson(dataObj, ApiMayor::class.java)
+        //     },
+        //     onError = { exception ->
+        //         LOGGER.warn("Failed to fetch election data: ${exception.message}")
+        //     }
+        // )
     }
 
     companion object {
