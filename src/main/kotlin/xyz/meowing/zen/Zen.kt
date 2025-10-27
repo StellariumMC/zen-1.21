@@ -42,7 +42,7 @@ class Zen : ClientModInitializer {
     annotation class Command
 
     override fun onInitializeClient() {
-        return // is it a eventbus thing? no idea
+        // is it a eventbus thing? no idea
         dataUtils = DataUtils("zen-data", firstInstall())
         //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             //if (shown) return@register
@@ -94,23 +94,23 @@ class Zen : ClientModInitializer {
             isInInventory = false
         }
 
-        EventBus.register<AreaEvent.Main> ({
-            TickUtils.scheduleServer(1) {
-                areaFeatures.forEach { it.update() }
-            }
-        })
+        // EventBus.register<AreaEvent.Main> ({
+        //     TickUtils.scheduleServer(1) {
+        //         areaFeatures.forEach { it.update() }
+        //     }
+        // })
 
-        EventBus.register<AreaEvent.Sub> ({
-            TickUtils.scheduleServer(1) {
-                subareaFeatures.forEach { it.update() }
-            }
-        })
+        // EventBus.register<AreaEvent.Sub> ({
+        //     TickUtils.scheduleServer(1) {
+        //         subareaFeatures.forEach { it.update() }
+        //     }
+        // })
 
-        EventBus.register<AreaEvent.Skyblock> ({
-            TickUtils.scheduleServer(1) {
-                skyblockFeatures.forEach { it.update() }
-            }
-        })
+        // EventBus.register<AreaEvent.Skyblock> ({
+        //     TickUtils.scheduleServer(1) {
+        //         skyblockFeatures.forEach { it.update() }
+        //     }
+        // })
 
         NetworkUtils.getJson(
             "https://api.hypixel.net/v2/resources/skyblock/election",
