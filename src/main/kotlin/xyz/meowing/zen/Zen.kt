@@ -33,7 +33,7 @@ data class firstInstall(val isFirstInstall: Boolean = true)
 
 class Zen : ClientModInitializer {
     private var shown = false
-    private lateinit var dataUtils: DataUtils<firstInstall>
+    // private lateinit var dataUtils: DataUtils<firstInstall>
 
     @Target(AnnotationTarget.CLASS)
     annotation class Module
@@ -43,7 +43,7 @@ class Zen : ClientModInitializer {
 
     override fun onInitializeClient() {
         // is it a eventbus thing? no idea
-        dataUtils = DataUtils("zen-data", firstInstall())
+        // dataUtils = DataUtils("zen-data", firstInstall())
         //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             //if (shown) return@register
 
@@ -54,22 +54,22 @@ class Zen : ClientModInitializer {
 
             //KnitChat.fakeMessage(loadMessage)
 
-            val data = dataUtils.getData()
+            // val data = dataUtils.getData()
 
-            if (data.isFirstInstall) {
-                //KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
-                //KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+            // if (data.isFirstInstall) {
+            //     //KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
+            //     //KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
 
-                val discordMessage = KnitText
-                    .literal("§7> §cDiscord:§b [Discord]")
-                    .onHover("Discord server")
-                    .onClick("https://discord.gg/KPmHQUC97G")
-                    .toVanilla()
+            //     val discordMessage = KnitText
+            //         .literal("§7> §cDiscord:§b [Discord]")
+            //         .onHover("Discord server")
+            //         .onClick("https://discord.gg/KPmHQUC97G")
+            //         .toVanilla()
 
-                //KnitChat.fakeMessage(discordMessage)
-                dataUtils.setData(data.copy(isFirstInstall = false))
-                dataUtils.save()
-            }
+            //     //KnitChat.fakeMessage(discordMessage)
+            //     dataUtils.setData(data.copy(isFirstInstall = false))
+            //     dataUtils.save()
+            // }
             if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
             //LoopUtils.setTimeout(5000) {
