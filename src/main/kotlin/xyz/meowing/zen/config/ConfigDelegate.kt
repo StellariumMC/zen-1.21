@@ -1,6 +1,6 @@
 package xyz.meowing.zen.config
 
-import xyz.meowing.zen.Zen.Companion.configUI
+// import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import java.awt.Color
 import kotlin.reflect.KProperty
@@ -14,11 +14,11 @@ class Handler<T>(private val key: String, private val clazz: Class<T>) {
     init {
         @Suppress("UNCHECKED_CAST")
         cachedValue = getBuiltInDefault() as T
-        configUI.registerListener(key) { newValue ->
-            @Suppress("UNCHECKED_CAST")
-            cachedValue = convertValue(newValue) as T
-            isInitialized = true
-        }
+        // configUI.registerListener(key) { newValue ->
+        //     @Suppress("UNCHECKED_CAST")
+        //     cachedValue = convertValue(newValue) as T
+        //     isInitialized = true
+        // }
     }
 
     private fun convertValue(value: Any?): Any {
