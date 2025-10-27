@@ -47,10 +47,10 @@ class Zen : ClientModInitializer {
         //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             //if (shown) return@register
 
-            val loadMessage = KnitText
-                .literal("$prefix §fMod loaded.")
-                .onHover("§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands")
-                .toVanilla()
+            // val loadMessage = KnitText
+            //     .literal("$prefix §fMod loaded.")
+            //     .onHover("§c${FeatureLoader.getFeatCount()} modules §8- §c${FeatureLoader.getLoadtime()}ms §8- §c${FeatureLoader.getCommandCount()} commands")
+            //     .toVanilla()
 
             //KnitChat.fakeMessage(loadMessage)
 
@@ -70,13 +70,13 @@ class Zen : ClientModInitializer {
             //     dataUtils.setData(data.copy(isFirstInstall = false))
             //     dataUtils.save()
             // }
-            if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
+            // if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
             //LoopUtils.setTimeout(5000) {
             //    UpdateChecker.checkForUpdates()
             //}
 
-            shown = true
+            // shown = true
         //}
 
         // EventBus.register<GameEvent.Load> ({
