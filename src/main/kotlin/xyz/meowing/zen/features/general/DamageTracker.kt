@@ -98,9 +98,9 @@ object DamageTracker : Feature("damagetracker", true) {
     override fun initialize() {
         updateEnabledTypes()
 
-        Zen.configUI.registerListener("damagetrackertype") {
-            updateEnabledTypes()
-        }
+        // Zen.configUI.registerListener("damagetrackertype") {
+        //     updateEnabledTypes()
+        // }
 
         register<EntityEvent.Attack> { event ->
             val player = player ?: return@register
