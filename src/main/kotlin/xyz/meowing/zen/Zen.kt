@@ -42,6 +42,7 @@ class Zen : ClientModInitializer {
     annotation class Command
 
     override fun onInitializeClient() {
+        return // is it a eventbus thing? no idea
         dataUtils = DataUtils("zen-data", firstInstall())
         //ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             //if (shown) return@register
