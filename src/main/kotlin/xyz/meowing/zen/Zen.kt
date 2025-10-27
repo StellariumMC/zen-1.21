@@ -80,7 +80,7 @@ class Zen : ClientModInitializer {
         //}
 
         EventBus.register<GameEvent.Load> ({
-            configUI = ZenConfig()
+            // configUI = ZenConfig()
             //FeatureLoader.init()
             //initializeFeatures()
             //executePending()
@@ -134,7 +134,7 @@ class Zen : ClientModInitializer {
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
         private val skyblockFeatures = mutableListOf<Feature>()
-        lateinit var configUI: ConfigUI
+        // lateinit var configUI: ConfigUI
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -145,9 +145,9 @@ class Zen : ClientModInitializer {
         var modInfo = KnitModInfo("zen", "Zen", "1.1.8")
 
         private fun executePending() {
-            pendingCallbacks.forEach { (configKey, callback) ->
-                configUI.registerListener(configKey, callback)
-            }
+            // pendingCallbacks.forEach { (configKey, callback) ->
+            //     configUI.registerListener(configKey, callback)
+            // }
             pendingCallbacks.clear()
         }
 
@@ -156,7 +156,7 @@ class Zen : ClientModInitializer {
                 if (instance is Feature) instance.update()
             }
 
-            if (::configUI.isInitialized) configUI.registerListener(configKey, callback) else pendingCallbacks.add(configKey to callback)
+            // if (::configUI.isInitialized) configUI.registerListener(configKey, callback) else pendingCallbacks.add(configKey to callback)
         }
 
         fun addFeature(feature: Feature) = pendingFeatures.add(feature)
@@ -178,7 +178,7 @@ class Zen : ClientModInitializer {
         fun openConfig() {
             TickUtils.schedule(2) {
                 client.execute {
-                    if (::configUI.isInitialized) client.setScreen(configUI)
+                    // if (::configUI.isInitialized) client.setScreen(configUI)
                 }
             }
         }
