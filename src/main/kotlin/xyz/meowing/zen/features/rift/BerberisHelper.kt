@@ -58,7 +58,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
 
         register<RenderEvent.World> { event ->
             val targetPos = blockPos ?: return@register
-            val consumers = event.consumers ?: return@register
+            val consumers = event.context.consumers()
             val blockState = world?.getBlockState(targetPos) ?: return@register
             val camera = client.gameRenderer.camera
             val blockShape = blockState.getOutlineShape(world, targetPos, ShapeContext.of(camera.focusedEntity))
@@ -66,7 +66,7 @@ object BerberisHelper : Feature("berberishelper", area = "the rift", subarea =  
 
             val camPos = camera.pos
             VertexRendering.drawOutline(
-                event.matrixStack,
+                event.context.matrixStack(),
                 consumers.getBuffer(RenderLayer.getLines()),
                 blockShape,
                 targetPos.x - camPos.x,

@@ -75,8 +75,8 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
             val pos = activatedPos ?: return@register
 
             Render3D.drawFilledCircle(
-                event.consumers,
-                event.matrixStack,
+                event.context.consumers(),
+                event.context.matrixStack(),
                 pos,
                 5f,
                 72,

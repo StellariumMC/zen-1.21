@@ -43,8 +43,10 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
             if (startingSilkPos == null) return@createCustomEvent
 
             if (isHolding("LARVA_SILK")) {
+                val consumers = event.context.consumers()
+                val matrixStack = event.context.matrixStack()
                 val lookingAt = client.crosshairTarget
-                Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, event.consumers, event.matrixStack)
+                Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, consumers, matrixStack)
 
                 if (lookingAt is BlockHitResult && lookingAt.type == HitResult.Type.BLOCK) {
                     val pos = startingSilkPos!!
@@ -52,8 +54,8 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
                     val start = Vec3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
                     val finish = Vec3d(lookingAtPos.x + 0.5, lookingAtPos.y + 0.5, lookingAtPos.z + 0.5)
 
-                    Render3D.drawLine(start, finish, 2f, larvasilklinescolor, event.consumers, event.matrixStack)
-                    Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, event.consumers, event.matrixStack)
+                    Render3D.drawLine(start, finish, 2f, larvasilklinescolor, consumers, matrixStack)
+                    Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, consumers, matrixStack)
                 }
             }
         }

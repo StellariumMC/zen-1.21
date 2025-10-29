@@ -112,7 +112,7 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
             val positions = if (LocationUtils.checkSubarea("dragon's nest")) zealotSpawns else bruiserSpawns
             positions.forEach { pos ->
                 val aabb = Box(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
-                if (drawZealotSpawnBox) Render3D.drawSpecialBB(aabb, zealotSpawnColor, event.consumers, event.matrixStack)
+                if (drawZealotSpawnBox) Render3D.drawSpecialBB(aabb, zealotSpawnColor, event.context.consumers(), event.context.matrixStack())
                 Render3D.drawString(
                     displayText,
                     Vec3d(pos).add(0.0, 1.5, 0.0),

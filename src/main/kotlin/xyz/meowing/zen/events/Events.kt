@@ -24,7 +24,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
-import net.minecraft.block.BlockState
+import xyz.meowing.knit.api.render.world.RenderContext
 
 abstract class Event
 
@@ -90,20 +90,15 @@ enum class PartyChangeType {
 
 abstract class RenderEvent {
     class World(
-        val consumers: VertexConsumerProvider?,
-        val matrixStack: MatrixStack?
+        val context: RenderContext
     ) : Event()
 
     class WorldPostEntities(
-        val consumers: VertexConsumerProvider?,
-        val matrixStack: MatrixStack?
+        val context: RenderContext
     ) : Event()
 
     class BlockOutline(
-        val blockPos: BlockPos,
-        val blockState: BlockState,
-        val consumers: VertexConsumerProvider?,
-        val matrixStack: MatrixStack?
+        val context: RenderContext
     ) : CancellableEvent()
 
     class EntityGlow(val entity: net.minecraft.entity.Entity, var shouldGlow: Boolean, var glowColor: Int) : Event()

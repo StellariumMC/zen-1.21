@@ -1,6 +1,10 @@
 package xyz.meowing.zen.mixins;
 
+import net.minecraft.client.gui.screen.Screen;
+import org.lwjgl.glfw.GLFW;
+import xyz.meowing.knit.api.KnitClient;
 import xyz.meowing.zen.events.EventBus;
+import xyz.meowing.zen.events.GuiEvent;
 import xyz.meowing.zen.events.KeyEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
@@ -12,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //#if MC >= 1.21.9
 //$$ import net.minecraft.client.input.KeyInput;
+//$$ import net.minecraft.client.input.CharInput;
 //#endif
 
 @Mixin(Keyboard.class)
@@ -39,5 +44,23 @@ public class MixinKeyboard {
                 //#endif
             }
         }
+    }
+
+    @Inject(method = "onChar", at = @At("HEAD"), cancellable = true)
+    //#if MC >= 1.21.9
+    //$$ private void zen$onChar(long window, CharInput input, CallbackInfo ci) {
+    //#else
+    private void zen$onChar(long window, int codePoint, int modifiers, CallbackInfo ci) {
+    //#endif
+        Screen screen = KnitClient.getClient().currentScreen;
+        if (screen == null) return;
+
+        //#if MC >= 1.21.9
+        //$$ char charTyped = (char) input.codepoint();
+        //#else
+        char charTyped = (char) codePoint;
+        //#endif
+        boolean cancelled = EventBus.INSTANCE.post(new GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen));
+        if (cancelled) ci.cancel();
     }
 }

@@ -36,8 +36,8 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
                 val player = player ?: return@register
                 val color = coherentrodoverlaycolor
                 Render3D.drawFilledCircle(
-                    event.consumers,
-                    event.matrixStack,
+                    event.context.consumers(),
+                    event.context.matrixStack(),
                     //#if MC >= 1.21.9
                     //$$ player.entityPos,
                     //#else

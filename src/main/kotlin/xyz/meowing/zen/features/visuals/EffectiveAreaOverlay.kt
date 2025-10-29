@@ -66,8 +66,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                     when (renderMethod) {
                         0 -> {
                             Render3D.drawFilledCircle(
-                                event.consumers,
-                                event.matrixStack,
+                                event.context.consumers(),
+                                event.context.matrixStack(),
                                 Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                                 7f,
                                 72,
@@ -114,8 +114,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                                 Render3D.drawFilledShapeVoxel(
                                     it as VoxelShape,
                                     effectiveareaoverlaycolor,
-                                    event.consumers,
-                                    event.matrixStack
+                                    event.context.consumers(),
+                                    event.context.matrixStack()
                                 )
                             }
                         }

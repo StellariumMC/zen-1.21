@@ -6,17 +6,16 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.NetworkUtils
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.BlockModelRenderer
 import net.minecraft.client.render.model.BlockStateManagers
 import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.render.world.RenderContext
 
 import java.io.File
 
@@ -31,7 +30,7 @@ object Rat : Feature(area = "Hub") {
         loadTexture()
         register<RenderEvent.WorldPostEntities> { event ->
             if (textureLoaded) {
-                render(event.consumers, event.matrixStack)
+                render(event.context)
             }
         }
     }
@@ -61,23 +60,19 @@ object Rat : Feature(area = "Hub") {
         )
     }
 
-    private fun render(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+    private fun render(context: RenderContext) {
         val camera = client.gameRenderer.camera
         val cameraPos = camera.pos
 
-        //#if MC >= 1.21.9
-        //$$ val frustum = (client.worldRenderer as xyz.meowing.zen.FrustumStorage).`zen$getFrustum`()
-        //#else
-        val frustum = (client.worldRenderer as xyz.meowing.zen.mixins.AccessorWorldRenderer).frustum
-        //#endif
+        val frustum = context.frustum() ?: return
 
         if (position.distanceTo(cameraPos) > 96.0) return
         if (!frustum.isVisible(culling)) return
 
         val itemFrameState = BlockStateManagers.getStateForItemFrame(false, true)
         val blockModel = client.blockRenderManager.getModel(itemFrameState)
-        val consumers = consumers ?: return
-        val matrices = matrixStack ?: return
+        val consumers = context.consumers()
+        val matrices = context.matrixStack() ?: return
 
         matrices.push()
         matrices.translate(

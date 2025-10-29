@@ -48,10 +48,16 @@ object BlockOverlay : Feature("blockoverlay") {
 
     override fun initialize() {
         register<RenderEvent.BlockOutline> { event ->
-            val blockPos = event.blockPos
-            val consumers = event.consumers ?: return@register
+            val blockPos = event.context.blockPos() ?: return@register
+            val blockState = event.context.blockState() ?: return@register
+            val matrixStack = event.context.matrixStack() ?: return@register
+            val consumers = event.context.consumers()
             val camera = client.gameRenderer.camera
-            val blockShape = event.blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
+            val blockShape = blockState.getOutlineShape(
+                EmptyBlockView.INSTANCE,
+                blockPos,
+                ShapeContext.of(camera.focusedEntity)
+            )
             if (blockShape.isEmpty) return@register
 
             val camPos = camera.pos
@@ -59,7 +65,7 @@ object BlockOverlay : Feature("blockoverlay") {
 
             if (blockoverlaybordered) {
                 VertexRendering.drawOutline(
-                    event.matrixStack,
+                    matrixStack,
                     consumers.getBuffer(RenderLayer.getLines()),
                     blockShape,
                     blockPos.x - camPos.x,
@@ -69,12 +75,12 @@ object BlockOverlay : Feature("blockoverlay") {
                 )
             }
 
-            if(blockoverlayfilled) {
+            if (blockoverlayfilled) {
                 Render3D.drawFilledShapeVoxel(
                     blockShape.offset(blockPos),
                     blockoverlaycolor,
-                    event.consumers,
-                    event.matrixStack
+                    consumers,
+                    matrixStack
                 )
             }
         }

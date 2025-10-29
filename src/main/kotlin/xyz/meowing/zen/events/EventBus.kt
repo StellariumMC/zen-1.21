@@ -4,7 +4,8 @@ import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.ScoreboardUtils
 import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.Knit
+import xyz.meowing.knit.internal.events.WorldRenderEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
@@ -27,10 +28,6 @@ import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
 import java.util.concurrent.ConcurrentHashMap
-
-//#if MC < 1.21.9
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-//#endif
 
 object EventBus {
     val messages = mutableListOf<String>()
@@ -83,19 +80,19 @@ object EventBus {
             }
         }
 
-        //#if MC < 1.21.9
-        WorldRenderEvents.LAST.register { context ->
-            post(RenderEvent.World(context.consumers(), context.matrixStack()))
+        Knit.EventBus.register<WorldRenderEvent.Last> { event ->
+            post(RenderEvent.World(event.context))
         }
 
-        WorldRenderEvents.AFTER_ENTITIES.register { context ->
-            post(RenderEvent.WorldPostEntities(context.consumers(), context.matrixStack()))
+        Knit.EventBus.register<WorldRenderEvent.AfterEntities> { event ->
+            post(RenderEvent.WorldPostEntities(event.context))
         }
 
-        WorldRenderEvents.BLOCK_OUTLINE.register { worldContext, blockContext ->
-            !post(RenderEvent.BlockOutline(blockContext.blockPos(), blockContext.blockState(), worldContext.consumers(), worldContext.matrixStack()))
+        Knit.EventBus.register<WorldRenderEvent.BlockOutline> { event ->
+            if (post(RenderEvent.BlockOutline(event.context))) {
+                event.cancel()
+            }
         }
-        //#endif
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             //#if MC >= 1.21.9
@@ -125,12 +122,6 @@ object EventBus {
                 !post(GuiEvent.Key(GLFW.glfwGetKeyName(key, scancode), key, charTyped, scancode, screen))
             }
             //#endif
-
-            GLFW.glfwSetCharCallback(client.window.handle) { window, codepoint ->
-                val charTyped = codepoint.toChar()
-
-                !post(GuiEvent.Key(null, GLFW.GLFW_KEY_UNKNOWN, charTyped, 0, screen))
-            }
 
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
                 post(GuiEvent.AfterRender(screen, context))

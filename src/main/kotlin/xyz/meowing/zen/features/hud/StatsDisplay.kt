@@ -18,7 +18,6 @@ import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.core.FormattingCodes
 import xyz.meowing.vexel.utils.render.NVGRenderer
-import xyz.meowing.vexel.utils.style.Font
 import xyz.meowing.zen.config.ConfigElement
 import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -236,6 +235,12 @@ object StatsDisplay : Feature("statsdisplay", true) {
             val window = KnitClient.client.window
             val guiScale = window.scaleFactor.toFloat()
 
+            //#if MC >= 1.21.7
+            //$$ event.context.matrices.pushMatrix()
+            //#else
+            event.context.matrices.push()
+            //#endif
+
             NVGRenderer.beginFrame(window.width.toFloat(), window.height.toFloat())
             NVGRenderer.push()
             NVGRenderer.scale(guiScale, guiScale)
@@ -246,6 +251,12 @@ object StatsDisplay : Feature("statsdisplay", true) {
             renderDrillFuelBar(event.context)
             NVGRenderer.pop()
             NVGRenderer.endFrame()
+
+            //#if MC >= 1.21.7
+            //$$ event.context.matrices.popMatrix()
+            //#else
+            event.context.matrices.pop()
+            //#endif
         }
     }
 

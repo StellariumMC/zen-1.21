@@ -37,7 +37,7 @@ object ScarfSpawnTimer : Feature("scarfspawntimers", area = "catacombs", subarea
     }
 
     override fun initialize() {
-        createCustomEvent<RenderEvent.World>("render") { event ->
+        createCustomEvent<RenderEvent.World>("render") {
             activeTimers.forEach { timer ->
                 val displayTime = time + timer.offset
                 if (displayTime > 0)

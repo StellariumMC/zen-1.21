@@ -97,8 +97,8 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
                 if (player?.canSee(entity) == true) {
                     Render3D.drawLineToEntity(
                         entity,
-                        event.consumers,
-                        event.matrixStack,
+                        event.context.consumers(),
+                        event.context.matrixStack(),
                         highlightlividcolor.toFloatArray(),
                         highlightlividcolor.alpha.toFloat()
                     )

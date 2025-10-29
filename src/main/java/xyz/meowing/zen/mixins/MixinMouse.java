@@ -21,7 +21,7 @@ public class MixinMouse {
     //#else
     private void zen$onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
     //#endif
-        if (window == KnitResolution.INSTANCE.getWindowHandle()) {
+        if (window == KnitResolution.getWindowHandle()) {
             boolean pressed = action == 1;
             if (pressed) {
                 //#if MC >= 1.21.9
