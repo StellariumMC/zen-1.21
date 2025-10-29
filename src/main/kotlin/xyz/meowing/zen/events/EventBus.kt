@@ -27,6 +27,7 @@ import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.vexel.Vexel
 import java.util.concurrent.ConcurrentHashMap
 
 object EventBus {
@@ -93,6 +94,8 @@ object EventBus {
                 event.cancel()
             }
         }
+
+        Vexel.eventBus.register<xyz.meowing.vexel.events.GuiEvent.Render> { post(GuiEvent.NVGRender()) }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             //#if MC >= 1.21.9

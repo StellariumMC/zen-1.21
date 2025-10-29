@@ -129,8 +129,7 @@ abstract class EntityEvent {
 
 abstract class GuiEvent {
     class AfterRender(val screen: Screen, val context: DrawContext) : Event()
-    @Deprecated("Use RenderEvent.HUD instead.")
-    class HUD(val context: DrawContext) : Event()
+    class NVGRender : Event()
     class Open(val screen: Screen) : Event()
     class Close(val screen: Screen, val handler: ScreenHandler) : CancellableEvent()
     class Click(val mx: Double, val my: Double, val mbtn: Int, val state: Boolean, val screen: Screen) : CancellableEvent()
