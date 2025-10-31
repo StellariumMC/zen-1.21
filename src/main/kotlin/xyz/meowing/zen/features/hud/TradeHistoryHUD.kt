@@ -25,16 +25,16 @@ import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.util.InputUtil
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitKeyboard
+import xyz.meowing.zen.ui.components.ItemComponent
+import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -430,9 +430,9 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             textScale = 0.9.pixels()
         }.setColor(color) childOf parent
 
-        val itemsList = UIContainer().constrain {
+        val itemsGrid = UIContainer().constrain {
             x = 0.percent()
-            y = 20.pixels()
+            y = 16.pixels()
             width = 100.percent()
             height = 64.pixels()
         } childOf parent
@@ -440,37 +440,46 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         var itemWorth = 0L
 
         val filteredItems = items.filter { itemElement ->
-            val itemObj = itemElement.asJsonObject
-            val stack = createItemStack(itemObj)
-            !stack.name.string.removeFormatting().equals("Air", ignoreCase = true)
+            val item = itemElement.asJsonObject.get("id").asString
+            !item.equals("air", ignoreCase = false)
         }
 
         filteredItems.forEachIndexed { index, itemElement ->
-            val itemObj = itemElement.asJsonObject
-            val stack = createItemStack(itemObj)
-            itemWorth += getItemValue(stack) * stack.count
+            val jsonObject = itemElement.asJsonObject
+            val stack = createItemStack(jsonObject)
+            val lore = jsonObject.get("lore").asString
 
-            if (index <= 3) {
-                val itemName = UIText("${stack.count}x ${stack.name.string}").constrain {
-                    x = 2.pixels()
-                    y = (index * 16).pixels()
-                    textScale = 0.8.pixels()
-                }.setColor(Color.WHITE) childOf itemsList
+            val resolution = 14f
+            val xPadding = 3f
+            val yPadding = 3f
 
-                val tooltip = mutableSetOf<String>()
-                tooltip.add(stack.name.string)
-                tooltip.add("§7Count: ${stack.count}")
+            val itemComponent = ItemComponent(stack, resolution).constrain {
+                x = (index % 4 * 16 + 2).pixels()
+                y = (index / 4 * 16 + 2).pixels()
+                width = 14.pixels()
+                height = 14.pixels()
+            } childOf itemsGrid
 
-                itemName.addTooltip(tooltip)
+            val textComponent = UIText(stack.count.toString()).constrain {
+                x = (resolution - xPadding).pixels()
+                y = (resolution - yPadding).pixels()
+                textScale = 0.5.pixels()
+            } childOf itemComponent
+
+            val tooltip = mutableSetOf<String>()
+            tooltip.add(jsonObject.get("name").asString)
+            lore.split('\n').forEach { line ->
+                tooltip.add(line)
             }
-        }
 
-        if (filteredItems.size > 3) {
-            UIText("§7+${items.size() - 3} more").constrain {
-                x = 2.pixels()
-                y = 70.pixels()
-                textScale = 0.7.pixels()
-            }.setColor(theme.accent2) childOf parent
+            val itemValue = getItemValue(stack)
+            if (itemValue > 0) {
+                tooltip.add("§7Value: §6${(itemValue * stack.count).abbreviateNumber()}")
+            }
+
+            itemComponent.addTooltip(tooltip, stack)
+
+            itemWorth += getItemValue(stack)
         }
 
         val totalWorth = itemWorth + coins
@@ -509,7 +518,6 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private fun createItemStack(itemObj: JsonObject): ItemStack {
         val item = Registries.ITEM.get(Identifier.of(itemObj.get("id").asString))
         val stack = ItemStack(item, itemObj.get("count").asInt)
-        stack.damage = itemObj.get("damage").asInt
         return stack
     }
 
@@ -531,8 +539,8 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
         listOf("yourItems", "theirItems").forEach { itemsKey ->
             trade.getAsJsonArray(itemsKey).forEach { itemElement ->
-                val stack = createItemStack(itemElement.asJsonObject)
-                if (stack.name.string.removeFormatting().contains(searchQuery, ignoreCase = true)) return true
+                val name = itemElement.asJsonObject.get("name").asString
+                if (name.removeFormatting().contains(searchQuery, ignoreCase = true)) return true
             }
         }
 
