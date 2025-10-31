@@ -96,7 +96,7 @@ object TradeAPI {
                 if (stack.name.string.removeFormatting().endsWith("coins")) {
                     coins += parseCoins(stack.name.string.removeFormatting())
                 } else {
-                    if(!stack.name.string.removeFormatting().contains("air", true))
+                    if (!stack.isEmpty)
                         items.add(createItemJson(stack))
                 }
             }

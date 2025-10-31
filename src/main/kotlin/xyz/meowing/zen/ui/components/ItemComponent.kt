@@ -25,19 +25,19 @@ class ItemComponent(var stack: ItemStack, var resolution: Float = 16f) : UICompo
             matrices.translate((x + resolution / 2), (y + resolution / 2), 100f)
 
             matrices.scale(resolution, -resolution, resolution)
-            val isSideLit: Boolean = renderState.isSideLit
-
-            if (isSideLit) {
-                vertexConsumers.draw()
-                DiffuseLighting.disableGuiDepthLighting()
-            }
+//            val isSideLit: Boolean = renderState.isSideLit
+//
+//            if (isSideLit) {
+//                vertexConsumers.draw()
+//                DiffuseLighting.disableGuiDepthLighting()
+//            }
 
             renderState.render(matrices, vertexConsumers, 15728880, OverlayTexture.DEFAULT_UV)
             vertexConsumers.draw()
 
-            if (isSideLit) {
-                DiffuseLighting.enableGuiDepthLighting()
-            }
+//            if (isSideLit) {
+//                DiffuseLighting.enableGuiDepthLighting()
+//            }
 
             matrices.pop()
         }

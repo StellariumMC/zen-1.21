@@ -439,12 +439,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
         var itemWorth = 0L
 
-        val filteredItems = items.filter { itemElement ->
-            val item = itemElement.asJsonObject.get("id").asString
-            !item.equals("air", ignoreCase = false)
-        }
-
-        filteredItems.forEachIndexed { index, itemElement ->
+        items.forEachIndexed { index, itemElement ->
             val jsonObject = itemElement.asJsonObject
             val stack = createItemStack(jsonObject)
             val lore = jsonObject.get("lore").asString
@@ -472,14 +467,9 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
                 tooltip.add(line)
             }
 
-            val itemValue = getItemValue(stack)
-            if (itemValue > 0) {
-                tooltip.add("§7Value: §6${(itemValue * stack.count).abbreviateNumber()}")
-            }
-
             itemComponent.addTooltip(tooltip, stack)
 
-            itemWorth += getItemValue(stack)
+            itemWorth += getItemValue(stack) * stack.count
         }
 
         val totalWorth = itemWorth + coins
