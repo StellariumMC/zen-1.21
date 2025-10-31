@@ -3,17 +3,16 @@ package xyz.meowing.zen.utils
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSerializer
-import com.google.gson.JsonPrimitive
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
-import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.GameEvent
 import xyz.meowing.zen.utils.TimeUtils.millis
 import net.fabricmc.loader.api.FabricLoader
+import xyz.meowing.zen.events.core.GameEvent
 import java.awt.Color
 import java.io.File
 import java.lang.reflect.Type
@@ -77,9 +76,7 @@ class DataUtils<T: Any>(fileName: String, private val defaultObject: T, private 
         dataFile.parentFile.mkdirs()
         autosave(5)
         startAutosaveLoop()
-        EventBus.register<GameEvent.Unload> ({
-            save()
-        })
+        EventBus.register<GameEvent.Stop> { save() }
     }
 
     private fun loadData(): T {

@@ -9,10 +9,10 @@ import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.zen.config.FeatureElement
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.ui.Theme
 import xyz.meowing.zen.config.ui.elements.base.ElementRenderer
+import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.managers.config.FeatureElement
 import java.awt.Color
 import kotlin.math.absoluteValue
 

@@ -1,10 +1,6 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.MouseEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.displayName
@@ -13,10 +9,14 @@ import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitPlayer
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.MouseEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object FatalTempoOverlay : Feature("fataltempooverlay",true) {
     private val hits = mutableListOf<Long>()
     private var level = 0
@@ -42,7 +42,7 @@ object FatalTempoOverlay : Feature("fataltempooverlay",true) {
             if (event.button == 0) checkFatal()
         }
 
-        register<RenderEvent.HUD> {
+        register<GuiEvent.Render.HUD> {
             if (HUDManager.isEnabled("Fatal Tempo")) render(it.context)
         }
     }

@@ -1,11 +1,8 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.PacketEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
@@ -17,12 +14,15 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.PacketEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 import kotlin.math.abs
 
-@Zen.Module
+@Module
 object ItemPickupLog : Feature("itempickuplog") {
     private const val name = "Item Pickup Log"
     private var ignoreStacksRegex = listOf("""^§8Quiver.*""".toRegex(), """^§aSkyBlock Menu §7\(Click\)""".toRegex(), """^§bMagical Map""".toRegex())
@@ -58,7 +58,7 @@ object ItemPickupLog : Feature("itempickuplog") {
             }
         }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

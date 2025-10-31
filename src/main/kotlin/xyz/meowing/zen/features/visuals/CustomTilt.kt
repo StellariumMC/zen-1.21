@@ -1,17 +1,17 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.util.math.RotationAxis
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.RenderEvent
 import kotlin.math.sin
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object CustomTilt : Feature("customtilt") {
     private val tiltx by ConfigDelegate<Double>("tiltx")
     private val tilty by ConfigDelegate<Double>("tilty")

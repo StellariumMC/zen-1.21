@@ -1,13 +1,13 @@
 package xyz.meowing.zen.features.mining
 
 import net.minecraft.sound.SoundEvents
-import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TablistEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.TablistEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -19,7 +19,7 @@ import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
 import kotlin.math.max
 
-@Zen.Module
+@Module
 object MiningAbility : Feature("miningability", skyblockOnly = true) {
 
     private const val name = "Mining Ability"
@@ -46,9 +46,9 @@ object MiningAbility : Feature("miningability", skyblockOnly = true) {
     override fun initialize() {
         HUDManager.register(name, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable")
 
-        register<TablistEvent.Update> { parseTablist() }
+        register<TablistEvent.Change> { parseTablist() }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name) && hasWidget) {
                 val x = HUDManager.getX(name)
                 val y = HUDManager.getY(name)

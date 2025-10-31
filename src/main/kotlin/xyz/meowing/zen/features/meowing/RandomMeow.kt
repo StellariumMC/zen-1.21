@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.meowing
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.Timer
@@ -9,11 +8,12 @@ import xyz.meowing.zen.utils.TitleUtils
 import xyz.meowing.zen.utils.Utils
 import net.minecraft.sound.SoundEvents
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.random.Random
 
-@Zen.Module
+@Module
 object RandomMeow : Feature("randommeow") {
     override fun addConfig() {
         ConfigManager

@@ -2,13 +2,13 @@ package xyz.meowing.zen.config.ui
 
 import xyz.meowing.knit.api.render.KnitResolution
 import xyz.meowing.vexel.core.VexelScreen
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.config.ui.elements.base.ConfigValidator
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.CategoryElement
 import xyz.meowing.zen.config.ui.panels.Panel
 import xyz.meowing.zen.config.ui.elements.MCColorCode
+import xyz.meowing.zen.managers.config.CategoryElement
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
 

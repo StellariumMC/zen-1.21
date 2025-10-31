@@ -1,12 +1,7 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TickEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
@@ -21,12 +16,23 @@ import net.minecraft.util.DyeColor
 import net.minecraft.util.math.BlockPos
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonFloor
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.TickEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
-object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = listOf("F5", "M5")) {
+@Module
+object HighlightLivid : Feature(
+    "highlightlivid",
+    island = SkyBlockIsland.THE_CATACOMBS,
+    dungeonFloor = listOf(DungeonFloor.F5, DungeonFloor.M5)
+) {
     private var lividEntity: Entity? = null
     private val lividPos = BlockPos(5, 108, 42)
     private val lividTypes = mapOf(
@@ -92,7 +98,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
             }
         }
 
-        createCustomEvent<RenderEvent.World>("renderLine") { event ->
+        createCustomEvent<RenderEvent.World.Last>("renderLine") { event ->
             lividEntity?.let { entity ->
                 if (player?.canSee(entity) == true) {
                     Render3D.drawLineToEntity(
@@ -140,7 +146,7 @@ object HighlightLivid : Feature("highlightlivid", area = "catacombs", subarea = 
             }
         }
 
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             unregisterRender()
         }
     }

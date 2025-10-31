@@ -2,15 +2,19 @@ package xyz.meowing.zen.api
 
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.*
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.PartyChangeType
+import xyz.meowing.zen.events.core.PartyEvent
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.LoopUtils.setTimeout
 import xyz.meowing.zen.utils.Utils.chestName
 import xyz.meowing.zen.utils.Utils.getRegexGroups
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
-@Zen.Module
+@Module
 object PartyTracker {
     private val destructionRegex = """^The party was disbanded because all invites expired and the party was empty\.|[^ ]+ has disbanded the party!|You (?:left|have left|have been kicked from|were kicked from) the party\.|You (?:are not in a party right now|are not in a party|are not currently in a party\.)""".toRegex()
     private val partyTransferRegex = """^The party was transferred to (?:\[[^]]+]\s*)?(?<newLeader>[^ ]+)(?: because (?<leavingPlayer>[^ ]+) left| by .*)?""".toRegex()
@@ -38,7 +42,8 @@ object PartyTracker {
     )
 
     init {
-        EventBus.register<ChatEvent.Receive> ({ event ->
+        EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val clean = event.message.string.removeFormatting()
 
             when {
@@ -54,9 +59,9 @@ object PartyTracker {
             }
 
             handlePartyMessage(clean)
-        })
+        }
 
-        EventBus.register<GuiEvent.Slot.Click> ({ event ->
+        EventBus.register<GuiEvent.Slot.Click> { event ->
             if (!event.screen.chestName.startsWith("Party Finder")) return@register
 
             val stackName = event.slot?.stack?.name?.string?.removeFormatting() ?: return@register
@@ -91,7 +96,7 @@ object PartyTracker {
                 partyMembers[leaderName]?.leader = true
                 playerInParty = true
             }
-        })
+        }
     }
 
     private fun addSelfToParty(selfLeader: Boolean) {

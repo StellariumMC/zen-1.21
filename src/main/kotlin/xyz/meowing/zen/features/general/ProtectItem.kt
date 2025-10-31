@@ -1,15 +1,12 @@
 package xyz.meowing.zen.features.general
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.uuid
-import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.chestName
@@ -25,8 +22,13 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 //#if MC >= 1.21.9
@@ -39,7 +41,7 @@ import java.awt.Color
  *
  * @license GPL-3.0
  */
-@Zen.Module
+@Module
 object ProtectItem : Feature("protectitem", true) {
     val protectedItems = DataUtils("protected_items", mutableSetOf<String>())
     val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
@@ -64,7 +66,7 @@ object ProtectItem : Feature("protectitem", true) {
 
     override fun initialize() {
         register<EntityEvent.ItemToss> { event ->
-            if (LocationUtils.checkArea("catacombs")) return@register
+            if (SkyBlockIsland.THE_CATACOMBS.inIsland()) return@register
             if (isProtected(event.stack)) {
                 sendProtectionMessage("dropping", event.stack.name.string)
                 event.cancel()
@@ -153,7 +155,7 @@ object ProtectItem : Feature("protectitem", true) {
     }
 }
 
-@Zen.Command
+@Command
 object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zenpi") {
     init {
         literal("gui") {

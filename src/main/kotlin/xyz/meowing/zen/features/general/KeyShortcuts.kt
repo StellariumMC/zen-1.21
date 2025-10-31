@@ -12,11 +12,8 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.KeyEvent
-import xyz.meowing.zen.events.MouseEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
@@ -28,9 +25,13 @@ import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitInputs
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
-import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.KeyEvent
+import xyz.meowing.zen.events.core.MouseEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 data class KeybindEntry(
@@ -40,7 +41,7 @@ data class KeybindEntry(
 
 data class KeybindData(val bindings: MutableList<KeybindEntry> = mutableListOf())
 
-@Zen.Module
+@Module
 object KeyShortcuts : Feature("keyshortcuts") {
     val bindings get() = dataUtils.getData().bindings
     val dataUtils = DataUtils("keybind", KeybindData())
@@ -137,7 +138,7 @@ object KeyShortcuts : Feature("keyshortcuts") {
     }
 }
 
-@Zen.Command
+@Command
 object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
     init {
         runs {

@@ -1,21 +1,24 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.EntityDetection
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.*
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.mob.EndermanEntity
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.util.concurrent.ConcurrentHashMap
 
-@Zen.Module
+@Module
 object HideEndermanLaser : Feature("hideendermanlaser", true) {
     private val hideForOption by ConfigDelegate<Int>("hideendermanlaserboss")
     private val endermanCache = ConcurrentHashMap<Int, EndermanEntity>()
@@ -49,12 +52,12 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
             }
         }
 
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             clearCache()
             cacheInitialized = false
         }
 
-        register<EntityEvent.Metadata> { event ->
+        register<EntityEvent.Packet.Metadata> { event ->
             nametagData[event.entity.id] = event.name.removeFormatting()
         }
 

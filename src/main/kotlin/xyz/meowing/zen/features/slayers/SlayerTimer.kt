@@ -2,21 +2,22 @@ package xyz.meowing.zen.features.slayers
 
 import com.google.gson.JsonObject
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.SlayerTracker.bossType
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.utils.Utils.decodeRoman
 import kotlin.time.Duration
 
-@Zen.Module
+@Module
 object SlayerTimer : Feature("slayertimer", true) {
     val slayerRecord = DataUtils("slayerRecords", JsonObject())
 
@@ -68,7 +69,7 @@ object SlayerTimer : Feature("slayertimer", true) {
 }
 
 
-@Zen.Command
+@Command
 object SlayerPBCommand : Commodore("zenslayers", "zenpb") {
     init {
         runs {

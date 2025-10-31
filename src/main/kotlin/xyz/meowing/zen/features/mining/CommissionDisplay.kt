@@ -1,18 +1,18 @@
 package xyz.meowing.zen.features.mining
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TablistEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.TablistEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.TextStyle
 import xyz.meowing.zen.utils.ScoreboardUtils
 
-@Zen.Module
+@Module
 object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     private const val name = "Commissions"
     private val commissions = mutableListOf<String>()
@@ -29,9 +29,9 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     override fun initialize() {
         HUDManager.register(name, "§9§lCommissions:\n§fGoblin Slayer: §c0%")
 
-        register<TablistEvent.Update> { parseTablist() }
+        register<TablistEvent.Change> { parseTablist() }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name) && hasData) {
                 val x = HUDManager.getX(name)
                 val y = HUDManager.getY(name)
@@ -47,7 +47,6 @@ object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
     private fun parseTablist() {
         val entries = ScoreboardUtils.getTabListEntriesString()
         val index = entries.indexOfFirst { it.equals("Commissions:", ignoreCase = true) }
-
 
         commissions.clear()
 

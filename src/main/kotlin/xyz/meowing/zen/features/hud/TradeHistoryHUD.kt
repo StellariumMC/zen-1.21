@@ -16,31 +16,29 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UMatrixStack
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.ItemAPI
 import xyz.meowing.zen.api.TradeAPI
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.util.InputUtil
 import net.minecraft.item.ItemStack
 import net.minecraft.registry.Registries
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
-import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitKeyboard
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.events.core.GuiEvent
 import java.awt.Color
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Zen.Command
+@Command
 object TradeHistoryCommand : Commodore("tradelogs", "zentl", "zentrades") {
     init {
         runs {
@@ -91,7 +89,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     init {
         buildGui()
         updateTrades()
-        EventBus.register<GuiEvent.AfterRender> { drawContext = it.context }
+        EventBus.register<GuiEvent.Render.Post> { drawContext = it.context }
     }
 
     private fun createBlock(radius: Float): UIRoundedRectangle = UIRoundedRectangle(radius)

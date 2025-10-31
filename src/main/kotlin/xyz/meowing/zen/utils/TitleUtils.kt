@@ -1,10 +1,10 @@
 package xyz.meowing.zen.utils
 
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.utils.TimeUtils.millis
 import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.zen.events.core.GuiEvent
 import java.util.*
 
 object TitleUtils {
@@ -22,7 +22,7 @@ object TitleUtils {
     private var startTime = TimeUtils.zero
 
     init {
-        EventBus.register<RenderEvent.HUD> ({ render(it.context) })
+        EventBus.register<GuiEvent.Render.HUD> { render(it.context) }
     }
 
     fun showTitle(title: String?, subtitle: String?, duration: Int, scale: Float = 4.0f) {

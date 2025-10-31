@@ -1,20 +1,21 @@
 package xyz.meowing.zen.features.rift
 
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
+import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.isHolding
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils.toColorInt
 import java.awt.Color
 
-@Zen.Module
-object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
+@Module
+object CoherentRodOverlay : Feature("coherentrodoverlay", island = SkyBlockIsland.THE_RIFT) {
     private val coherentrodoverlaycolor by ConfigDelegate<Color>("coherentrodoverlaycolor")
 
     override fun addConfig() {
@@ -31,7 +32,7 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", area = "the rift") {
 
 
     override fun initialize() {
-        register<RenderEvent.World> { event ->
+        register<RenderEvent.World.Last> { event ->
             if (isHolding("NEARLY_COHERENT_ROD")) {
                 val player = player ?: return@register
                 val color = coherentrodoverlaycolor

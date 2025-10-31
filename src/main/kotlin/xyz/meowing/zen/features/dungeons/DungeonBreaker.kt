@@ -1,9 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.PacketEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.lore
@@ -11,11 +8,15 @@ import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.PacketEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
-object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
+@Module
+object DungeonBreaker : Feature("dungeonbreaker", island = SkyBlockIsland.THE_CATACOMBS) {
     private const val name = "Dungeon Breaker Charges"
     private val regex = "Charges: (\\d+)/(\\d+)⸕".toRegex()
     private var charges = 0
@@ -44,7 +45,7 @@ object DungeonBreaker : Feature("dungeonbreaker", area = "catacombs") {
             }
         }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (max == 0 || !HUDManager.isEnabled(name)) return@register
             val x = HUDManager.getX(name)
             val y = HUDManager.getY(name)

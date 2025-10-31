@@ -8,7 +8,7 @@ import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.zen.config.CategoryElement
+import xyz.meowing.zen.managers.config.CategoryElement
 import xyz.meowing.zen.ui.Theme
 import kotlin.math.max
 

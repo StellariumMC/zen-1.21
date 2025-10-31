@@ -1,17 +1,17 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object SoulflowDisplay : Feature("soulflowdisplay") {
     private const val name = "Soulflow Display"
 
@@ -27,7 +27,7 @@ object SoulflowDisplay : Feature("soulflowdisplay") {
     override fun initialize() {
         HUDManager.register(name, "§3500⸎ Soulflow")
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

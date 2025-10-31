@@ -13,12 +13,10 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.mixins.AccessorChatHud
 import xyz.meowing.zen.utils.DataUtils
@@ -33,10 +31,13 @@ import xyz.meowing.knit.api.input.KnitKey
 import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.events.KeyEvent
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.KeyEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 import java.util.regex.Pattern
 
@@ -57,7 +58,7 @@ data class ChatPattern(
 
 data class ChatPatterns(val patterns: MutableList<ChatPattern> = mutableListOf())
 
-@Zen.Module
+@Module
 object ChatCleaner : Feature("chatcleaner") {
     private val chatcleanerkey by ConfigDelegate<Int>("chatcleanerkey")
     val patterns get() = dataUtils.getData().patterns
@@ -90,6 +91,7 @@ object ChatCleaner : Feature("chatcleaner") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val message = event.message.string.removeFormatting()
             if (patterns.any { it.matches(message) }) event.cancel()
         }
@@ -160,7 +162,7 @@ object ChatCleaner : Feature("chatcleaner") {
     }
 }
 
-@Zen.Command
+@Command
 object ChatCleanerCommand : Commodore("chatcleaner", "zencc", "zenchatcleaner") {
     init {
         runs {

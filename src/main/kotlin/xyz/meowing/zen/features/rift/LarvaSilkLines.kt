@@ -1,12 +1,7 @@
 package xyz.meowing.zen.features.rift
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.isHolding
 import xyz.meowing.zen.utils.Render3D
@@ -16,12 +11,18 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
-object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
+@Module
+object LarvaSilkLines : Feature("larvasilklines", island = SkyBlockIsland.THE_RIFT) {
     private var startingSilkPos: BlockPos? = null
     private val larvasilklinescolor by ConfigDelegate<Color>("larvasilklinescolor")
 
@@ -39,7 +40,7 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
 
 
     override fun initialize() {
-        createCustomEvent<RenderEvent.World>("render") { event ->
+        createCustomEvent<RenderEvent.World.Last>("render") { event ->
             if (startingSilkPos == null) return@createCustomEvent
 
             if (isHolding("LARVA_SILK")) {
@@ -61,6 +62,8 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
         }
 
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
+
             if (event.message.string.removeFormatting().startsWith("You cancelled the wire")) {
                 startingSilkPos = null
                 unregisterEvent("render")
@@ -79,7 +82,7 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
             }
         }
 
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             startingSilkPos = null
             unregisterEvent("render")
         }

@@ -1,12 +1,12 @@
 package xyz.meowing.zen.api
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.EventBus
+import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
-@Zen.Module
+@Module
 object PetTracker {
     private val AUTO_PET = "Autopet equipped your \\[Lvl (?<level>\\d+)] (?<name>.*?)! VIEW RULE".toRegex()
     private val PET_LEVEL = "Your (?<name>.*?) leveled up to level (?<newLevel>\\d+)!".toRegex()
@@ -24,6 +24,7 @@ object PetTracker {
 
     init {
         EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val message = event.message.string.removeFormatting()
 
             AUTO_PET.find(message)?.let { match ->

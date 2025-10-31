@@ -2,17 +2,17 @@ package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.world
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.SkyblockEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object VengDamage : Feature("vengdmg", true) {
     private var nametagID = -1
     private val veng = Pattern.compile("^\\d+(,\\d+)*ﬗ$")

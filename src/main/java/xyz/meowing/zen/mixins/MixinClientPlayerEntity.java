@@ -1,6 +1,5 @@
 package xyz.meowing.zen.mixins;
 
-import xyz.meowing.zen.events.EntityEvent;
 import xyz.meowing.zen.events.EventBus;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -12,6 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import xyz.meowing.zen.events.core.EntityEvent;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class MixinClientPlayerEntity {

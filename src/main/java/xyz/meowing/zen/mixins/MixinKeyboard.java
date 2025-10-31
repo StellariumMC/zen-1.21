@@ -4,8 +4,6 @@ import net.minecraft.client.gui.screen.Screen;
 import org.lwjgl.glfw.GLFW;
 import xyz.meowing.knit.api.KnitClient;
 import xyz.meowing.zen.events.EventBus;
-import xyz.meowing.zen.events.GuiEvent;
-import xyz.meowing.zen.events.KeyEvent;
 import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +11,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.meowing.zen.events.core.GuiEvent;
+import xyz.meowing.zen.events.core.KeyEvent;
 
 //#if MC >= 1.21.9
 //$$ import net.minecraft.client.input.KeyInput;

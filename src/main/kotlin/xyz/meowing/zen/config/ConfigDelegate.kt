@@ -1,7 +1,7 @@
 package xyz.meowing.zen.config
 
-import xyz.meowing.zen.Zen.Companion.configUI
 import xyz.meowing.zen.config.ui.elements.MCColorCode
+import xyz.meowing.zen.managers.config.ConfigManager.configUI
 import java.awt.Color
 import kotlin.reflect.KProperty
 

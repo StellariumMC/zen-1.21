@@ -1,11 +1,5 @@
 package xyz.meowing.zen.utils
 
-import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.AreaEvent
-import xyz.meowing.zen.events.TablistEvent
-import xyz.meowing.zen.events.WorldEvent
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.math.floor
 
 object DungeonUtils {
@@ -16,7 +10,6 @@ object DungeonUtils {
     private var currentClass: String? = null
     private var currentLevel = 0
     private val players = mutableMapOf<String, PlayerData>()
-    private var cryptsTab: EventBus.EventCall? = null
 
     data class PlayerData(val name: String, val className: String, val level: Int)
 
@@ -24,57 +17,6 @@ object DungeonUtils {
     private val Data = DataUtils("DungeonUtils", PersistentData())
 
     init {
-        EventBus.register<AreaEvent.Main> ({ event ->
-            val inCatacombs = event.area.equals("catacombs", true)
-
-            if (inCatacombs && cryptsTab == null) {
-                cryptsTab = EventBus.register<TablistEvent.Update> ({ tabEvent ->
-                    tabEvent.packet.entries.forEach { entry ->
-                        val text = entry.displayName?.string?.removeFormatting() ?: return@forEach
-
-                        cryptsRegex.find(text)?.let {
-                            crypts = it.groupValues[1].toIntOrNull() ?: crypts
-                        }
-
-                        playerInfoRegex.find(text)?.let { match ->
-                            val playerName = match.groupValues[1]
-                            val className = match.groupValues[2]
-                            val levelStr = match.groupValues[4]
-                            val level = if (levelStr.isNotEmpty()) Utils.decodeRoman(levelStr) else 0
-
-                            players[playerName] = PlayerData(playerName, className, level)
-
-                            if (playerName == player?.name?.string) {
-                                currentClass = className
-                                currentLevel = level
-                            }
-                        }
-                    }
-                })
-            }
-
-            if (!inCatacombs) {
-                cryptsTab?.unregister()
-                cryptsTab = null
-                reset()
-            }
-        })
-
-        EventBus.register<TablistEvent.Update> ({ event ->
-            event.packet.entries.forEach { entry ->
-                val text = entry.displayName?.string?.removeFormatting() ?: return@forEach
-                cataRegex.find(text)?.let { match ->
-                    val cata = match.groupValues[1].toIntOrNull()
-                    if (cata != null) updateData { it.cataLevel = cata }
-                }
-            }
-        })
-
-        EventBus.register<WorldEvent.Change> ({
-            cryptsTab?.unregister()
-            cryptsTab = null
-            reset()
-        })
     }
 
     private fun reset() {

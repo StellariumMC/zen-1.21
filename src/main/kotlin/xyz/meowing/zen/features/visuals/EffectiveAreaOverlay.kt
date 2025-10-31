@@ -1,12 +1,9 @@
 package xyz.meowing.zen.features.visuals
 
 import net.minecraft.block.ShapeContext
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
@@ -20,10 +17,13 @@ import net.minecraft.world.EmptyBlockView
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
+@Module
 object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
     private val items = listOf(
         "BAT_WAND",
@@ -56,7 +56,7 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
     val cachedBlockShapes = mutableSetOf<Any>()
 
     override fun initialize() {
-        register<RenderEvent.World> { event ->
+        register<RenderEvent.World.Last> { event ->
             val held = player?.mainHandStack?.skyblockID ?: return@register
             if (held in items) {
                 val lookingAt = player?.raycast(if (held == "BAT_WAND" || held == "STARRED_BAT_WAND") 45.0 else 9.0, Utils.partialTicks, false) ?: return@register

@@ -1,6 +1,5 @@
 package xyz.meowing.zen.api
 
-import xyz.meowing.zen.Zen.Companion.mayorData
 import xyz.meowing.zen.api.EntityDetection.bossID
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.events.*
@@ -12,18 +11,25 @@ import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.mob.SpiderEntity
+import tech.thatgravyboat.skyblockapi.api.data.Perk
 import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.ScoreboardEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.events.core.TickEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-@Zen.Module
+@Module
 object SlayerTracker {
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
     private val killRegex = " (?<kills>.*)/(?<target>.*) Kills".toRegex()
     private val tierXp = mapOf("I" to 5, "II" to 25, "III" to 100, "IV" to 500, "V" to 1500)
 
-    private val serverTickCall = EventBus.register<TickEvent.Server>({ serverTicks++ }, false)
+    private val serverTickCall = EventBus.register<TickEvent.Server>(add = false) { serverTicks++ }
 
     private var slayerSpawnedAtTime = TimeUtils.zero
     private var currentMobKills = 0
@@ -84,12 +90,11 @@ object SlayerTracker {
             questStartedAtTime = TimeUtils.now
         }
 
-        EventBus.register<SidebarUpdateEvent> { event ->
-            event.lines.firstNotNullOfOrNull { killRegex.find(it) }?.let { match ->
+        EventBus.register<ScoreboardEvent.Update> { event ->
+            event.new.firstNotNullOfOrNull { killRegex.find(it) }?.let { match ->
                 val killsInt = match.groupValues[1].toIntOrNull() ?: return@register
 
                 if (killsInt != currentMobKills) {
-                    // Start the session timer if it's not already started
                     if (sessionStart.isZero) sessionStart = TimeUtils.now
                     if (questStartedAtTime.isZero) questStartedAtTime = TimeUtils.now
 
@@ -159,7 +164,7 @@ object SlayerTracker {
             resetBossTracker()
         }
 
-        EventBus.register<WorldEvent.Change> {
+        EventBus.register<LocationEvent.WorldChange> {
             mobLastKilledAt = TimeUtils.zero
         }
 
@@ -204,7 +209,7 @@ object SlayerTracker {
             else -> 0
         }
 
-        val isAatrox = mayorData?.mayor?.perks?.any { it.name == "Slayer XP Buff" } == true || mayorData?.mayor?.minister?.perks?.any { it.name == "Slayer XP Buff" } == true
+        val isAatrox = Perk.SLAYER_XP_BUFF.active
         if (isAatrox) return (xp * 1.25).toInt()
 
         return xp
