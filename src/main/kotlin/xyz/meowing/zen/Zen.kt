@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import xyz.meowing.zen.config.ZenConfig
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.DataUtils
@@ -21,13 +20,13 @@ import xyz.meowing.zen.features.Debug
 import xyz.meowing.zen.features.FeatureLoader
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.NetworkUtils
-import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import org.apache.logging.log4j.LogManager
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.loader.KnitModInfo
 import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.zen.config.ui.ClickGUI
 
 data class firstInstall(val isFirstInstall: Boolean = true)
 
@@ -133,7 +132,7 @@ class Zen : ClientModInitializer {
         private val areaFeatures = mutableListOf<Feature>()
         private val subareaFeatures = mutableListOf<Feature>()
         private val skyblockFeatures = mutableListOf<Feature>()
-        lateinit var configUI: ConfigUI
+        lateinit var configUI: ClickGUI
         const val prefix = "§7[§bZen§7]"
         val features = mutableListOf<Feature>()
         val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())

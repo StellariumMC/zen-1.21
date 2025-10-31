@@ -27,7 +27,7 @@ import xyz.meowing.zen.Zen.Companion.features
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.RenderEvent

@@ -13,7 +13,7 @@ import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.KeyEvent
 import xyz.meowing.zen.events.MouseEvent

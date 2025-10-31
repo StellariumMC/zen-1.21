@@ -1,48 +1,47 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.utils.Utils.createBlock
-import java.awt.Color
+import xyz.meowing.vexel.animations.EasingType
+import xyz.meowing.vexel.animations.colorTo
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.zen.ui.Theme
 
 class ButtonElement(
     text: String,
-    private val onClick: (() -> Unit)? = null
-) : UIContainer() {
-    private val normalBg = Color(18, 24, 28, 255)
-    private val hoverBg = Color(25, 35, 40, 255)
-    private val pressedBg = Color(40, 80, 90, 255)
-    private val textColor = Color(170, 230, 240, 255)
+    private val onClick: () -> Unit
+) : VexelElement<ButtonElement>() {
+
+    private val button = Rectangle(Theme.Bg.color, Theme.Border.color, 5f, 1f, floatArrayOf(8f, 16f, 8f, 16f))
+        .setSizing(228f, Size.Pixels, 0f, Size.Auto)
+        .setPositioning(6f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .childOf(this)
+
+    private val buttonText = Text(text, Theme.Text.color, 16f)
+        .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
+        .childOf(button)
 
     init {
-        val container = createBlock(3f).constrain {
-            x = 0.pixels()
-            y = 0.pixels()
-            width = 100.percent()
-            height = 100.percent()
-        }.setColor(normalBg) childOf this
+        setSizing(240f, Size.Pixels, 40f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
 
-        UIText(text).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            textScale = 0.9.pixels()
-        }.setColor(textColor) childOf container
+        button.onHover(
+            { _, _ -> button.colorTo(Theme.BgLight.color, 150, EasingType.EASE_OUT) },
+            { _, _ -> button.colorTo(Theme.Bg.color, 150, EasingType.EASE_IN) }
+        )
 
-        container.onMouseEnter {
-            animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, hoverBg.toConstraint()) }
-        }.onMouseLeave {
-            animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, normalBg.toConstraint()) }
-        }.onMouseClick {
-            onClick?.invoke()
-            animate {
-                setColorAnimation(Animations.OUT_EXP, 0.1f, pressedBg.toConstraint())
-                onComplete {
-                    animate { setColorAnimation(Animations.OUT_QUAD, 0.2f, normalBg.toConstraint()) }
+        button.onClick { _, _, btn ->
+            if (btn == 0) {
+                button.colorTo(Theme.Highlight.withAlpha(0.8f), 100, EasingType.EASE_OUT) {
+                    button.colorTo(Theme.BgLight.color, 100, EasingType.EASE_IN)
                 }
-            }
+                onClick()
+                true
+            } else false
         }
     }
+
+    override fun onRender(mouseX: Float, mouseY: Float) {}
 }

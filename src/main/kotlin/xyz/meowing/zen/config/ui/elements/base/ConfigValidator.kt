@@ -1,4 +1,4 @@
-package xyz.meowing.zen.config.ui.core
+package xyz.meowing.zen.config.ui.elements.base
 
 import xyz.meowing.zen.config.ui.types.ConfigValue
 

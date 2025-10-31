@@ -22,9 +22,9 @@ class Handler<T>(private val key: String, private val clazz: Class<T>) {
     }
 
     private fun convertValue(value: Any?): Any {
-        return when {
-            clazz == MCColorCode::class.java && value is String -> MCColorCode.entries.find { it.code == value || it.name == value || it.displayName == value } ?: getBuiltInDefault()
-            clazz == Set::class.java && value is List<*> -> value.mapNotNull { (it as? Number)?.toInt() }.toSet()
+        return when (clazz) {
+            MCColorCode::class.java if value is String -> MCColorCode.entries.find { it.code == value || it.name == value || it.displayName == value } ?: getBuiltInDefault()
+            Set::class.java if value is List<*> -> value.mapNotNull { (it as? Number)?.toInt() }.toSet()
             else -> value ?: getBuiltInDefault()
         }
     }
@@ -47,7 +47,7 @@ class Handler<T>(private val key: String, private val clazz: Class<T>) {
 
     operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         if (!isInitialized) {
-            ConfigManager.getConfigValue(key)?.let { currentValue ->
+            configUI.getConfigValue(key)?.let { currentValue ->
                 @Suppress("UNCHECKED_CAST")
                 cachedValue = convertValue(currentValue) as T
                 isInitialized = true

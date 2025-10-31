@@ -1,83 +1,40 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.utils.Utils.createBlock
-import java.awt.Color
+import xyz.meowing.vexel.elements.Switch
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.zen.ui.Theme
 
 class SwitchElement(
-    private var isOn: Boolean = false,
-    roundness: Float = 6f,
-    private val handleWidth: Float = 25f,
-    private val onChange: ((Boolean) -> Unit)? = null
-) : UIContainer() {
-    private val onColor = Color(100, 245, 255, 255)
-    private val offColor = Color(60, 75, 85, 255)
-    private val bgColor = Color(18, 22, 26, 255)
-    private val hoverColor = Color(22, 26, 30, 255)
+    name: String,
+    initialValue: Boolean
+) : VexelElement<SwitchElement>() {
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .childOf(this)
 
-    private val bg: UIComponent
-    private val handle: UIComponent
+    val switch = Switch(
+        thumbColor = 0xFFFFFFFF.toInt(),
+        trackEnabledColor = Theme.Success.color,
+        trackDisabledColor = Theme.BgDark.color,
+        thumbRadius = 5f,
+        borderRadius = 5f,
+        thumbWidth = 12f,
+        thumbHeight = 12f,
+        padding = floatArrayOf(0f, 0f, 0f, 0f)
+    )
+        .setSizing(40f, Size.Pixels, 16f, Size.Pixels)
+        .setPositioning(-5f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .alignRight()
+        .childOf(this)
 
     init {
-        bg = createBlock(roundness).constrain {
-            x = 0.pixels()
-            y = 0.pixels()
-            width = 100.percent()
-            height = 100.percent()
-        }.setColor(bgColor) childOf this
-
-        handle = createBlock(roundness).constrain {
-            x = if (isOn) (100 - handleWidth - 5).percent() else 5.percent()
-            y = CenterConstraint()
-            width = handleWidth.percent()
-            height = 80.percent()
-        }.setColor(if (isOn) onColor else offColor) childOf bg
-
-        setupEventHandlers()
+        setSizing(240f, Size.Pixels, 32f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
+        switch.setEnabled(initialValue, animated = false, silent = true)
     }
 
-    private fun setupEventHandlers() {
-        onMouseEnter {
-            bg.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, hoverColor.toConstraint())
-            }
-        }
-
-        onMouseLeave {
-            bg.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, bgColor.toConstraint())
-            }
-        }
-
-        onMouseClick {
-            toggle()
-        }
-    }
-
-    fun setValue(value: Boolean, skipAnimation: Boolean = false) {
-        isOn = value
-
-        if (skipAnimation) {
-            handle.constrain {
-                x = if (isOn) (100 - handleWidth - 5).percent() else 5.percent()
-            }
-            handle.setColor(if (isOn) onColor else offColor)
-        } else {
-            handle.animate {
-                setXAnimation(Animations.OUT_EXP, 0.5f, if (isOn) (100 - handleWidth - 5).percent() else 5.percent())
-                setColorAnimation(Animations.OUT_EXP, 0.5f, (if (isOn) onColor else offColor).toConstraint())
-            }
-        }
-    }
-
-    fun toggle() {
-        setValue(!isOn)
-        onChange?.invoke(isOn)
-    }
-
-    fun getValue(): Boolean = isOn
+    override fun onRender(mouseX: Float, mouseY: Float) {}
 }

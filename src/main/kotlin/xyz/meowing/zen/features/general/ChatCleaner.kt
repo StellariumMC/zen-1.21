@@ -16,7 +16,7 @@ import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature

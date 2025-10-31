@@ -1,12 +1,11 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import gg.essential.elementa.utils.withAlpha
-import xyz.meowing.zen.utils.Utils.createBlock
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.zen.ui.Theme
 import java.awt.Color
 
 enum class MCColorCode(val code: String, val color: Color, val displayName: String) {
@@ -29,95 +28,70 @@ enum class MCColorCode(val code: String, val color: Color, val displayName: Stri
 }
 
 class MCColorPickerElement(
-    initialValue: MCColorCode = MCColorCode.WHITE,
-    private val onChange: ((MCColorCode) -> Unit)? = null
-) : UIContainer() {
-    private var selectedColor: MCColorCode = initialValue
-    private val colorGrid: UIContainer
-    private val colorButtons = mutableMapOf<MCColorCode, UIComponent>()
-    private val selectionBorders = mutableMapOf<MCColorCode, UIComponent>()
+    name: String,
+    private var selectedColor: MCColorCode
+) : VexelElement<MCColorPickerElement>() {
+
+    private val colorBoxes = mutableListOf<Rectangle>()
+
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 6f, Pos.ParentPixels)
+        .childOf(this)
 
     init {
-        colorGrid = UIContainer().constrain {
-            x = 0.pixels()
-            y = CenterConstraint()
-            width = 100.percent()
-            height = 18.pixels()
-        } childOf this
+        setSizing(240f, Size.Pixels, 48f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
 
-        createColorButtons()
-        updateSelection()
+        createColorGrid()
     }
 
-    private fun createColorButtons() {
+    private fun createColorGrid() {
         val colors = MCColorCode.entries
-        val totalColors = colors.size
-        val spacing = 1f
 
-        colors.forEachIndexed { index, colorCode ->
-            val buttonWidthPercent = (100f - (totalColors - 1) * spacing) / totalColors
-            val buttonWidth = buttonWidthPercent.percent()
-            val xOffset = (index * (buttonWidthPercent + spacing)).percent()
+        colors.forEachIndexed { index, mcColor ->
+            val colorBox = Rectangle(
+                mcColor.color.rgb,
+                if (mcColor == selectedColor) Theme.Border.color else 0x00000000,
+                2f,
+                if (mcColor == selectedColor) 2f else 0f
+            )
+                .setSizing(13f, Size.Pixels, 13f, Size.Pixels)
+                .setPositioning(
+                    6f + index * 14f,
+                    Pos.ParentPixels,
+                    26f,
+                    Pos.ParentPixels
+                )
+                .childOf(this)
 
-            val borderContainer = UIContainer().constrain {
-                x = xOffset
-                y = 0.pixels()
-                width = buttonWidth
-                height = 100.percent()
-            } childOf colorGrid
-
-            val selectionBorder = createBlock(2f).constrain {
-                x = (-1).pixels()
-                y = (-1).pixels()
-                width = 100.percent() + 2.pixels()
-                height = 100.percent() + 2.pixels()
-            }.setColor(Color(170, 230, 240, 255)) childOf borderContainer
-
-            val button = createBlock(2f).constrain {
-                x = 0.pixels()
-                y = 0.pixels()
-                width = 100.percent()
-                height = 100.percent()
-            }.setColor(colorCode.color) childOf borderContainer
-
-            button.onMouseClick {
-                selectedColor = colorCode
-                updateSelection()
-                onChange?.invoke(colorCode)
-                button.setColor(colorCode.color)
+            colorBox.onClick { _, _, _ ->
+                selectColor(mcColor)
+                true
             }
 
-            button.onMouseEnter {
-                if (selectedColor != colorCode) {
-                    animate {
-                        setColorAnimation(Animations.OUT_QUAD, 0.1f, colorCode.color.withAlpha(180).toConstraint())
-                    }
-                }
-            }
-
-            button.onMouseLeave {
-                if (selectedColor != colorCode) {
-                    animate {
-                        setColorAnimation(Animations.OUT_QUAD, 0.1f, colorCode.color.toConstraint())
-                    }
-                }
-            }
-
-            colorButtons[colorCode] = button
-            selectionBorders[colorCode] = selectionBorder
+            colorBoxes.add(colorBox)
         }
+    }
+
+    private fun selectColor(mcColor: MCColorCode) {
+        selectedColor = mcColor
+        updateSelection()
+        onValueChange.forEach { it.invoke(selectedColor) }
     }
 
     private fun updateSelection() {
-        selectionBorders.forEach { (colorCode, border) ->
-            if (colorCode == selectedColor) border.unhide() else border.hide()
+        val colors = MCColorCode.entries
+
+        colorBoxes.forEachIndexed { index, box ->
+            if (colors[index] == selectedColor) {
+                box.borderThickness = 2f
+                box.borderColor = Theme.Border.color
+            } else {
+                box.borderThickness = 0f
+                box.borderColor = 0x00000000
+            }
         }
     }
 
-    fun setValue(colorCode: MCColorCode) {
-        selectedColor = colorCode
-        updateSelection()
-    }
-
-    fun getValue(): MCColorCode = selectedColor
+    override fun onRender(mouseX: Float, mouseY: Float) {}
 }

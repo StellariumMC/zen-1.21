@@ -1,141 +1,125 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.animate
-import gg.essential.elementa.dsl.childOf
-import gg.essential.elementa.dsl.constrain
-import gg.essential.elementa.dsl.minus
-import gg.essential.elementa.dsl.percent
-import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.dsl.toConstraint
-import xyz.meowing.zen.config.ui.core.ConfigTheme
-import xyz.meowing.zen.utils.Utils.createBlock
 import org.lwjgl.glfw.GLFW
-import java.awt.Color
+import xyz.meowing.knit.api.input.KnitInputs
+import xyz.meowing.vexel.animations.EasingType
+import xyz.meowing.vexel.animations.colorTo
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.utils.render.NVGRenderer
+import xyz.meowing.zen.ui.Theme
 
 class KeybindElement(
-    private var code: Int = 0,
-    private val onKeyChange: ((Int) -> Unit)? = null,
-    private val theme: ConfigTheme = ConfigTheme()
-) : UIContainer() {
+    name: String,
+    initialKeyCode: Int
+) : VexelElement<KeybindElement>() {
+
+    var selectedKey: Int = initialKeyCode
+        private set
     private var listening = false
-    private var keyDisplay: UIText
-    private val border: UIComponent
-    private val container: UIComponent
+
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .ignoreMouseEvents()
+        .childOf(this)
+
+    private val keybindButton = Rectangle(Theme.BgLight.color, Theme.Border.color, 5f, 1.5f)
+        .setPositioning(-6f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+        .alignRight()
+        .childOf(this)
+
+    private val keybindText = Text(getKeyName(initialKeyCode), Theme.Text.color, 16f)
+        .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
+        .childOf(keybindButton)
 
     init {
-        border = createBlock(3f).constrain {
-            x = 0.pixels()
-            y = 0.pixels()
-            width = 100.percent()
-            height = 100.percent()
-        }.setColor(Color(18, 22, 26, 0)) childOf this
+        setSizing(240f, Size.Pixels, 32f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
+        ignoreFocus()
 
-        container = createBlock(3f).constrain {
-            x = 1.pixels()
-            y = 1.pixels()
-            width = 100.percent() - 2.pixels()
-            height = 100.percent() - 2.pixels()
-        }.setColor(Color(18, 22, 26, 255)) childOf border
+        updateButtonSize()
 
-        keyDisplay = (UIText(getKeyName(code)).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-        }.setColor(Color.WHITE) childOf container) as UIText
-
-        setupEventHandlers()
-    }
-
-    private fun setupEventHandlers() {
-        onMouseEnter {
-            if (!listening) {
-                border.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.3f, Color(170, 230, 240, 127).toConstraint())
+        keybindButton.onHover(
+            { _, _ ->
+                if (!listening) {
+                    keybindButton.colorTo(Theme.Highlight.color, 150, EasingType.EASE_OUT)
                 }
-                container.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.3f, Color(28, 32, 36, 255).toConstraint())
+            },
+            { _, _ ->
+                if (!listening) {
+                    keybindButton.colorTo(Theme.BgLight.color, 150, EasingType.EASE_IN)
                 }
             }
-        }
+        )
 
-        onMouseLeave {
-            if (!listening) {
-                border.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.3f, Color(18, 22, 26, 0).toConstraint())
-                }
-                container.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.3f, Color(18, 22, 26, 255).toConstraint())
-                }
-            }
-        }
-
-        container.onMouseClick {
-            grabWindowFocus()
-            listening = true
-            keyDisplay.setText(".....")
-            border.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.2f, Color(170, 230, 240, 255).toConstraint())
-            }
-            container.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.2f, theme.element.brighter().toConstraint())
-            }
-        }
-
-        container.onKeyType { _, keycode ->
+        keybindButton.onClick { _, _, button ->
             if (listening) {
-                if (keycode == 256) {
-                    keyDisplay.setText("None").setColor(Color.WHITE)
-                    code = 0
-                    onKeyChange?.invoke(0)
-                } else {
-                    keyDisplay.setText(getKeyName(keycode)).setColor(Color.WHITE)
-                    code = keycode
-                    onKeyChange?.invoke(keycode)
+                setKey(-100 + button)
+                false
+            } else if (button == 0) {
+                startListening()
+                true
+            } else {
+                false
+            }
+        }
+
+        onCharType { keyCode, _, _ ->
+            if (!listening) return@onCharType false
+            when (keyCode) {
+                GLFW.GLFW_KEY_ESCAPE -> {
+                    stopListening()
+                    true
                 }
-                listening = false
-                border.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.2f, Color(18, 22, 26, 0).toConstraint())
+                GLFW.GLFW_KEY_BACKSPACE -> {
+                    setKey(0)
+                    true
                 }
-                container.animate {
-                    setColorAnimation(Animations.OUT_EXP, 0.2f, theme.element.toConstraint())
+                GLFW.GLFW_KEY_ENTER -> {
+                    stopListening()
+                    true
                 }
-                loseFocus()
+                else -> {
+                    setKey(keyCode)
+                    true
+                }
             }
         }
     }
 
-    override fun keyType(typedChar: Char, keyCode: Int) {
-        if (keyCode == 256 && listening) {
-            keyDisplay.setText("None").setColor(Color.WHITE)
-            code = 0
-            onKeyChange?.invoke(0)
-            listening = false
-            border.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.2f, Color(18, 22, 26, 0).toConstraint())
-            }
-            container.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.2f, theme.element.toConstraint())
-            }
-            loseFocus()
-            return
-        }
-        super.keyType(typedChar, keyCode)
+    private fun startListening() {
+        listening = true
+        keybindText.text = "..."
+        updateButtonSize()
+        keybindButton.colorTo(Theme.Primary.color, 150, EasingType.EASE_OUT)
+    }
+
+    private fun stopListening() {
+        listening = false
+        keybindText.text = getKeyName(selectedKey)
+        updateButtonSize()
+        keybindButton.colorTo(Theme.BgLight.color, 150, EasingType.EASE_IN)
+    }
+
+    private fun setKey(keyCode: Int) {
+        selectedKey = keyCode
+        onValueChange.forEach { it.invoke(selectedKey) }
+        stopListening()
+    }
+
+    private fun updateButtonSize() {
+        val textWidth = NVGRenderer.textWidth(keybindText.text, 16f, NVGRenderer.defaultFont)
+        keybindButton.setSizing(textWidth + 12f, Size.Pixels, 20f, Size.Pixels)
     }
 
     private fun getKeyName(keyCode: Int): String = when (keyCode) {
-        340 -> "LShift"
-        344 -> "RShift"
-        341 -> "LCtrl"
-        345 -> "RCtrl"
-        342 -> "LAlt"
-        346 -> "RAlt"
-        257 -> "Enter"
-        256 -> "None"
-        in 290..301 -> "F${keyCode - 289}"
-        else -> GLFW.glfwGetKeyName(keyCode, 0)?.uppercase() ?: "Key $keyCode"
+        0 -> "None"
+        in -100..-1 -> "Mouse ${keyCode + 100}"
+        else -> KnitInputs.getDisplayName(keyCode)
     }
+
+    override fun onRender(mouseX: Float, mouseY: Float) {}
 }

@@ -1,8 +1,8 @@
-package xyz.meowing.zen.config.ui.constraint
+package xyz.meowing.zen.ui.constraint
 
 import gg.essential.elementa.UIComponent
-import gg.essential.elementa.constraints.SizeConstraint
 import gg.essential.elementa.constraints.ConstraintType
+import gg.essential.elementa.constraints.SizeConstraint
 import gg.essential.elementa.constraints.resolution.ConstraintVisitor
 
 class ChildHeightConstraint(private val padding: Float = 0f) : SizeConstraint {

@@ -5,23 +5,6 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.Utils.toColorFromMap
 
-//override fun addConfig(configUI: ConfigUI): ConfigUI {
-//    return configUI
-//        .addFeature("Architect Draft Message","", "Dungeons", ConfigElement(
-//            "architectdraft",
-//            null,
-//            ElementType.Switch(false)
-//        ), isSectionToggle = true)
-//        .addFeatureOption("Only get drafts on your fails", "Options", ConfigElement(
-//            "selfdraft",
-//            ElementType.Switch(false)
-//        ))
-//        .addFeatureOption("Automatically get architect drafts", "Options", ConfigElement(
-//            "autogetdraft",
-//            ElementType.Switch(false)
-//        ))
-//}
-
 object ConfigManager {
     private val dataUtils = DataUtils("config", mutableMapOf<String, Any>())
     val configValueMap: MutableMap<String, Any> = dataUtils.getData()

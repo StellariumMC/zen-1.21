@@ -3,7 +3,6 @@ package xyz.meowing.zen.features
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ui.ConfigUI
 import xyz.meowing.zen.events.Event
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.config.ConfigManager
