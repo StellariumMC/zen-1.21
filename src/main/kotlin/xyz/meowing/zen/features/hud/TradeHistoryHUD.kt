@@ -32,7 +32,6 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.input.KnitKeyboard
 import xyz.meowing.zen.ui.components.ItemComponent
-import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.events.core.GuiEvent
 import java.awt.Color
@@ -430,12 +429,21 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             textScale = 0.9.pixels()
         }.setColor(color) childOf parent
 
+        //#if MC >= 1.21.9
+        //$$ val itemsList = UIContainer().constrain {
+        //$$     x = 0.percent()
+        //$$     y = 20.pixels()
+        //$$     width = 100.percent()
+        //$$     height = 64.pixels()
+        //$$ } childOf parent
+        //#else
         val itemsGrid = UIContainer().constrain {
             x = 0.percent()
             y = 16.pixels()
             width = 100.percent()
             height = 64.pixels()
         } childOf parent
+        //#endif
 
         var itemWorth = 0L
 
@@ -443,7 +451,23 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             val jsonObject = itemElement.asJsonObject
             val stack = createItemStack(jsonObject)
             val lore = jsonObject.get("lore").asString
+            val name = jsonObject.get("name").asString
 
+            //#if MC >= 1.21.9
+            //$$ if (index <= 3) {
+            //$$    val itemName = UIText("${stack.count}x ${name}").constrain {
+            //$$        x = 2.pixels()
+            //$$        y = (index * 16).pixels()
+            //$$        width = 100.percent()
+            //$$    }.setColor(Color.WHITE) childOf itemsList
+            //$$    val tooltip = mutableSetOf<String>()
+            //$$    tooltip.add(name)
+            //$$    lore.split('\n').forEach { line ->
+            //$$        tooltip.add(line)
+            //$$    }
+            //$$    itemName.addTooltip(tooltip)
+            //$$ }
+            //#else
             val resolution = 14f
             val xPadding = 3f
             val yPadding = 3f
@@ -462,15 +486,26 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             } childOf itemComponent
 
             val tooltip = mutableSetOf<String>()
-            tooltip.add(jsonObject.get("name").asString)
+            tooltip.add(name)
             lore.split('\n').forEach { line ->
                 tooltip.add(line)
             }
+            itemComponent.addTooltip(tooltip)
 
-            itemComponent.addTooltip(tooltip, stack)
+            //#endif
 
             itemWorth += getItemValue(stack) * stack.count
         }
+
+        //#if MC >= 1.21.9
+        //$$ if(items.size() > 3) {
+        //$$    UIText("§7+${items.size() - 3} more").constrain {
+        //$$        x = 2.pixels()
+        //$$        y = 70.pixels()
+        //$$        textScale = 0.7.pixels()
+        //$$    }.setColor(theme.accent2) childOf parent
+        //$$ }
+        //#endif
 
         val totalWorth = itemWorth + coins
         var currentWorth = totalWorth
