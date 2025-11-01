@@ -7,11 +7,23 @@ import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.events.Event
 
 sealed class ScoreboardEvent {
+    /**
+     * Posted when a change in the scoreboard title has occurred.
+     *
+     * @see xyz.meowing.zen.events.compat.SkyblockAPI
+     * @since 1.2.0
+     */
     class UpdateTitle(
         val old: String?,
         val new: String
     ) : Event()
 
+    /**
+     * Posted when a change in the scoreboard has occurred.
+     *
+     * @see xyz.meowing.zen.events.compat.SkyblockAPI
+     * @since 1.2.0
+     */
     class Update(
         val old: List<String>,
         val new: List<String>,

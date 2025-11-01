@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.loader.KnitModInfo
 import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.zen.events.core.GameEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.ServerEvent
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -42,6 +43,8 @@ object Zen : ClientModInitializer {
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     override fun onInitializeClient() {
+        EventBus.post(GameEvent.ModInit.Pre())
+
         ConfigManager.createConfigUI()
         FeatureManager.loadFeatures()
         FeatureManager.initializeFeatures()
@@ -90,5 +93,7 @@ object Zen : ClientModInitializer {
         EventBus.register<GuiEvent.Close> {
             isInInventory = false
         }
+
+        EventBus.post(GameEvent.ModInit.Post())
     }
 }

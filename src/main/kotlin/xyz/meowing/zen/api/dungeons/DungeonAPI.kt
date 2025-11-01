@@ -53,7 +53,7 @@ object DungeonAPI {
         private set(value) {
             if (field != value) {
                 field = value
-                EventBus.post(LocationEvent.DungeonFloorChange(field, value))
+                EventBus.post(LocationEvent.DungeonFloorChange(value))
             }
         }
 
