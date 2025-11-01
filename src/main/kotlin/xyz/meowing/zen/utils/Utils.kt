@@ -17,7 +17,7 @@ import net.minecraft.text.Text
 import org.apache.commons.lang3.SystemUtils
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.WorldEvent
+import xyz.meowing.zen.events.core.LocationEvent
 import java.awt.Color
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -46,7 +46,7 @@ object Utils {
     init {
         nickedName = ""
         nicked = false
-        EventBus.register<WorldEvent.Change> { isNicked() }
+        EventBus.register<LocationEvent.WorldChange> { isNicked() }
     }
 
     fun playSound(sound: SoundEvent, volume: Float, pitch: Float) {
@@ -395,7 +395,7 @@ object Utils {
         val entries = ScoreboardUtils.getTabListEntriesString()
 
         //shouldn't ever happen but ill add the check
-        if(entries.size < 2) {
+        if (entries.size < 2) {
             nicked = false
             return
         }
@@ -406,7 +406,7 @@ object Utils {
             return
         }
 
-        if(tabName.contains(playerName)) {
+        if (tabName.contains(playerName)) {
             nicked = false
             nickedName = ""
             return
@@ -417,7 +417,7 @@ object Utils {
 
         nickedName = tabName.substring(
             firstIndex + 1,
-            if(lastIndex != firstIndex) lastIndex else tabName.length
+            if (lastIndex != firstIndex) lastIndex else tabName.length
         )
 
         nicked = true
