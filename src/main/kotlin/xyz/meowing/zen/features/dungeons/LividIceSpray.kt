@@ -1,27 +1,34 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TickEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.knit.api.events.EventCall
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonFloor
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.TickEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
-object LividIceSpray : Feature("lividicespray", area = "catacombs", subarea = listOf("F5", "M5")) {
+@Module
+object LividIceSpray : Feature(
+    "lividicespray",
+    island = SkyBlockIsland.THE_CATACOMBS,
+    dungeonFloor = listOf(DungeonFloor.F5, DungeonFloor.M5)
+) {
     private var bossticks = 390
-    private val tickCall: EventBus.EventCall = EventBus.register<TickEvent.Server> ({
+    private val tickCall: EventCall = EventBus.register<TickEvent.Server> (add = false) {
         bossticks--
         if (bossticks < 0) tickCall.unregister()
-    }, false)
+    }
 
     override fun addConfig() {
         ConfigManager
@@ -40,9 +47,9 @@ object LividIceSpray : Feature("lividicespray", area = "catacombs", subarea = li
             }
         }
 
-        register<WorldEvent.Change> { cleanup() }
+        register<LocationEvent.WorldChange> { cleanup() }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled("Livid ice spray timer")) render(event.context)
         }
     }

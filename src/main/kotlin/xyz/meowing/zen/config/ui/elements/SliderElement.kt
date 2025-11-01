@@ -1,178 +1,61 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.input.UITextInput
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.SiblingConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.utils.Utils.createBlock
-import java.awt.Color
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.round
+import xyz.meowing.knit.api.input.KnitMouseButtons
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.elements.Slider
+import xyz.meowing.zen.ui.Theme
 
 class SliderElement(
-    private val min: Double = 0.0,
-    private val max: Double = 100.0,
-    initialValue: Double = 50.0,
-    private val showDouble: Boolean = false,
-    private val onChange: ((Double) -> Unit)? = null
-) : UIContainer() {
-    private var value: Double = max(min, min(max, initialValue))
-    private val sliderContainer: UIComponent
-    private val textContainer: UIComponent
-    private val progress: UIComponent
-    private val input: UITextInput
+    name: String,
+    initialValue: Double,
+    private val min: Double,
+    private val max: Double,
+    private val showDouble: Boolean
+) : VexelElement<SliderElement>() {
+
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 8f, Pos.ParentPixels)
+        .childOf(this)
+
+    private val valueText = Text(formatValue(initialValue), Theme.TextMuted.color, 16f)
+        .setPositioning(-6f, Pos.ParentPixels, 8f, Pos.ParentPixels)
+        .alignRight()
+        .childOf(this)
+
+    val slider = Slider(
+        value = ((initialValue - min) / (max - min)).toFloat(),
+        minValue = 0f,
+        maxValue = 1f,
+        thumbColor = 0xFFFFFFFF.toInt(),
+        trackColor = Theme.Bg.color,
+        trackFillColor = Theme.Primary.color
+    )
+        .setSizing(220f, Size.Pixels, 24f, Size.Pixels)
+        .setPositioning(10f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+        .alignBottom()
+        .setOffset(0f, -8f)
+        .childOf(this)
 
     init {
-        sliderContainer = createBlock(3f).constrain {
-            x = 0.pixels()
-            y = CenterConstraint()
-            width = 85.percent()
-            height = 60.percent()
-        }.setColor(Color(18, 24, 28, 255)) childOf this
+        setSizing(240f, Size.Pixels, 48f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
 
-        textContainer = createBlock(3f).constrain {
-            x = SiblingConstraint(5f)
-            y = CenterConstraint()
-            width = 15.percent() - 5.pixels
-            height = 80.percent()
-        }.setColor(Color(18, 24, 28, 255)) childOf this
-
-        val initialPercent = (value - min).toFloat() / (max - min).toFloat()
-        progress = createBlock(3f).constrain {
-            x = 0.percent()
-            y = 0.percent()
-            width = (initialPercent * 100).percent()
-            height = 100.percent()
-        }.setColor(Color(100, 245, 255, 255)) childOf sliderContainer
-
-        input = (UITextInput(formatDisplayValue(value)).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            width = client.textRenderer.getWidth(formatDisplayValue(value)).pixels()
-        }.setColor(Color(170, 230, 240, 255)) childOf textContainer) as UITextInput
-
-        setupMouseHandlers()
-        setupInputHandlers()
-        setupHoverEffects()
-    }
-
-    private fun formatDisplayValue(value: Double): String {
-        return if (!showDouble && value == value.toInt().toDouble()) value.toInt().toString() else value.toString()
-    }
-
-    private fun setupHoverEffects() {
-        sliderContainer.onMouseEnter {
-            sliderContainer.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, Color(28, 34, 38, 255).toConstraint())
-            }
-        }
-
-        sliderContainer.onMouseLeave {
-            sliderContainer.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, Color(18, 24, 28, 255).toConstraint())
-            }
-        }
-
-        textContainer.onMouseEnter {
-            textContainer.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, Color(28, 34, 38, 255).toConstraint())
-            }
-        }
-
-        textContainer.onMouseLeave {
-            textContainer.animate {
-                setColorAnimation(Animations.OUT_EXP, 0.3f, Color(18, 24, 28, 255).toConstraint())
-            }
-        }
-
-        textContainer.onMouseClick {
-            input.setText(formatDisplayValue(value))
-            input.grabWindowFocus()
+        slider.onValueChange { sliderValue ->
+            val actualValue = min + (sliderValue as Float) * (max - min)
+            valueText.text = formatValue(actualValue)
         }
     }
 
-    private fun setupMouseHandlers() {
-        fun updateSliderPosition(mouseX: Float) {
-            val clamped = mouseX.coerceIn(0f, sliderContainer.getWidth())
-            val percent = clamped / sliderContainer.getWidth()
-            updateSliderValue(percent)
-        }
+    private fun formatValue(value: Double): String =
+        if (showDouble) String.format("%.1f", value)
+        else value.toInt().toString()
 
-        sliderContainer.onMouseClick { event ->
-            val withinBounds = event.relativeX in 0f..sliderContainer.getWidth() && event.relativeY in 0f..sliderContainer.getHeight()
-            if (!withinBounds) return@onMouseClick
-            updateSliderPosition(event.relativeX)
-        }
-
-        sliderContainer.onMouseDrag { x, y, _ ->
-            val withinBounds = x in 0f..sliderContainer.getWidth() && y in -5f..(sliderContainer.getHeight() + 5f)
-            if (!withinBounds) return@onMouseDrag
-            updateSliderPosition(x)
-        }
-    }
-
-    private fun setupInputHandlers() {
-        input.onKeyType { _, _ ->
-            processInputValue()
-            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
-        }
-
-        input.onFocusLost {
-            processInputValue()
-            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
-        }
-    }
-
-    private fun processInputValue() {
-        val inputText = input.getText().trim()
-
-        if (inputText.isEmpty()) {
-            setValue(min)
-            return
-        }
-
-        val newValue = inputText.toDoubleOrNull()
-        if (newValue != null) {
-            val constrainedValue = max(min, min(max, newValue))
-            setValue(constrainedValue)
-            if (constrainedValue != newValue) input.setText(formatDisplayValue(constrainedValue))
-        } else input.setText(formatDisplayValue(value))
-    }
-
-    private fun updateSliderValue(percent: Float) {
-        val clampedPercent = percent.coerceIn(0f, 1f)
-        val rawValue = min + (max - min) * clampedPercent
-        val newValue = if (showDouble) (round(rawValue * 10) / 10.0) else round(rawValue)
-
-        if (newValue != value) {
-            value = newValue
-            input.setText(formatDisplayValue(value))
-            input.setWidth(client.textRenderer.getWidth(formatDisplayValue(value)).pixels())
-            onChange?.invoke(value)
-        }
-
-        progress.animate {
-            setWidthAnimation(Animations.OUT_EXP, 0.5f, (clampedPercent * 100).percent())
-        }
-    }
-
-    fun getValue(): Double = value
-
-    fun setValue(newValue: Double) {
-        val clampedValue = max(min, min(max, newValue))
-        if (clampedValue != value) {
-            value = clampedValue
-            input.setText(formatDisplayValue(value))
-            val percent = (value - min).toFloat() / (max - min).toFloat()
-            progress.animate {
-                setWidthAnimation(Animations.OUT_EXP, 0.5f, (percent * 100).percent())
-            }
-            onChange?.invoke(value)
+    override fun onRender(mouseX: Float, mouseY: Float) {
+        if (slider.isDragging && !KnitMouseButtons.LEFT.isPressed) {
+            slider.isDragging = false
         }
     }
 }

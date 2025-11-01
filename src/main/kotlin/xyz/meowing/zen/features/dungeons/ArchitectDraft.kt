@@ -1,10 +1,8 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -12,12 +10,15 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
-object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
+@Module
+object ArchitectDraft : Feature("architectdraft", island = SkyBlockIsland.THE_CATACOMBS) {
     private val puzzlefail = "^PUZZLE FAIL! (\\w{1,16}) .+$".toRegex()
     private val quizfail = "^\\[STATUE] Oruo the Omniscient: (\\w{1,16}) chose the wrong answer! I shall never forget this moment of misrememberance\\.$".toRegex()
     private val autogetdraft by ConfigDelegate<Boolean>("autogetdraft")
@@ -41,6 +42,8 @@ object ArchitectDraft : Feature("architectdraft", area = "catacombs") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
+
             val text = event.message.string.removeFormatting()
             val matchResult = puzzlefail.find(text) ?: quizfail.find(text) ?: return@register
             val playerName = Utils.currentPlayerName

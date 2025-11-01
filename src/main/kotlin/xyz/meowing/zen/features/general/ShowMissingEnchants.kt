@@ -2,30 +2,29 @@ package xyz.meowing.zen.features.general
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.NEUApi
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.InternalEvent
-import xyz.meowing.zen.events.ItemTooltipEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.nbt.NbtElement
 import net.minecraft.text.Text
 import org.apache.commons.lang3.StringUtils
-import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.input.KnitKeys
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.InternalEvent
+import xyz.meowing.zen.events.core.ItemTooltipEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
 /**
  * Module contains modified code from NEU
  *
+ * See: [NotEnoughUpdates - ItemTooltipListener.java](https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/master/src/main/java/io/github/moulberry/notenoughupdates/listener/ItemTooltipListener.java)
  * @author NEU Contributors
- * @see [NotEnoughUpdates - ItemTooltipListener.java](https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/master/src/main/java/io/github/moulberry/notenoughupdates/listener/ItemTooltipListener.java)
  */
-@Zen.Module
+@Module
 object ShowMissingEnchants : Feature("showmissingenchants", true) {
     private var enchantsData: JsonObject? = null
     private var enchantPools: JsonArray? = null

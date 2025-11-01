@@ -1,10 +1,9 @@
 package xyz.meowing.zen.mixins;
 
-
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import xyz.meowing.zen.events.EntityEvent;
 import xyz.meowing.zen.events.EventBus;
+import xyz.meowing.zen.events.core.EntityEvent;
 import xyz.meowing.zen.features.visuals.ItemAnimations;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

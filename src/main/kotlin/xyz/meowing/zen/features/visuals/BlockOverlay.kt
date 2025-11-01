@@ -1,21 +1,21 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import net.minecraft.block.ShapeContext
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.VertexRendering
 import net.minecraft.world.EmptyBlockView
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
 import java.awt.Color
 import xyz.meowing.zen.utils.Render3D
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object BlockOverlay : Feature("blockoverlay") {
     private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
     private val blockbordercolor by ConfigDelegate<Color>("blockbordercolor")
@@ -47,11 +47,17 @@ object BlockOverlay : Feature("blockoverlay") {
     }
 
     override fun initialize() {
-        register<RenderEvent.BlockOutline> { event ->
-            val blockPos = event.blockPos
-            val consumers = event.consumers ?: return@register
+        register<RenderEvent.World.BlockOutline> { event ->
+            val blockPos = event.context.blockPos() ?: return@register
+            val blockState = event.context.blockState() ?: return@register
+            val matrixStack = event.context.matrixStack() ?: return@register
+            val consumers = event.context.consumers()
             val camera = client.gameRenderer.camera
-            val blockShape = event.blockState.getOutlineShape(EmptyBlockView.INSTANCE, blockPos, ShapeContext.of(camera.focusedEntity))
+            val blockShape = blockState.getOutlineShape(
+                EmptyBlockView.INSTANCE,
+                blockPos,
+                ShapeContext.of(camera.focusedEntity)
+            )
             if (blockShape.isEmpty) return@register
 
             val camPos = camera.pos
@@ -59,7 +65,7 @@ object BlockOverlay : Feature("blockoverlay") {
 
             if (blockoverlaybordered) {
                 VertexRendering.drawOutline(
-                    event.matrixStack,
+                    matrixStack,
                     consumers.getBuffer(RenderLayer.getLines()),
                     blockShape,
                     blockPos.x - camPos.x,
@@ -69,12 +75,12 @@ object BlockOverlay : Feature("blockoverlay") {
                 )
             }
 
-            if(blockoverlayfilled) {
+            if (blockoverlayfilled) {
                 Render3D.drawFilledShapeVoxel(
                     blockShape.offset(blockPos),
                     blockoverlaycolor,
-                    event.consumers,
-                    event.matrixStack
+                    consumers,
+                    matrixStack
                 )
             }
         }

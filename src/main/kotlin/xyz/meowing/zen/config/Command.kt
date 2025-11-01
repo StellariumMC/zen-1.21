@@ -3,15 +3,16 @@ package xyz.meowing.zen.config
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.openConfig
 import xyz.meowing.zen.hud.HUDEditor
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.Zen.Companion.configUI
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.managers.config.ConfigManager.configUI
+import xyz.meowing.zen.managers.config.ConfigManager.openConfig
 import java.lang.Exception
 
-@Zen.Command
+@Command
 object ConfigCommand : Commodore("zen", "ma", "meowaddons") {
     init {
         literal("hud") {

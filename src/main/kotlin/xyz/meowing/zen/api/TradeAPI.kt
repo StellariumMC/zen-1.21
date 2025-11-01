@@ -2,10 +2,8 @@ package xyz.meowing.zen.api
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.events.ChatEvent
+import me.owdding.ktmodules.Module
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils
@@ -16,8 +14,10 @@ import net.minecraft.registry.Registries
 import net.minecraft.screen.ScreenHandler
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
 
-@Zen.Module
+@Module
 object TradeAPI {
     data class TradeLogs(val tradeHistory: JsonObject = JsonObject())
 
@@ -43,6 +43,7 @@ object TradeAPI {
         }
 
         EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             if (event.message.string.removeFormatting().startsWith("Trade completed with")) {
                 interpretLastTradeMenu()
                 inTradeMenu = false

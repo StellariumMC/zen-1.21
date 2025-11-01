@@ -1,23 +1,24 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.MouseEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
 import net.minecraft.util.hit.EntityHitResult
 import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.Zen.Companion.prefix
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.MouseEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
+@Module
 object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
     private val trackedMobs = mutableListOf<String>()
     private val highlightcolor by ConfigDelegate<Color>("bestiarymobhighlightcolor")
@@ -38,6 +39,9 @@ object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
         register<RenderEvent.EntityGlow> { event ->
             val mob = event.entity.sbMobID ?: return@register
             if (trackedMobs.contains(mob)) {
+                val visible = KnitClient.player?.canSee(event.entity)?: false
+
+                if (!visible) return@register
                 event.shouldGlow = true
                 event.glowColor = highlightcolor.toColorInt()
             }

@@ -1,7 +1,6 @@
 package xyz.meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import xyz.meowing.zen.events.EntityEvent;
 import xyz.meowing.zen.events.EventBus;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientCommonNetworkHandler;
@@ -12,16 +11,15 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.meowing.zen.events.core.EntityEvent;
 
 import java.util.Optional;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkHandler {
-    @Unique MinecraftClient mc = MinecraftClient.getInstance();
     protected MixinClientPlayNetworkHandler(MinecraftClient client, ClientConnection connection, ClientConnectionState connectionState) {
         super(client, connection, connectionState);
     }
@@ -36,9 +34,9 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
                     .map(text -> ((Text) text).getString())
                     .findFirst().orElse("") : "";
 
-            if (EventBus.INSTANCE.post(new EntityEvent.Metadata(packet, entity, name))) {
-                if (mc != null && mc.world != null) {
-                    mc.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
+            if (EventBus.INSTANCE.post(new EntityEvent.Packet.Metadata(packet, entity, name))) {
+                if (client != null && client.world != null) {
+                    client.world.removeEntity(entity.getId(), Entity.RemovalReason.DISCARDED);
                 }
             }
         }

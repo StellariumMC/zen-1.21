@@ -1,8 +1,7 @@
 package xyz.meowing.zen.features.slayers.carrying
 
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.hud.HUDEditor
 import xyz.meowing.zen.utils.TickUtils
@@ -12,10 +11,11 @@ import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.knit.api.text.core.ColorCodes
+import xyz.meowing.zen.annotations.Command
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Zen.Command
+@Command
 object CarryCommand : Commodore("carry", "zencarry") {
     private val carrycounter by ConfigDelegate<Boolean>("carrycounter")
     private var currentLogPage = 1

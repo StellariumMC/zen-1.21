@@ -1,9 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -11,12 +8,21 @@ import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.sound.SoundEvents
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.events.WorldEvent
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonFloor
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
-object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = listOf("F3", "M3")) {
+@Module
+object FireFreezeTimer : Feature(
+    "firefreeze",
+    island = SkyBlockIsland.THE_CATACOMBS,
+    dungeonFloor = listOf(DungeonFloor.F3, DungeonFloor.M3)
+) {
     var ticks = 0
 
     override fun addConfig() {
@@ -45,9 +51,9 @@ object FireFreezeTimer : Feature("firefreeze", area = "catacombs", subarea = lis
             }
         }
 
-        register<RenderEvent.HUD> { renderHUD(it.context) }
+        register<GuiEvent.Render.HUD> { renderHUD(it.context) }
 
-        register<WorldEvent.Change> { ticks = 0 }
+        register<LocationEvent.WorldChange> { ticks = 0 }
     }
 
     override fun onRegister() {

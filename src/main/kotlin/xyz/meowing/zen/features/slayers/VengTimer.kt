@@ -1,12 +1,10 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.*
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
@@ -19,9 +17,13 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.utils.Utils
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
 import kotlin.time.Duration.Companion.seconds
 
-@Zen.Module
+@Module
 object VengTimer : Feature("vengtimer", true) {
     private var starttime = TimeUtils.zero
     private var hit = false
@@ -39,7 +41,7 @@ object VengTimer : Feature("vengtimer", true) {
     override fun initialize() {
         HUDManager.register("vengtimer", "§bVeng proc: §c4.3s")
 
-        createCustomEvent<RenderEvent.HUD>("render") {
+        createCustomEvent<GuiEvent.Render.HUD>("render") {
             if (HUDManager.isEnabled("VengTimer")) render(it.context)
         }
 

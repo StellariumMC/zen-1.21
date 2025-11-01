@@ -1,12 +1,7 @@
 package xyz.meowing.zen.api
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.EventBus.post
-import xyz.meowing.zen.events.SkyblockEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.Entity
@@ -15,8 +10,13 @@ import net.minecraft.entity.projectile.ArrowEntity
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.utils.Utils
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
 
-@Zen.Module
+@Module
 object EntityDetection {
     private val hashMap = HashMap<Entity, SkyblockMob>()
     private val slayerEntities = HashMap<Entity, SkyblockMob>()
@@ -67,7 +67,7 @@ object EntityDetection {
             }
         }
 
-        EventBus.register<EntityEvent.Metadata> { event ->
+        EventBus.register<EntityEvent.Packet.Metadata> { event ->
             if (inSlayerFight) return@register
             val world = world ?: return@register
             val player = player ?: return@register
@@ -99,6 +99,8 @@ object EntityDetection {
         }
 
         EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
+
             when (event.message.string.removeFormatting()) {
                 "  SLAYER QUEST FAILED!" -> {
                     bossID = null
@@ -115,7 +117,7 @@ object EntityDetection {
             }
         }
 
-        EventBus.register<WorldEvent.Change> {
+        EventBus.register<LocationEvent.WorldChange> {
             hashMap.clear()
         }
 

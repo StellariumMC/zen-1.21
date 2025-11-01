@@ -5,8 +5,6 @@ import xyz.meowing.zen.api.PlayerStats
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.GameEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.events.configRegister
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
@@ -18,13 +16,15 @@ import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.core.FormattingCodes
 import xyz.meowing.vexel.utils.render.NVGRenderer
-import xyz.meowing.vexel.utils.style.Font
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.awt.Color
 
-@Zen.Module
+@Module
 object StatsDisplay : Feature("statsdisplay", true) {
     private const val healthBarName = "Health Bar"
     private const val manaBarName = "Mana Bar"
@@ -217,7 +217,8 @@ object StatsDisplay : Feature("statsdisplay", true) {
         HUDManager.registerCustom(riftTimeBarName, 80, 10, this::riftTimeBarEditorRender)
         HUDManager.registerCustom(drillFuelBarName, 80, 10, this::drillFuelBarEditorRender)
 
-        configRegister<GameEvent.ActionBar>(listOf("statsdisplay", "cleanactionbar"), priority = 1000) { event ->
+        configRegister<ChatEvent.Receive>(listOf("statsdisplay", "cleanactionbar"), priority = 1000, skyblockOnly = true) { event ->
+            if (!event.isActionBar) return@configRegister
             val originalText = event.message.string
 
             if (originalText.endsWith(PROCESSED_MARKER)) return@configRegister
@@ -232,9 +233,15 @@ object StatsDisplay : Feature("statsdisplay", true) {
             }
         }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             val window = KnitClient.client.window
             val guiScale = window.scaleFactor.toFloat()
+
+            //#if MC >= 1.21.7
+            //$$ event.context.matrices.pushMatrix()
+            //#else
+            event.context.matrices.push()
+            //#endif
 
             NVGRenderer.beginFrame(window.width.toFloat(), window.height.toFloat())
             NVGRenderer.push()
@@ -246,6 +253,12 @@ object StatsDisplay : Feature("statsdisplay", true) {
             renderDrillFuelBar(event.context)
             NVGRenderer.pop()
             NVGRenderer.endFrame()
+
+            //#if MC >= 1.21.7
+            //$$ event.context.matrices.popMatrix()
+            //#else
+            event.context.matrices.pop()
+            //#endif
         }
     }
 

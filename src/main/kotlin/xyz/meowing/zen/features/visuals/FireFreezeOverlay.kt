@@ -1,12 +1,8 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
@@ -16,10 +12,14 @@ import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
+@Module
 object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
     private var activatedPos: Vec3d? = null
     private var overlayTimerId: Long? = null
@@ -70,13 +70,13 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
             }
         }
 
-        register<RenderEvent.World> { event ->
+        register<RenderEvent.World.Last> { event ->
             val timer = overlayTimerId?.let { getTimer(it) } ?: return@register
             val pos = activatedPos ?: return@register
 
             Render3D.drawFilledCircle(
-                event.consumers,
-                event.matrixStack,
+                event.context.consumers(),
+                event.context.matrixStack(),
                 pos,
                 5f,
                 72,
@@ -92,7 +92,7 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
             )
         }
 
-        register<RenderEvent.World> { event ->
+        register<RenderEvent.World.Last> {
             val timer = freezeTimerId?.let { getTimer(it) } ?: return@register
             frozenEntities.removeAll { !it.isAlive }
             frozenEntities.forEach { ent ->

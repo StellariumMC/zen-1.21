@@ -1,12 +1,9 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.SlayerTracker
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -18,12 +15,16 @@ import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-@Zen.Module
+@Module
 object SlayerStats : Feature("slayerstats", true) {
     private const val name = "SlayerStats"
     private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
@@ -59,7 +60,7 @@ object SlayerStats : Feature("slayerstats", true) {
     override fun initialize() {
         HUDManager.register("SlayerStats", "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
 
-        register<RenderEvent.HUD> {
+        register<GuiEvent.Render.HUD> {
             if (HUDManager.isEnabled("SlayerStats")) render(it.context)
         }
 
@@ -142,7 +143,7 @@ object SlayerStats : Feature("slayerstats", true) {
     private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)
 }
 
-@Zen.Command
+@Command
 object SlayerStatsCommand : Commodore("slayerstats", "zenslayerstats") {
     init {
         executable {

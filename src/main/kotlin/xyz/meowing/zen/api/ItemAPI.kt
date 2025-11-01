@@ -5,17 +5,17 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.Zen.Companion.scope
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.NetworkUtils
 import net.minecraft.item.ItemStack
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.Zen.scope
+import xyz.meowing.zen.annotations.Module
 import java.util.concurrent.atomic.AtomicBoolean
 
-@Zen.Module
+@Module
 object ItemAPI {
     private val isLoading = AtomicBoolean(false)
     private val initializationComplete = CompletableDeferred<Unit>()

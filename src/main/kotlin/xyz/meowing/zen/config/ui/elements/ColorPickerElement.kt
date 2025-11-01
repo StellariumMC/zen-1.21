@@ -1,347 +1,262 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.*
-import gg.essential.elementa.constraints.*
-import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.OutlineEffect
-import gg.essential.universal.UMatrixStack
-import xyz.meowing.zen.utils.Utils.createBlock
+import xyz.meowing.knit.api.input.KnitMouseButtons
+import xyz.meowing.vexel.animations.EasingType
+import xyz.meowing.vexel.animations.animateSize
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.utils.render.NVGRenderer
+import xyz.meowing.vexel.utils.style.Gradient
+import xyz.meowing.zen.ui.Theme
+import xyz.meowing.zen.config.ui.panels.SectionButton
 import java.awt.Color
 import kotlin.math.roundToInt
 
-class ConfigTheme {
-    val panel = Color(4, 6, 8, 255)
-    val element = Color(12, 16, 20, 255)
-    val accent = Color(100, 245, 255, 255)
-    val popup = Color(6, 10, 14, 255)
-    val border = Color(60, 80, 100, 255)
-}
-
 class ColorPickerElement(
-    initialValue: Color = Color.WHITE,
-    private val onChange: ((Color) -> Unit)? = null
-) : UIContainer() {
-    companion object {
-        private var pickerContainer: UIContainer? = null
-        var isPickerOpen = false
+    name: String,
+    initialColor: Color
+) : VexelElement<ColorPickerElement>() {
+    var selectedColor: Color = initialColor
+    private var expanded = false
+    private var isAnimating = false
 
-        fun closePicker() {
-            if (!isPickerOpen) return
-            pickerContainer?.parent?.removeChild(pickerContainer!!)
-            pickerContainer = null
-            isPickerOpen = false
-        }
-    }
+    var currentHue: Float
+    var currentSaturation: Float
+    var currentBrightness: Float
+    var currentAlpha = initialColor.alpha / 255f
+    var draggingPicker = false
+    var draggingHue = false
+    var draggingAlpha = false
 
-    private var value: Color = initialValue
-    private val colorPreview: UIComponent
-    private val theme = ConfigTheme()
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 8f, Pos.ParentPixels)
+        .childOf(this)
 
-    init {
-        colorPreview = createBlock(3f).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            width = 100.percent()
-            height = 100.percent()
-        }.setColor(value).childOf(this)
+    private val previewRect = Rectangle(
+        selectedColor.rgb,
+        Theme.Border.color,
+        3f,
+        1f,
+        hoverColor = selectedColor.darker().rgb
+    )
+        .setSizing(30f, Size.Pixels, 20f, Size.Pixels)
+        .setPositioning(-6f, Pos.ParentPixels, 0f, Pos.MatchSibling)
+        .alignRight()
+        .setOffset(0f, -2f)
+        .childOf(this)
 
-        colorPreview.onMouseClick {
-            togglePicker()
-        }
-    }
+    private val pickerContainer = Rectangle(
+        0x00000000,
+        0x00000000,
+        0f,
+        0f
+    )
+        .setSizing(228f, Size.Pixels, 0f, Size.Pixels)
+        .setPositioning(6f, Pos.ParentPixels, 34f, Pos.ParentPixels)
+        .childOf(this)
 
-    private fun togglePicker() {
-        if (isPickerOpen) closePicker() else openPicker()
-    }
+    private val pickerArea = ColorPickerArea()
+        .setSizing(228f, Size.Pixels, 140f, Size.Pixels)
+        .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+        .childOf(pickerContainer)
 
-    private fun openPicker() {
-        if (isPickerOpen) return
+    private val hueSlider = HueSlider()
+        .setSizing(228f, Size.Pixels, 15f, Size.Pixels)
+        .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+        .childOf(pickerContainer)
 
-        val window = Window.of(this)
-
-        pickerContainer = UIContainer().constrain {
-            x = (this@ColorPickerElement.getRight() + 5f).pixels()
-            y = this@ColorPickerElement.getTop().pixels()
-            width = 130.pixels()
-            height = 100.pixels()
-        }.childOf(window)
-
-        val background = UIBlock(theme.popup).constrain {
-            width = 100.percent()
-            height = 100.percent()
-        }.childOf(pickerContainer!!).effect(OutlineEffect(theme.border, 1f))
-
-        ColorPickerComponent(value).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            width = 90.percent()
-            height = 80.pixels()
-        }.childOf(background).onValueChange { color ->
-            value = color
-            colorPreview.setColor(color)
-            onChange?.invoke(color)
-        }
-
-        isPickerOpen = true
-    }
-}
-
-class ColorPickerComponent(val initialColor: Color) : UIContainer() {
-    private var currentColor = initialColor
-    private var currentHue: Float
-    private var currentSaturation: Float
-    private var currentBrightness: Float
-    private var currentAlpha = initialColor.alpha / 255f
-    private var onValueChange: (Color) -> Unit = {}
-    private var draggingHue = false
-    private var draggingPicker = false
-    private var draggingAlpha = false
-    private var isChroma = false
-    private val theme = ConfigTheme()
+    private val alphaSlider = AlphaSlider()
+        .setSizing(228f, Size.Pixels, 15f, Size.Pixels)
+        .setPositioning(0f, Pos.ParentPixels, 5f, Pos.AfterSibling)
+        .childOf(pickerContainer)
 
     init {
+        setSizing(240f, Size.Pixels, 32f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
+
         val hsb = Color.RGBtoHSB(initialColor.red, initialColor.green, initialColor.blue, null)
         currentHue = hsb[0]
         currentSaturation = hsb[1]
         currentBrightness = hsb[2]
+        updateColor()
 
-        setupUI()
+        previewRect.onClick { _, _, _ ->
+            if (!isAnimating) toggleExpanded()
+            true
+        }
+
+        setupInteractions()
+        pickerContainer.visible = false
     }
 
-    private fun setupUI() {
-        val pickerBox = UIBlock().constrain {
-            width = 80.pixels()
-            height = 100.percent()
-            color = theme.border.toConstraint()
-        }.childOf(this)
-
-        val pickerIndicator = UIContainer().constrain {
-            x = (RelativeConstraint(currentSaturation) - 3.5f.pixels()).coerceIn(2.pixels(), 2.pixels(alignOpposite = true))
-            y = (RelativeConstraint(1f - currentBrightness) - 3.5f.pixels()).coerceIn(2.pixels(), 2.pixels(alignOpposite = true))
-            width = 3.pixels()
-            height = 3.pixels()
-        }.effect(OutlineEffect(theme.accent, 1f))
-
-        pickerBox.addChild(createCustomRenderer { matrixStack, component ->
-            drawColorPicker(matrixStack, component)
-        }.constrain {
-            x = 1.pixels()
-            y = (-0.5).pixels()
-            width = 100.percent() - 2.pixels()
-            height = 100.percent() - 2.pixels()
-        } as UIComponent).addChild(pickerIndicator)
-
-        pickerBox.onMouseClick { event ->
-            isChroma = false
+    private fun setupInteractions() {
+        pickerArea.onMouseClick { mouseX, mouseY, _ ->
             draggingPicker = true
-            currentSaturation = event.relativeX / pickerBox.getWidth()
-            currentBrightness = 1f - (event.relativeY / pickerBox.getHeight())
-            updatePickerIndicator(pickerIndicator)
-        }.onMouseDrag { mouseX, mouseY, _ ->
-            if (!draggingPicker) return@onMouseDrag
-            currentSaturation = (mouseX / pickerBox.getWidth()).coerceIn(0f..1f)
-            currentBrightness = 1f - ((mouseY / pickerBox.getHeight()).coerceIn(0f..1f))
-            updatePickerIndicator(pickerIndicator)
-        }.onMouseRelease { draggingPicker = false }
-
-        val hueLine = UIBlock().constrain {
-            x = SiblingConstraint(5f)
-            width = 14.pixels()
-            height = 100.percent()
-            color = theme.border.toConstraint()
-        }.childOf(this)
-
-        val hueIndicator = UIText("◄").constrain {
-            x = (-4).pixels(alignOpposite = true)
-            y = RelativeConstraint(currentHue) - 5.pixels()
-            color = theme.accent.toConstraint()
+            updatePickerFromMouse(mouseX, mouseY)
+            true
         }
 
-        hueLine.addChild(createCustomRenderer { matrixStack, component ->
-            drawHueLine(matrixStack, component)
-        }.constrain {
-            x = 1.pixels()
-            y = 1.pixels()
-            width = 100.percent() - 2.pixels()
-            height = 100.percent() - 3.5.pixels()
-        }).addChild(hueIndicator)
-
-        hueLine.onMouseClick { event ->
+        hueSlider.onMouseClick { mouseX, _, _ ->
             draggingHue = true
-            currentHue = (event.relativeY - 1f) / hueLine.getHeight()
-            isChroma = false
-            updateHueIndicator(hueIndicator)
-        }.onMouseDrag { _, mouseY, _ ->
-            if (!draggingHue) return@onMouseDrag
-            currentHue = ((mouseY - 1f) / hueLine.getHeight()).coerceIn(0f..1f)
-            updateHueIndicator(hueIndicator)
-        }.onMouseRelease { draggingHue = false }
-
-        val alphaLine = UIBlock().constrain {
-            x = SiblingConstraint(5f)
-            width = 14.pixels()
-            height = 75.percent()
-            color = theme.border.toConstraint()
-        }.childOf(this)
-
-        val alphaIndicator = UIText("◄").constrain {
-            x = (-4).pixels(alignOpposite = true)
-            y = RelativeConstraint(1f - currentAlpha) - 5.pixels()
-            color = theme.accent.toConstraint()
+            updateHueFromMouse(mouseX)
+            true
         }
 
-        alphaLine.addChild(createCustomRenderer { matrixStack, component ->
-            drawAlphaLine(matrixStack, component)
-        }.constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            width = 100.percent() - 2.pixels()
-            height = 100.percent() - 2.pixels()
-        }).addChild(alphaIndicator)
-
-        alphaLine.onMouseClick { event ->
+        alphaSlider.onMouseClick { mouseX, _, _ ->
             draggingAlpha = true
-            currentAlpha = 1f - ((event.relativeY - 1f) / alphaLine.getHeight())
-            updateAlphaIndicator(alphaIndicator)
-        }.onMouseDrag { _, mouseY, _ ->
-            if (!draggingAlpha) return@onMouseDrag
-            currentAlpha = 1f - ((mouseY - 1f) / alphaLine.getHeight()).coerceIn(0f..1f)
-            updateAlphaIndicator(alphaIndicator)
-        }.onMouseRelease { draggingAlpha = false }
-
-        UIBlock(initialColor).constrain {
-            x = SiblingConstraint(-12f, true)
-            y = 80.percent() + 4.pixels()
-            width = 10.pixels()
-            height = 10.pixels()
-        }.childOf(this).effect(OutlineEffect(theme.border, 1f)).onMouseClick {
-            isChroma = true
-            onValueChange(initialColor)
+            updateAlphaFromMouse(mouseX)
+            true
         }
     }
 
-    private fun createCustomRenderer(renderer: (UMatrixStack, UIComponent) -> Unit) = object : UIComponent() {
-        override fun draw(matrixStack: UMatrixStack) {
-            super.beforeDraw(matrixStack)
-            renderer(matrixStack, this)
-            super.draw(matrixStack)
+    override fun handleMouseMove(mouseX: Float, mouseY: Float): Boolean {
+        val result = super.handleMouseMove(mouseX, mouseY)
+
+        when {
+            draggingPicker -> updatePickerFromMouse(mouseX, mouseY)
+            draggingHue -> updateHueFromMouse(mouseX)
+            draggingAlpha -> updateAlphaFromMouse(mouseX)
         }
+
+        return result
     }
 
-    private fun updateHueIndicator(indicator: UIText) {
-        indicator.setY(RelativeConstraint(currentHue.coerceAtMost(0.98f)) - 3.pixels())
-        recalculateColor()
+    override fun handleMouseRelease(mouseX: Float, mouseY: Float, button: Int): Boolean {
+        val result = super.handleMouseRelease(mouseX, mouseY, button)
+
+        if (button == 0) {
+            draggingPicker = false
+            draggingHue = false
+            draggingAlpha = false
+        }
+
+        return result
     }
 
-    private fun updateAlphaIndicator(indicator: UIText) {
-        indicator.setY(RelativeConstraint(1f - currentAlpha.coerceAtMost(0.98f)) - 3.pixels())
-        recalculateColor()
+    private fun updatePickerFromMouse(mouseX: Float, mouseY: Float) {
+        val relativeX = (mouseX - pickerArea.x) / pickerArea.width
+        val relativeY = (mouseY - pickerArea.y) / pickerArea.height
+
+        currentSaturation = relativeX.coerceIn(0f, 1f)
+        currentBrightness = (1f - relativeY).coerceIn(0f, 1f)
+
+        updateColor()
     }
 
-    private fun updatePickerIndicator(indicator: UIContainer) {
-        indicator.setX((RelativeConstraint(currentSaturation) - 2.5f.pixels()).coerceIn(2.pixels(), 2.pixels(alignOpposite = true)))
-        indicator.setY((RelativeConstraint(1f - currentBrightness) - 2.5f.pixels()).coerceIn(2.pixels(), 2.pixels(alignOpposite = true)))
-        recalculateColor()
+    private fun updateHueFromMouse(mouseX: Float) {
+        val relativeX = (mouseX - hueSlider.x) / hueSlider.width
+        currentHue = relativeX.coerceIn(0f, 1f)
+        updateColor()
     }
 
-    private fun recalculateColor() {
-        val alpha = ((currentAlpha * 255).roundToInt()).coerceIn(0, 255)
+    private fun updateAlphaFromMouse(mouseX: Float) {
+        val relativeX = (mouseX - alphaSlider.x) / alphaSlider.width
+        currentAlpha = relativeX.coerceIn(0f, 1f)
+        updateColor()
+    }
 
-        val color = if (isChroma) {
-            Color(
-                theme.accent.red.coerceIn(0, 255),
-                theme.accent.green.coerceIn(0, 255),
-                theme.accent.blue.coerceIn(0, 255),
-                alpha
-            )
+    private fun updateColor() {
+        val rgb = Color.HSBtoRGB(currentHue, currentSaturation, currentBrightness)
+        val baseColor = Color(rgb)
+        val alpha = (currentAlpha * 255).roundToInt().coerceIn(0, 255)
+
+        selectedColor = Color(baseColor.red, baseColor.green, baseColor.blue, alpha)
+        previewRect.backgroundColor = selectedColor.rgb
+
+        pickerArea.currentHue = currentHue
+        alphaSlider.currentColor = Color(baseColor.red, baseColor.green, baseColor.blue)
+
+        onValueChange.forEach { it.invoke(selectedColor) }
+    }
+
+    private fun toggleExpanded() {
+        expanded = !expanded
+        isAnimating = true
+        if (expanded) {
+            pickerContainer.visible = true
+            val targetHeight = 32f + 190f
+            animateSize(240f, targetHeight, 200, EasingType.EASE_OUT) {
+                isAnimating = false
+                invalidateParentLayout()
+            }
+            pickerContainer.animateSize(228f, 175f, 200, EasingType.EASE_OUT)
         } else {
-            val rgb = Color.HSBtoRGB(
-                currentHue.coerceIn(0.0f, 1.0f),
-                currentSaturation.coerceIn(0.0f, 1.0f),
-                currentBrightness.coerceIn(0.0f, 1.0f)
-            )
-            val c = Color(rgb)
-            Color(c.red.coerceIn(0, 255), c.green.coerceIn(0, 255), c.blue.coerceIn(0, 255), alpha)
-        }
-
-        currentColor = color
-        onValueChange(color)
-    }
-
-    fun onValueChange(listener: (Color) -> Unit) {
-        onValueChange = listener
-    }
-
-    private fun drawColorPicker(matrixStack: UMatrixStack, component: UIComponent) {
-        val left = component.getLeft().toDouble()
-        val top = component.getTop().toDouble()
-        val right = component.getRight().toDouble()
-        val bottom = component.getBottom().toDouble()
-
-        val height = bottom - top
-
-        for (x in 0..49) {
-            val leftX = left + (right - left) * x / 50f
-            val rightX = left + (right - left) * (x + 1) / 50f
-
-            var first = true
-            for (y in 0..50) {
-                val yPos = top + (y * height / 50.0)
-                val color = Color(Color.HSBtoRGB(currentHue, x / 50f, 1 - y / 50f))
-
-                if (!first) {
-                    UIBlock.drawBlock(matrixStack, color, leftX, yPos, rightX, yPos + height / 50.0)
-                }
-                first = false
+            animateSize(240f, 32f, 200, EasingType.EASE_IN) {
+                pickerContainer.visible = false
+                isAnimating = false
+                invalidateParentLayout()
             }
+            pickerContainer.animateSize(228f, 0f, 200, EasingType.EASE_IN)
         }
     }
 
-    private fun drawHueLine(matrixStack: UMatrixStack, component: UIComponent) {
-        val left = component.getLeft().toDouble()
-        val top = component.getTop().toDouble()
-        val right = component.getRight().toDouble()
-        val height = component.getHeight().toDouble()
+    @Suppress("UNCHECKED_CAST")
+    private fun invalidateParentLayout() {
+        var current = parent as? VexelElement<SectionButton>
 
-        for (i in 0..50) {
-            val yPos = top + (i * height / 50.0)
-            val color = Color(Color.HSBtoRGB(i / 50f, 1f, 0.8f))
-            UIBlock.drawBlock(matrixStack, color, left, yPos, right, yPos + height / 50.0)
+        while (current != null && current !is SectionButton) {
+            current = current.parent as? VexelElement<SectionButton>
+        }
+
+        current?.recalculateHeight()
+    }
+
+    override fun onRender(mouseX: Float, mouseY: Float) {
+        if (draggingPicker && !KnitMouseButtons.LEFT.isPressed) draggingPicker = false
+        if (draggingAlpha && !KnitMouseButtons.LEFT.isPressed) draggingAlpha = false
+        if (draggingHue && !KnitMouseButtons.LEFT.isPressed) draggingHue = false
+    }
+
+    inner class ColorPickerArea : VexelElement<ColorPickerArea>() {
+        var currentHue = 0f
+
+        override fun onRender(mouseX: Float, mouseY: Float) {
+            val hueColor = Color.HSBtoRGB(currentHue, 1f, 1f)
+            val whiteColor = 0xFFFFFFFF.toInt()
+            val blackColor = 0xFF000000.toInt()
+
+            NVGRenderer.gradientRect(x, y, width, height, whiteColor, hueColor, Gradient.LeftToRight, 0f)
+            NVGRenderer.gradientRect(x, y, width, height + 1f, 0x00000000, blackColor, Gradient.TopToBottom, 0f)
+
+            val indicatorX = x + currentSaturation * width
+            val indicatorY = y + (1f - currentBrightness) * height
+            NVGRenderer.hollowRect(indicatorX - 3f, indicatorY - 3f, 6f, 6f, 2f, 0xFFFFFFFF.toInt(), 2f)
         }
     }
 
-    private fun drawAlphaLine(matrixStack: UMatrixStack, component: UIComponent) {
-        val left = component.getLeft().toDouble()
-        val top = component.getTop().toDouble()
-        val width = component.getWidth().toDouble()
-        val height = component.getHeight().toDouble()
-        val rectSize = 2.0
+    inner class HueSlider : VexelElement<HueSlider>() {
+        override fun onRender(mouseX: Float, mouseY: Float) {
+            val steps = (width / 1f).toInt()
+            val stepWidth = width / steps
 
-        for (y in 0 until (height / rectSize).toInt()) {
-            for (x in 0 until (width / rectSize).toInt()) {
-                val baseColor = if ((x + y) % 2 == 0) theme.panel else theme.element
-                UIBlock.drawBlock(
-                    matrixStack,
-                    baseColor,
-                    left + x * rectSize,
-                    top + y * rectSize,
-                    left + (x + 1) * rectSize,
-                    top + (y + 1) * rectSize
-                )
+            for (i in 0 until steps) {
+                val hue = i.toFloat() / steps
+                val rgb = Color.HSBtoRGB(hue, 1f, 1f)
+                val color = Color(rgb)
+
+                val rectX = x + i * stepWidth
+                NVGRenderer.rect(rectX, y, stepWidth, height, color.rgb, 0f)
             }
-        }
 
-        for (y in 0 until height.toInt()) {
-            val alpha = (255 * (1f - y / height)).roundToInt().coerceIn(0, 255)
-            UIBlock.drawBlock(
-                matrixStack,
-                Color(currentColor.red, currentColor.green, currentColor.blue, alpha),
-                left,
-                top + y,
-                left + width,
-                top + y + 1
-            )
+            val indicatorX = x + currentHue * width
+            NVGRenderer.rect(indicatorX - 2f, y - 2f, 4f, height + 4f, 0xFFFFFFFF.toInt(), 3f)
+        }
+    }
+
+    inner class AlphaSlider : VexelElement<AlphaSlider>() {
+        var currentColor: Color = Color.WHITE
+
+        override fun onRender(mouseX: Float, mouseY: Float) {
+            val opaqueColor = Color(currentColor.red, currentColor.green, currentColor.blue, 255).rgb
+            val transparentColor = Color(currentColor.red, currentColor.green, currentColor.blue, 0).rgb
+
+            NVGRenderer.gradientRect(x, y, width, height, transparentColor, opaqueColor, Gradient.LeftToRight, 0f)
+
+            val indicatorX = x + currentAlpha * width
+            NVGRenderer.rect(indicatorX - 2f, y - 2f, 4f, height + 4f, 0xFFFFFFFF.toInt(), 2f)
         }
     }
 }

@@ -9,7 +9,7 @@ import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.NetworkUtils.createConnection

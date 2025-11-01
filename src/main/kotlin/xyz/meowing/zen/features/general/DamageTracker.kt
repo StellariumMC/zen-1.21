@@ -11,13 +11,10 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -27,9 +24,14 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.zen.utils.Utils
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.managers.config.ConfigManager.configUI
 import java.awt.Color
 import java.text.DecimalFormat
 
@@ -51,7 +53,7 @@ data class DamageStats(
     var enabledTypes: MutableSet<DamageType> = mutableSetOf(DamageType.CRIT)
 )
 
-@Zen.Module
+@Module
 object DamageTracker : Feature("damagetracker", true) {
     private val selectedTypes by ConfigDelegate<Set<Int>>("damagetrackertype")
     private val damagetrackersend by ConfigDelegate<Boolean>("damagetrackersend")
@@ -99,7 +101,7 @@ object DamageTracker : Feature("damagetracker", true) {
     override fun initialize() {
         updateEnabledTypes()
 
-        Zen.configUI.registerListener("damagetrackertype") {
+        configUI.registerListener("damagetrackertype") {
             updateEnabledTypes()
         }
 
@@ -181,7 +183,7 @@ object DamageTracker : Feature("damagetracker", true) {
     }
 }
 
-@Zen.Command
+@Command
 object DamageTrackerCommand : Commodore("damagetracker", "dt", "dmg") {
     init {
         runs {

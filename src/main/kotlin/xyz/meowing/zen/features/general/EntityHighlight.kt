@@ -1,9 +1,7 @@
 package xyz.meowing.zen.features.general
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
@@ -13,11 +11,13 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.hit.EntityHitResult
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
+@Module
 object EntityHighlight : Feature("entityhighlight") {
     private val entityhighlightplayercolor by ConfigDelegate<Color>("entityhighlightplayercolor")
     private val entityhighlightmobcolor by ConfigDelegate<Color>("entityhighlightmobcolor")

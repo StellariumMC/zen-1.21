@@ -1,13 +1,7 @@
 package xyz.meowing.zen.features.slayers.slayerdisplay
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TickEvent
-import xyz.meowing.zen.events.WorldEvent
-import xyz.meowing.zen.events.configRegister
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.Render3D
@@ -21,10 +15,16 @@ import net.minecraft.entity.mob.BlazeEntity
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.configRegister
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.TickEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object SlayerDisplay : Feature("slayerdisplay", true) {
     private val slayerEntities = mutableMapOf<Int, SlayerData>()
     private val nametagData = mutableMapOf<Int, String>()
@@ -95,14 +95,14 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
     }
 
     override fun initialize() {
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             slayerEntities.clear()
             nametagData.clear()
             killTimers.clear()
             hiddenArmorStands.clear()
         }
 
-        register<EntityEvent.Metadata> { event ->
+        register<EntityEvent.Packet.Metadata> { event ->
             val cleanName = event.name.removeFormatting()
             val entityId = event.entity.id
             nametagData[entityId] = cleanName
@@ -139,13 +139,13 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
             }
         }
 
-        configRegister<RenderEvent.Entity.Pre>(listOf("slayerdisplay", "slayerdisplayhideoriginalnametags"), priority = 1000) { event ->
+        configRegister<RenderEvent.Entity.Pre>(listOf("slayerdisplay", "slayerdisplayhideoriginalnametags"), priority = 1000, skyblockOnly = true) { event ->
             if (event.entity is ArmorStandEntity && hiddenArmorStands.contains(event.entity.id)) {
                 event.cancel()
             }
         }
 
-        configRegister<TickEvent.Client>(listOf("slayerdisplay", "slayerdisplayoptions"), requiredIndex = 3) {
+        configRegister<TickEvent.Client>(listOf("slayerdisplay", "slayerdisplayoptions"), requiredIndex = 3, skyblockOnly = true) {
             slayerEntities.forEach { (slayerEntityId, _) ->
                 val nametagEntityId = slayerEntityId + 1
                 nametagData[nametagEntityId]?.let {
@@ -209,7 +209,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
             }
         }
 
-        configRegister<RenderEvent.World>(listOf("slayerdisplay", "slayerdisplayshowkilltimer")) {
+        configRegister<RenderEvent.World.Last>(listOf("slayerdisplay", "slayerdisplayshowkilltimer"), skyblockOnly = true) {
             killTimers.entries.removeAll { (_, timerData) ->
                 val expired = System.currentTimeMillis() - timerData.first > 3000
                 if (!expired) {

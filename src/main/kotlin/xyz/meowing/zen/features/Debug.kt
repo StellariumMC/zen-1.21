@@ -23,27 +23,29 @@ import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.UpdateChecker
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.features
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.api.PlayerStats
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Command
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.managers.feature.FeatureManager.features
 import java.awt.Color
 import java.text.DecimalFormat
 import kotlin.collections.forEachIndexed
 import kotlin.collections.isNotEmpty
 
-@Zen.Module
+@Module
 object Debug : Feature() {
     data class PersistentData(var debugmode: Boolean = false)
     val data = DataUtils("Debug", PersistentData())
@@ -128,7 +130,7 @@ object Debug : Feature() {
     }
 }
 
-@Zen.Command
+@Command
 object DebugCommand : Commodore("zendebug", "zd") {
     init {
         executable {
@@ -452,14 +454,14 @@ class DebugGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private fun createEventListenersInfo() {
         createSectionHeader("Event Listeners")
         val eventPanel = createStatsPanel()
-        val eventTypes = EventBus.listeners.keys.sortedBy { it.name }
-        val totalListeners = EventBus.listeners.values.sumOf { it.size }
+        val eventTypes = EventBus.subscribers.keys.sortedBy { it.name }
+        val totalListeners = EventBus.subscribers.values.sumOf { it.size }
 
         createStatRow("Total Event Types", eventTypes.size.toString(), theme.accent, eventPanel)
         createStatRow("Total Listeners", totalListeners.toString(), theme.success, eventPanel)
 
         eventTypes.forEach { eventClass ->
-            val listeners = EventBus.listeners[eventClass] ?: emptySet()
+            val listeners = EventBus.subscribers[eventClass] ?: emptySet()
             val eventName = getFullEventName(eventClass)
             val isExpanded = expandedEvents.contains(eventName)
 

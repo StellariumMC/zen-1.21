@@ -1,233 +1,180 @@
 package xyz.meowing.zen.config.ui.elements
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.components.UIWrappedText
-import gg.essential.elementa.components.Window
-import gg.essential.elementa.constraints.CenterConstraint
-import gg.essential.elementa.constraints.animation.Animations
-import gg.essential.elementa.dsl.*
-import xyz.meowing.knit.api.KnitClient
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.knit.api.input.KnitMouse
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.utils.Utils.createBlock
-import java.awt.Color
+import xyz.meowing.vexel.animations.EasingType
+import xyz.meowing.vexel.animations.animateSize
+import xyz.meowing.vexel.animations.colorTo
+import xyz.meowing.vexel.components.core.Rectangle
+import xyz.meowing.vexel.components.core.Text
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.base.Size
+import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.zen.ui.Theme
+import xyz.meowing.zen.config.ui.panels.SectionButton
 
 class MultiCheckboxElement(
-    private val options: List<String> = emptyList(),
-    initialSelected: Set<Int> = emptySet(),
-    private val onChange: ((Set<Int>) -> Unit)? = null
-) : UIContainer() {
+    name: String,
+    private val options: List<String>,
+    selectedIndices: Set<Int>
+) : VexelElement<MultiCheckboxElement>() {
 
     companion object {
-        var openMultiCheckboxElement: MultiCheckboxElement? = null
-        fun closeAllMultiCheckboxes() = openMultiCheckboxElement?.collapse()
+        var openMultiCheckbox: MultiCheckboxElement? = null
+        fun closeAllMultiCheckboxes() = openMultiCheckbox?.collapse()
     }
 
-    private var selectedIndices = initialSelected.toMutableSet()
-    private val normalBg = Color(18, 24, 28, 255)
-    private val hoverBg = Color(25, 35, 40, 255)
-    private val selectedBg = Color(40, 80, 90, 255)
-    private val textColor = Color(170, 230, 240, 255)
+    private var expanded = false
+    private var isAnimating = false
+    var selectedIndices = selectedIndices.toMutableSet()
+        private set
 
-    private var titleText: UIWrappedText
-    private var container: UIComponent
-    private var optionsContainer: UIContainer? = null
-    private var clickInterceptor: UIContainer? = null
-    private var isExpanded = false
+    private val label = Text(name, Theme.Text.color, 16f)
+        .setPositioning(6f, Pos.ParentPixels, 8f, Pos.ParentPixels)
+        .childOf(this)
+
+    private val selectedButton = Rectangle(Theme.BgLight.color, Theme.Border.color, 5f, 1f)
+        .setPositioning(-6f, Pos.ParentPixels, 0f, Pos.MatchSibling)
+        .alignRight()
+        .setOffset(0f, -2f)
+        .childOf(this)
+
+    private val selectedText = Text("${selectedIndices.size} selected", Theme.Text.color, 16f)
+        .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
+        .childOf(selectedButton)
+
+    private val optionsContainer = Rectangle(Theme.BgLight.color, 0x00000000, 5f, 0f)
+        .setSizing(228f, Size.Pixels, 0f, Size.Pixels)
+        .setPositioning(6f, Pos.ParentPixels, 37f, Pos.ParentPixels)
+        .childOf(this)
 
     init {
-        container = createBlock(3f).constrain {
-            x = 0.pixels()
-            y = 0.pixels()
-            width = 100.percent()
-            height = 100.percent()
-        }.setColor(normalBg) childOf this
+        setSizing(240f, Size.Pixels, 32f, Size.Pixels)
+        setPositioning(Pos.ParentPixels, Pos.AfterSibling)
 
-        titleText = (UIWrappedText(getDisplayText(), centered = true).constrain {
-            x = CenterConstraint()
-            y = CenterConstraint()
-            width = client.textRenderer.getWidth(getDisplayText()).pixels()
-        }.setColor(textColor) childOf container) as UIWrappedText
+        updateButtonSize()
 
-        container.onMouseClick { event ->
-            event.stopPropagation()
-            if (isExpanded) collapse() else expand()
-        }
+        selectedButton.onHover(
+            { _, _ -> selectedButton.colorTo(Theme.Highlight.color, 150, EasingType.EASE_OUT) },
+            { _, _ -> selectedButton.colorTo(Theme.BgLight.color, 150, EasingType.EASE_IN) }
+        )
 
-        container.onMouseEnter {
-            if (!isExpanded) container.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, hoverBg.toConstraint()) }
-        }
-
-        container.onMouseLeave {
-            if (!isExpanded) container.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, normalBg.toConstraint()) }
-        }
-    }
-
-    private fun getDisplayText(): String = "${selectedIndices.size} selected"
-
-    private fun updateDisplayText() {
-        val newText = getDisplayText()
-        titleText.setText(newText)
-        titleText.setWidth(client.textRenderer.getWidth(newText).pixels)
-    }
-
-    private fun createClickInterceptor() {
-        if (clickInterceptor != null) return
-
-        try {
-            val window = Window.of(this)
-            clickInterceptor = (UIContainer().constrain {
-                x = 0.pixels()
-                y = 0.pixels()
-                width = 100.percent()
-                height = 100.percent()
-            }.onMouseClick { event ->
-                if (isExpanded) {
-                    val clickX = event.absoluteX
-                    val clickY = event.absoluteY
-
-                    if (isClickInContainer(clickX, clickY)) {
-                        collapse()
-                    } else if (isClickInOptions(clickX, clickY)) {
-                        optionsContainer?.children?.find { isClickInBounds(clickX, clickY, it) }?.mouseClick(clickX.toDouble(), clickY.toDouble(), event.mouseButton)
-                    } else {
-                        collapse()
+        selectedButton.onClick { _, _, button ->
+            when (button) {
+                0 -> {
+                    if (!isAnimating) {
+                        if (expanded) collapse() else expand()
                     }
+                    true
                 }
-            }.onMouseScroll { event ->
-                if (isExpanded) findScrollComponentUnderMouse()?.mouseScroll(event.delta)
-            } childOf window) as UIContainer?
-        } catch (e: Exception) {
-            LOGGER.warn("Failed to create click interceptor: $e")
-        }
-    }
-
-    private fun isClickInContainer(x: Float, y: Float) = isClickInBounds(x, y, container)
-
-    private fun isClickInOptions(x: Float, y: Float) = optionsContainer?.let { isClickInBounds(x, y, it) } == true
-
-    private fun isClickInBounds(x: Float, y: Float, component: UIComponent) =
-        x >= component.getLeft() && x <= component.getRight() && y >= component.getTop() && y <= component.getBottom()
-
-    private fun getScaledMousePos(): Pair<Float, Float> {
-        return KnitMouse.Scaled.x.toFloat() to KnitMouse.Scaled.y.toFloat()
-    }
-
-    private fun findScrollComponentUnderMouse(): UIComponent? {
-        val (mouseX, mouseY) = getScaledMousePos()
-        return findScrollComponents(Window.of(this)).find { isClickInBounds(mouseX, mouseY, it) }
-    }
-
-    private fun findScrollComponents(component: UIComponent): List<UIComponent> =
-        mutableListOf<UIComponent>().apply {
-            if (component.javaClass.simpleName.contains("ScrollComponent")) add(component)
-            component.children.forEach { addAll(findScrollComponents(it)) }
+                else -> false
+            }
         }
 
-    private fun expand() {
-        if (isExpanded) return
-
-        closeAllMultiCheckboxes()
-        openMultiCheckboxElement = this
-        isExpanded = true
-
-        container.setColor(selectedBg)
-        createClickInterceptor()
-
-        val expandedHeight = options.size * (container.getHeight() + 2)
-        (parent.parent as? UIContainer)?.animate {
-            setHeightAnimation(Animations.OUT_QUAD, 0.2f, (48 + expandedHeight).pixels())
-        }
-
-        optionsContainer = UIContainer().constrain {
-            x = 0.pixels()
-            y = 100.percent()
-            width = 100.percent()
-            height = expandedHeight.pixels()
-        } childOf this
-
+        optionsContainer.visible = false
         createOptions()
     }
 
-    private fun collapse() {
-        if (!isExpanded) return
-
-        isExpanded = false
-        openMultiCheckboxElement = null
-
-        container.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, normalBg.toConstraint()) }
-
-        (parent.parent as? UIContainer)?.animate {
-            setHeightAnimation(Animations.OUT_QUAD, 0.2f, 48.pixels())
-        }
-
-        optionsContainer?.let { removeChild(it) }
-        optionsContainer = null
-
-        clickInterceptor?.let {
-            try {
-                Window.of(this).removeChild(it)
-            } catch (e: Exception) {
-                LOGGER.warn("Failed to remove click interceptor: $e")
-            }
-        }
-        clickInterceptor = null
-    }
-
     private fun createOptions() {
-        var yOffset = 2f
-
         options.forEachIndexed { index, option ->
-            val optionComponent = createBlock(3f).constrain {
-                x = 0.pixels()
-                y = yOffset.pixels()
-                width = 100.percent()
-                height = container.getHeight().pixels
-            }.setColor(normalBg) childOf optionsContainer!!
+            val optionRect = Rectangle(0x00000000, 0x00000000, 0f, 0f, padding = floatArrayOf(0f, 0f, 1.5f, 0f))
+                .setSizing(228f, Size.Pixels, 26f, Size.Pixels)
+                .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
+                .childOf(optionsContainer)
 
-            yOffset += container.getHeight() + 2f
+            val checkbox = Rectangle(Theme.BgLight.color, Theme.Text.color, 3f, 1f)
+                .setSizing(12f, Size.Pixels, 12f, Size.Pixels)
+                .setPositioning(6f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+                .childOf(optionRect)
 
-            val checkboxBox = createBlock(3f).constrain {
-                x = 4.pixels()
-                y = CenterConstraint()
-                width = 12.pixels()
-                height = 12.pixels()
-            }.setColor(if (selectedIndices.contains(index)) selectedBg else normalBg.darker()) childOf optionComponent
+            val checkmark = Rectangle(Theme.Primary.color, 0x00000000, 2f, 0f)
+                .setSizing(8f, Size.Pixels, 8f, Size.Pixels)
+                .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
+                .childOf(checkbox)
 
-            UIWrappedText(option).constrain {
-                x = 20.pixels()
-                y = CenterConstraint()
-                textScale = 0.8.pixels()
-                width = (100.percent() - 40.pixels())
-            }.setColor(textColor) childOf optionComponent
+            checkmark.visible = selectedIndices.contains(index)
 
-            optionComponent.onMouseClick { event ->
-                event.stopPropagation()
-                toggleOption(index, checkboxBox)
-            }
+            Text(option, Theme.Text.color, 14f)
+                .setPositioning(24f, Pos.ParentPixels, 0f, Pos.ParentCenter)
+                .childOf(optionRect)
 
-            optionComponent.onMouseEnter {
-                optionComponent.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, hoverBg.toConstraint()) }
-            }
+            optionRect.onHover(
+                { _, _ -> optionRect.colorTo(Theme.Highlight.color, 150, EasingType.EASE_OUT) },
+                { _, _ -> optionRect.colorTo(0x00000000, 150, EasingType.EASE_IN) }
+            )
 
-            optionComponent.onMouseLeave {
-                optionComponent.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, normalBg.toConstraint()) }
+            optionRect.onClick { _, _, _ ->
+                toggleOption(index, checkmark, checkbox)
+                true
             }
         }
     }
 
-    private fun toggleOption(index: Int, checkboxBox: UIComponent) {
-        if (selectedIndices.contains(index)) {
+    private fun updateButtonSize() {
+        selectedButton.setSizing(100f, Size.Pixels, 20f, Size.Pixels)
+    }
+
+    private fun expand() {
+        if (expanded) return
+
+        closeAllMultiCheckboxes()
+        openMultiCheckbox = this
+
+        expanded = true
+        isAnimating = true
+
+        optionsContainer.visible = true
+        val targetHeight = 32f + options.size * 26f + 12f
+        val containerHeight = options.size * 26f + 6f
+
+        animateSize(240f, targetHeight, 200, EasingType.EASE_OUT) {
+            isAnimating = false
+            invalidateParentLayout()
+        }
+        optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT)
+    }
+
+    private fun collapse() {
+        if (!expanded) return
+
+        expanded = false
+        isAnimating = true
+        openMultiCheckbox = null
+
+        animateSize(240f, 32f, 200, EasingType.EASE_IN) {
+            optionsContainer.visible = false
+            isAnimating = false
+            invalidateParentLayout()
+        }
+        optionsContainer.animateSize(228f, 0f, 200, EasingType.EASE_IN)
+    }
+
+    private fun toggleOption(index: Int, checkmark: VexelElement<*>, checkbox: Rectangle) {
+        val wasSelected = selectedIndices.contains(index)
+
+        if (wasSelected) {
             selectedIndices.remove(index)
-            checkboxBox.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, normalBg.darker().toConstraint()) }
+            checkmark.visible = false
         } else {
             selectedIndices.add(index)
-            checkboxBox.animate { setColorAnimation(Animations.OUT_QUAD, 0.15f, selectedBg.toConstraint()) }
+            checkmark.visible = true
+            checkbox.colorTo(Theme.Primary.withAlpha(0.3f), 100, EasingType.EASE_OUT) {
+                checkbox.colorTo(Theme.BgLight.color, 100, EasingType.EASE_IN)
+            }
         }
 
-        updateDisplayText()
-        onChange?.invoke(selectedIndices.toSet())
+        selectedText.text = "${selectedIndices.size} selected"
+        onValueChange.forEach { it.invoke(selectedIndices.toSet()) }
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun invalidateParentLayout() {
+        var current = parent as? VexelElement<SectionButton>
+
+        while (current != null && current !is SectionButton) {
+            current = current.parent as? VexelElement<SectionButton>
+        }
+
+        current?.recalculateHeight()
+    }
+
+    override fun onRender(mouseX: Float, mouseY: Float) {}
 }

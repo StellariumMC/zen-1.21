@@ -1,12 +1,7 @@
 package xyz.meowing.zen.features.rift
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.isHolding
 import xyz.meowing.zen.utils.Render3D
@@ -16,12 +11,18 @@ import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
-object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
+@Module
+object LarvaSilkLines : Feature("larvasilklines", island = SkyBlockIsland.THE_RIFT) {
     private var startingSilkPos: BlockPos? = null
     private val larvasilklinescolor by ConfigDelegate<Color>("larvasilklinescolor")
 
@@ -39,12 +40,14 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
 
 
     override fun initialize() {
-        createCustomEvent<RenderEvent.World>("render") { event ->
+        createCustomEvent<RenderEvent.World.Last>("render") { event ->
             if (startingSilkPos == null) return@createCustomEvent
 
             if (isHolding("LARVA_SILK")) {
+                val consumers = event.context.consumers()
+                val matrixStack = event.context.matrixStack()
                 val lookingAt = client.crosshairTarget
-                Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, event.consumers, event.matrixStack)
+                Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, consumers, matrixStack)
 
                 if (lookingAt is BlockHitResult && lookingAt.type == HitResult.Type.BLOCK) {
                     val pos = startingSilkPos!!
@@ -52,13 +55,15 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
                     val start = Vec3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
                     val finish = Vec3d(lookingAtPos.x + 0.5, lookingAtPos.y + 0.5, lookingAtPos.z + 0.5)
 
-                    Render3D.drawLine(start, finish, 2f, larvasilklinescolor, event.consumers, event.matrixStack)
-                    Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, event.consumers, event.matrixStack)
+                    Render3D.drawLine(start, finish, 2f, larvasilklinescolor, consumers, matrixStack)
+                    Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, consumers, matrixStack)
                 }
             }
         }
 
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
+
             if (event.message.string.removeFormatting().startsWith("You cancelled the wire")) {
                 startingSilkPos = null
                 unregisterEvent("render")
@@ -77,7 +82,7 @@ object LarvaSilkLines : Feature("larvasilklines", area = "the rift") {
             }
         }
 
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             startingSilkPos = null
             unregisterEvent("render")
         }

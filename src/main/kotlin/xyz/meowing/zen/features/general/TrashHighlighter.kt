@@ -16,9 +16,8 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.constraint.ChildHeightConstraint
+import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
@@ -27,15 +26,17 @@ import xyz.meowing.zen.utils.TickUtils
 import net.minecraft.item.ItemStack
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 enum class FilterType { REGEX, EQUALS, CONTAINS }
 enum class InputType { ITEM_ID, DISPLAY_NAME, LORE }
 
-@Zen.Module
+@Module
 object TrashHighlighter : Feature("trashhighlighter", true) {
     private val highlightType by ConfigDelegate<Int>("trashhighlighttype")
     private val color by ConfigDelegate<Color>("trashhighlightercolor")

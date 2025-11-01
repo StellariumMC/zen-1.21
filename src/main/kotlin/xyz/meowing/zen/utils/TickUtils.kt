@@ -1,7 +1,7 @@
 package xyz.meowing.zen.utils
 
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.TickEvent
+import xyz.meowing.zen.events.core.TickEvent
 import java.util.*
 
 object TickUtils {

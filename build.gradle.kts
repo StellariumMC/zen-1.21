@@ -21,12 +21,44 @@ toolkitLoomHelper {
     useMixinRefMap(modData.id)
 }
 
+repositories {
+    maven("https://repo.hypixel.net/repository/Hypixel/")
+    maven("https://api.modrinth.com/maven")
+    maven("https://maven.teamresourceful.com/repository/maven-public/")
+}
+
+val clocheAction: Action<ExternalModuleDependency> = Action {
+    attributes {
+        attribute(Attribute.of("earth.terrarium.cloche.modLoader", String::class.java), "fabric")
+        attribute(Attribute.of("earth.terrarium.cloche.minecraftVersion", String::class.java),
+            when (mcData.version) {
+                MinecraftVersions.VERSION_1_21_7 -> "1.21.8"
+                else -> mcData.toString().substringBefore("-")
+            }
+        )
+    }
+}
+
 dependencies {
+    implementation(include("io.github.classgraph:classgraph:4.8.184")!!)
+
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
+
     modImplementation(include("gg.essential:elementa:710")!!)
     modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
-    modImplementation(include("xyz.meowing:vexel-${mcData}:111")!!)
+
+    modImplementation(include("xyz.meowing:vexel-${mcData}:118")!!)
+
+    modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
+    modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
+
+    modImplementation("me.owdding:item-data-fixer:1.0.3", clocheAction)
+    modImplementation("tech.thatgravyboat:skyblock-api:3.0.9") {
+        exclude("me.owdding")
+        clocheAction.execute(this)
+    }
+    include("tech.thatgravyboat:skyblock-api:3.0.9", clocheAction)
 
     when (mcData.version) {
         MinecraftVersions.VERSION_1_21_9 -> modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
@@ -40,54 +72,4 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     compilerOptions {
         freeCompilerArgs.add("-Xlambdas=class")
     }
-}
-
-tasks.register("generateLists") {
-    val srcDir = rootProject.file("src/main/kotlin/xyz/meowing/zen")
-    val featureOutput = project.file("build/generated/resources/features.list")
-    val commandOutput = project.file("build/generated/resources/commands.list")
-
-    val moduleRegex = Regex("@Zen\\.Module\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
-    val commandRegex = Regex("@Zen\\.Command\\s*(?:\\n|\\s)*(?:object|class)\\s+(\\w+)")
-    val pkgRegex = Regex("package\\s+([\\w.]+)")
-
-    inputs.dir(srcDir).optional(true)
-    outputs.files(featureOutput, commandOutput)
-
-    doLast {
-        val featureClasses = mutableListOf<String>()
-        val commandClasses = mutableListOf<String>()
-
-        if (!srcDir.exists()) return@doLast
-
-        srcDir.walkTopDown().forEach { file ->
-            if (file.isFile && file.extension in listOf("kt", "java")) {
-                val text = file.readText()
-                val pkg = pkgRegex.find(text)?.groupValues?.get(1) ?: return@forEach
-
-                moduleRegex.findAll(text).forEach { match ->
-                    featureClasses += "${pkg}.${match.groupValues[1]}"
-                }
-
-                commandRegex.findAll(text).forEach { match ->
-                    commandClasses += "${pkg}.${match.groupValues[1]}"
-                }
-            }
-        }
-
-        featureOutput.parentFile.mkdirs()
-        commandOutput.parentFile.mkdirs()
-        featureOutput.writeText(featureClasses.joinToString("\n"))
-        commandOutput.writeText(commandClasses.joinToString("\n"))
-    }
-}
-
-tasks.processResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    dependsOn("generateLists")
-    from("build/generated/resources")
-}
-
-tasks.classes {
-    dependsOn("generateLists")
 }

@@ -1,20 +1,21 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import xyz.meowing.zen.events.EntityEvent
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.entity.decoration.ArmorStandEntity
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.events.WorldEvent
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
-object KeyAlert : Feature("keyalert", area = "catacombs") {
+@Module
+object KeyAlert : Feature("keyalert", island = SkyBlockIsland.THE_CATACOMBS) {
     private var bloodOpen = false
 
     override fun addConfig() {
@@ -42,7 +43,7 @@ object KeyAlert : Feature("keyalert", area = "catacombs") {
             }
         }
 
-        register<WorldEvent.Change> { bloodOpen = false }
+        register<LocationEvent.WorldChange> { bloodOpen = false }
     }
 
     override fun onRegister() {
