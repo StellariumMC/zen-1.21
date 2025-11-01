@@ -7,12 +7,14 @@ import tech.thatgravyboat.skyblockapi.utils.extentions.parseRomanOrArabic
 import tech.thatgravyboat.skyblockapi.utils.extentions.toIntValue
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.find
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
+import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.DungeonEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.PlayerEvent
 import xyz.meowing.zen.events.core.ScoreboardEvent
@@ -37,8 +39,12 @@ object DungeonAPI {
     private val milestoneRegex = Regex("\\s*Your Milestone: ☠(?<milestone>.)")
     private val startRegex = Regex("\\[NPC] Mort: Here, I found this map when I first entered the dungeon\\.")
     private val uniqueClassRegex = Regex("Your .+ stats are doubled because you are the only player using this class!")
-    private val bossStartRegex = Regex( "^\\[BOSS] (?<boss>.+?):")
+    private val bossStartRegex = Regex("^\\[BOSS] (?<boss>.+?):")
     private val endRegex = Regex("\\s+(?:Master Mode|The) Catacombs - (?:Entrance|Floor [XVI]+)")
+    private val keyObtainedRegex = Regex("(?:\\[.+] ?)?\\w+ has obtained (?<type>\\w+) Key!")
+    private val keyPickedUpRegex = Regex("A (?<type>\\w+) Key was picked up!")
+    private val witherDoorOpenRegex = Regex("\\w+ opened a WITHER door!")
+    private val bloodDoorOpenRegex = Regex("The BLOOD DOOR has been opened!")
 
     var cryptCount: Int = 0
         private set
@@ -84,6 +90,15 @@ object DungeonAPI {
     var roomId: String? = null
         private set
 
+    var witherKeys: Int = 0
+        private set
+
+    var bloodKeys: Int = 0
+        private set
+
+    var bloodOpened: Boolean = false
+        private set
+
     init {
         EventBus.register<LocationEvent.IslandChange> { reset() }
 
@@ -107,14 +122,14 @@ object DungeonAPI {
                         if (name != ownName) dungeonPlayer.dead = false
 
                         if (dungeonPlayer.missingData()) {
-                            dungeonPlayer.dungeonClass = DungeonClass.Companion.getByName(dungeonClass)
+                            dungeonPlayer.dungeonClass = DungeonClass.getByName(dungeonClass)
                             dungeonPlayer.classLevel = level.parseRomanOrArabic()
                         }
 
                         return@findThenNull
                     }
 
-                    val playerClass = DungeonClass.Companion.getByName(dungeonClass)
+                    val playerClass = DungeonClass.getByName(dungeonClass)
                     val player = DungeonPlayer(name, playerClass, level.parseRomanOrArabic())
 
                     if (name == ownName) ownPlayer = player
@@ -149,13 +164,15 @@ object DungeonAPI {
             }
         }
 
-        EventBus.registerIn<LocationEvent.AreaChange> (SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.registerIn<LocationEvent.AreaChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
             dungeonFloorRegex.find(event.new.name, "floor") { (floor) ->
-                dungeonFloor = DungeonFloor.Companion.getByName(floor)
+                dungeonFloor = DungeonFloor.getByName(floor)
+                val floorValue = dungeonFloor ?: return@find
+                EventBus.post(DungeonEvent.Enter(floorValue))
             }
         }
 
-        EventBus.registerIn<ScoreboardEvent.Update> (SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.registerIn<ScoreboardEvent.Update>(SkyBlockIsland.THE_CATACOMBS) { event ->
             for (line in event.added) {
                 timeRegex.findThenNull(line, "time") { (time) ->
                     this.time = time.parseDuration() ?: return@findThenNull
@@ -167,12 +184,13 @@ object DungeonAPI {
             }
         }
 
-        EventBus.registerIn<ChatEvent.Receive> (SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.registerIn<ChatEvent.Receive>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (event.isActionBar) return@registerIn
             val message = event.message.string
 
             if (!started && startRegex.matches(message)) {
                 started = true
+                dungeonFloor?.let { EventBus.post(DungeonEvent.Start(it)) }
                 return@registerIn
             }
 
@@ -192,13 +210,42 @@ object DungeonAPI {
                 completed = true
                 return@registerIn
             }
+
+            matchWhen(message) {
+                case(keyObtainedRegex, "type") { (type) ->
+                    handleGetKey(type)
+                }
+                case(keyPickedUpRegex, "type") { (type) ->
+                    handleGetKey(type)
+                }
+                case(witherDoorOpenRegex) {
+                    if (witherKeys > 0) --witherKeys
+                }
+                case(bloodDoorOpenRegex) {
+                    if (bloodKeys > 0) --bloodKeys
+                    bloodOpened = true
+                }
+            }
         }
 
-        EventBus.registerIn<PlayerEvent.HotbarChange> (SkyBlockIsland.THE_CATACOMBS) { event ->
+        EventBus.registerIn<PlayerEvent.HotbarChange>(SkyBlockIsland.THE_CATACOMBS) { event ->
             if (event.slot != 0) return@registerIn
 
             val id = event.item.getData(DataTypes.ID)
             ownPlayer?.dead = id == "HAUNT_ABILITY"
+        }
+    }
+
+    private fun handleGetKey(type: String) {
+        when {
+            type.equals("wither", true) -> {
+                ++witherKeys
+                DungeonKey.getById(type)?.let { EventBus.post(DungeonEvent.KeyPickUp(it)) }
+            }
+            type.equals("blood", true) -> {
+                ++bloodKeys
+                DungeonKey.getById(type)?.let { EventBus.post(DungeonEvent.KeyPickUp(it)) }
+            }
         }
     }
 
@@ -217,5 +264,8 @@ object DungeonAPI {
         teammates = emptyList()
         time = Duration.ZERO
         roomId = null
+        witherKeys = 0
+        bloodKeys = 0
+        bloodOpened = false
     }
 }
