@@ -15,9 +15,10 @@ class FeatureElement(
     ): FeatureElement {
         val option = OptionElement(optionName, description, optionsSection, element)
         option.configElement.parent = option
-
         val optionsList = options.getOrPut(optionsSection) { mutableListOf() }
         if (!optionsList.any { it.optionName == optionName }) optionsList.add(option)
+
+        ConfigManager.ensureDefaultValue(element)
 
         return this
     }

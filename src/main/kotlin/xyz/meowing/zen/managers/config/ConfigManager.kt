@@ -5,6 +5,7 @@ package xyz.meowing.zen.managers.config
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.config.ui.ClickGUI
+import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.managers.feature.FeatureManager
 import xyz.meowing.zen.utils.DataUtils
@@ -57,7 +58,30 @@ object ConfigManager {
 
         if (!category.features.any { it.featureName == featureName }) category.features.add(featureElement)
 
+        ensureDefaultValue(element)
+
         return featureElement
+    }
+
+    fun ensureDefaultValue(element: ConfigElement) {
+        if (configValueMap.containsKey(element.configKey)) return
+
+        val defaultValue = when (val type = element.type) {
+            is ElementType.Switch -> type.default
+            is ElementType.Slider -> type.default
+            is ElementType.Dropdown -> type.default
+            is ElementType.TextInput -> type.default
+            is ElementType.ColorPicker -> type.default
+            is ElementType.Keybind -> type.default
+            is ElementType.MultiCheckbox -> type.default
+            is ElementType.MCColorPicker -> type.default.code
+            else -> null
+        }
+
+        defaultValue?.let {
+            configValueMap[element.configKey] = it
+            saveConfig(false)
+        }
     }
 
     fun saveConfig(saveToFile: Boolean) {
@@ -79,7 +103,3 @@ object ConfigManager {
         }
     }
 }
-
-
-
-
