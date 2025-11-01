@@ -54,11 +54,11 @@ dependencies {
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
 
     modImplementation("me.owdding:item-data-fixer:1.0.3", clocheAction)
-    modImplementation("tech.thatgravyboat:skyblock-api:3.0.9") {
+    modImplementation("tech.thatgravyboat:skyblock-api:3.0.17") {
         exclude("me.owdding")
         clocheAction.execute(this)
     }
-    include("tech.thatgravyboat:skyblock-api:3.0.9", clocheAction)
+    include("tech.thatgravyboat:skyblock-api:3.0.17", clocheAction)
 
     when (mcData.version) {
         MinecraftVersions.VERSION_1_21_9 -> modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
