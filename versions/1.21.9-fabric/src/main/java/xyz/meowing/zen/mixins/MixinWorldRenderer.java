@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import xyz.meowing.zen.events.EventBus;
-import xyz.meowing.zen.events.RenderEvent;
+import xyz.meowing.zen.events.core.RenderEvent;
 
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {

@@ -1,22 +1,23 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PlayerStats
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
 import net.minecraft.client.gui.DrawContext
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
 /**
  * @author Eclipse-5214
  */
-@Zen.Module
-object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
+@Module
+object RoomSecrets : Feature("roomsecrets", island = SkyBlockIsland.THE_CATACOMBS) {
     private const val name = "Secrets Display"
 
     override fun addConfig() {
@@ -30,7 +31,7 @@ object RoomSecrets : Feature("roomsecrets", area = "catacombs") {
     override fun initialize() {
         HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)
 
-        register<RenderEvent.HUD> { renderHUD(it.context) }
+        register<GuiEvent.Render.HUD> { renderHUD(it.context) }
     }
 
     fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {

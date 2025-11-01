@@ -2,19 +2,19 @@ package xyz.meowing.zen.features.slayers
 
 import net.minecraft.sound.SoundEvents
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.TitleUtils
 
-@Zen.Module
+@Module
 object MinibossSpawn : Feature("minibossspawn", true) {
     private val showTitle by ConfigDelegate<Boolean>("minibossspawntitle")
 
@@ -32,6 +32,7 @@ object MinibossSpawn : Feature("minibossspawn", true) {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val message = event.message.string.removeFormatting()
 
             if (message.contains("SLAYER MINI-BOSS") && message.contains("has spawned!")) {

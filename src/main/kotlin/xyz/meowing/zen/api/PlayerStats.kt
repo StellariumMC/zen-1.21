@@ -1,20 +1,19 @@
 package xyz.meowing.zen.api
 
-import net.minecraft.component.DataComponentTypes
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
-import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.GameEvent
-import xyz.meowing.zen.events.PacketEvent
-import xyz.meowing.zen.events.TickEvent
-import xyz.meowing.zen.events.WorldEvent
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.PacketEvent
+import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.text.startsWith
 
-@Zen.Module
+@Module
 object PlayerStats {
     private val HEALTH_REGEX = """(§.)(?<currentHealth>[\d,]+)/(?<maxHealth>[\d,]+)❤""".toRegex()
     private val MANA_REGEX = """§b(?<currentMana>[\d,]+)/(?<maxMana>[\d,]+)✎( Mana)?""".toRegex()
@@ -51,7 +50,7 @@ object PlayerStats {
     private var manaRegenRate = 0f
 
     init {
-        EventBus.register<WorldEvent.Change> {
+        EventBus.register<LocationEvent.WorldChange> {
             maxRiftTime = 0
             currentRoomSecrets = -1
             currentRoomMaxSecrets = 0
@@ -87,8 +86,8 @@ object PlayerStats {
             applyInterpolation()
         }
 
-        EventBus.register<GameEvent.ActionBar> { event ->
-            extractPlayerStats(event.message.string)
+        EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) extractPlayerStats(event.message.string)
         }
 
         EventBus.register<PacketEvent.Received> { event ->

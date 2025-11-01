@@ -1,9 +1,7 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
@@ -12,10 +10,12 @@ import net.minecraft.client.gui.DrawContext
 import net.minecraft.item.ItemStack
 import net.minecraft.item.Items
 import xyz.meowing.knit.api.KnitPlayer
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object ArmorHUD : Feature("armorhud") {
     private const val name = "Armor HUD"
     private var armor = emptyList<ItemStack?>()
@@ -57,7 +57,7 @@ object ArmorHUD : Feature("armorhud") {
             }
         }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

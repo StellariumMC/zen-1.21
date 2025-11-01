@@ -1,18 +1,18 @@
 package xyz.meowing.zen.features.general
 
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.TickEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
 
-@Zen.Module
+@Module
 object ReaperTimer : Feature("reapertimer", true) {
     private const val name = "Reaper Timer"
     private val indices = listOf(36, 37, 38)
@@ -30,7 +30,7 @@ object ReaperTimer : Feature("reapertimer", true) {
     override fun initialize() {
         HUDManager.register(name, "§c4.2s")
 
-        createCustomEvent<RenderEvent.HUD>("render") { event ->
+        createCustomEvent<GuiEvent.Render.HUD>("render") { event ->
             val x = HUDManager.getX(name)
             val y = HUDManager.getY(name)
             val scale = HUDManager.getScale(name)

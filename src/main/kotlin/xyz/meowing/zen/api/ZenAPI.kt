@@ -4,7 +4,8 @@ import xyz.meowing.zen.Zen
 import java.security.MessageDigest
 import net.fabricmc.loader.api.FabricLoader
 import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.Zen.Companion.LOGGER
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.utils.LoopUtils
 import java.net.URI
 import java.net.URLEncoder
@@ -16,7 +17,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
 import kotlin.math.pow
 
-@Zen.Module
+@Module
 object ZenAPI {
     private var ws: WebSocket? = null
     private var reconnectAttempts = 0

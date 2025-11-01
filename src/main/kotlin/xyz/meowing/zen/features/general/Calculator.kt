@@ -3,10 +3,10 @@ package xyz.meowing.zen.features.general
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.command.utils.GreedyString
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
+import xyz.meowing.zen.annotations.Command
 
-@Zen.Command
+@Command
 object CalculatorCommand : Commodore("zencalc", "calc") {
     init {
         runs { equation: GreedyString ->

@@ -1,14 +1,9 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.SkyblockEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils.fromNow
@@ -17,12 +12,23 @@ import xyz.meowing.zen.utils.Utils.toFormattedDuration
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.Vec3d
-import xyz.meowing.zen.config.ConfigElement
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockAreas
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
-@Zen.Module
-object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", listOf("Zealot Bruiser Hideout", "Zealot Bruiser", "Dragon's Nest")) {
+@Module
+object ZealotSpawnLocations : Feature(
+    "zealotspawnvisual",
+    true,
+    SkyBlockIsland.THE_END,
+    listOf(SkyBlockAreas.ZEALOT_BRUISER_HIDEOUT, SkyBlockAreas.DRAGONS_NEST)
+) {
     private val zealotSpawns: List<BlockPos> = listOf(
         BlockPos(-646, 5, -274),
         BlockPos(-633, 5, -277),
@@ -93,7 +99,7 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
             loop<ClientTick>(10) {
                 val timeUntilSpawn = spawnTime.until
                 val remaining = if (timeUntilSpawn.isPositive() && timeUntilSpawn.millis > 1000) timeUntilSpawn.millis.toFormattedDuration() else "§aReady"
-                val mobType = if (LocationUtils.checkSubarea("dragon's nest")) "Zealot" else "Bruiser"
+                val mobType = if (SkyBlockAreas.DRAGONS_NEST.inArea()) "Zealot" else "Bruiser"
                 displayText = "§d$mobType Spawn: §5$remaining"
             }
         }
@@ -102,14 +108,14 @@ object ZealotSpawnLocations : Feature("zealotspawnvisual", true, "the end", list
         register<SkyblockEvent.EntitySpawn> { event ->
             val mobId = event.skyblockMob.id
 
-            if ((LocationUtils.checkSubarea("zealot bruiser hideout") && mobId == "Zealot Bruiser") ||
-                (LocationUtils.checkSubarea("dragon's nest") && mobId == "Zealot")) {
+            if (SkyBlockAreas.ZEALOT_BRUISER_HIDEOUT.inArea() && mobId == "Zealot Bruiser" ||
+                (SkyBlockAreas.DRAGONS_NEST.inArea() && mobId == "Zealot")) {
                 spawnTime = 8.seconds.fromNow
             }
         }
 
-        register<RenderEvent.World> { event ->
-            val positions = if (LocationUtils.checkSubarea("dragon's nest")) zealotSpawns else bruiserSpawns
+        register<RenderEvent.World.Last> { event ->
+            val positions = if (SkyBlockAreas.DRAGONS_NEST.inArea()) zealotSpawns else bruiserSpawns
             positions.forEach { pos ->
                 val aabb = Box(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
                 if (drawZealotSpawnBox) Render3D.drawSpecialBB(aabb, zealotSpawnColor, event.context.consumers(), event.context.matrixStack())

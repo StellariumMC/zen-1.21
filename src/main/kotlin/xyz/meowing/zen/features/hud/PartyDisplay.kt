@@ -3,17 +3,18 @@ package xyz.meowing.zen.features.hud
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.api.PartyTracker
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.PartyEvent
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.PartyEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 
-@Zen.Module
+@Module
 object PartyDisplay : Feature("partydisplay") {
     private const val name = "Party Display"
     private var partyMembers = mapOf<String, PartyTracker.PartyMember>()
@@ -34,7 +35,7 @@ object PartyDisplay : Feature("partydisplay") {
             partyMembers = event.members
         }
 
-        register<RenderEvent.HUD> { event ->
+        register<GuiEvent.Render.HUD> { event ->
             if (HUDManager.isEnabled(name)) render(event.context)
         }
     }

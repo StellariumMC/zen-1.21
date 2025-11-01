@@ -6,7 +6,6 @@ import xyz.meowing.zen.mixins.AccessorPlayerInventory
 import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
-import xyz.meowing.zen.utils.LocationUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.DungeonUtils.isMage
 import xyz.meowing.zen.utils.SimpleTimeMark
@@ -16,8 +15,15 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.item.ItemStack
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.MouseEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
 
-@Zen.Module
+@Module
 object ItemAbility {
     private val cooldowns = hashMapOf<String, CooldownItem>()
     private val activeCooldowns = hashMapOf<String, Double>()
@@ -72,13 +78,13 @@ object ItemAbility {
             }
         }
 
-        EventBus.register<WorldEvent.Change> ({
+        EventBus.register<LocationEvent.WorldChange> {
             activeCooldowns.clear()
             cooldowns.clear()
             cooldownReduction = -1
-        })
+        }
 
-        EventBus.register<MouseEvent.Click> ({ event ->
+        EventBus.register<MouseEvent.Click> { event ->
             if (world == null) return@register
             val heldItem = player?.mainHandStack ?: return@register
             val skyblockId = heldItem.skyblockID
@@ -92,9 +98,9 @@ object ItemAbility {
                     sendItemAbilityEvent(cdItem.leftClick!!)
                 }
             }
-        })
+        }
 
-        EventBus.register<EntityEvent.Interact> ({ event ->
+        EventBus.register<EntityEvent.Interact> {
             if (world == null) return@register
             val heldItem = player?.mainHandStack ?: return@register
             val skyblockId = heldItem.skyblockID
@@ -105,12 +111,13 @@ object ItemAbility {
             } else if (cdItem.rightClick != null) {
                 sendItemAbilityEvent(cdItem.rightClick!!)
             }
-        })
+        }
 
-        EventBus.register<GameEvent.ActionBar> ({ event ->
+        EventBus.register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val clean = event.message.string.removeFormatting()
 
-            if (clean.startsWith("Used") && LocationUtils.checkArea("catacombs"))
+            if (clean.startsWith("Used") && SkyBlockIsland.THE_CATACOMBS.inIsland())
                 justUsedAbility = ItemAbility("Dungeon_Ability")
 
             justUsedAbility?.let { ability ->
@@ -121,7 +128,7 @@ object ItemAbility {
                     activeCooldowns[ability.abilityName] = currentCooldown.toDouble()
                 }
             }
-        })
+        }
     }
 
     private fun setItemAbility(line: String, cdItem: CooldownItem, skyblockId: String) {
@@ -169,7 +176,7 @@ object ItemAbility {
     private fun updateCooldown(cooldownCount: Double): Double {
         var secondsToAdd = 0.05
 
-        if (LocationUtils.checkArea("catacombs") && cooldownReduction == -1 && isMage()) {
+        if (SkyBlockIsland.THE_CATACOMBS.inIsland() && cooldownReduction == -1 && isMage()) {
             cooldownReduction = (DungeonUtils.getCurrentLevel() / 2) + 25
             if (!DungeonUtils.isDuplicate("mage")) cooldownReduction += 25
         }

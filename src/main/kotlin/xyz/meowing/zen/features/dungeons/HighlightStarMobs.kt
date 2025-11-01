@@ -1,22 +1,23 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.WorldEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
-@Zen.Module
-object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
+@Module
+object HighlightStarMobs : Feature("boxstarmobs", island = SkyBlockIsland.THE_CATACOMBS) {
     private val boxstarmobscolor by ConfigDelegate<Color>("boxstarmobscolor")
     private val entities = mutableListOf<Int>()
 
@@ -50,7 +51,7 @@ object HighlightStarMobs : Feature("boxstarmobs", area = "catacombs") {
             }
         }
 
-        register<WorldEvent.Change> {
+        register<LocationEvent.WorldChange> {
             entities.clear()
         }
 

@@ -3,9 +3,6 @@
 package xyz.meowing.zen.config.ui.elements.base
 
 import xyz.meowing.vexel.components.base.VexelElement
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
-import xyz.meowing.zen.config.OptionElement
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.config.ui.elements.ButtonElement
@@ -18,6 +15,9 @@ import xyz.meowing.zen.config.ui.elements.SliderElement
 import xyz.meowing.zen.config.ui.elements.SwitchElement
 import xyz.meowing.zen.config.ui.elements.TextInputElement
 import xyz.meowing.zen.config.ui.elements.TextParagraphElement
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.managers.config.OptionElement
 import java.awt.Color
 
 class ElementRenderer(

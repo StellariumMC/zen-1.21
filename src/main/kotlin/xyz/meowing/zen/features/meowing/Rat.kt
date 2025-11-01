@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.meowing
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.events.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.NetworkUtils
 import net.minecraft.client.render.OverlayTexture
@@ -16,11 +14,14 @@ import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.render.world.RenderContext
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.RenderEvent
 
 import java.io.File
 
-@Zen.Module
-object Rat : Feature(area = "Hub") {
+@Module
+object Rat : Feature(island = SkyBlockIsland.HUB) {
     private val position = Vec3d(-1.0, 72.0, -92.0)
     private val culling = Box(position.x, position.y, position.z, position.x + 1, position.y + 1, position.z + 1/16.0)
     private val textureId = Identifier.of("zen", "zen_rat_png")
@@ -28,7 +29,7 @@ object Rat : Feature(area = "Hub") {
 
     override fun initialize() {
         loadTexture()
-        register<RenderEvent.WorldPostEntities> { event ->
+        register<RenderEvent.World.AfterEntities> { event ->
             if (textureLoaded) {
                 render(event.context)
             }

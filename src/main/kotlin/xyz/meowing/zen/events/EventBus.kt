@@ -1,14 +1,11 @@
+@file:Suppress("UNUSED")
+
 package xyz.meowing.zen.events
 
-import xyz.meowing.zen.Zen.Companion.configUI
-import xyz.meowing.zen.utils.LocationUtils
-import xyz.meowing.zen.utils.ScoreboardUtils
-import xyz.meowing.zen.config.ConfigManager
 import xyz.meowing.knit.Knit
 import xyz.meowing.knit.internal.events.WorldRenderEvent
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -23,21 +20,77 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
 import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket
 import net.minecraft.network.packet.s2c.play.*
 import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
+import xyz.meowing.knit.api.events.Event
+import xyz.meowing.knit.api.events.EventCall
+import xyz.meowing.knit.internal.events.ClientEvent
+import xyz.meowing.knit.internal.events.TickEvent
 import xyz.meowing.vexel.Vexel
-import java.util.concurrent.ConcurrentHashMap
+import xyz.meowing.zen.api.dungeons.DungeonAPI
+import xyz.meowing.zen.api.dungeons.DungeonFloor
+import xyz.meowing.zen.api.location.LocationAPI
+import xyz.meowing.zen.api.location.SkyBlockArea
+import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.GameEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.ItemTooltipEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.PacketEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.events.core.ServerEvent
+import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.managers.events.EventBusManager
 
-object EventBus {
+object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
     val messages = mutableListOf<String>()
-    val listeners = ConcurrentHashMap<Class<*>, MutableSet<PrioritizedCallback<*>>>()
-    data class PrioritizedCallback<T>(val priority: Int, val callback: (T) -> Unit)
 
     init {
-        ClientTickEvents.END_CLIENT_TICK.register { client ->
-            post(TickEvent.Client())
+        Knit.EventBus.register<WorldRenderEvent.Last> { event ->
+            post(RenderEvent.World.Last(event.context))
+        }
+
+        Knit.EventBus.register<WorldRenderEvent.AfterEntities> { event ->
+            post(RenderEvent.World.AfterEntities(event.context))
+        }
+
+        Knit.EventBus.register<WorldRenderEvent.BlockOutline> { event ->
+            if (post(RenderEvent.World.BlockOutline(event.context))) event.cancel()
+        }
+
+        Knit.EventBus.register<TickEvent.Client.End> {
+            post(xyz.meowing.zen.events.core.TickEvent.Client())
+        }
+
+        Knit.EventBus.register<TickEvent.Server.End> {
+            post(xyz.meowing.zen.events.core.TickEvent.Server())
+        }
+
+        Knit.EventBus.register<ClientEvent.Start> {
+            post(GameEvent.Start())
+        }
+
+        Vexel.eventBus.register<xyz.meowing.vexel.events.GuiEvent.Render> {
+            post(GuiEvent.Render.NVG())
+        }
+
+        ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
+            post(ServerEvent.Connect())
+        }
+
+        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            post(ServerEvent.Disconnect())
+        }
+
+        ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
+            post(GameEvent.Start())
+        }
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
+            post(GameEvent.Stop())
         }
 
         ClientEntityEvents.ENTITY_LOAD.register { entity, _ ->
@@ -49,18 +102,11 @@ object EventBus {
         }
 
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { mc, world ->
-            if(WorldEvent.Change.shouldPost()) {
-                post(WorldEvent.Change(world))
-            }
+            post(LocationEvent.WorldChange())
         }
 
-        ClientReceiveMessageEvents.ALLOW_GAME.register { msg, show ->
-            val customEvent = when (show) {
-                true -> GameEvent.ActionBar(msg)
-                false -> ChatEvent.Receive(msg)
-            }
-
-            !post(customEvent)
+        ClientReceiveMessageEvents.ALLOW_GAME.register { message, isActionBar ->
+            !post(ChatEvent.Receive(message, isActionBar))
         }
 
         ClientSendMessageEvents.ALLOW_CHAT.register { string ->
@@ -80,23 +126,6 @@ object EventBus {
                 else -> true
             }
         }
-
-        Knit.EventBus.register<WorldRenderEvent.Last> { event ->
-            post(RenderEvent.World(event.context))
-        }
-
-        Knit.EventBus.register<WorldRenderEvent.AfterEntities> { event ->
-            post(RenderEvent.WorldPostEntities(event.context))
-        }
-
-        Knit.EventBus.register<WorldRenderEvent.BlockOutline> { event ->
-            if (post(RenderEvent.BlockOutline(event.context))) {
-                event.cancel()
-            }
-        }
-
-        Vexel.eventBus.register<xyz.meowing.vexel.events.GuiEvent.Render> { post(GuiEvent.NVGRender()) }
-
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             //#if MC >= 1.21.9
             //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
@@ -112,12 +141,12 @@ object EventBus {
             //$$    !post(GuiEvent.Key(GLFW.glfwGetKeyName(keyInput.key, keyInput.scancode), keyInput.key, charTyped, keyInput.key, screen))
             //$$ }
             //#else
-            ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mbtn ->
-                !post(GuiEvent.Click(mx, my, mbtn, true, screen))
+            ScreenMouseEvents.allowMouseClick(screen).register { _, mx, my, mouseButton ->
+                !post(GuiEvent.Click(mx, my, mouseButton, true, screen))
             }
 
-            ScreenMouseEvents.allowMouseRelease(screen).register { _, mx, my, mbtn ->
-                !post(GuiEvent.Click(mx, my, mbtn, false, screen))
+            ScreenMouseEvents.allowMouseRelease(screen).register { _, mx, my, mouseButton ->
+                !post(GuiEvent.Click(mx, my, mouseButton, false, screen))
             }
 
             ScreenKeyboardEvents.allowKeyPress(screen).register { _, key, scancode, modifiers ->
@@ -127,20 +156,12 @@ object EventBus {
             //#endif
 
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
-                post(GuiEvent.AfterRender(screen, context))
+                post(GuiEvent.Render.Post(screen, context))
             }
         }
 
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             if (screen != null) post(GuiEvent.Open(screen))
-        }
-
-        ClientLifecycleEvents.CLIENT_STARTED.register { _ ->
-            post(GameEvent.Load())
-        }
-
-        ClientLifecycleEvents.CLIENT_STOPPING.register { _ ->
-            post(GameEvent.Unload())
         }
 
         UseItemCallback.EVENT.register { player, world, hand ->
@@ -171,38 +192,25 @@ object EventBus {
         ItemTooltipCallback.EVENT.register { stack, context, type, lines ->
             val tooltipEvent = ItemTooltipEvent(stack, context, type, lines)
             post(tooltipEvent)
+
             if (tooltipEvent.lines != lines) {
                 lines.clear()
                 lines.addAll(tooltipEvent.lines)
             }
         }
 
-        ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
-            post(GameEvent.Disconnect())
-        }
+        //TODO: Impl after sonatype finishes publishing my shit ffs
+//        Knit.EventBus.register<TickEvent.Client.Start> { TickScheduler.Client.onTick() }
+//
+//        Knit.EventBus.register<TickEvent.Server.Start> { TickScheduler.Server.onTick() }
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {
         if (post(PacketEvent.Received(packet))) return true
 
         return when (packet) {
-            is CommonPingS2CPacket -> {
-                post(TickEvent.Server())
-            }
             is EntitySpawnS2CPacket -> {
-                post(EntityEvent.Spawn(packet))
-            }
-            is ScoreboardObjectiveUpdateS2CPacket, is ScoreboardScoreUpdateS2CPacket, is ScoreboardDisplayS2CPacket, is TeamS2CPacket -> {
-                val lines = ScoreboardUtils.getSidebarLines()
-                post(SidebarUpdateEvent(lines))
-            }
-            is PlayerListS2CPacket -> {
-                when (packet.actions.firstOrNull()) {
-                    PlayerListS2CPacket.Action.ADD_PLAYER, PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME -> {
-                        post(TablistEvent.Update(packet))
-                    }
-                    else -> false
-                }
+                post(EntityEvent.Packet.Spawn(packet))
             }
             else -> false
         }
@@ -212,63 +220,14 @@ object EventBus {
         post(PacketEvent.Sent(packet))
     }
 
-    /*
-     * Modified from Devonian code
-     * Under GPL 3.0 License
-     */
-    inline fun <reified T : Event> register(priority: Int = 0, noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
-        val eventClass = T::class.java
-        val handlers = listeners.getOrPut(eventClass) { ConcurrentHashMap.newKeySet() }
-        val prioritizedCallback = PrioritizedCallback(priority, callback)
-        if (add) handlers.add(prioritizedCallback)
-        return EventCallImpl(prioritizedCallback, handlers)
-    }
-
-    inline fun <reified T : Event> register(noinline callback: (T) -> Unit, add: Boolean = true): EventCall {
-        return register(0, callback, add)
-    }
-
-    inline fun <reified T : Event> register(noinline callback: (T) -> Unit): EventCall {
-        return register(0, callback, true)
-    }
-
-    @JvmStatic
-    fun <T : Event> registerJava(eventClass: Class<T>, priority: Int, add: Boolean = false, callback: (T) -> Unit): EventCall {
-        val handlers = listeners.getOrPut(eventClass) { ConcurrentHashMap.newKeySet() }
-        val prioritizedCallback = PrioritizedCallback(priority, callback)
-        if (add) handlers.add(prioritizedCallback)
-        return EventCallImpl(prioritizedCallback, handlers)
-    }
-
-    fun <T : Event> post(event: T): Boolean {
-        val eventClass = event::class.java
-        val handlers = listeners[eventClass] ?: return false
-        if (handlers.isEmpty()) return false
-
-        val sortedHandlers = handlers.sortedBy { it.priority }
-
-        for (handler in sortedHandlers) {
-            try {
-                @Suppress("UNCHECKED_CAST")
-                (handler.callback as (T) -> Unit)(event)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return if (event is CancellableEvent) event.isCancelled() else false
-    }
-
-    class EventCallImpl(
-        private val callback: PrioritizedCallback<*>,
-        private val handlers: MutableSet<PrioritizedCallback<*>>
-    ) : EventCall {
-        override fun unregister(): Boolean = handlers.remove(callback)
-        override fun register(): Boolean = handlers.add(callback)
-    }
-
-    interface EventCall {
-        fun unregister(): Boolean
-        fun register(): Boolean
+    inline fun <reified T : Event> registerIn(
+        vararg islands: SkyBlockIsland,
+        skyblockOnly: Boolean = false,
+        noinline callback: (T) -> Unit
+    ) {
+        val eventCall = register<T>(add = false, callback = callback)
+        val islandSet = if (islands.isNotEmpty()) islands.toSet() else null
+        EventBusManager.trackConditionalEvent(islandSet, skyblockOnly, eventCall)
     }
 }
 
@@ -276,57 +235,71 @@ inline fun <reified T : Event> configRegister(
     configKeys: Any,
     priority: Int = 0,
     skyblockOnly: Boolean = false,
+    island: Any? = null,
     area: Any? = null,
-    subarea: Any? = null,
+    dungeonFloor: Any? = null,
     noinline enabledCheck: (Map<String, Any?>) -> Boolean,
     noinline callback: (T) -> Unit
-): EventBus.EventCall {
-    val eventCall = EventBus.register<T>(priority, callback, false)
+): EventCall {
+    val eventCall = EventBus.register<T>(priority, false, callback)
     val keys = when (configKeys) {
         is String -> listOf(configKeys)
         is List<*> -> configKeys.filterIsInstance<String>()
         else -> throw IllegalArgumentException("configKeys must be String or List<String>")
     }
 
-    val areas = when (area) {
-        is String -> listOf(area.lowercase())
-        is List<*> -> area.filterIsInstance<String>().map { it.lowercase() }
+    val islands = when (island) {
+        is SkyBlockIsland -> listOf(island)
+        is List<*> -> island.filterIsInstance<SkyBlockIsland>()
         else -> emptyList()
     }
-    val subareas = when (subarea) {
-        is String -> listOf(subarea.lowercase())
-        is List<*> -> subarea.filterIsInstance<String>().map { it.lowercase() }
+
+    val areas = when (area) {
+        is SkyBlockArea -> listOf(area)
+        is List<*> -> area.filterIsInstance<SkyBlockArea>()
+        else -> emptyList()
+    }
+
+    val dungeonFloors = when (dungeonFloor) {
+        is DungeonFloor -> listOf(dungeonFloor)
+        is List<*> -> dungeonFloor.filterIsInstance<DungeonFloor>()
         else -> emptyList()
     }
 
     val checkAndUpdate = {
         val configValues = keys.associateWith { ConfigManager.getConfigValue(it) }
         val configEnabled = enabledCheck(configValues)
-        val skyblockEnabled = !skyblockOnly || LocationUtils.inSkyblock
-        val areaEnabled = areas.isEmpty() || areas.any { LocationUtils.checkArea(it) }
-        val subareaEnabled = subareas.isEmpty() || subareas.any { LocationUtils.checkSubarea(it) }
+        val skyblockEnabled = !skyblockOnly || LocationAPI.isOnSkyBlock
+        val islandEnabled = islands.isEmpty() || LocationAPI.island in islands
+        val areaEnabled = areas.isEmpty() || LocationAPI.area in areas
+        val dungeonFloorEnabled = if (dungeonFloors.isEmpty()) true else SkyBlockIsland.THE_CATACOMBS.inIsland() && DungeonAPI.dungeonFloor in dungeonFloors
 
-        if (configEnabled && skyblockEnabled && areaEnabled && subareaEnabled) {
+        if (configEnabled && skyblockEnabled && islandEnabled && areaEnabled && dungeonFloorEnabled) {
             eventCall.register()
         } else {
             eventCall.unregister()
         }
     }
 
-    keys.forEach { configKey ->
-        configUI.registerListener(configKey) { checkAndUpdate() }
+    keys.forEach { key ->
+        ConfigManager.registerListener(key) { checkAndUpdate() }
+    }
+
+    if (islands.isNotEmpty()) {
+        EventBus.register<LocationEvent.IslandChange> { checkAndUpdate() }
     }
 
     if (areas.isNotEmpty()) {
-        EventBus.register<AreaEvent.Main> { checkAndUpdate() }
+        EventBus.register<LocationEvent.AreaChange> { checkAndUpdate() }
     }
 
-    if (subareas.isNotEmpty()) {
-        EventBus.register<AreaEvent.Sub> { checkAndUpdate() }
+    if (dungeonFloors.isNotEmpty()) {
+        EventBus.register<LocationEvent.DungeonFloorChange> { checkAndUpdate() }
     }
 
     if (skyblockOnly) {
-        EventBus.register<AreaEvent.Skyblock> { checkAndUpdate() }
+        EventBus.register<LocationEvent.SkyblockJoin> { checkAndUpdate() }
+        EventBus.register<LocationEvent.SkyblockLeave> { checkAndUpdate() }
     }
 
     checkAndUpdate()
@@ -338,11 +311,12 @@ inline fun <reified T : Event> configRegister(
     configKeys: Any,
     priority: Int = 0,
     skyblockOnly: Boolean = false,
+    island: Any? = null,
     area: Any? = null,
-    subarea: Any? = null,
+    dungeonFloor: Any? = null,
     noinline callback: (T) -> Unit
-): EventBus.EventCall {
-    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
+): EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, island, area, dungeonFloor, { configValues ->
         configValues.values.all { it as? Boolean == true }
     }, callback)
 }
@@ -353,11 +327,12 @@ inline fun <reified T : Event> configRegister(
     enabledIndices: Set<Int>,
     priority: Int = 0,
     skyblockOnly: Boolean = false,
+    island: Any? = null,
     area: Any? = null,
-    subarea: Any? = null,
+    dungeonFloor: Any? = null,
     noinline callback: (T) -> Unit
-): EventBus.EventCall {
-    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
+): EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, island, area, dungeonFloor, { configValues ->
         configValues.values.all { value ->
             when (value) {
                 is Int -> value in enabledIndices
@@ -374,11 +349,12 @@ inline fun <reified T : Event> configRegister(
     requiredIndex: Int,
     priority: Int = 0,
     skyblockOnly: Boolean = false,
+    island: Any? = null,
     area: Any? = null,
-    subarea: Any? = null,
+    dungeonFloor: Any? = null,
     noinline callback: (T) -> Unit
-): EventBus.EventCall {
-    return configRegister(configKeys, priority, skyblockOnly, area, subarea, { configValues ->
+): EventCall {
+    return configRegister(configKeys, priority, skyblockOnly, island, area, dungeonFloor, { configValues ->
         configValues.values.all { value ->
             when (value) {
                 is Set<*> -> value.contains(requiredIndex)

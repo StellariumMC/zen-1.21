@@ -1,12 +1,9 @@
 package xyz.meowing.zen.features.slayers.carrying
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.EntityEvent
-import xyz.meowing.zen.events.RenderEvent
-import xyz.meowing.zen.events.ChatEvent
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.DataUtils
@@ -24,9 +21,14 @@ import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
-import xyz.meowing.zen.Zen.Companion.LOGGER
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -35,7 +37,7 @@ import kotlin.math.abs
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
 
-@Zen.Module
+@Module
 object CarryCounter : Feature("carrycounter") {
     private val tradeInit = Pattern.compile("^Trade completed with (?:\\[.*?] )?(\\w+)!$")
     private val tradeComp = Pattern.compile("^ \\+ (\\d+\\.?\\d*)M coins$")
@@ -119,6 +121,7 @@ object CarryCounter : Feature("carrycounter") {
         }
 
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val text = event.message.string.removeFormatting()
 
             tradeInit.matcher(text).let { matcher ->
@@ -153,7 +156,7 @@ object CarryCounter : Feature("carrycounter") {
             }
         }
 
-        createCustomEvent<EntityEvent.Metadata>("entityMetadata") { event ->
+        createCustomEvent<EntityEvent.Packet.Metadata>("entityMetadata") { event ->
             val name = event.name
             if (name.contains("Spawned by")) {
                 val hasBlackhole = event.entity.let { entity ->
@@ -196,7 +199,7 @@ object CarryCounter : Feature("carrycounter") {
         }
 
         CarryHUD.initialize()
-        register<RenderEvent.HUD> { CarryHUD.renderHUD(it.context) }
+        register<GuiEvent.Render.HUD> { CarryHUD.renderHUD(it.context) }
     }
 
     private fun loadCompletedCarries() {

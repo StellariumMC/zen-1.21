@@ -2,18 +2,18 @@ package xyz.meowing.zen.features.meowing
 
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
-import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
 
-@Zen.Module
+@Module
 object AutoMeow : Feature("automeow") {
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
     private val channels = mapOf(

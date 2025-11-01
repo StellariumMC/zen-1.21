@@ -2,20 +2,20 @@ package xyz.meowing.zen.api
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.LOGGER
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.InternalEvent
 import xyz.meowing.zen.utils.DataUtils
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpHead
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
+import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.core.InternalEvent
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
-@Zen.Module
+@Module
 object NEUApi {
     private var client: CloseableHttpClient = HttpClients.createDefault()
     private const val NeuZipUrl = "https://github.com/NotEnoughUpdates/NotEnoughUpdates-Repo/archive/master.zip"

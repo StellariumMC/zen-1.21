@@ -1,16 +1,16 @@
 package xyz.meowing.zen.features.general
 
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
-@Zen.Module
+@Module
 object GuildMessage : Feature("guildmessage") {
     private val guildPattern = Pattern.compile("Guild > (\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?: (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
@@ -25,6 +25,7 @@ object GuildMessage : Feature("guildmessage") {
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
+            if (event.isActionBar) return@register
             val text = event.message.string.removeFormatting()
             val m = guildPattern.matcher(text)
             if (m.matches()) {
@@ -53,7 +54,7 @@ object GuildMessage : Feature("guildmessage") {
     }
 }
 
-@Zen.Module
+@Module
 object PartyMessage : Feature("partymessage") {
     private val partyPattern = Pattern.compile("Party > (\\[.+?])? ?(.+?): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")

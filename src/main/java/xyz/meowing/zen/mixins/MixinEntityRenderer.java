@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 //$$ import net.minecraft.client.render.state.CameraRenderState;
 //$$ import net.minecraft.client.render.entity.state.EntityRenderState;
 //$$ import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-//$$ import xyz.meowing.zen.events.RenderEvent;
+//$$ import xyz.meowing.zen.events.core.RenderEvent;
 //$$ import xyz.meowing.zen.events.EventBus;
 //$$ import org.joml.Vector3f;
 //#endif
@@ -60,7 +60,7 @@ import static xyz.meowing.zen.features.general.ContributorColor.replaceText;
 //$$     ) {
 //$$         RenderEvent.Entity.Pre event = new RenderEvent.Entity.Pre(this.zen$currentEntity, matrices, null, renderState.light);
 //$$         EventBus.INSTANCE.post(event);
-//$$         if (event.isCancelled()) {
+//$$         if (event.getCancelled()) {
 //$$             callbackInfo.cancel();
 //$$         }
 //$$     }

@@ -1,15 +1,16 @@
 package xyz.meowing.zen.features.slayers.carrying
 
 import xyz.meowing.zen.Zen
-import xyz.meowing.zen.Zen.Companion.prefix
+import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.GuiEvent
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.util.Colors
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.knit.api.input.KnitMouse
+import xyz.meowing.zen.events.core.GuiEvent
 
 object CarryHUD {
     private data class Button(val x: Float, val y: Float, val width: Float, val height: Float, val action: String, val carryee: CarryCounter.Carryee, val tooltip: String)
@@ -19,8 +20,8 @@ object CarryHUD {
     private val renderItems = mutableListOf<RenderItem>()
     private var hoveredButton: Button? = null
     private var isRegistered = false
-    private var guiClickHandler: EventBus.EventCall? = null
-    private var guiDrawHandler: EventBus.EventCall? = null
+    private var guiClickHandler: EventCall? = null
+    private var guiDrawHandler: EventCall? = null
     private const val name = "CarryHud"
 
     fun initialize() {
@@ -63,10 +64,10 @@ object CarryHUD {
             try {
                 if (shouldRegister) {
                     guiClickHandler = EventBus.register<GuiEvent.Click> {
-                        if (it.state) onMouseInput()
+                        if (it.buttonState) onMouseInput()
                     }
 
-                    guiDrawHandler = EventBus.register<GuiEvent.AfterRender> {
+                    guiDrawHandler = EventBus.register<GuiEvent.Render.Post> {
                         onGuiRender(it.context)
                     }
                 } else {

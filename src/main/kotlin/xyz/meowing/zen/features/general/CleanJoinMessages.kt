@@ -1,15 +1,15 @@
 package xyz.meowing.zen.features.general
 
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.config.ConfigElement
-import xyz.meowing.zen.config.ConfigManager
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.managers.config.ConfigElement
+import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
-import xyz.meowing.zen.events.ChatEvent
+import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import java.util.regex.Pattern
 
-@Zen.Module
+@Module
 object GuildJoinLeave : Feature("guildjoinleave") {
     private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
@@ -40,8 +40,8 @@ object GuildJoinLeave : Feature("guildjoinleave") {
     }
 }
 
-@Zen.Module
-object friendjoinleave : Feature("friendjoinleave") {
+@Module
+object FriendJoinLeave : Feature("friendjoinleave") {
     private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
     override fun addConfig() {
