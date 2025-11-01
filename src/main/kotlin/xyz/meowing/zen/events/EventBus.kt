@@ -25,6 +25,7 @@ import net.minecraft.util.ActionResult
 import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.events.Event
 import xyz.meowing.knit.api.events.EventCall
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.internal.events.ClientEvent
 import xyz.meowing.knit.internal.events.TickEvent
 import xyz.meowing.vexel.Vexel
@@ -63,10 +64,12 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
 
         Knit.EventBus.register<TickEvent.Client.End> {
             post(xyz.meowing.zen.events.core.TickEvent.Client())
+            TickScheduler.Client.onTick()
         }
 
         Knit.EventBus.register<TickEvent.Server.End> {
             post(xyz.meowing.zen.events.core.TickEvent.Server())
+            TickScheduler.Server.onTick()
         }
 
         Knit.EventBus.register<ClientEvent.Start> {
@@ -198,11 +201,6 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
                 lines.addAll(tooltipEvent.lines)
             }
         }
-
-        //TODO: Impl after sonatype finishes publishing my shit ffs
-//        Knit.EventBus.register<TickEvent.Client.Start> { TickScheduler.Client.onTick() }
-//
-//        Knit.EventBus.register<TickEvent.Server.Start> { TickScheduler.Server.onTick() }
     }
 
     fun onPacketReceived(packet: Packet<*>): Boolean {
