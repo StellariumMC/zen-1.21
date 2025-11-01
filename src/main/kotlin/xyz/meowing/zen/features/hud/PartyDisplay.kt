@@ -8,6 +8,7 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PartyEvent
@@ -53,7 +54,10 @@ object PartyDisplay : Feature("partydisplay") {
 
     private fun getDisplayLines(): List<String> {
         if (partyMembers.isEmpty()) return emptyList()
-        if (partyMembers.size == 1 && partyMembers.keys.contains(player?.name?.string)) return emptyList()
+
+        val playerName = Utils.currentPlayerName
+
+        if (partyMembers.size == 1 && partyMembers.keys.contains(playerName)) return emptyList()
 
         val lines = mutableListOf<String>()
         lines.add("§9§lParty Members §r§7(${partyMembers.size})")

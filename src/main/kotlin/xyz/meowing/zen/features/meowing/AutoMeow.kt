@@ -10,6 +10,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
+import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
 
@@ -49,7 +50,9 @@ object AutoMeow : Feature("automeow") {
             val text = event.message.string.removeFormatting()
             val player = player ?: return@register
 
-            if (text.contains(player.name.string) || !text.endsWith("meow")) return@register
+            val playerName = Utils.currentPlayerName ?: return@register
+
+            if (text.contains(playerName) || !text.endsWith("meow")) return@register
 
             val (cmd, channelIndex) = channels.entries.firstOrNull { text.startsWith(it.key) }?.value ?: ("ac" to -1)
 
