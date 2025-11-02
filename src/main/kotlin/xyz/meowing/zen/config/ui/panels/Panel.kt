@@ -33,7 +33,7 @@ class Panel(
         padding = floatArrayOf(HEADER_HEIGHT, 0f, 2f, 0f)
     )
         .setSizing(WIDTH, Size.Pixels, 0f, Size.Auto)
-        .setMaxAutoSize(null, 600f)
+        .setMaxAutoSize(null, 800f)
         .scrollable(true)
         .showScrollbar(false)
         .dropShadow(10f, 3f, Theme.BgDark.color)
@@ -110,19 +110,21 @@ class Panel(
     }
 
     fun adjustScrollAfterResize() {
-        if (isAnimating) return
-
         val contentHeight = background.getContentHeight()
         val viewHeight = background.height - background.padding[0] - background.padding[2]
         val maxScroll = max(0f, contentHeight - viewHeight)
 
         if (background.scrollOffset > maxScroll) {
+            isAnimating = true
             background.animateFloat(
                 { background.scrollOffset },
                 { background.scrollOffset = it },
                 maxScroll,
                 100,
-                EasingType.EASE_OUT
+                EasingType.EASE_OUT,
+                onComplete = {
+                    isAnimating = false
+                }
             )
         }
     }
@@ -138,6 +140,6 @@ class Panel(
             y = deltaY + KnitMouse.Raw.y.toFloat()
         }
 
-        adjustScrollAfterResize()
+        if (!isAnimating) adjustScrollAfterResize()
     }
 }

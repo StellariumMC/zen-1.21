@@ -45,7 +45,6 @@ object FeatureManager {
             areaFeatures.forEach { it.update() }
         }
 
-
         EventBus.register<LocationEvent.DungeonFloorChange> {
             dungeonFloorFeatures.forEach { it.update() }
         }

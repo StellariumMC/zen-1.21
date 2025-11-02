@@ -3,11 +3,14 @@ package xyz.meowing.zen.config.ui.elements
 import xyz.meowing.vexel.animations.EasingType
 import xyz.meowing.vexel.animations.animateSize
 import xyz.meowing.vexel.animations.colorTo
+import xyz.meowing.vexel.animations.fadeIn
+import xyz.meowing.vexel.animations.fadeOut
 import xyz.meowing.vexel.components.core.Rectangle
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.vexel.components.core.Container
 import xyz.meowing.vexel.utils.render.NVGRenderer
 import xyz.meowing.zen.ui.Theme
 import xyz.meowing.zen.config.ui.panels.SectionButton
@@ -47,6 +50,11 @@ class DropdownElement(
         .setPositioning(6f, Pos.ParentPixels, 37f, Pos.ParentPixels)
         .childOf(this)
 
+    private val actualContainer = Container()
+        .setSizing(Size.Fill, Size.Auto)
+        .setPositioning(Pos.ParentCenter, Pos.ParentCenter)
+        .childOf(optionsContainer)
+
     init {
         setSizing(240f, Size.Pixels, 32f, Size.Pixels)
         setPositioning(Pos.ParentPixels, Pos.AfterSibling)
@@ -83,7 +91,7 @@ class DropdownElement(
             val optionRect = Rectangle(0x00000000, 0x00000000, 0f, 0f, padding = floatArrayOf(0f, 0f, 1.5f, 0f))
                 .setSizing(228f, Size.Pixels, 26f, Size.Pixels)
                 .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
-                .childOf(optionsContainer)
+                .childOf(actualContainer)
 
             Text(option, Theme.Text.color, 16f)
                 .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
@@ -116,14 +124,20 @@ class DropdownElement(
         isAnimating = true
 
         optionsContainer.visible = true
-        val targetHeight = 32f + options.size * 26f + 12f
+        val targetHeight = 32f + options.size * 26f + 18f
         val containerHeight = options.size * 26f + 6f
 
         animateSize(240f, targetHeight, 200, EasingType.EASE_OUT) {
             isAnimating = false
             invalidateParentLayout()
         }
-        optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT)
+        optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT) {
+            optionsContainer.children.forEach { child ->
+                child.children.forEach { grandchild ->
+                    grandchild.children.filterIsInstance<Text>().forEach { it.fadeIn(50) }
+                }
+            }
+        }
     }
 
     private fun collapse() {
@@ -137,6 +151,13 @@ class DropdownElement(
             isAnimating = false
             invalidateParentLayout()
         }
+
+        optionsContainer.children.forEach { child ->
+            child.children.forEach { grandchild ->
+                grandchild.children.filterIsInstance<Text>().forEach { it.fadeOut(50) }
+            }
+        }
+
         optionsContainer.animateSize(228f, 0f, 200, EasingType.EASE_IN) {
             optionsContainer.visible = false
         }

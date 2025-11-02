@@ -67,7 +67,7 @@ class SectionButton(
         buttonBackground.onHover(
             { _, _ ->
                 val hoverColor = if (isEnabled) {
-                    Color(Theme.Primary.color).brighter().rgb
+                    Color(68, 120, 175, 255).rgb
                 } else {
                     Color(Theme.Bg.color).brighter().rgb
                 }
