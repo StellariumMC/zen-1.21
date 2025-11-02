@@ -48,7 +48,7 @@ dependencies {
     modImplementation(include("gg.essential:elementa:710")!!)
     modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
 
-    modImplementation(include("xyz.meowing:vexel-${mcData}:118")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:119")!!)
 
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
