@@ -63,7 +63,9 @@ object MaskTimers : Feature("masktimers", island = SkyBlockIsland.THE_CATACOMBS)
 
             when {
                 text.matches(BonzoRegex) -> {
-                    BonzoTicks = (maxOf(180.0, 360.0 - getCurrentCata() * 3.6) * 20)
+                    val time = if (text.contains("⚚")) 180.0 else 360.0
+
+                    BonzoTicks = (maxOf(180.0, time - getCurrentCata() * 3.6) * 20)
                     tickCall.register()
                 }
                 text == "Second Wind Activated! Your Spirit Mask saved your life!" -> {
