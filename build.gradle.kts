@@ -53,7 +53,7 @@ dependencies {
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
 
-    modImplementation("me.owdding:item-data-fixer:1.0.3", clocheAction)
+    modImplementation("me.owdding:item-data-fixer:1.0.5", clocheAction)
     modImplementation("tech.thatgravyboat:skyblock-api:3.0.17") {
         exclude("me.owdding")
         clocheAction.execute(this)
