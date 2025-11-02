@@ -13,7 +13,7 @@ import xyz.meowing.zen.ui.Theme
 import kotlin.math.max
 
 class Panel(
-    category: CategoryElement,
+    private val category: CategoryElement,
     initialX: Float,
     initialY: Float,
     private val onConfigUpdate: (String, Any) -> Unit
@@ -78,11 +78,18 @@ class Panel(
     companion object {
         const val WIDTH = 240f
         const val HEADER_HEIGHT = 32f
+        private val panelPositions = mutableMapOf<String, Pair<Float, Float>>()
     }
 
     init {
         setSizing(WIDTH, Size.Pixels, 0f, Size.Auto)
-        setPositioning(initialX, Pos.ScreenPixels, initialY, Pos.ScreenPixels)
+
+        val savedPosition = panelPositions[category.name]
+        if (savedPosition != null) {
+            setPositioning(savedPosition.first, Pos.ScreenPixels, savedPosition.second, Pos.ScreenPixels)
+        } else {
+            setPositioning(initialX, Pos.ScreenPixels, initialY, Pos.ScreenPixels)
+        }
 
         header.onClick { _, _, button ->
             if (button == 0) {
@@ -94,7 +101,10 @@ class Panel(
         }
 
         header.onMouseRelease { _, _, button ->
-            if (button == 0) dragging = false
+            if (button == 0) {
+                dragging = false
+                savePosition()
+            }
             true
         }
 
@@ -104,6 +114,10 @@ class Panel(
         }
 
         updateVisibility()
+    }
+
+    private fun savePosition() {
+        panelPositions[category.name] = Pair(x, y)
     }
 
     private fun updateVisibility() {
