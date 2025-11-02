@@ -14,6 +14,7 @@ import net.minecraft.registry.Registries
 import net.minecraft.screen.ScreenHandler
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
 
@@ -96,7 +97,8 @@ object TradeAPI {
                 if (stack.name.string.removeFormatting().endsWith("coins")) {
                     coins += parseCoins(stack.name.string.removeFormatting())
                 } else {
-                    items.add(createItemJson(stack))
+                    if (!stack.isEmpty)
+                        items.add(createItemJson(stack))
                 }
             }
         }
@@ -116,8 +118,8 @@ object TradeAPI {
     private fun createItemJson(stack: ItemStack): JsonObject {
         return JsonObject().apply {
             addProperty("count", stack.count)
-            addProperty("damage", stack.damage)
-            addProperty("nbt", stack.item.components.toString())
+            addProperty("lore", stack.lore.joinToString("\n"))
+            addProperty("name", stack.name.string)
             addProperty("id", Registries.ITEM.getId(stack.item).toString())
         }
     }
