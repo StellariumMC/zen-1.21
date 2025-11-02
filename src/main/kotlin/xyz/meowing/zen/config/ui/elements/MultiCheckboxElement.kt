@@ -8,6 +8,8 @@ import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.base.Size
 import xyz.meowing.vexel.components.base.VexelElement
+import xyz.meowing.zen.config.ui.elements.utils.fadeIn
+import xyz.meowing.zen.config.ui.elements.utils.fadeOut
 import xyz.meowing.zen.ui.Theme
 import xyz.meowing.zen.config.ui.panels.SectionButton
 
@@ -75,7 +77,16 @@ class MultiCheckboxElement(
 
     private fun createOptions() {
         options.forEachIndexed { index, option ->
-            val optionRect = Rectangle(0x00000000, 0x00000000, 0f, 0f, padding = floatArrayOf(0f, 0f, 1.5f, 0f))
+            val isFirst = index == 0
+            val isLast = index == options.size - 1
+
+            val topLeftRadius = if (isFirst) 5f else 0f
+            val topRightRadius = if (isFirst) 5f else 0f
+            val bottomLeftRadius = if (isLast) 5f else 0f
+            val bottomRightRadius = if (isLast) 5f else 0f
+
+            val optionRect = Rectangle(0x00000000, 0x00000000, 0f, 0f)
+                .borderRadiusVarying(topRight = topRightRadius, topLeft = topLeftRadius, bottomRight = bottomRightRadius, bottomLeft = bottomLeftRadius)
                 .setSizing(228f, Size.Pixels, 26f, Size.Pixels)
                 .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
                 .childOf(optionsContainer)
@@ -122,14 +133,19 @@ class MultiCheckboxElement(
         isAnimating = true
 
         optionsContainer.visible = true
-        val targetHeight = 32f + options.size * 26f + 12f
-        val containerHeight = options.size * 26f + 6f
+        val targetHeight = 32f + options.size * 26f + 6f
+        val containerHeight = options.size * 26f
 
         animateSize(240f, targetHeight, 200, EasingType.EASE_OUT) {
             isAnimating = false
             invalidateParentLayout()
         }
-        optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT)
+        optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT) {
+            optionsContainer.children.forEach { child ->
+                child.fadeIn(50)
+                child.children.forEach { it.fadeIn(50) }
+            }
+        }
     }
 
     private fun collapse() {
@@ -144,6 +160,12 @@ class MultiCheckboxElement(
             isAnimating = false
             invalidateParentLayout()
         }
+
+        optionsContainer.children.forEach { child ->
+            child.fadeOut(50)
+            child.children.forEach { it.fadeOut(50) }
+        }
+
         optionsContainer.animateSize(228f, 0f, 200, EasingType.EASE_IN)
     }
 

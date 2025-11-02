@@ -3,6 +3,7 @@ package xyz.meowing.zen.config.ui.elements
 import xyz.meowing.knit.api.input.KnitMouseButtons
 import xyz.meowing.vexel.animations.EasingType
 import xyz.meowing.vexel.animations.animateSize
+import xyz.meowing.vexel.animations.colorTo
 import xyz.meowing.vexel.components.core.Rectangle
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.components.base.Pos
@@ -39,8 +40,7 @@ class ColorPickerElement(
         selectedColor.rgb,
         Theme.Border.color,
         3f,
-        1f,
-        hoverColor = selectedColor.darker().rgb
+        1f
     )
         .setSizing(30f, Size.Pixels, 20f, Size.Pixels)
         .setPositioning(-6f, Pos.ParentPixels, 0f, Pos.MatchSibling)
@@ -55,7 +55,7 @@ class ColorPickerElement(
         0f
     )
         .setSizing(228f, Size.Pixels, 0f, Size.Pixels)
-        .setPositioning(6f, Pos.ParentPixels, 34f, Pos.ParentPixels)
+        .setPositioning(6f, Pos.ParentPixels, 37f, Pos.ParentPixels)
         .childOf(this)
 
     private val pickerArea = ColorPickerArea()
@@ -83,13 +83,21 @@ class ColorPickerElement(
         currentBrightness = hsb[2]
         updateColor()
 
-        previewRect.onClick { _, _, _ ->
-            if (!isAnimating) toggleExpanded()
-            true
-        }
+        previewRect
+            .onClick { _, _, _ ->
+                if (!isAnimating) toggleExpanded()
+                true
+            }
+            .onHover(
+                { _, _ -> previewRect.colorTo(selectedColor.darker().rgb, 150, EasingType.EASE_OUT) },
+                { _, _ -> previewRect.colorTo(selectedColor.rgb, 150, EasingType.EASE_IN) }
+            )
 
         setupInteractions()
         pickerContainer.visible = false
+        pickerArea.visible = false
+        hueSlider.visible = false
+        alphaSlider.visible = false
     }
 
     private fun setupInteractions() {
@@ -182,13 +190,20 @@ class ColorPickerElement(
                 isAnimating = false
                 invalidateParentLayout()
             }
-            pickerContainer.animateSize(228f, 175f, 200, EasingType.EASE_OUT)
+            pickerContainer.animateSize(228f, 175f, 200, EasingType.EASE_OUT) {
+                pickerArea.visible = true
+                hueSlider.visible = true
+                alphaSlider.visible = true
+            }
         } else {
             animateSize(240f, 32f, 200, EasingType.EASE_IN) {
                 pickerContainer.visible = false
                 isAnimating = false
                 invalidateParentLayout()
             }
+            pickerArea.visible = false
+            hueSlider.visible = false
+            alphaSlider.visible = false
             pickerContainer.animateSize(228f, 0f, 200, EasingType.EASE_IN)
         }
     }

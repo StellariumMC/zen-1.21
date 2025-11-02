@@ -30,13 +30,14 @@ class SliderElement(
         minValue = 0f,
         maxValue = 1f,
         thumbColor = 0xFFFFFFFF.toInt(),
+        thumbWidth = 15f,
+        thumbHeight = 15f,
         trackColor = Theme.Bg.color,
         trackFillColor = Theme.Primary.color
     )
         .setSizing(220f, Size.Pixels, 24f, Size.Pixels)
         .setPositioning(10f, Pos.ParentPixels, 0f, Pos.ParentPixels)
         .alignBottom()
-        .setOffset(0f, -8f)
         .childOf(this)
 
     init {

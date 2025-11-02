@@ -30,7 +30,7 @@ class Panel(
         0x00000000,
         5f,
         0f,
-        padding = floatArrayOf(HEADER_HEIGHT, 0f, 2f, 0f)
+        padding = floatArrayOf(HEADER_HEIGHT, 0f, 0f, 0f)
     )
         .setSizing(WIDTH, Size.Pixels, 0f, Size.Auto)
         .setMaxAutoSize(null, 800f)
@@ -98,8 +98,9 @@ class Panel(
             true
         }
 
-        category.features.forEach { feature ->
-            sections.add(SectionButton(feature, sectionsContainer, onConfigUpdate))
+        category.features.forEachIndexed { index, feature ->
+            val isLast = index == category.features.size - 1
+            sections.add(SectionButton(feature, sectionsContainer, onConfigUpdate, isLast))
         }
 
         updateVisibility()
