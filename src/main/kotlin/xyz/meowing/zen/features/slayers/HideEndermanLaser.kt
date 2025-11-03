@@ -9,6 +9,7 @@ import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.mob.EndermanEntity
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
@@ -97,7 +98,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
 
         val playerName = player?.name?.string ?: return true
         val cleanSpawnerName = spawnerNametag.removeFormatting()
-        val cleanPlayerName = playerName.removeFormatting()
+        val cleanPlayerName = if(!Utils.nicked) playerName.removeFormatting() else Utils.nickedName
 
         val isMyBoss = cleanSpawnerName.endsWith("by: $cleanPlayerName")
         val isCarryBoss = CarryCounter.carries.any {

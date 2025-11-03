@@ -257,7 +257,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
         val spawnerNametag = nametagData[slayerEntityId + 3] ?: ""
         val playerName = player?.name?.string ?: ""
         val cleanSpawnerNametag = spawnerNametag.removeFormatting()
-        val cleanPlayerName = playerName.removeFormatting()
+        val cleanPlayerName = if(!Utils.nicked) playerName.removeFormatting() else Utils.nickedName
 
         return when (shownBossesOption) {
             0 -> true

@@ -10,6 +10,7 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
+import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.ChatEvent
@@ -45,8 +46,10 @@ object ArchitectDraft : Feature("architectdraft", island = SkyBlockIsland.THE_CA
 
             val text = event.message.string.removeFormatting()
             val matchResult = puzzlefail.find(text) ?: quizfail.find(text) ?: return@register
+            val playerName = Utils.currentPlayerName
 
-            if (matchResult.groupValues[1] != player?.name?.string && selfdraft) return@register
+
+            if (matchResult.groupValues[1] != playerName && selfdraft) return@register
 
             if (autogetdraft) {
                 TickUtils.schedule(40) {

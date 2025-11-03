@@ -24,6 +24,7 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
@@ -106,7 +107,9 @@ object DamageTracker : Feature("damagetracker", true) {
 
         register<EntityEvent.Attack> { event ->
             val player = player ?: return@register
-            if (event.player.name.string != player.name.string) return@register
+            val playerName = Utils.currentPlayerName
+
+            if (event.player.name.string != playerName) return@register
 
             lastHitEntity = event.target
             lastHitTime = System.currentTimeMillis()
@@ -114,7 +117,9 @@ object DamageTracker : Feature("damagetracker", true) {
 
         register<EntityEvent.ArrowHit> { event ->
             val player = player ?: return@register
-            if (event.shooterName != player.name.string) return@register
+
+            val playerName = Utils.currentPlayerName
+            if (event.shooterName != playerName) return@register
 
             lastHitEntity = event.hitEntity
         }
