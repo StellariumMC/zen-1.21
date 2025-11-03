@@ -8,6 +8,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.meowing.zen.utils.EntityAccessor;
 
+/**
+ * Modified from SkyOcean's implementation
+ * <p>
+ * Original File: [GitHub](https://github.com/meowdding/SkyOcean/blob/main/src/common/main/java/me/owdding/skyocean/mixins/EntityMixin.java)
+ * @author Meowdding
+ */
 @Mixin(Entity.class)
 public class MixinEntity implements EntityAccessor {
     @Unique

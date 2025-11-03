@@ -3,7 +3,13 @@ package xyz.meowing.zen.utils
 import net.minecraft.entity.Entity
 import kotlin.time.Duration
 
-interface EntityAccessor {
+/**
+ * Modified from SkyOcean's implementation
+ *
+ * Original File: [GitHub](https://github.com/meowdding/SkyOcean/blob/main/src/common/main/kotlin/me/owdding/skyocean/helpers/EntityHelper.kt)
+ * @author Meowdding
+ */
+internal interface EntityAccessor {
     fun `zen$setGlowing`(glowing: Boolean)
     fun `zen$setGlowingColor`(color: Int)
     fun `zen$glowTime`(time: Long)

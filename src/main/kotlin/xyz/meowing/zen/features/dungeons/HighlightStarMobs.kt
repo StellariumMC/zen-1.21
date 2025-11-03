@@ -57,12 +57,12 @@ object HighlightStarMobs : Feature("boxstarmobs", island = SkyBlockIsland.THE_CA
         }
 
         register<RenderEvent.Entity.Pre> { event ->
-            val ent = event.entity
-            if (!entities.contains(ent.id)) return@register
+            val entity = event.entity
+            if (!entities.contains(entity.id)) return@register
 
-            if (player?.canSee(event.entity) == true) {
-                ent.glowThisFrame = true
-                ent.glowingColor = boxstarmobscolor.rgb
+            if (player?.canSee(entity) == true) {
+                entity.glowThisFrame = true
+                entity.glowingColor = boxstarmobscolor.rgb
             }
         }
     }
