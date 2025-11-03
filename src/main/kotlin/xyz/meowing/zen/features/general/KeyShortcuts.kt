@@ -171,7 +171,7 @@ object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
                 val message = KnitText
                     .literal("$prefix §cYou do not have the feature §bKeyShortcuts §cenabled!")
                     .onHover("Click to enable feature.")
-                    .onClick(ClickEvent.RunCommand("/zen updateConfig keyshortcuts true false"))
+                    .onClick(ClickEvent.RunCommand("/zen updateConfig keyShortcuts true false"))
                     .toVanilla()
 
                 KnitChat.fakeMessage(message)

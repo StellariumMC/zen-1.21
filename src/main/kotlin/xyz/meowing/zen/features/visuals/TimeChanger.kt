@@ -11,26 +11,36 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.PacketEvent
 
 @Module
-object TimeChanger : Feature("timechanger") {
-    val timeSlider by ConfigDelegate<Double>("timeslider")
+object TimeChanger : Feature(
+    "timeChanger"
+) {
+    private val timeOfDay by ConfigDelegate<Double>("timeChanger.timeOfDay")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Time Changer", "", "Visuals", ConfigElement(
-                "timechanger",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Time of day", "", "Size", ConfigElement(
-                "timeslider",
-                ElementType.Slider(0.1, 24.0, 1.0, true)
-            ))
+            .addFeature(
+                "Time changer",
+                "Changes the time of day",
+                "Visuals",
+                ConfigElement(
+                    "timeChanger",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Time of day",
+                ConfigElement(
+                    "timeChanger.timeOfDay",
+                    ElementType.Slider(0.1, 24.0, 1.0, true)
+                )
+            )
     }
 
     override fun initialize() {
         register<PacketEvent.Received> {
             if (it.packet is WorldTimeUpdateS2CPacket) {
                 it.cancel()
-                KnitClient.client.world?.setTime((1000L * timeSlider).toLong(), (1000L * timeSlider).toLong() , false)
+                KnitClient.client.world?.setTime((1000L * timeOfDay).toLong(), (1000L * timeOfDay).toLong(), false)
             }
         }
     }

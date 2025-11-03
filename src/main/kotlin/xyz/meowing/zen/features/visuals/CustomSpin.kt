@@ -11,34 +11,50 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object CustomSpin : Feature("customspin") {
-    private val customspinspeed by ConfigDelegate<Double>("customspinspeed")
-    private val spineveryone by ConfigDelegate<Boolean>("spineveryone")
-    private val spindirection by ConfigDelegate<Int>("spindirection")
+object CustomSpin : Feature(
+    "customSpin"
+) {
+    private val customSpinSpeed by ConfigDelegate<Double>("customSpin.customSpinSpeed")
+    private val spinEveryone by ConfigDelegate<Boolean>("customSpin.spinEveryone")
+    private val spinDirection by ConfigDelegate<Int>("customSpin.spinDirection")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Custom spin", "", "Visuals", ConfigElement(
-                "customspin",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Spin everyone", "", "Options", ConfigElement(
-                "spineveryone",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Custom spin direction", "", "Options", ConfigElement(
-                "spindirection",
-                ElementType.Dropdown(listOf("Right", "Left"), 1)
-            ))
-            .addFeatureOption("Custom spin speed", "", "Options", ConfigElement(
-                "customspinspeed",
-                ElementType.Slider(1.0, 20.0, 5.0, true)
-            ))
+            .addFeature(
+                "Custom spin",
+                "Makes player models spin",
+                "Visuals",
+                ConfigElement(
+                    "customSpin",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Spin everyone",
+                ConfigElement(
+                    "customSpin.spinEveryone",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Spin direction",
+                ConfigElement(
+                    "customSpin.spinDirection",
+                    ElementType.Dropdown(listOf("Right", "Left"), 1)
+                )
+            )
+            .addFeatureOption(
+                "Spin speed",
+                ConfigElement(
+                    "customSpin.customSpinSpeed",
+                    ElementType.Slider(1.0, 20.0, 5.0, true)
+                )
+            )
     }
 
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->
-            if (spineveryone || event.entity.id == player?.id) {
+            if (spinEveryone || event.entity.id == player?.id) {
                 event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(getRotation()))
             }
         }
@@ -51,7 +67,7 @@ object CustomSpin : Feature("customspin") {
     private fun getRotation(): Float {
         val millis = System.currentTimeMillis() % 4000
         val fraction = millis / 4000f
-        val angle = (fraction * 360f) * customspinspeed.toFloat()
-        return if (spindirection == 0) angle - 180f else 180f - angle
+        val angle = (fraction * 360f) * customSpinSpeed.toFloat()
+        return if (spinDirection == 0) angle - 180f else 180f - angle
     }
 }

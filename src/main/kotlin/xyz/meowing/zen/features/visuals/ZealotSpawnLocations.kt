@@ -24,7 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @Module
 object ZealotSpawnLocations : Feature(
-    "zealotspawnvisual",
+    "zealotSpawnVisual",
     true,
     SkyBlockIsland.THE_END,
     listOf(SkyBlockAreas.ZEALOT_BRUISER_HIDEOUT, SkyBlockAreas.DRAGONS_NEST)
@@ -74,25 +74,39 @@ object ZealotSpawnLocations : Feature(
     private var spawnTime = SimpleTimeMark(0)
     private var displayText = "§dZealot Spawn: §510s"
 
-    private val drawZealotSpawnBox by ConfigDelegate<Boolean>("drawzealotspawnbox")
-    private val zealotSpawnColor by ConfigDelegate<Color>("drawzealotspawncolor")
+    private val drawZealotSpawnBox by ConfigDelegate<Boolean>("zealotSpawnVisual.drawBox")
+    private val zealotSpawnColor by ConfigDelegate<Color>("zealotSpawnVisual.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Zealot Spawn Locations", "", "Visuals", ConfigElement(
-                "zealotspawnvisual",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Zealot Spawn Location Boxes", "", "Options", ConfigElement(
-                "drawzealotspawnbox",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Box color", "", "Options", ConfigElement(
-                "drawzealotspawncolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                { config -> config["drawzealotspawnbox"] as? Boolean == true }
-            ))
+            .addFeature(
+                "Zealot spawn locations",
+                "",
+                "Visuals",
+                ConfigElement(
+                    "zealotSpawnVisual",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Zealot spawn location boxes",
+                ConfigElement(
+                    "zealotSpawnVisual.drawBox",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Box color",
+                ConfigElement(
+                    "zealotSpawnVisual.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127)),
+                    { config ->
+                        config["drawZealotSpawnBox"] as? Boolean == true
+                    }
+                )
+            )
     }
+
 
     override fun initialize() {
         setupLoops {

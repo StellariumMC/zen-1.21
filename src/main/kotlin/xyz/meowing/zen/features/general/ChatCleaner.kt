@@ -201,7 +201,7 @@ object ChatCleanerCommand : Commodore("chatcleaner", "zencc", "zenchatcleaner") 
                 val message = KnitText
                     .literal("$prefix §cYou do not have the feature §bChatCleaner §cenabled!")
                     .onHover("Click to enable feature.")
-                    .onClick(ClickEvent.RunCommand("/zen updateConfig chatcleaner true false"))
+                    .onClick(ClickEvent.RunCommand("/zen updateConfig chatCleaner true false"))
                     .toVanilla()
 
                 KnitChat.fakeMessage(message)
