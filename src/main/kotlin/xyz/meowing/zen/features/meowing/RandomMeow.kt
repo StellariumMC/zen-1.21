@@ -14,13 +14,20 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.random.Random
 
 @Module
-object RandomMeow : Feature("randommeow") {
+object RandomMeow : Feature(
+    "randomMeow"
+) {
     override fun addConfig() {
         ConfigManager
-            .addFeature("Random Meows", "", "Meowing", ConfigElement(
-                "randommeow",
-                ElementType.Switch(true)
-            ))
+            .addFeature(
+                "Random meows",
+                "Send random meows in chat",
+                "Meowing",
+                ConfigElement(
+                    "randomMeow",
+                    ElementType.Switch(true)
+                )
+            )
     }
 
 

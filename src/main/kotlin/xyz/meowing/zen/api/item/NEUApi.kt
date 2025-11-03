@@ -1,15 +1,15 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.item
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.api.data.StoredFile
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.client.methods.HttpHead
 import org.apache.http.impl.client.CloseableHttpClient
 import org.apache.http.impl.client.HttpClients
-import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.zen.Zen
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
+import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.InternalEvent
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.zip.ZipEntry
@@ -72,7 +72,7 @@ object NEUApi {
                                             entry.name.contains("/constants/") -> neuConstants.add(name, value)
                                         }
                                     } catch (e: Exception) {
-                                        LOGGER.error("Failed to parse JSON from entry ${entry.name}, skipping...")
+                                        Zen.LOGGER.error("Failed to parse JSON from entry ${entry.name}, skipping...")
                                     }
                                 }
                                 entry = zip.nextEntry
@@ -83,14 +83,14 @@ object NEUApi {
                             neuConstantData = neuConstants
 
                             zip.closeEntry()
-                            LOGGER.info("NEU API data downloaded and processed successfully.")
+                            Zen.LOGGER.info("NEU API data downloaded and processed successfully.")
 
                             val newETag = response.getFirstHeader("ETag")?.value
                             eTagData = JsonObject().apply {
                                 addProperty("tag", newETag ?: "")
                             }
 
-                            LOGGER.info("Saved NEU API Data to file and updated ETag.")
+                            Zen.LOGGER.info("Saved NEU API Data to file and updated ETag.")
 
                             neuItemFile.forceSave()
                             neuMobFile.forceSave()
@@ -99,10 +99,10 @@ object NEUApi {
                         }
                     }
             } else {
-                LOGGER.info("ETag matches. No need to download. Loading from file...")
+                Zen.LOGGER.info("ETag matches. No need to download. Loading from file...")
 
                 if (neuItemData.entrySet().isEmpty() || neuMobData.entrySet().isEmpty() || neuConstantData.entrySet().isEmpty()) {
-                    LOGGER.warn("Failed to load NEU API data from file. Redownloading...")
+                    Zen.LOGGER.warn("Failed to load NEU API data from file. Redownloading...")
                     isDownloading.set(false)
                     downloadAndProcessRepo(true)
                     return

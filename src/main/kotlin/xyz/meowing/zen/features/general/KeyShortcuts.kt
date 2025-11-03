@@ -51,7 +51,9 @@ data class KeybindEntry(
 }
 
 @Module
-object KeyShortcuts : Feature("keyshortcuts") {
+object KeyShortcuts : Feature(
+    "keyShortcuts"
+) {
     val bindingData = StoredFile("features/KeyShortcuts")
     var bindings: List<KeybindEntry> by bindingData.list("bindings", KeybindEntry.CODEC)
 
@@ -61,18 +63,26 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Key Shortcuts", "", "General", ConfigElement(
-                "keyshortcuts",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Open Keybind Manager", "Open Keybind Manager", "GUI", ConfigElement(
-                "keyshortcutsgui",
-                ElementType.Button("Open Manager") {
-                    TickUtils.schedule(2) {
-                        client.setScreen(KeybindGui())
+            .addFeature(
+                "Key shortcuts",
+                "Create custom keybinds to execute commands",
+                "General",
+                ConfigElement(
+                    "keyShortcuts",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Open keybind manager",
+                ConfigElement(
+                    "keyShortcuts.guiButton",
+                    ElementType.Button("Open Manager") {
+                        TickUtils.schedule(2) {
+                            client.setScreen(KeybindGui())
+                        }
                     }
-                }
-            ))
+                )
+            )
     }
 
     override fun initialize() {

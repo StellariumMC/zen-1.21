@@ -11,16 +11,23 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
 @Module
-object GuildMessage : Feature("guildmessage") {
+object GuildMessage : Feature(
+    "guildMessage"
+) {
     private val guildPattern = Pattern.compile("Guild > (\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?: (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean guild messages", "Clean guild messages", "General", ConfigElement(
-                "guildmessage",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Clean guild messages",
+                "Reformats guild messages",
+                "General",
+                ConfigElement(
+                    "guildMessage",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
@@ -55,16 +62,23 @@ object GuildMessage : Feature("guildmessage") {
 }
 
 @Module
-object PartyMessage : Feature("partymessage") {
+object PartyMessage : Feature(
+    "partyMessage"
+) {
     private val partyPattern = Pattern.compile("Party > (\\[.+?])? ?(.+?): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean party messages", "Clean party messages", "General", ConfigElement(
-                "partymessage",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Clean party messages",
+                "Reformats party messages",
+                "General",
+                ConfigElement(
+                    "partyMessage",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

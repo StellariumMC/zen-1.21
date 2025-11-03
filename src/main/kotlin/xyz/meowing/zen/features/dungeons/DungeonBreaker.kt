@@ -16,22 +16,30 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object DungeonBreaker : Feature("dungeonbreaker", island = SkyBlockIsland.THE_CATACOMBS) {
-    private const val name = "Dungeon Breaker Charges"
+object DungeonBreaker : Feature(
+    "dungeonBreaker",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
+    private const val NAME = "Dungeon Breaker Charges"
     private val regex = "Charges: (\\d+)/(\\d+)⸕".toRegex()
     private var charges = 0
     private var max = 0
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Breaker Charge Display", "", "Dungeons", ConfigElement(
-                "dungeonbreaker",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Breaker charge display",
+                "Shows the amount of breaker charges left.",
+                "Dungeons",
+                ConfigElement(
+                    "dungeonBreaker",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§bCharges: §e20§7/§e20§c⸕")
+        HUDManager.register(NAME, "§bCharges: §e20§7/§e20§c⸕")
 
         register<PacketEvent.ReceivedPost> { event ->
             if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
@@ -46,10 +54,10 @@ object DungeonBreaker : Feature("dungeonbreaker", island = SkyBlockIsland.THE_CA
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (max == 0 || !HUDManager.isEnabled(name)) return@register
-            val x = HUDManager.getX(name)
-            val y = HUDManager.getY(name)
-            val scale = HUDManager.getScale(name)
+            if (max == 0 || !HUDManager.isEnabled(NAME)) return@register
+            val x = HUDManager.getX(NAME)
+            val y = HUDManager.getY(NAME)
+            val scale = HUDManager.getScale(NAME)
 
             Render2D.renderString(event.context, "§bCharges: §e${charges}§7/§e${max}§c⸕", x, y, scale)
         }

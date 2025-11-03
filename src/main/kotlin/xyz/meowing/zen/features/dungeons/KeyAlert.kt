@@ -15,15 +15,23 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object KeyAlert : Feature("keyalert", island = SkyBlockIsland.THE_CATACOMBS) {
+object KeyAlert : Feature(
+    "keySpawnAlert",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
     private var bloodOpen = false
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Key Spawn Alert", "", "Dungeons", ConfigElement(
-                "keyalert",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Key spawn alert",
+                "Displays a title when a Key spawns in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "keySpawnAlert",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

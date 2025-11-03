@@ -20,7 +20,7 @@ import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object LividIceSpray : Feature(
-    "lividicespray",
+    "lividIceSpray",
     island = SkyBlockIsland.THE_CATACOMBS,
     dungeonFloor = listOf(DungeonFloor.F5, DungeonFloor.M5)
 ) {
@@ -32,10 +32,15 @@ object LividIceSpray : Feature(
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Livid Ice Spray Timer", "", "Dungeons", ConfigElement(
-                "lividicespray",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Livid ice spray timer",
+                "Shows a timer until you can ice-spray Livid",
+                "Dungeons",
+                ConfigElement(
+                    "lividIceSpray",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

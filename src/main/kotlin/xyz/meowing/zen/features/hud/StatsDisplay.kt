@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.api.PlayerStats
+import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import xyz.meowing.zen.config.ui.types.ElementType
@@ -25,12 +24,15 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.awt.Color
 
 @Module
-object StatsDisplay : Feature("statsdisplay", true) {
-    private const val healthBarName = "Health Bar"
-    private const val manaBarName = "Mana Bar"
-    private const val overflowManaName = "Overflow Mana"
-    private const val riftTimeBarName = "Rift Time Bar"
-    private const val drillFuelBarName = "Drill Fuel Bar"
+object StatsDisplay : Feature(
+    "statsdisplay",
+    true
+) {
+    private const val HEALTH_BAR_NAME = "Health Bar"
+    private const val MANA_BAR_NAME = "Mana Bar"
+    private const val OVERFLOW_MANA_BAR_NAME = "Overflow Mana"
+    private const val RIFT_TIME_BAR_NAME = "Rift Time Bar"
+    private const val DRILL_FUEL_BAR_NAME = "Drill Fuel Bar"
     private const val PROCESSED_MARKER = "§z§e§b"
 
     private data class ColoredSegment(val text: String, val color: Int)
@@ -41,42 +43,42 @@ object StatsDisplay : Feature("statsdisplay", true) {
         }
     }
 
-    private val hiddenstats by ConfigDelegate<Set<Int>>("hiddenstats")
-    private val hideVanillaHp by ConfigDelegate<Boolean>("hidevanillahp")
-    private val hideVanillaArmor by ConfigDelegate<Boolean>("hidevanillaarmor")
-    private val hideExpBar by ConfigDelegate<Boolean>("hideexpbar")
+    private val hiddenStats by ConfigDelegate<Set<Int>>("statsDisplay.hiddenStats")
+    private val hideVanillaHp by ConfigDelegate<Boolean>("statsDisplay.hideVanillaHp")
+    private val hideVanillaArmor by ConfigDelegate<Boolean>("statsDisplay.hideVanillaArmor")
+    private val hideExpBar by ConfigDelegate<Boolean>("statsDisplay.hideExpBar")
 
     @JvmStatic fun shouldHideVanillaHealth(): Boolean = isEnabled() && hideVanillaHp
     @JvmStatic fun shouldHideVanillaArmor(): Boolean = isEnabled() && hideVanillaArmor
     @JvmStatic fun shouldHideExpBar(): Boolean = isEnabled() && hideExpBar
 
-    private val showHealthBar by ConfigDelegate<Boolean>("showhealthbar")
-    private val healthBarFillColor by ConfigDelegate<Color>("healthbarmaincolor")
-    private val healthBarExtraColor by ConfigDelegate<Color>("healthbarextracolor")
-    private val healthtextstyle by ConfigDelegate<Int>("healthtextstyle")
-    private val showHealthText by ConfigDelegate<Boolean>("showhealthtext")
-    private val showMaxHealth by ConfigDelegate<Boolean>("showmaxhealth")
-    private val healthTextColor by ConfigDelegate<MCColorCode>("healthtextcolor")
-    private val maxHealthTextColor by ConfigDelegate<MCColorCode>("maxhealthtextcolor")
+    private val showHealthBar by ConfigDelegate<Boolean>("statsDisplay.showHealthBar")
+    private val healthBarFillColor by ConfigDelegate<Color>("statsDisplay.healthBarFillColor")
+    private val healthBarExtraColor by ConfigDelegate<Color>("statsDisplay.healthBarExtraColor")
+    private val healthTextStyle by ConfigDelegate<Int>("statsDisplay.healthTextStyle")
+    private val showHealthText by ConfigDelegate<Boolean>("statsDisplay.showHealthText")
+    private val showMaxHealth by ConfigDelegate<Boolean>("statsDisplay.showMaxHealth")
+    private val healthTextColor by ConfigDelegate<MCColorCode>("statsDisplay.healthTextColor")
+    private val maxHealthTextColor by ConfigDelegate<MCColorCode>("statsDisplay.maxHealthTextColor")
 
-    private val showManaBar by ConfigDelegate<Boolean>("showmanabar")
-    private val manaBarFillColor by ConfigDelegate<Color>("manabarmaincolor")
-    private val manatextstyle by ConfigDelegate<Int>("manatextstyle")
-    private val showManaText by ConfigDelegate<Boolean>("showmanatext")
-    private val showMaxMana by ConfigDelegate<Boolean>("showmaxmana")
-    private val manaTextColor by ConfigDelegate<MCColorCode>("manatextcolor")
-    private val maxManaTextColor by ConfigDelegate<MCColorCode>("maxmanatextcolor")
+    private val showManaBar by ConfigDelegate<Boolean>("statsDisplay.showManaBar")
+    private val manaBarFillColor by ConfigDelegate<Color>("statsDisplay.manaBarFillColor")
+    private val manaTextStyle by ConfigDelegate<Int>("statsDisplay.manaTextStyle")
+    private val showManaText by ConfigDelegate<Boolean>("statsDisplay.showManaText")
+    private val showMaxMana by ConfigDelegate<Boolean>("statsDisplay.showMaxMana")
+    private val manaTextColor by ConfigDelegate<MCColorCode>("statsDisplay.manaTextColor")
+    private val maxManaTextColor by ConfigDelegate<MCColorCode>("statsDisplay.maxManaTextColor")
 
-    private val showOverflowManaText by ConfigDelegate<Boolean>("showoverflowmanatext")
-    private val overflowManaTextColor by ConfigDelegate<MCColorCode>("overflowmanatextcolor")
+    private val showOverflowManaText by ConfigDelegate<Boolean>("statsDisplay.showOverflowManaText")
+    private val overflowManaTextColor by ConfigDelegate<MCColorCode>("statsDisplay.overflowManaTextColor")
 
-    private val showRiftTimeText by ConfigDelegate<Boolean>("showrifttimetext")
-    private val riftTimeTextColor by ConfigDelegate<MCColorCode>("rifttimetextcolor")
+    private val showRiftTimeText by ConfigDelegate<Boolean>("statsDisplay.showRiftTimeText")
+    private val riftTimeTextColor by ConfigDelegate<MCColorCode>("statsDisplay.riftTimeTextColor")
 
-    private val showDrillFuelText by ConfigDelegate<Boolean>("showdrillfueltext")
-    private val showMaxDrillFuel by ConfigDelegate<Boolean>("showmaxdrillfuel")
-    private val drillFuelTextColor by ConfigDelegate<MCColorCode>("drillfueltextcolor")
-    private val maxDrillFuelTextColor by ConfigDelegate<MCColorCode>("maxdrillfueltextcolor")
+    private val showDrillFuelText by ConfigDelegate<Boolean>("statsDisplay.showDrillFuelText")
+    private val showMaxDrillFuel by ConfigDelegate<Boolean>("statsDisplay.showMaxDrillFuel")
+    private val drillFuelTextColor by ConfigDelegate<MCColorCode>("statsDisplay.drillFuelTextColor")
+    private val maxDrillFuelTextColor by ConfigDelegate<MCColorCode>("statsDisplay.maxDrillFuelTextColor")
 
     private enum class StatType(val displayName: String, val regex: Regex) {
         HEALTH("Health", """(§.)(?<currentHealth>[\d,]+)/(?<maxHealth>[\d,]+)❤""".toRegex()),
@@ -89,141 +91,230 @@ object StatsDisplay : Feature("statsdisplay", true) {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Stats Display", "", "HUD", ConfigElement(
-                "statsdisplay",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Clean Action Bar", "", "Options", ConfigElement(
-                "cleanactionbar",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Hide Vanilla HP and Saturation", "", "Options", ConfigElement(
-                "hidevanillahp",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Hide Armor Icon", "", "Options", ConfigElement(
-                "hidevanillaarmor",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Hide Experience Bar", "", "Options", ConfigElement(
-                "hideexpbar",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Hide Stats", "", "Options", ConfigElement(
-                "hiddenstats",
-                ElementType.MultiCheckbox(
-                    options = StatType.entries.map { it.displayName },
-                    default = emptySet()
+            .addFeature(
+                "Stats display",
+                "Display stats on HUD",
+                "HUD",
+                ConfigElement(
+                    "statsDisplay",
+                    ElementType.Switch(false)
                 )
-            ))
-            .addFeatureOption("Show Health Bar", "", "Health Display", ConfigElement(
-                "showhealthbar",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Health Bar Fill Color", "", "Health Display", ConfigElement(
-                "healthbarmaincolor",
-                ElementType.ColorPicker(MCColorCode.RED.color)
-            ))
-            .addFeatureOption("Health Bar Absorption Fill Color", "", "Health Display", ConfigElement(
-                "healthbarextracolor",
-                ElementType.ColorPicker(MCColorCode.YELLOW.color)
-            ))
-            .addFeatureOption("Show Health Numbers", "", "Health Display", ConfigElement(
-                "showhealthtext",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Health Text Style", "", "Health Display", ConfigElement(
-                "healthtextstyle",
-                ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
-            ))
-            .addFeatureOption("Show Max Health", "", "Health Display", ConfigElement(
-                "showmaxhealth",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Health Text Color", "", "Health Display", ConfigElement(
-                "healthtextcolor",
-                ElementType.MCColorPicker(MCColorCode.RED)
-            ))
-            .addFeatureOption("Max Health Text Color", "", "Health Display", ConfigElement(
-                "maxhealthtextcolor",
-                ElementType.MCColorPicker(MCColorCode.RED)
-            ))
-            .addFeatureOption("Show Mana Bar", "", "Mana Display", ConfigElement(
-                "showmanabar",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Health Bar Fill Color", "", "Mana Display", ConfigElement(
-                "manabarmaincolor",
-                ElementType.ColorPicker(MCColorCode.BLUE.color)
-            ))
-            .addFeatureOption("Show Mana Numbers", "", "Mana Display", ConfigElement(
-                "showmanatext",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Mana Text Style", "", "Mana Display", ConfigElement(
-                "manatextstyle",
-                ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
-            ))
-            .addFeatureOption("Show Max Mana", "", "Mana Display", ConfigElement(
-                "showmaxmana",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Mana Text Color", "", "Mana Display", ConfigElement(
-                "manatextcolor",
-                ElementType.MCColorPicker(MCColorCode.BLUE)
-            ))
-            .addFeatureOption("Max Mana Text Color", "", "Mana Display", ConfigElement(
-                "maxmanatextcolor",
-                ElementType.MCColorPicker(MCColorCode.BLUE)
-            ))
-            .addFeatureOption("Show Overflow Mana", "", "Overflow Mana", ConfigElement(
-                "showoverflowmanatext",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Overflow Mana Text Color", "", "Overflow Mana", ConfigElement(
-                "overflowmanatextcolor",
-                ElementType.MCColorPicker(MCColorCode.DARK_AQUA)
-            ))
-            .addFeatureOption("Show Rift Time Text", "", "Rift Time Bar", ConfigElement(
-                "showrifttimetext",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Rift Time Text Color", "", "Rift Time Bar", ConfigElement(
-                "rifttimetextcolor",
-                ElementType.MCColorPicker(MCColorCode.GREEN)
-            ))
-            .addFeatureOption("Show Drill Fuel Numbers", "", "Drill Fuel Bar", ConfigElement(
-                "showdrillfueltext",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Show Max Drill Fuel", "", "Drill Fuel Bar", ConfigElement(
-                "showmaxdrillfuel",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Drill Fuel Text Color", "", "Drill Fuel Bar", ConfigElement(
-                "drillfueltextcolor",
-                ElementType.MCColorPicker(MCColorCode.DARK_GREEN)
-            ))
-            .addFeatureOption("Max Drill Fuel Text Color", "", "Drill Fuel Bar", ConfigElement(
-                "maxdrillfueltextcolor",
-                ElementType.MCColorPicker(MCColorCode.GREEN)
-            ))
+            )
+            .addFeatureOption(
+                "Clean action bar",
+                ConfigElement(
+                    "statsDisplay.cleanActionBar",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Hide vanilla HP and saturation",
+                ConfigElement(
+                    "statsDisplay.hideVanillaHp",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Hide armor icon",
+                ConfigElement(
+                    "statsDisplay.hideVanillaArmor",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Hide experience bar",
+                ConfigElement(
+                    "statsDisplay.hideExpBar",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Hide stats",
+                ConfigElement(
+                    "statsDisplay.hiddenStats",
+                    ElementType.MultiCheckbox(
+                        options = StatType.entries.map { it.displayName },
+                        default = emptySet()
+                    )
+                )
+            )
+            .addFeatureOption(
+                "Show health bar",
+                ConfigElement(
+                    "statsDisplay.showHealthBar",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Health bar fill color",
+                ConfigElement(
+                    "statsDisplay.healthBarFillColor",
+                    ElementType.ColorPicker(MCColorCode.RED.color)
+                )
+            )
+            .addFeatureOption(
+                "Health bar absorption fill color",
+                ConfigElement(
+                    "statsDisplay.healthBarExtraColor",
+                    ElementType.ColorPicker(MCColorCode.YELLOW.color)
+                )
+            )
+            .addFeatureOption(
+                "Show health numbers",
+                ConfigElement(
+                    "statsDisplay.showHealthText",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Health text style",
+                ConfigElement(
+                    "statsDisplay.healthTextStyle",
+                    ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
+                )
+            )
+            .addFeatureOption(
+                "Show max health",
+                ConfigElement(
+                    "statsDisplay.showMaxHealth",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Health text color",
+                ConfigElement(
+                    "statsDisplay.healthTextColor",
+                    ElementType.MCColorPicker(MCColorCode.RED)
+                )
+            )
+            .addFeatureOption(
+                "Max health text color",
+                ConfigElement(
+                    "statsDisplay.maxHealthTextColor",
+                    ElementType.MCColorPicker(MCColorCode.RED)
+                )
+            )
+            .addFeatureOption(
+                "Show mana bar",
+                ConfigElement(
+                    "statsDisplay.showManaBar",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Mana bar fill color",
+                ConfigElement(
+                    "statsDisplay.manaBarFillColor",
+                    ElementType.ColorPicker(MCColorCode.BLUE.color)
+                )
+            )
+            .addFeatureOption(
+                "Show mana numbers",
+                ConfigElement(
+                    "statsDisplay.showManaText",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Mana text style",
+                ConfigElement(
+                    "statsDisplay.manaTextStyle",
+                    ElementType.Dropdown(listOf("Shadow", "Default", "Outline"), 0)
+                )
+            )
+            .addFeatureOption(
+                "Show max mana",
+                ConfigElement(
+                    "statsDisplay.showMaxMana",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Mana text color",
+                ConfigElement(
+                    "statsDisplay.manaTextColor",
+                    ElementType.MCColorPicker(MCColorCode.BLUE)
+                )
+            )
+            .addFeatureOption(
+                "Max mana text color",
+                ConfigElement(
+                    "statsDisplay.maxManaTextColor",
+                    ElementType.MCColorPicker(MCColorCode.BLUE)
+                )
+            )
+            .addFeatureOption(
+                "Show overflow mana",
+                ConfigElement(
+                    "statsDisplay.showOverflowManaText",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Overflow mana text color",
+                ConfigElement(
+                    "statsDisplay.overflowManaTextColor",
+                    ElementType.MCColorPicker(MCColorCode.DARK_AQUA)
+                )
+            )
+            .addFeatureOption(
+                "Show rift time text",
+                ConfigElement(
+                    "statsDisplay.showRiftTimeText",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Rift time text color",
+                ConfigElement(
+                    "statsDisplay.riftTimeTextColor",
+                    ElementType.MCColorPicker(MCColorCode.GREEN)
+                )
+            )
+            .addFeatureOption(
+                "Show drill fuel numbers",
+                ConfigElement(
+                    "statsDisplay.showDrillFuelText",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Show max drill fuel",
+                ConfigElement(
+                    "statsDisplay.showMaxDrillFuel",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Drill fuel text color",
+                ConfigElement(
+                    "statsDisplay.drillFuelTextColor",
+                    ElementType.MCColorPicker(MCColorCode.DARK_GREEN)
+                )
+            )
+            .addFeatureOption(
+                "Max drill fuel text color",
+                ConfigElement(
+                    "statsDisplay.maxDrillFuelTextColor",
+                    ElementType.MCColorPicker(MCColorCode.GREEN)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.register(overflowManaName, "§3642ʬ")
-        HUDManager.registerCustom(healthBarName, 80, 10, this::healthBarEditorRender)
-        HUDManager.registerCustom(manaBarName, 80, 10, this::manaBarEditorRender)
-        HUDManager.registerCustom(riftTimeBarName, 80, 10, this::riftTimeBarEditorRender)
-        HUDManager.registerCustom(drillFuelBarName, 80, 10, this::drillFuelBarEditorRender)
+        HUDManager.register(OVERFLOW_MANA_BAR_NAME, "§3642ʬ")
+        HUDManager.registerCustom(HEALTH_BAR_NAME, 80, 10, this::healthBarEditorRender)
+        HUDManager.registerCustom(MANA_BAR_NAME, 80, 10, this::manaBarEditorRender)
+        HUDManager.registerCustom(RIFT_TIME_BAR_NAME, 80, 10, this::riftTimeBarEditorRender)
+        HUDManager.registerCustom(DRILL_FUEL_BAR_NAME, 80, 10, this::drillFuelBarEditorRender)
 
-        configRegister<ChatEvent.Receive>(listOf("statsdisplay", "cleanactionbar"), priority = 1000, skyblockOnly = true) { event ->
+        configRegister<ChatEvent.Receive>(listOf("statsDisplay", "statsDisplay.cleanActionBar"), priority = 1000, skyblockOnly = true) { event ->
             if (!event.isActionBar) return@configRegister
             val originalText = event.message.string
 
             if (originalText.endsWith(PROCESSED_MARKER)) return@configRegister
 
-            val cleanedText = hiddenstats.fold(originalText) { text, index ->
+            val cleanedText = hiddenStats.fold(originalText) { text, index ->
                 StatType.entries.getOrNull(index)?.regex?.replace(text, "") ?: text
             }.trim().replace("§r  ", " ")
 
@@ -299,37 +390,37 @@ object StatsDisplay : Feature("statsdisplay", true) {
     }
 
     private fun renderHealthBar(context: DrawContext) {
-        if (!HUDManager.isEnabled(healthBarName) || PlayerStats.maxHealth == 0) return
+        if (!HUDManager.isEnabled(HEALTH_BAR_NAME) || PlayerStats.maxHealth == 0) return
         val max = PlayerStats.maxHealth
         val absorption = PlayerStats.absorption
         val health = PlayerStats.displayedHealth
         val total = max + absorption
         val healthFillPerc = health.toDouble() / total
         val absorbFillPerc = absorption.toDouble() / total
-        val x = HUDManager.getX(healthBarName)
-        val y = HUDManager.getY(healthBarName)
-        val scale = HUDManager.getScale(healthBarName)
+        val x = HUDManager.getX(HEALTH_BAR_NAME)
+        val y = HUDManager.getY(HEALTH_BAR_NAME)
+        val scale = HUDManager.getScale(HEALTH_BAR_NAME)
 
         healthBarEditorRender(context, x, y, 80, 10, scale, 0f, false, healthFillPerc, absorbFillPerc)
     }
 
     private fun renderManaBar(context: DrawContext) {
-        if (!HUDManager.isEnabled(manaBarName) || PlayerStats.maxMana == 0) return
+        if (!HUDManager.isEnabled(MANA_BAR_NAME) || PlayerStats.maxMana == 0) return
         val max = PlayerStats.maxMana
         val current = PlayerStats.displayedMana
         val fillPerc = current.toDouble() / max
-        val x = HUDManager.getX(manaBarName)
-        val y = HUDManager.getY(manaBarName)
-        val scale = HUDManager.getScale(manaBarName)
+        val x = HUDManager.getX(MANA_BAR_NAME)
+        val y = HUDManager.getY(MANA_BAR_NAME)
+        val scale = HUDManager.getScale(MANA_BAR_NAME)
 
         manaBarEditorRender(context, x, y, 80, 10, scale, 0f, false, fillPerc)
     }
 
     private fun renderOverflowMana(context: DrawContext) {
-        if (!HUDManager.isEnabled(overflowManaName)) return
-        val x = HUDManager.getX(overflowManaName)
-        val y = HUDManager.getY(overflowManaName)
-        val scale = HUDManager.getScale(overflowManaName)
+        if (!HUDManager.isEnabled(OVERFLOW_MANA_BAR_NAME)) return
+        val x = HUDManager.getX(OVERFLOW_MANA_BAR_NAME)
+        val y = HUDManager.getY(OVERFLOW_MANA_BAR_NAME)
+        val scale = HUDManager.getScale(OVERFLOW_MANA_BAR_NAME)
 
         if (showOverflowManaText) {
             val overflowMana = PlayerStats.overflowMana
@@ -342,25 +433,25 @@ object StatsDisplay : Feature("statsdisplay", true) {
     }
 
     private fun renderRiftTimeBar(context: DrawContext) {
-        if (!HUDManager.isEnabled(riftTimeBarName) || PlayerStats.maxRiftTime == 0) return
+        if (!HUDManager.isEnabled(RIFT_TIME_BAR_NAME) || PlayerStats.maxRiftTime == 0) return
         val current = PlayerStats.riftTimeSeconds
         val max = PlayerStats.maxRiftTime
         val fillPerc = current.toDouble() / max
-        val x = HUDManager.getX(riftTimeBarName)
-        val y = HUDManager.getY(riftTimeBarName)
-        val scale = HUDManager.getScale(riftTimeBarName)
+        val x = HUDManager.getX(RIFT_TIME_BAR_NAME)
+        val y = HUDManager.getY(RIFT_TIME_BAR_NAME)
+        val scale = HUDManager.getScale(RIFT_TIME_BAR_NAME)
 
         riftTimeBarEditorRender(context, x, y, 80, 10, scale, 0f, false, fillPerc)
     }
 
     private fun renderDrillFuelBar(context: DrawContext) {
-        if (!HUDManager.isEnabled(drillFuelBarName) || PlayerStats.maxDrillFuel == 0) return
+        if (!HUDManager.isEnabled(DRILL_FUEL_BAR_NAME) || PlayerStats.maxDrillFuel == 0) return
         val max = PlayerStats.maxDrillFuel
         val current = PlayerStats.drillFuel
         val fillPerc = current.toDouble() / max
-        val x = HUDManager.getX(drillFuelBarName)
-        val y = HUDManager.getY(drillFuelBarName)
-        val scale = HUDManager.getScale(drillFuelBarName)
+        val x = HUDManager.getX(DRILL_FUEL_BAR_NAME)
+        val y = HUDManager.getY(DRILL_FUEL_BAR_NAME)
+        val scale = HUDManager.getScale(DRILL_FUEL_BAR_NAME)
 
         drillFuelBarEditorRender(context, x, y, 80, 10, scale, 0f, false, fillPerc)
     }
@@ -384,7 +475,7 @@ object StatsDisplay : Feature("statsdisplay", true) {
                 "${healthTextColor.code}$currentHealth"
             }
 
-            val healthTextStyle = when (healthtextstyle) {
+            val healthTextStyle = when (healthTextStyle) {
                 0 -> Render2D.TextStyle.DROP_SHADOW
                 1 -> Render2D.TextStyle.DEFAULT
                 2 -> Render2D.TextStyle.BLACK_OUTLINE
@@ -413,7 +504,7 @@ object StatsDisplay : Feature("statsdisplay", true) {
                 "${manaTextColor.code}$currentMana"
             }
 
-            val manaTextStyle = when (manatextstyle) {
+            val manaTextStyle = when (manaTextStyle) {
                 0 -> Render2D.TextStyle.DROP_SHADOW
                 1 -> Render2D.TextStyle.DEFAULT
                 2 -> Render2D.TextStyle.BLACK_OUTLINE

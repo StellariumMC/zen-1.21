@@ -1,4 +1,4 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.skyblock
 
 import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
 import xyz.meowing.zen.annotations.Module
@@ -11,7 +11,7 @@ import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import kotlin.math.abs
 import kotlin.math.max
-import kotlin.text.startsWith
+import kotlin.text.get
 
 @Module
 object PlayerStats {

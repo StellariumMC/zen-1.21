@@ -6,36 +6,43 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import net.minecraft.client.gui.DrawContext
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.api.PlayerStats
+import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object SoulflowDisplay : Feature("soulflowdisplay") {
-    private const val name = "Soulflow Display"
+object SoulflowDisplay : Feature(
+    "soulflowDisplay",
+    true
+) {
+    private const val NAME = "Soulflow Display"
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Soulflow Display HUD", "", "HUD", ConfigElement(
-                "soulflowdisplay",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Soulflow display HUD",
+                "Display soulflow on HUD",
+                "HUD",
+                ConfigElement(
+                    "soulflowDisplay",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
-
     override fun initialize() {
-        HUDManager.register(name, "§3500⸎ Soulflow")
+        HUDManager.register(NAME, "§3500⸎ Soulflow")
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(name)) render(event.context)
+            if (HUDManager.isEnabled(NAME)) render(event.context)
         }
     }
 
     private fun render(context: DrawContext) {
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         Render2D.renderStringWithShadow(context,"§3${PlayerStats.soulflow}", x, y, scale)
     }

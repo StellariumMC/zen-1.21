@@ -1,8 +1,7 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.skyblock
 
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.EventBus.post
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -21,18 +20,20 @@ object DamageAPI {
             val damageStr = matchResult.groupValues[1].replace(",", "")
             val damage = damageStr.toIntOrNull() ?: return@register
 
-            if (post(
+            if (EventBus.post(
                     SkyblockEvent.DamageSplash(
-                    damage,
-                    name,
-                    //#if MC >= 1.21.9
-                    //$$ entity.entityPos,
-                    //#else
-                    entity.pos,
-                    //#endif
-                    packet,
-                    entity
-            ))) event.cancel()
+                        damage,
+                        name,
+                        //#if MC >= 1.21.9
+                        //$$ entity.entityPos,
+                        //#else
+                        entity.pos,
+                        //#endif
+                        packet,
+                        entity
+                    )
+                )
+            ) event.cancel()
         }
     }
 }

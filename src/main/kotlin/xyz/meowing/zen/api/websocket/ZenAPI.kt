@@ -1,17 +1,16 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.websocket
 
-import xyz.meowing.zen.Zen
-import java.security.MessageDigest
 import net.fabricmc.loader.api.FabricLoader
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.zen.Zen.LOGGER
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.scheduler.TimeScheduler
+import xyz.meowing.zen.Zen
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.utils.LoopUtils
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.WebSocket
 import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionStage
@@ -30,21 +29,21 @@ object ZenAPI {
 
     private fun scheduleReconnect() {
         if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            LOGGER.warn("Max reconnection attempts ($MAX_RECONNECT_ATTEMPTS) reached. Stopping reconnection.")
+            Zen.LOGGER.warn("Max reconnection attempts ($MAX_RECONNECT_ATTEMPTS) reached. Stopping reconnection.")
             return
         }
 
         val delayMillis = (BASE_RECONNECT_DELAY * 2.0.pow(reconnectAttempts.toDouble())).toLong()
         reconnectAttempts++
-        LOGGER.info("Reconnecting in ${delayMillis / 1000} seconds...")
-        LoopUtils.setTimeout(delayMillis) {
+        Zen.LOGGER.info("Reconnecting in ${delayMillis / 1000} seconds...")
+        TimeScheduler.schedule(delayMillis) {
             connectToWebsocket()
         }
     }
 
     fun connectToWebsocket() {
-        LOGGER.info("Attempting to connect to WebSocket...")
-        val uuid = (client.session.uuidOrNull ?: client.session.username).toString()
+        Zen.LOGGER.info("Attempting to connect to WebSocket...")
+        val uuid = (KnitClient.client.session.uuidOrNull ?: KnitClient.client.session.username).toString()
         val hashedUUID = MessageDigest.getInstance("MD5")
             .digest(uuid.toByteArray())
             .joinToString("") { "%02x".format(it) }
@@ -65,7 +64,7 @@ object ZenAPI {
         val connectionAttempt = client.newWebSocketBuilder()
             .buildAsync(uri, object : WebSocket.Listener {
                 override fun onOpen(webSocket: WebSocket) {
-                    LOGGER.info("WebSocket connected!")
+                    Zen.LOGGER.info("WebSocket connected!")
                     ws = webSocket
                     reconnectAttempts = 0 // Reset on successful connection
                     webSocket.request(1)
@@ -77,11 +76,11 @@ object ZenAPI {
                 }
 
                 override fun onError(webSocket: WebSocket?, error: Throwable) {
-                    LOGGER.error("WebSocket error: $error")
+                    Zen.LOGGER.error("WebSocket error: $error")
                 }
 
                 override fun onClose(webSocket: WebSocket, statusCode: Int, reason: String?): CompletionStage<*> {
-                    LOGGER.info("WebSocket closed: $statusCode ${reason ?: ""}")
+                    Zen.LOGGER.info("WebSocket closed: $statusCode ${reason ?: ""}")
                     scheduleReconnect()
                     return CompletableFuture.completedFuture(null)
                 }
@@ -89,7 +88,7 @@ object ZenAPI {
 
         // Handle connection timeout or failure
         connectionAttempt.exceptionally { error ->
-            LOGGER.error("WebSocket connection failed: $error")
+            Zen.LOGGER.error("WebSocket connection failed: $error")
             scheduleReconnect()
             null
         }

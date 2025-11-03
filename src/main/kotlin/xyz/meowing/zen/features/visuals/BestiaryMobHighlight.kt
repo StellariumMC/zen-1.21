@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.api.EntityDetection.sbMobID
+import xyz.meowing.zen.api.skyblock.EntityDetection.sbMobID
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
@@ -20,20 +20,31 @@ import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
-object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
+object BestiaryMobHighlight : Feature(
+    "bestiaryMobHighlighter",
+    true
+) {
     private val trackedMobs = mutableListOf<String>()
-    private val highlightcolor by ConfigDelegate<Color>("bestiarymobhighlightcolor")
+    private val highlightColor by ConfigDelegate<Color>("bestiaryMobHighlighter.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Bestiary Mob Highlight", "Middle click on a mob in the world to toggle highlighting for it", "Visuals", ConfigElement(
-                    "bestiarymobhighlighter",
+            .addFeature(
+                "Bestiary Mob Highlight",
+                "Middle click on a mob in the world to toggle highlighting for it",
+                "Visuals",
+                ConfigElement(
+                    "bestiaryMobHighlighter",
                     ElementType.Switch(false)
-            ))
-            .addFeatureOption("Highlight Color", "", "Options", ConfigElement(
-                "bestiarymobhighlightcolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+                )
+            )
+            .addFeatureOption(
+                "Highlight Color",
+                ConfigElement(
+                    "bestiaryMobHighlighter.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
     override fun initialize() {
@@ -45,7 +56,7 @@ object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
 
                 if (!visible) return@register
                 entity.glowThisFrame = true
-                entity.glowingColor = highlightcolor.rgb
+                entity.glowingColor = highlightColor.rgb
             }
         }
 

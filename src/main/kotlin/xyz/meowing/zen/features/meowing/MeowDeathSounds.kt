@@ -11,19 +11,21 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object MeowDeathSounds : Feature("meowdeathsounds") {
+object MeowDeathSounds : Feature(
+    "meowDeathSounds"
+) {
     override fun addConfig() {
         ConfigManager
-            .addFeature("Meow Death Sounds", "Meow Death Sounds", "Meowing", ConfigElement(
-                "meowdeathsounds",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("", "Plays a meow sound when a mob dies.", "", ConfigElement(
-                "",
-                ElementType.TextParagraph("Plays a meow sound when a mob dies.")
-            ))
+            .addFeature(
+                "Meow death sounds",
+                "Plays a meow sound when a mob dies",
+                "Meowing",
+                ConfigElement(
+                    "meowDeathSounds",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     override fun initialize() {
         register<EntityEvent.Death> { event ->

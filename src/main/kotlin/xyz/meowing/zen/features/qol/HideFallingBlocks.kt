@@ -7,12 +7,19 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 
 @Module
-object HideFallingBlocks : Feature("hidefallingblocks") {
+object HideFallingBlocks : Feature(
+    "hideFallingBlocks"
+) {
     override fun addConfig() {
         ConfigManager
-            .addFeature("Hide falling blocks", "Hide falling blocks", "QoL", ConfigElement(
-                "hidefallingblocks",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Hide falling blocks",
+                "Hide falling blocks",
+                "QoL",
+                ConfigElement(
+                    "hideFallingBlocks",
+                    ElementType.Switch(false)
+                )
+            )
     }
 }

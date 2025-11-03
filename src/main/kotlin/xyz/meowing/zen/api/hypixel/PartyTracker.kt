@@ -1,18 +1,19 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.hypixel
 
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.events.*
+import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PartyChangeType
 import xyz.meowing.zen.events.core.PartyEvent
 import xyz.meowing.zen.utils.ItemUtils.lore
-import xyz.meowing.zen.utils.LoopUtils.setTimeout
 import xyz.meowing.zen.utils.Utils.chestName
 import xyz.meowing.zen.utils.Utils.getRegexGroups
 import xyz.meowing.zen.utils.Utils.removeFormatting
+import kotlin.text.get
 
 @Module
 object PartyTracker {
@@ -72,9 +73,9 @@ object PartyTracker {
 
             hadProblemJoiningParty = false
 
-            setTimeout(1000) {
-                if (hadProblemJoiningParty) return@setTimeout
-                partyMembers.entries.removeIf { it.key != player?.name?.string }
+            TimeScheduler.schedule(1000) {
+                if (hadProblemJoiningParty) return@schedule
+                partyMembers.entries.removeIf { it.key != KnitPlayer.player?.name?.string }
                 addSelfToParty(false)
                 val stackLore = stack.lore
                 for (line in stackLore) {
@@ -101,7 +102,7 @@ object PartyTracker {
 
     private fun addSelfToParty(selfLeader: Boolean) {
         playerInParty = true
-        val playerName = player?.name?.string ?: return
+        val playerName = KnitPlayer.player?.name?.string ?: return
         if (!partyMembers.containsKey(playerName)) partyMembers[playerName] = PartyMember(playerName, selfLeader)
     }
 
@@ -194,7 +195,7 @@ object PartyTracker {
                 KnitChat.sendCommand("p list")
                 hidePartyList = true
 
-                if (playerName == player?.name?.string) partyMembers[playerName]?.leader = false
+                if (playerName == KnitPlayer.player?.name?.string) partyMembers[playerName]?.leader = false
                 EventBus.post(PartyEvent.Changed(PartyChangeType.PARTY_FINDER, playerName, partyMembers.toMap()))
             }
 

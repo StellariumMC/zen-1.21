@@ -19,22 +19,28 @@ import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object FireFreezeTimer : Feature(
-    "firefreeze",
+    "fireFreezeTimer",
     island = SkyBlockIsland.THE_CATACOMBS,
     dungeonFloor = listOf(DungeonFloor.F3, DungeonFloor.M3)
 ) {
+    private const val NAME = "Fire Freeze Timer"
     var ticks = 0
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Fire Freeze Timer", "", "Dungeons", ConfigElement(
-                "firefreeze",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Fire freeze timer",
+                "Shows a timer for Fire Freeze staff ability in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "fireFreezeTimer",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.register("firefreeze", "§bFire freeze: §c4.3s")
+        HUDManager.register(NAME, "§bFire freeze: §c4.3s")
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
@@ -67,12 +73,12 @@ object FireFreezeTimer : Feature(
     }
 
     private fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled("firefreeze") || ticks <= 0) return
+        if (!HUDManager.isEnabled(NAME) || ticks <= 0) return
 
         val text = "§bFire freeze: §c${"%.1f".format(ticks / 20.0)}s"
-        val x = HUDManager.getX("firefreeze")
-        val y = HUDManager.getY("firefreeze")
-        val scale = HUDManager.getScale("firefreeze")
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         Render2D.renderString(context, text, x, y, scale)
     }

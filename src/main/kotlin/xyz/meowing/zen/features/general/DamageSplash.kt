@@ -14,7 +14,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.text.DecimalFormat
 
 @Module
-object DamageSplash : Feature("damagesplash", true) {
+object DamageSplash : Feature(
+    "damagesplash",
+    true
+) {
     enum class DamageType(val displayName: String) {
         CRIT("Crit Hits"),
         OVERLOAD("Overload Hits"),
@@ -26,59 +29,88 @@ object DamageSplash : Feature("damagesplash", true) {
     private val allSymbols = setOf('✧', '✯', '⚔', '+', '❤', '♞', '☄', '✷', 'ﬗ')
     private val commaFormatter = DecimalFormat("#,###")
 
-    private val enableRainbow by ConfigDelegate<Boolean>("damagesplashrainbow")
-    private val normalDamageColor by ConfigDelegate<MCColorCode>("damagesplashnormalcolor")
-    private val criticalDamageColor by ConfigDelegate<MCColorCode>("damagesplashcriticalcolor")
-    private val enabledColors by ConfigDelegate<Set<Int>>("damagesplashcolors")
-    private val showFormatted by ConfigDelegate<Boolean>("damagesplashformatted")
-    private val useCommas by ConfigDelegate<Boolean>("damagesplashcommas")
-    private val cancelTypes by ConfigDelegate<Set<Int>>("damagesplashcancel")
-    private val cancelAll by ConfigDelegate<Boolean>("damagesplashcancelall")
+    private val enableRainbow by ConfigDelegate<Boolean>("damageSplash.rainbow")
+    private val normalDamageColor by ConfigDelegate<MCColorCode>("damageSplash.normalColor")
+    private val criticalDamageColor by ConfigDelegate<MCColorCode>("damageSplash.criticalColor")
+    private val enabledColors by ConfigDelegate<Set<Int>>("damageSplash.rainbowColors")
+    private val showFormatted by ConfigDelegate<Boolean>("damageSplash.formatted")
+    private val useCommas by ConfigDelegate<Boolean>("damageSplash.commas")
+    private val cancelTypes by ConfigDelegate<Set<Int>>("damageSplash.cancelTypes")
+    private val cancelAll by ConfigDelegate<Boolean>("damageSplash.cancelAll")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Damage Splash", "", "General", ConfigElement(
-                "damagesplash",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Show formatted numbers", "Show formatted numbers", "Display", ConfigElement(
-                "damagesplashformatted",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Use comma separators", "Use comma separators", "Display", ConfigElement(
-                "damagesplashcommas",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Cancel all damage splash", "Cancel all damage splash", "Cancellation", ConfigElement(
-                "damagesplashcancelall",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Cancel specific damage types", "Cancel specific damage types", "Cancellation", ConfigElement(
-                "damagesplashcancel",
-                ElementType.MultiCheckbox(
-                    options = DamageType.entries.map { it.displayName },
-                    default = setOf()
+            .addFeature(
+                "Damage splash",
+                "Customize damage numbers that appear above mobs",
+                "General",
+                ConfigElement(
+                    "damageSplash",
+                    ElementType.Switch(false)
                 )
-            ))
-            .addFeatureOption("Rainbow damage with symbols", "Rainbow damage with symbols", "Colors", ConfigElement(
-                "damagesplashrainbow",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Normal damage color", "Normal damage color", "Colors", ConfigElement(
-                "damagesplashnormalcolor",
-                ElementType.MCColorPicker(MCColorCode.AQUA)
-            ))
-            .addFeatureOption("Symbol damage color", "Symbol damage color", "Colors", ConfigElement(
-                "damagesplashcriticalcolor",
-                ElementType.MCColorPicker(MCColorCode.WHITE)
-            ))
-            .addFeatureOption("Rainbow colors to use", "Rainbow colors to use", "Colors", ConfigElement(
-                "damagesplashcolors",
-                ElementType.MultiCheckbox(
-                    options = listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"),
-                    default = setOf(0, 1, 2, 3)
+            )
+            .addFeatureOption(
+                "Show formatted numbers",
+                ConfigElement(
+                    "damageSplash.formatted",
+                    ElementType.Switch(true)
                 )
-            ))
+            )
+            .addFeatureOption(
+                "Use comma separators",
+                ConfigElement(
+                    "damageSplash.commas",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Cancel all damage splash",
+                ConfigElement(
+                    "damageSplash.cancelAll",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Cancel specific damage types",
+                ConfigElement(
+                    "damageSplash.cancelTypes",
+                    ElementType.MultiCheckbox(
+                        options = DamageType.entries.map { it.displayName },
+                        default = setOf()
+                    )
+                )
+            )
+            .addFeatureOption(
+                "Rainbow damage with symbols",
+                ConfigElement(
+                    "damageSplash.rainbow",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Normal damage color",
+                ConfigElement(
+                    "damageSplash.normalColor",
+                    ElementType.MCColorPicker(MCColorCode.AQUA)
+                )
+            )
+            .addFeatureOption(
+                "Symbol damage color",
+                ConfigElement(
+                    "damageSplash.criticalColor",
+                    ElementType.MCColorPicker(MCColorCode.WHITE)
+                )
+            )
+            .addFeatureOption(
+                "Rainbow colors to use",
+                ConfigElement(
+                    "damageSplash.rainbowColors",
+                    ElementType.MultiCheckbox(
+                        options = listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"),
+                        default = setOf(0, 1, 2, 3)
+                    )
+                )
+            )
     }
 
     override fun initialize() {

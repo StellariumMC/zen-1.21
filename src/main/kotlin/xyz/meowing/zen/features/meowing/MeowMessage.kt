@@ -11,15 +11,22 @@ import xyz.meowing.zen.features.Feature
 import kotlin.random.Random
 
 @Module
-object MeowMessage : Feature("meowmessage") {
+object MeowMessage : Feature(
+    "meowMessage"
+) {
     private val variants = listOf("meow", "mew", "mrow", "nyaa", "purr", "mrrp", "meoww", "nya")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Cat Speak", "Cat Speak", "Meowing", ConfigElement(
-                "meowmessage",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Cat speak",
+                "Adds random meows and purrs to your messages :3",
+                "Meowing",
+                ConfigElement(
+                    "meowMessage",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 

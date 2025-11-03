@@ -21,7 +21,9 @@ import xyz.meowing.zen.events.core.RenderEvent
 import java.io.File
 
 @Module
-object Rat : Feature(island = SkyBlockIsland.HUB) {
+object Rat : Feature(
+    island = SkyBlockIsland.HUB
+) {
     private val position = Vec3d(-1.0, 72.0, -92.0)
     private val culling = Box(position.x, position.y, position.z, position.x + 1, position.y + 1, position.z + 1/16.0)
     private val textureId = Identifier.of("zen", "zen_rat_png")
@@ -29,6 +31,7 @@ object Rat : Feature(island = SkyBlockIsland.HUB) {
 
     override fun initialize() {
         loadTexture()
+
         register<RenderEvent.World.AfterEntities> { event ->
             if (textureLoaded) {
                 render(event.context)

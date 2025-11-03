@@ -11,19 +11,22 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object MeowSounds : Feature("meowsounds") {
+object MeowSounds : Feature(
+    "meowSounds"
+) {
     private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Meow Sounds", "Meow Sounds", "Meowing", ConfigElement(
-                "meowsounds",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("", "Plays a meow sound when a message containing 'meow' is received in chat.", "", ConfigElement(
-                    "",
-                    ElementType.TextParagraph("Plays a meow sound when a message containing 'meow' is received in chat.")
-            ))
+            .addFeature(
+                "Meow sounds",
+                "Plays a meow sound when a message containing 'meow' is received in chat",
+                "Meowing",
+                ConfigElement(
+                    "meowSounds",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 

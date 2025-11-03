@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.api.EntityDetection
+import xyz.meowing.zen.api.skyblock.EntityDetection
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
@@ -19,8 +19,11 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.util.concurrent.ConcurrentHashMap
 
 @Module
-object HideEndermanLaser : Feature("hideendermanlaser", true) {
-    private val hideForOption by ConfigDelegate<Int>("hideendermanlaserboss")
+object HideEndermanLaser : Feature(
+    "hideEndermanLaser",
+    true
+) {
+    private val hideForOption by ConfigDelegate<Int>("hideEndermanLaser.forBossType")
     private val endermanCache = ConcurrentHashMap<Int, EndermanEntity>()
     private val nametagData = ConcurrentHashMap<Int, String>()
     private var lastCacheUpdate = 0L
@@ -28,17 +31,25 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Hide Enderman Laser", "", "Slayers", ConfigElement(
-                "hideendermanlaser",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Hide For", "", "Options", ConfigElement(
-                "hideendermanlaserboss",
-                ElementType.Dropdown(
-                    listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),
-                    0
+            .addFeature(
+                "Hide enderman laser",
+                "",
+                "Slayers",
+                ConfigElement(
+                    "hideEndermanLaser",
+                    ElementType.Switch(false)
                 )
-            ))
+            )
+            .addFeatureOption(
+                "Hide for",
+                ConfigElement(
+                    "hideEndermanLaser.forBossType",
+                    ElementType.Dropdown(
+                        listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),
+                        0
+                    )
+                )
+            )
     }
 
 

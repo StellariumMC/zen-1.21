@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
-import xyz.meowing.zen.api.PlayerStats
+import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
@@ -17,19 +17,27 @@ import xyz.meowing.zen.managers.config.ConfigManager
  * @author Eclipse-5214
  */
 @Module
-object RoomSecrets : Feature("roomsecrets", island = SkyBlockIsland.THE_CATACOMBS) {
-    private const val name = "Secrets Display"
+object RoomSecrets : Feature(
+    "roomSecrets",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
+    private const val NAME = "Secrets Display"
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Room Secrets Hud", "", "Dungeons", ConfigElement(
-                "roomsecrets",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Room secrets HUD",
+                "Displays the number of secrets found in the current dungeon room",
+                "Dungeons",
+                ConfigElement(
+                    "roomSecrets",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 50, 30, this::HUDEditorRender)
+        HUDManager.registerCustom(NAME, 50, 30, this::HUDEditorRender)
 
         register<GuiEvent.Render.HUD> { renderHUD(it.context) }
     }
@@ -66,11 +74,11 @@ object RoomSecrets : Feature("roomsecrets", island = SkyBlockIsland.THE_CATACOMB
     }
 
     private fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled(name)) return
+        if (!HUDManager.isEnabled(NAME)) return
         val matrix = context.matrices
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         //#if MC >= 1.21.7
         //$$ matrix.pushMatrix()

@@ -16,8 +16,8 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UMatrixStack
-import xyz.meowing.zen.api.ItemAPI
-import xyz.meowing.zen.api.TradeAPI
+import xyz.meowing.zen.api.item.ItemAPI
+import xyz.meowing.zen.api.skyblock.TradeAPI
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
@@ -479,7 +479,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
                 height = 14.pixels()
             } childOf itemsGrid
 
-            val textComponent = UIText(stack.count.toString()).constrain {
+            UIText(stack.count.toString()).constrain {
                 x = (resolution - xPadding).pixels()
                 y = (resolution - yPadding).pixels()
                 textScale = 0.5.pixels()

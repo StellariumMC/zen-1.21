@@ -16,26 +16,34 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object SlayerHUD : Feature("slayerhud", true) {
-    private const val name = "Slayer HUD"
+object SlayerHUD : Feature(
+    "slayerHud",
+    true
+) {
+    private const val NAME = "Slayer HUD"
     private var timerEntity: Entity? = null
     private var hpEntity: Entity? = null
     private var bossID: Int? = null
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Slayer HUD", "Slayer HUD", "Slayers", ConfigElement(
-                "slayerhud",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Slayer HUD",
+                "Slayer HUD",
+                "Slayers",
+                ConfigElement(
+                    "slayerHud",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 
     override fun initialize() {
-        HUDManager.register(name, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤")
+        HUDManager.register(NAME, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤")
 
         createCustomEvent<GuiEvent.Render.HUD>("render") {
-            if (HUDManager.isEnabled(name)) render(it.context)
+            if (HUDManager.isEnabled(NAME)) render(it.context)
         }
 
         register<SkyblockEvent.Slayer.Spawn> { event ->
@@ -65,9 +73,9 @@ object SlayerHUD : Feature("slayerhud", true) {
     private fun render(context: DrawContext) {
         val timeText = timerEntity?.name ?: return
         val hpText = hpEntity?.name ?: return
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
         val matrices = context.matrices
         //#if MC >= 1.21.7
         //$$ matrices.pushMatrix()

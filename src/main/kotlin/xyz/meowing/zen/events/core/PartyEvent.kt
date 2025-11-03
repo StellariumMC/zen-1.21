@@ -3,13 +3,13 @@
 package xyz.meowing.zen.events.core
 
 import xyz.meowing.knit.api.events.Event
-import xyz.meowing.zen.api.PartyTracker
+import xyz.meowing.zen.api.hypixel.PartyTracker
 
 sealed class PartyEvent {
     /**
      * Posted when a change in the current party has occurred.
      *
-     * @see xyz.meowing.zen.api.PartyTracker
+     * @see PartyTracker
      * @since 1.2.0
      */
     class Changed(

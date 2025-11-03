@@ -15,21 +15,28 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
 @Module
-object ServerLagTimer : Feature("serverlagtimer", island = SkyBlockIsland.THE_CATACOMBS) {
+object ServerLagTimer : Feature(
+    "serverLagTimer",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
     private val regex = Pattern.compile("^\\s*☠ Defeated .+ in 0?[\\dhms ]+?\\s*(?:\\(NEW RECORD!\\))?$")
     private var sent = false
     private var ticking = false
-    private var clienttick: Long = 0
-    private var servertick: Long = 0
+    private var clientTick: Long = 0
+    private var serverTick: Long = 0
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Server lag timer", "", "Dungeons", ConfigElement(
-                "serverlagtimer",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Server lag timer",
+                "Shows the total time the server lagged for in Dungeons.",
+                "Dungeons",
+                ConfigElement(
+                    "serverLagTimer",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -42,7 +49,7 @@ object ServerLagTimer : Feature("serverlagtimer", island = SkyBlockIsland.THE_CA
                     sent = false
                 }
                 regex.matcher(text).matches() && !sent -> {
-                    val lagtick = clienttick - servertick
+                    val lagtick = clientTick - serverTick
                     val lagtime = lagtick / 20.0
                     ticking = false
                     sent = true
@@ -55,26 +62,26 @@ object ServerLagTimer : Feature("serverlagtimer", island = SkyBlockIsland.THE_CA
         }
 
         register<TickEvent.Server> {
-            if (ticking) servertick++
+            if (ticking) serverTick++
         }
 
         register<TickEvent.Client> {
-            if (ticking) clienttick++
+            if (ticking) clientTick++
         }
     }
 
     override fun onRegister() {
         sent = false
-        clienttick = 0
-        servertick = 0
+        clientTick = 0
+        serverTick = 0
         ticking = false
         super.onRegister()
     }
 
     override fun onUnregister() {
         sent = false
-        clienttick = 0
-        servertick = 0
+        clientTick = 0
+        serverTick = 0
         ticking = false
         super.onUnregister()
     }

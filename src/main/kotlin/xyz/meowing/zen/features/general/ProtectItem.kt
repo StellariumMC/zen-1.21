@@ -42,27 +42,34 @@ import java.awt.Color
  * @license GPL-3.0
  */
 @Module
-object ProtectItem : Feature("protectitem", true) {
+object ProtectItem : Feature(
+    "protectItem",
+    true
+) {
     val itemData = StoredFile("features/ProtectItem")
     var protectedItems: Set<String> by itemData.set("protectedItems", Codec.STRING)
     var protectedTypes: Set<String> by itemData.set("protectedTypes", Codec.STRING)
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Item Protection", "", "General", ConfigElement(
-                "protectitem",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Item Protection Info", "", "", ConfigElement(
-                "",
-                ElementType.TextParagraph("Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi")
-            ))
-            .addFeatureOption("Protect Item GUI", "Protect Item GUI", "GUI", ConfigElement(
-                "protectItem.GuiButton",
-                ElementType.Button("Open GUI") {
-                    client.setScreen(ItemProtectGUI())
-                }
-            ))
+            .addFeature(
+                "Item protection",
+                "Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi",
+                "General",
+                ConfigElement(
+                    "protectItem",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Protect item GUI",
+                ConfigElement(
+                    "protectItem.guiButton",
+                    ElementType.Button("Open GUI") {
+                        client.setScreen(ItemProtectGUI())
+                    }
+                )
+            )
     }
 
     override fun initialize() {

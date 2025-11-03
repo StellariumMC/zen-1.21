@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.api.SlayerTracker
+import xyz.meowing.zen.api.slayer.SlayerTracker
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
@@ -25,47 +25,61 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Module
-object SlayerStats : Feature("slayerstats", true) {
-    private const val name = "SlayerStats"
-    private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
-    private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerstatslines")
+object SlayerStats : Feature(
+    "slayerStats",
+    true
+) {
+    private const val NAME = "Slayer Stats"
+    private val slayerTimer by ConfigDelegate<Boolean>("slayerTimer")
+    private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerStats.lines")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Slayer stats", "Slayer stats", "Slayers", ConfigElement(
-                "slayerstats",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("", "", "", ConfigElement(
-                "",
-                ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
-            ))
-            .addFeatureOption("Lines to show", "", "Options", ConfigElement(
-                "slayerstatslines",
-                ElementType.MultiCheckbox(
-                    options = listOf(
-                        "Show Bosses Killed",
-                        "Show Bosses/hr",
-                        "Show Average kill time",
-                        "Show Average spawn time",
-                        "Show Total Session time",
-                        "Show XP/hr"
-                    ),
-                    default = setOf(0, 1, 4, 5)
+            .addFeature(
+                "Slayer stats",
+                "Slayer stats",
+                "Slayers",
+                ConfigElement(
+                    "slayerStats",
+                    ElementType.Switch(false)
                 )
-            ))
+            )
+            .addFeatureOption(
+                "",
+                ConfigElement(
+                    "",
+                    ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
+                )
+            )
+            .addFeatureOption(
+                "Lines to show",
+                ConfigElement(
+                    "slayerStats.lines",
+                    ElementType.MultiCheckbox(
+                        options = listOf(
+                            "Show Bosses Killed",
+                            "Show Bosses/hr",
+                            "Show Average kill time",
+                            "Show Average spawn time",
+                            "Show Total Session time",
+                            "Show XP/hr"
+                        ),
+                        default = setOf(0, 1, 4, 5)
+                    )
+                )
+            )
     }
 
 
     override fun initialize() {
-        HUDManager.register("SlayerStats", "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
+        HUDManager.register(NAME, "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
 
         register<GuiEvent.Render.HUD> {
-            if (HUDManager.isEnabled("SlayerStats")) render(it.context)
+            if (HUDManager.isEnabled(NAME)) render(it.context)
         }
 
         register<SkyblockEvent.Slayer.Death> {
-            if (!slayertimer) {
+            if (!slayerTimer) {
                 KnitChat.fakeMessage("$prefix §cYou must enable the §eSlayer Timer§c feature for Slayer Stats to work.")
             }
         }
@@ -85,9 +99,9 @@ object SlayerStats : Feature("slayerstats", true) {
     }
 
     private fun render(context: DrawContext) {
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
         val lines = getLines()
 
         if (lines.isNotEmpty()) {

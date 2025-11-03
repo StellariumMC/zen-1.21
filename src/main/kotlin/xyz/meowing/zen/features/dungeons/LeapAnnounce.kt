@@ -11,26 +11,36 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
-object LeapAnnounce : Feature("leapannounce") {
+object LeapAnnounce : Feature(
+    "leapAnnounce"
+) {
     private val regex = "^You have teleported to (.+)".toRegex()
-    private val leapmessage by ConfigDelegate<String>("leapmessage")
+    private val leapMessage by ConfigDelegate<String>("leapAnnounce.message")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Leap announce", "", "Dungeons", ConfigElement(
-                "leapannounce",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Leap announce message", "Leap announce message", "Options", ConfigElement(
-                "leapmessage",
-                ElementType.TextInput("Leaping to", "Leaping to")
-            ))
+            .addFeature(
+                "Leap announce",
+                "Announces in party chat when you use a leap",
+                "Dungeons",
+                ConfigElement(
+                    "leapAnnounce",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Leap announce message",
+                ConfigElement(
+                    "leapAnnounce.message",
+                    ElementType.TextInput("Leaping to", "Leaping to")
+                )
+            )
     }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
             val result = regex.find(event.message.string.removeFormatting())
-            if (result != null) KnitChat.sendCommand("pc $leapmessage ${result.groupValues[1]}")
+            if (result != null) KnitChat.sendCommand("pc $leapMessage ${result.groupValues[1]}")
         }
     }
 }

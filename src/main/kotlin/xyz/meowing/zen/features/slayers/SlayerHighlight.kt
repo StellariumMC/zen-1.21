@@ -2,7 +2,7 @@ package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.api.EntityDetection.getSlayerEntity
+import xyz.meowing.zen.api.skyblock.EntityDetection.getSlayerEntity
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -14,19 +14,30 @@ import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
-object SlayerHighlight : Feature("slayerhighlight", true) {
+object SlayerHighlight : Feature(
+    "slayerHighlight",
+    true
+) {
     private val slayerhighlightcolor by ConfigDelegate<Color>("slayerhighlightcolor")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Slayer highlight", "Slayer highlight", "Slayers", ConfigElement(
-                "slayerhighlight",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "slayerhighlightcolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Slayer highlight",
+                "Slayer highlight",
+                "Slayers",
+                ConfigElement(
+                    "slayerHighlight",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "slayerHighlight.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
 

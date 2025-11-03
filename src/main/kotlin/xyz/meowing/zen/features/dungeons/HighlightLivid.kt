@@ -30,7 +30,7 @@ import java.awt.Color
 
 @Module
 object HighlightLivid : Feature(
-    "highlightlivid",
+    "highlightLivid",
     island = SkyBlockIsland.THE_CATACOMBS,
     dungeonFloor = listOf(DungeonFloor.F5, DungeonFloor.M5)
 ) {
@@ -48,6 +48,7 @@ object HighlightLivid : Feature(
         DyeColor.PURPLE to "Purple",
         DyeColor.YELLOW to "Arcade"
     )
+
     val stainedGlassBlocks = mapOf(
         Blocks.RED_STAINED_GLASS to DyeColor.RED,
         Blocks.ORANGE_STAINED_GLASS to DyeColor.ORANGE,
@@ -66,30 +67,44 @@ object HighlightLivid : Feature(
         Blocks.BLACK_STAINED_GLASS to DyeColor.BLACK,
         Blocks.BROWN_STAINED_GLASS to DyeColor.BROWN
     )
-    private val highlightlividline by ConfigDelegate<Boolean>("highlightlividline")
-    private val hidewronglivid by ConfigDelegate<Boolean>("hidewronglivid")
-    private val highlightlividcolor by ConfigDelegate<Color>("highlightlividcolor")
+
+    private val highlightLividColor by ConfigDelegate<Color>("highlightLivid.color")
+    private val hideWrongLivid by ConfigDelegate<Boolean>("highlightLivid.hideWrong")
+    private val highlightLividLine by ConfigDelegate<Boolean>("highlightLivid.line")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Highlight Livid", "Highlight correct livid", "Dungeons", ConfigElement(
-                "highlightlivid",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Highlight correct livid color", "Highlight correct livid color", "Color", ConfigElement(
-                "highlightlividcolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
-            .addFeatureOption("Hide incorrect livid entity", "Hide incorrect livid entity", "Options", ConfigElement(
-                "hidewronglivid",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Line to correct livid entity", "Line to correct livid entity", "Options", ConfigElement(
-                "highlightlividline",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Highlight livid",
+                "Highlights the correct Livid in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "highlightLivid",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Highlight correct livid color",
+                ConfigElement(
+                    "highlightLivid.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
+            .addFeatureOption(
+                "Hide incorrect livid entity",
+                ConfigElement(
+                    "highlightLivid.hideWrong",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Line to correct livid entity",
+                ConfigElement(
+                    "highlightLivid.line",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     override fun initialize() {
         createCustomEvent<RenderEvent.Entity.Pre>("renderLivid") { event ->
@@ -97,7 +112,7 @@ object HighlightLivid : Feature(
 
             if (lividEntity == entity && player?.canSee(entity) == true) {
                 entity.glowThisFrame = true
-                entity.glowingColor = highlightlividcolor.rgb
+                entity.glowingColor = highlightLividColor.rgb
             }
         }
 
@@ -108,8 +123,8 @@ object HighlightLivid : Feature(
                         entity,
                         event.context.consumers(),
                         event.context.matrixStack(),
-                        highlightlividcolor.toFloatArray(),
-                        highlightlividcolor.alpha.toFloat()
+                        highlightLividColor.toFloatArray(),
+                        highlightLividColor.alpha.toFloat()
                     )
                 }
             }
@@ -156,8 +171,8 @@ object HighlightLivid : Feature(
 
     private fun registerRender() {
         registerEvent("renderLivid")
-        if (hidewronglivid) registerEvent("renderWrong")
-        if (highlightlividline) registerEvent("renderLine")
+        if (hideWrongLivid) registerEvent("renderWrong")
+        if (highlightLividLine) registerEvent("renderLine")
     }
 
     private fun unregisterRender() {

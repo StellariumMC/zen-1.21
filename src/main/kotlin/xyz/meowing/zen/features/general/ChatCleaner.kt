@@ -72,29 +72,42 @@ data class ChatPattern(
 }
 
 @Module
-object ChatCleaner : Feature("chatcleaner") {
-    private val chatcleanerkey by ConfigDelegate<Int>("chatcleanerkey")
+object ChatCleaner : Feature(
+    "chatCleaner"
+) {
+    private val chatCleanerKey by ConfigDelegate<Int>("chatCleaner.keybind")
     val patternData = StoredFile("features/ChatCleaner")
     var patterns: List<ChatPattern> by patternData.list("patterns", ChatPattern.CODEC)
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Chat Cleaner", "", "General", ConfigElement(
-                "chatcleaner",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Keybind to add message to filter", "Keybind to add message to filter", "Options", ConfigElement(
-                "chatcleanerkey",
-                ElementType.Keybind(GLFW.GLFW_KEY_H)
-            ))
-            .addFeatureOption("Chat Cleaner Filter GUI", "Chat Cleaner Filter GUI", "GUI", ConfigElement(
-                "chatcleanergui",
-                ElementType.Button("Open Filter GUI") {
-                    TickUtils.schedule(2) {
-                        client.setScreen(ChatCleanerGui())
+            .addFeature(
+                "Chat cleaner",
+                "Filter out unwanted chat messages using custom patterns",
+                "General",
+                ConfigElement(
+                    "chatCleaner",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Keybind to add message to filter",
+                ConfigElement(
+                    "chatCleaner.keybind",
+                    ElementType.Keybind(GLFW.GLFW_KEY_H)
+                )
+            )
+            .addFeatureOption(
+                "Chat cleaner filter GUI",
+                ConfigElement(
+                    "chatCleaner.guiButton",
+                    ElementType.Button("Open Filter GUI") {
+                        TickUtils.schedule(2) {
+                            client.setScreen(ChatCleanerGui())
+                        }
                     }
-                }
-            ))
+                )
+            )
     }
 
     init {
@@ -109,7 +122,7 @@ object ChatCleaner : Feature("chatcleaner") {
         }
 
         register<KeyEvent.Press> { _ ->
-            if (client.currentScreen !is ChatScreen || !KnitKey(chatcleanerkey).isPressed) return@register
+            if (client.currentScreen !is ChatScreen || !KnitKey(chatCleanerKey).isPressed) return@register
 
             val chat = client.inGameHud.chatHud as AccessorChatHud
             val line = chat.getMessageLineIdx(chat.toChatLineMX(KnitMouse.Scaled.x), chat.toChatLineMY(KnitMouse.Scaled.y))

@@ -1,19 +1,18 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.skyblock
 
-import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.events.EventBus.post
-import xyz.meowing.zen.utils.TickUtils
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.entity.Entity
 import net.minecraft.entity.decoration.ArmorStandEntity
 import net.minecraft.entity.projectile.ArrowEntity
-import xyz.meowing.knit.api.KnitClient.world
-import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.utils.TickUtils
+import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
 object EntityDetection {
@@ -34,8 +33,8 @@ object EntityDetection {
 
     init {
         TickUtils.loop(5) {
-            val world = world ?: return@loop
-            val player = player ?: return@loop
+            val world = KnitClient.world ?: return@loop
+            val player = KnitPlayer.player ?: return@loop
 
             world.entities.forEach { entity ->
                 if (player.distanceTo(entity) > 30 || entity !is ArmorStandEntity || !entity.hasCustomName() || hashMap.containsKey(entity)) return@forEach
@@ -50,17 +49,17 @@ object EntityDetection {
                 updateMobData(skyblockMob)
 
                 if (skyblockMob.id != null) {
-                    post(SkyblockEvent.EntitySpawn(skyblockMob))
+                    EventBus.post(SkyblockEvent.EntitySpawn(skyblockMob))
                 }
             }
         }
 
         TickUtils.loop(100) {
             bossID?.let { id ->
-                val world = world ?: return@loop
+                val world = KnitClient.world ?: return@loop
                 val boss = world.getEntityById(id)
                 if (boss == null || !boss.isAlive) {
-                    post(SkyblockEvent.Slayer.Cleanup())
+                    EventBus.post(SkyblockEvent.Slayer.Cleanup())
                     bossID = null
                 }
             }
@@ -68,8 +67,8 @@ object EntityDetection {
 
         EventBus.register<EntityEvent.Packet.Metadata> { event ->
             if (inSlayerFight) return@register
-            val world = world ?: return@register
-            val player = player ?: return@register
+            val world = KnitClient.world ?: return@register
+            val player = KnitPlayer.player ?: return@register
 
             val name = event.name
             if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {
@@ -81,7 +80,7 @@ object EntityDetection {
                     bossID = event.packet.id - 3
                     SlayerEntity = world.getEntityById(event.packet.id - 3)
                     inSlayerFight = true
-                    post(SkyblockEvent.Slayer.Spawn(event.entity, event.entity.id, event.packet))
+                    EventBus.post(SkyblockEvent.Slayer.Spawn(event.entity, event.entity.id, event.packet))
                 }
             }
         }
@@ -91,7 +90,7 @@ object EntityDetection {
                 bossID = null
                 SlayerEntity = null
                 inSlayerFight = false
-                post(SkyblockEvent.Slayer.Death(event.entity, event.entity.id))
+                EventBus.post(SkyblockEvent.Slayer.Death(event.entity, event.entity.id))
             }
         }
 
@@ -103,13 +102,13 @@ object EntityDetection {
                     bossID = null
                     SlayerEntity = null
                     inSlayerFight = false
-                    post(SkyblockEvent.Slayer.Fail())
+                    EventBus.post(SkyblockEvent.Slayer.Fail())
                 }
                 "  SLAYER QUEST STARTED!" -> {
                     bossID = null
                     SlayerEntity = null
                     inSlayerFight = false
-                    post(SkyblockEvent.Slayer.QuestStart())
+                    EventBus.post(SkyblockEvent.Slayer.QuestStart())
                 }
             }
         }

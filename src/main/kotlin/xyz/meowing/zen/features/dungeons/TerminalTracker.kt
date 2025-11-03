@@ -14,18 +14,25 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
 @Module
-object TerminalTracker : Feature("termtracker", island = SkyBlockIsland.THE_CATACOMBS) {
+object TerminalTracker : Feature(
+    "terminalTracker",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
     private var completed: MutableMap<String, MutableMap<String, Int>> = mutableMapOf()
     private val pattern = Pattern.compile("^(\\w{1,16}) (?:activated|completed) a (\\w+)! \\(\\d/\\d\\)$")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Terminal Tracker", "", "Dungeons", ConfigElement(
-                "termtracker",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Terminal tracker",
+                "Tracks terminal/device/lever completions in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "terminalTracker",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -36,9 +43,11 @@ object TerminalTracker : Feature("termtracker", island = SkyBlockIsland.THE_CATA
 
             when {
                 msg == "The Core entrance is opening!" -> {
-                    completed.forEach { (user, data) ->
+                    completed.toList().forEach { (user, data) ->
                         KnitChat.fakeMessage("$prefix §b$user§7 - §b${data["lever"] ?: 0} §flevers §7| §b${data["terminal"] ?: 0} §fterminals §7| §b${data["device"] ?: 0} §fdevices")
                     }
+
+                    completed.clear()
                 }
                 matcher.matches() -> {
                     val user = matcher.group(1)
