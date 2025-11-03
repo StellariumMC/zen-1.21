@@ -3,7 +3,7 @@ package xyz.meowing.zen.utils
 import net.minecraft.entity.Entity
 import kotlin.time.Duration
 
-internal interface EntityAccessor {
+interface EntityAccessor {
     fun `zen$setGlowing`(glowing: Boolean)
     fun `zen$setGlowingColor`(color: Int)
     fun `zen$glowTime`(time: Long)

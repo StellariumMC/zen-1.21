@@ -24,7 +24,7 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
-import xyz.meowing.zen.utils.isCurrentlyGlowing
+import xyz.meowing.zen.utils.glowThisFrame
 import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
@@ -95,8 +95,8 @@ object HighlightLivid : Feature(
         createCustomEvent<RenderEvent.Entity.Pre>("renderLivid") { event ->
             val entity = event.entity
 
-            if (lividEntity == entity) {
-                entity.isCurrentlyGlowing = true
+            if (lividEntity == entity && player?.canSee(entity) == true) {
+                entity.glowThisFrame = true
                 entity.glowingColor = highlightlividcolor.rgb
             }
         }
