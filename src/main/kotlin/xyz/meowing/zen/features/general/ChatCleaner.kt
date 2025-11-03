@@ -191,8 +191,6 @@ object ChatCleaner : Feature(
             false
         }
     }
-
-    fun getPatterns(): List<ChatPattern> = patterns
 }
 
 @Command

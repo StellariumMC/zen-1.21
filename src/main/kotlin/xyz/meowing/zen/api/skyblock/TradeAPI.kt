@@ -20,7 +20,7 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 @Module
 object TradeAPI {
     private val tradeData = StoredFile("api/TradeAPI")
-    private var tradeHistory: JsonObject by tradeData.jsonObject("tradeHistory")
+    var tradeHistory: JsonObject by tradeData.jsonObject("tradeHistory")
 
     private var inTradeMenu = false
     private var lastTradeMenu: ScreenHandler? = null
@@ -120,6 +120,4 @@ object TradeAPI {
             addProperty("id", Registries.ITEM.getId(stack.item).toString())
         }
     }
-
-    fun getTradeHistory(): JsonObject = tradeHistory
 }

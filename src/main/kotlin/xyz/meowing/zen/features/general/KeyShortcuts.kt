@@ -161,8 +161,6 @@ object KeyShortcuts : Feature(
         bindingData.forceSave()
         return true
     }
-
-    fun getBindings(): List<KeybindEntry> = bindings
 }
 
 @Command

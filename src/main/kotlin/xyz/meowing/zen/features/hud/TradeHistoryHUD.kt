@@ -190,7 +190,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         tooltipElements.clear()
         stackElements.clear()
 
-        val tradeHistory = TradeAPI.getTradeHistory()
+        val tradeHistory = TradeAPI.tradeHistory
         if (tradeHistory.entrySet().isEmpty()) {
             createEmptyState()
             return

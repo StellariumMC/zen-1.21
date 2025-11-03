@@ -37,18 +37,11 @@ object SlayerStats : Feature(
         ConfigManager
             .addFeature(
                 "Slayer stats",
-                "Slayer stats",
+                "Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats.",
                 "Slayers",
                 ConfigElement(
                     "slayerStats",
                     ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "",
-                ConfigElement(
-                    "",
-                    ElementType.TextParagraph("Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats. Requires §eSlayer Timer§r to be enabled.")
                 )
             )
             .addFeatureOption(
