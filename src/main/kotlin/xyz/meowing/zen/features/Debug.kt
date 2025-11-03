@@ -30,12 +30,12 @@ import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.utils.DataUtils
-import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -156,10 +156,9 @@ object DebugCommand : Commodore("zendebug", "zd") {
                     }
                     "dgutils" -> {
                         KnitChat.fakeMessage(
-                            "Crypt Count: ${DungeonUtils.getCryptCount()}\n" +
-                                    "Current Class: ${DungeonUtils.getCurrentClass()} ${DungeonUtils.getCurrentLevel()}\n" +
-                                    "isMage: ${DungeonUtils.isMage()}\n" +
-                                    "Cata: ${DungeonUtils.getCurrentCata()}"
+                            "Crypt Count: ${DungeonAPI.cryptCount}\n" +
+                                    "Current Class: ${DungeonAPI.dungeonClass?.displayName} ${DungeonAPI.classLevel}\n" +
+                                    "Cata: ${DungeonAPI.cataLevel}"
                         )
                     }
                     "regfeats" -> {
@@ -441,14 +440,10 @@ class DebugGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
         val dungeonPanel = createStatsPanel()
 
-        createStatRow("Current Class", DungeonUtils.getCurrentClass() ?: "None", theme.accent, dungeonPanel)
-        createStatRow("Class Level", DungeonUtils.getCurrentLevel().toString(), theme.accent2, dungeonPanel)
-        createStatRow("Catacombs Level", DungeonUtils.getCurrentCata().toString(), theme.accent2, dungeonPanel)
-        createStatRow("Crypt Count", DungeonUtils.getCryptCount().toString(), theme.warning, dungeonPanel)
-        createStatRow(
-            "Is Mage", if (DungeonUtils.isMage()) "Yes" else "No",
-            if (DungeonUtils.isMage()) theme.success else theme.danger, dungeonPanel
-        )
+        createStatRow("Current Class", DungeonAPI.dungeonClass?.displayName ?: "None", theme.accent, dungeonPanel)
+        createStatRow("Class Level", DungeonAPI.classLevel.toString(), theme.accent2, dungeonPanel)
+        createStatRow("Catacombs Level", DungeonAPI.cataLevel.toString(), theme.accent2, dungeonPanel)
+        createStatRow("Crypt Count", DungeonAPI.cryptCount.toString(), theme.warning, dungeonPanel)
     }
 
     private fun createEventListenersInfo() {

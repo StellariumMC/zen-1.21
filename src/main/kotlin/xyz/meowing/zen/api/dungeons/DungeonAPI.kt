@@ -11,6 +11,7 @@ import tech.thatgravyboat.skyblockapi.utils.regex.matchWhen
 import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
@@ -19,6 +20,7 @@ import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.PlayerEvent
 import xyz.meowing.zen.events.core.ScoreboardEvent
 import xyz.meowing.zen.events.core.TablistEvent
+import kotlin.math.floor
 import kotlin.time.Duration
 
 /**
@@ -29,6 +31,7 @@ import kotlin.time.Duration
  */
 @Module
 object DungeonAPI {
+    private val cataRegex = Regex("^ Catacombs (?<level>\\d+):")
     private val cryptsRegex = Regex("^ Crypts: (?<count>\\d+)$")
     private val dungeonFloorRegex = Regex("The Catacombs \\((?<floor>.+)\\)")
     private val timeRegex = Regex("Time Elapsed: (?<time>[\\dhms ]+)")
@@ -46,8 +49,14 @@ object DungeonAPI {
     private val witherDoorOpenRegex = Regex("\\w+ opened a WITHER door!")
     private val bloodDoorOpenRegex = Regex("The BLOOD DOOR has been opened!")
 
+    private val storedData = StoredFile("api/DungeonAPI")
+
+    var cataLevel: Int by storedData.int("cataLevel", 0)
+        private set
+
     var cryptCount: Int = 0
         private set
+
     var ownPlayer: DungeonPlayer? = null
         private set
 
@@ -101,6 +110,18 @@ object DungeonAPI {
 
     init {
         EventBus.register<LocationEvent.IslandChange> { reset() }
+
+        EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.DUNGEON_HUB) { event ->
+            val fourthColumn = event.new.getOrNull(3) ?: return@registerIn
+
+            fourthColumn.forEach { line ->
+                cataRegex.findThenNull(line.stripped, "level") { (level) ->
+                    if (level.toIntOrNull() == null || level.toIntOrNull() == cataLevel) return@findThenNull
+
+                    cataLevel = level.toInt()
+                } ?: return@registerIn
+            }
+        }
 
         EventBus.registerIn<TablistEvent.Change>(SkyBlockIsland.THE_CATACOMBS) { event ->
             val firstColumn = event.new.firstOrNull() ?: return@registerIn
@@ -234,6 +255,11 @@ object DungeonAPI {
             val id = event.item.getData(DataTypes.ID)
             ownPlayer?.dead = id == "HAUNT_ABILITY"
         }
+    }
+
+    fun getMageReduction(cooldown: Double): Double {
+        val multiplier = if (uniqueClass) 1 else 2
+        return cooldown * (0.75 - (floor(classLevel / 2.0) / 100.0) * multiplier)
     }
 
     private fun handleGetKey(type: String) {

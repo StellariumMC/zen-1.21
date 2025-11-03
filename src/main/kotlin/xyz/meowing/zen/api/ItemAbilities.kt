@@ -1,13 +1,10 @@
 package xyz.meowing.zen.api
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.events.*
 import xyz.meowing.zen.mixins.AccessorPlayerInventory
-import xyz.meowing.zen.utils.DungeonUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
-import xyz.meowing.zen.utils.DungeonUtils.isMage
 import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
@@ -16,6 +13,8 @@ import net.minecraft.item.ItemStack
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonAPI
+import xyz.meowing.zen.api.dungeons.DungeonClass
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent
@@ -176,9 +175,9 @@ object ItemAbility {
     private fun updateCooldown(cooldownCount: Double): Double {
         var secondsToAdd = 0.05
 
-        if (SkyBlockIsland.THE_CATACOMBS.inIsland() && cooldownReduction == -1 && isMage()) {
-            cooldownReduction = (DungeonUtils.getCurrentLevel() / 2) + 25
-            if (!DungeonUtils.isDuplicate("mage")) cooldownReduction += 25
+        if (SkyBlockIsland.THE_CATACOMBS.inIsland() && cooldownReduction == -1 && DungeonAPI.dungeonClass == DungeonClass.MAGE) {
+            cooldownReduction = (DungeonAPI.classLevel / 2) + 25
+            if (DungeonAPI.uniqueClass) cooldownReduction += 25
         }
 
         if (cooldownReduction != -1) secondsToAdd *= (100.0 + cooldownReduction) / cooldownReduction

@@ -5,8 +5,6 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.utils.DungeonUtils
-import xyz.meowing.zen.utils.DungeonUtils.getCurrentCata
 import xyz.meowing.zen.utils.ItemUtils.createSkull
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -15,6 +13,7 @@ import net.minecraft.item.ItemStack
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
@@ -65,11 +64,11 @@ object MaskTimers : Feature("masktimers", island = SkyBlockIsland.THE_CATACOMBS)
                 text.matches(BonzoRegex) -> {
                     val time = if (text.contains("⚚")) 180.0 else 360.0
 
-                    BonzoTicks = (maxOf(180.0, time - getCurrentCata() * 3.6) * 20)
+                    BonzoTicks = (maxOf(180.0, time - DungeonAPI.cataLevel * 3.6) * 20)
                     tickCall.register()
                 }
                 text == "Second Wind Activated! Your Spirit Mask saved your life!" -> {
-                    SpiritTicks = DungeonUtils.getMageReduction(30.0, true) * 20
+                    SpiritTicks = DungeonAPI.getMageReduction(30.0) * 20
                     tickCall.register()
                 }
                 text == "Your Phoenix Pet saved you from certain death!" -> {
