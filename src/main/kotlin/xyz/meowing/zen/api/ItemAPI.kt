@@ -5,7 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import xyz.meowing.zen.utils.DataUtils
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.NetworkUtils
@@ -20,23 +20,15 @@ object ItemAPI {
     private val isLoading = AtomicBoolean(false)
     private val initializationComplete = CompletableDeferred<Unit>()
 
-    private var skyblockItemData = JsonObject()
-    private var liveAuctionData = JsonObject()
+    private val itemDataFile = StoredFile("api/ItemAPI/itemData")
+    private val liveAuctionDataFile = StoredFile("api/ItemAPI/liveAuctionData")
 
-    private val itemDataFile = DataUtils("itemData", JsonObject())
-    private val liveAuctionDataFile = DataUtils("liveAuctionData", JsonObject())
+    private var skyblockItemData by itemDataFile.jsonObject("data")
+    private var liveAuctionData by liveAuctionDataFile.jsonObject("data")
 
     init {
         scope.launch {
             delay(5000L)
-
-            if (itemDataFile.getData().entrySet().isNotEmpty()) {
-                skyblockItemData = itemDataFile.getData()
-            }
-
-            if (liveAuctionDataFile.getData().entrySet().isNotEmpty()) {
-                liveAuctionData = liveAuctionDataFile.getData()
-            }
 
             NEUApi.downloadAndProcessRepo()
 
@@ -98,20 +90,20 @@ object ItemAPI {
 
         try {
             NEUApi.downloadAndProcessRepo(force)
-            NEUApi.NeuItemData.getData().entrySet().forEach {
+            NEUApi.neuItemData.entrySet().forEach {
                 val newKey = convertNeuItemToZen(it.key, it.value.asJsonObject)
                 it.value.asJsonObject.addProperty("sbtID", newKey)
 
                 if (it.value.asJsonObject.has("lore")) {
                     val lore = it.value.asJsonObject.get("lore").asJsonArray
                     lore.reversed().find { loreEntry ->
-                        val rarity = extractRarity(loreEntry.asString)
-                        if (rarity != null) {
+                        extractRarity(loreEntry.asString)?.let { rarity ->
                             it.value.asJsonObject.addProperty("rarity", rarity)
                             true
-                        } else false
+                        } ?: false
                     }
                 }
+
                 skyblockItemData.add(newKey, it.value)
             }
 
@@ -149,10 +141,8 @@ object ItemAPI {
 
                 loadPricingData()
 
-                itemDataFile.setData(skyblockItemData)
-                liveAuctionDataFile.setData(liveAuctionData)
-                itemDataFile.save()
-                liveAuctionDataFile.save()
+                itemDataFile.forceSave()
+                liveAuctionDataFile.forceSave()
 
                 if (!initializationComplete.isCompleted) {
                     initializationComplete.complete(Unit)

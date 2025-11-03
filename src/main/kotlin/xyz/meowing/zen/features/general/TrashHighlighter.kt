@@ -1,6 +1,7 @@
 package xyz.meowing.zen.features.general
 
-import com.google.gson.reflect.TypeToken
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -14,12 +15,10 @@ import gg.essential.elementa.constraints.CramSiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.universal.UKeyboard
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
@@ -28,6 +27,7 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -40,6 +40,7 @@ enum class InputType { ITEM_ID, DISPLAY_NAME, LORE }
 object TrashHighlighter : Feature("trashhighlighter", true) {
     private val highlightType by ConfigDelegate<Int>("trashhighlighttype")
     private val color by ConfigDelegate<Color>("trashhighlightercolor")
+
     private val defaultList = listOf(
         FilteredItem("CRYPT_DREADLORD_SWORD", FilterType.EQUALS, InputType.ITEM_ID),
         FilteredItem("MACHINE_GUN_BOW", FilterType.EQUALS, InputType.ITEM_ID),
@@ -62,7 +63,9 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
         FilteredItem("ZOMBIE_KNIGHT", FilterType.CONTAINS, InputType.ITEM_ID),
         FilteredItem("ENCHANTED_ROTTEN_FLESH", FilterType.CONTAINS, InputType.ITEM_ID)
     )
-    val trashFilters = DataUtils("trashFilters", defaultList.toMutableList(), object : TypeToken<MutableList<FilteredItem>>() {})
+
+    private val trashData = StoredFile("features/TrashHighlighter")
+    private var trashFilters: List<FilteredItem> by trashData.list("filters", FilteredItem.CODEC, defaultList)
 
     data class FilteredItem(
         var textInput: String,
@@ -80,6 +83,22 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
                 FilterType.CONTAINS -> input.contains(textInput)
                 FilterType.EQUALS -> input == textInput
                 FilterType.REGEX -> try { input.matches(textInput.toRegex()) } catch (_: Exception) { false }
+            }
+        }
+
+        companion object {
+            val CODEC: Codec<FilteredItem> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.STRING.fieldOf("textInput").forGetter { it.textInput },
+                    Codec.STRING.xmap(
+                        { FilterType.valueOf(it) },
+                        { it.name }
+                    ).fieldOf("selectedFilter").forGetter { it.selectedFilter },
+                    Codec.STRING.xmap(
+                        { InputType.valueOf(it) },
+                        { it.name }
+                    ).fieldOf("selectedInput").forGetter { it.selectedInput }
+                ).apply(instance, ::FilteredItem)
             }
         }
     }
@@ -134,7 +153,7 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
 
     private fun safeGetFilters(): List<FilteredItem> {
         return try {
-            trashFilters.getData()
+            trashFilters
         } catch (e: Exception) {
             LOGGER.warn("Error in Trash Highlighter\$getFilter: $e")
             emptyList()
@@ -148,8 +167,12 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
     }
 
     fun getFilters(): List<FilteredItem> = safeGetFilters()
-    fun setFilters(filters: List<FilteredItem>) = trashFilters.setData(filters.toMutableList())
-    fun resetToDefault() = trashFilters.setData(defaultList.toMutableList())
+    fun setFilters(filters: List<FilteredItem>) {
+        trashFilters = filters
+    }
+    fun resetToDefault() {
+        trashFilters = defaultList
+    }
 }
 
 class TrashHighlightText(
@@ -235,11 +258,6 @@ class TrashFilterGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     init {
         buildGui()
-    }
-
-    override fun onScreenClose() {
-        super.onScreenClose()
-        TrashHighlighter.trashFilters.save()
     }
 
     private fun createBlock(radius: Float): UIRoundedRectangle = UIRoundedRectangle(radius)

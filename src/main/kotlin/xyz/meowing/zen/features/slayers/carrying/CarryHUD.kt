@@ -29,7 +29,7 @@ object CarryHUD {
     }
 
     fun renderHUD(context: DrawContext) {
-        if (CarryCounter.carryees.isEmpty() || Zen.isInInventory || !HUDManager.isEnabled(name)) return
+        if (CarryCounter.carries.isEmpty() || Zen.isInInventory || !HUDManager.isEnabled(name)) return
 
         val x = HUDManager.getX(name)
         val y = HUDManager.getY(name)
@@ -48,18 +48,18 @@ object CarryHUD {
     }
 
     private fun getLines(): List<String> {
-        if (CarryCounter.carryees.isEmpty() || Zen.isInInventory) return emptyList()
+        if (CarryCounter.carries.isEmpty() || Zen.isInInventory) return emptyList()
 
         val lines = mutableListOf<String>()
         lines.add("$prefix §f§lCarries:")
-        CarryCounter.carryees.mapTo(lines) {
+        CarryCounter.carries.mapTo(lines) {
             "§7> §b${it.name}§f: §b${it.count}§f/§b${it.total} §7(${it.getTimeSinceLastBoss()} | ${it.getBossPerHour()}§7)"
         }
         return lines
     }
 
     fun checkRegistration() {
-        val shouldRegister = CarryCounter.carryees.isNotEmpty()
+        val shouldRegister = CarryCounter.carries.isNotEmpty()
         if (shouldRegister != isRegistered) {
             try {
                 if (shouldRegister) {
@@ -82,13 +82,13 @@ object CarryHUD {
     }
 
     private fun onGuiRender(context: DrawContext) {
-        if (CarryCounter.carryees.isEmpty() || !Zen.isInInventory || !HUDManager.isEnabled(name)) return
+        if (CarryCounter.carries.isEmpty() || !Zen.isInInventory || !HUDManager.isEnabled(name)) return
         buildRenderData()
         render(context)
     }
 
     private fun onMouseInput() {
-        if (CarryCounter.carryees.isEmpty() || !Zen.isInInventory) return
+        if (CarryCounter.carries.isEmpty() || !Zen.isInInventory) return
 
         val scale = HUDManager.getScale(name)
         buttons.find {
@@ -114,7 +114,7 @@ object CarryHUD {
         buttons.clear()
         renderItems.add(RenderItem("$prefix §f§lCarries:", x, y, Colors.WHITE, true))
 
-        CarryCounter.carryees.forEachIndexed { i, carryee ->
+        CarryCounter.carries.forEachIndexed { i, carryee ->
             val lineY = y + (12f * scale) + i * (12f * scale)
             val str = "§7> §b${carryee.name}§f: §b${carryee.count}§f/§b${carryee.total} §7(${carryee.getTimeSinceLastBoss()} | ${carryee.getBossPerHour()}§7)"
             val textWidth = client.textRenderer.getWidth(str) * scale

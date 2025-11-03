@@ -3,20 +3,19 @@ package xyz.meowing.zen.features.meowing
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
-data class Data(var meowcount: Double = 0.0)
-
 @Module
-object meowcount : Feature("meowcount") {
-    private val dataUtils = DataUtils("meowcount", Data())
+object MeowCount : Feature("meowcount") {
+    private val meowData = StoredFile("features/MeowCount")
+    var meowCount: Int by meowData.int("meowCount", 0)
 
     override fun addConfig() {
         ConfigManager
@@ -25,30 +24,24 @@ object meowcount : Feature("meowcount") {
                 ElementType.Switch(false)
             ))
             .addFeatureOption("", "Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.", "", ConfigElement(
-                    "",
-                    ElementType.TextParagraph("Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.")
+                "",
+                ElementType.TextParagraph("Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.")
             ))
     }
 
 
     override fun initialize() {
         register<ChatEvent.Send> { event ->
-            if (event.message.lowercase().contains("meow")) {
-                dataUtils.updateAndSave {
-                    meowcount++
-                }
-            }
+            if (event.message.lowercase().contains("meow")) meowCount++
         }
     }
-
-    fun getMeowCount(): Double = dataUtils.getData().meowcount
 }
 
 @Command
 object MeowCommand : Commodore("meowcount", "zenmeow", "zenmeowcount") {
     init {
         runs {
-            val count = meowcount.getMeowCount().toInt()
+            val count = MeowCount.meowCount
             KnitChat.fakeMessage("$prefix §fYou have meowed §b$count §ftimes!")
         }
     }

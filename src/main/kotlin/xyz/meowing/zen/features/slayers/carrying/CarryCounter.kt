@@ -1,11 +1,12 @@
 package xyz.meowing.zen.features.slayers.carrying
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.SimpleTimeMark
@@ -21,6 +22,7 @@ import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
@@ -47,9 +49,11 @@ object CarryCounter : Feature("carrycounter") {
     private val completedCarriesMap = ConcurrentHashMap<String, CompletedCarry>()
     private val bossPerHourCache = ConcurrentHashMap<String, Pair<String, SimpleTimeMark>>()
     private var lasttradeuser: String? = null
-    inline val carryees get() = carryeesByName.values.toList()
-    val dataUtils = DataUtils("carrylogs", CarryLogs())
-    val carryeesByName = ConcurrentHashMap<String, Carryee>()
+    inline val carries get() = carriesByName.values.toList()
+
+    private val carryData = StoredFile("features/CarryCounter")
+    var completedCarries: List<CompletedCarry> by carryData.list("completedCarries", CompletedCarry.CODEC, emptyList())
+    val carriesByName = ConcurrentHashMap<String, Carryee>()
 
     private val carrycountsend by ConfigDelegate<Boolean>("carrycountsend")
     private val carrysendmsg by ConfigDelegate<Boolean>("carrysendmsg")
@@ -67,8 +71,8 @@ object CarryCounter : Feature("carrycounter") {
                 ElementType.Switch(false)
             ))
             .addFeatureOption("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help", "", "", ConfigElement(
-                    "",
-                    ElementType.TextParagraph("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help")
+                "",
+                ElementType.TextParagraph("Use the command §c/carry help §rto see all the commands available. §7§oAlias: /zencarry help")
             ))
             .addFeatureOption("Send count", "", "QOL", ConfigElement(
                 "carrycountsend",
@@ -151,7 +155,7 @@ object CarryCounter : Feature("carrycounter") {
 
             playerDead.matcher(text).let { matcher ->
                 if (matcher.matches() && matcher.group(2) in bossNames) {
-                    carryeesByName[matcher.group(1)]?.reset()
+                    carriesByName[matcher.group(1)]?.reset()
                 }
             }
         }
@@ -160,14 +164,14 @@ object CarryCounter : Feature("carrycounter") {
             val name = event.name
             if (name.contains("Spawned by")) {
                 val hasBlackhole = event.entity.let { entity ->
-                    world?.entities?.any { Entity ->
-                        entity.distanceTo(Entity) <= 3f && Entity.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
+                    world?.entities?.any { worldEnt ->
+                        entity.distanceTo(worldEnt) <= 3f && worldEnt.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
                     }
                 } ?: false
 
                 if (hasBlackhole) return@createCustomEvent
                 val spawnerName = name.substringAfter("by: ")
-                carryeesByName[spawnerName]?.onSpawn(event.packet.id - 3)
+                carriesByName[spawnerName]?.onSpawn(event.packet.id - 3)
             }
         }
 
@@ -195,7 +199,7 @@ object CarryCounter : Feature("carrycounter") {
             val entity = event.entity
             val cleanName = entity.name.string.removeFormatting()
 
-            carryeesByName[cleanName]?.let {
+            carriesByName[cleanName]?.let {
                 if (player?.canSee(entity) == false) return@let
                 entity.glowThisFrame = true
                 entity.glowingColor = carryclientcolor.rgb
@@ -208,9 +212,8 @@ object CarryCounter : Feature("carrycounter") {
 
     private fun loadCompletedCarries() {
         try {
-            val carriesList = dataUtils.getData().completedCarries
             completedCarriesMap.clear()
-            carriesList.forEach { carry ->
+            completedCarries.forEach { carry ->
                 completedCarriesMap[carry.playerName] = carry
             }
             LOGGER.info("Data loaded.")
@@ -224,7 +227,7 @@ object CarryCounter : Feature("carrycounter") {
     }
 
     private fun checkRegistration() {
-        if (carryeesByName.isNotEmpty()) {
+        if (carriesByName.isNotEmpty()) {
             registerEvent("entityMetadata")
             registerEvent("entityDeath")
             registerEvent("bossGlow")
@@ -240,42 +243,51 @@ object CarryCounter : Feature("carrycounter") {
 
     fun addCarryee(name: String, total: Int): Carryee? {
         if (name.isBlank() || total <= 0) return null
-        val existing = carryeesByName[name]
+        val existing = carriesByName[name]
         if (existing != null) {
             existing.total += total
             return existing
         }
 
         val carryee = Carryee(name, total)
-        carryeesByName[name] = carryee
+        carriesByName[name] = carryee
         checkRegistration()
         return carryee
     }
 
     fun removeCarryee(name: String): Boolean {
         if (name.isBlank()) return false
-        val carryee = carryeesByName.remove(name) ?: return false
+        val carryee = carriesByName.remove(name) ?: return false
         carryee.bossID?.let { carryeesByBossId.remove(it) }
         checkRegistration()
         return true
     }
 
-    fun findCarryee(name: String): Carryee? = if (name.isBlank()) null else carryeesByName[name]
+    fun findCarryee(name: String): Carryee? = if (name.isBlank()) null else carriesByName[name]
 
     fun clearCarryees() {
-        carryeesByName.clear()
+        carriesByName.clear()
         carryeesByBossId.clear()
         checkRegistration()
     }
-
-    data class CarryLogs(val completedCarries: MutableList<CompletedCarry> = mutableListOf())
 
     data class CompletedCarry(
         val playerName: String,
         val totalCarries: Int,
         val lastKnownCount: Int = 0,
         var timestamp: Long
-    )
+    ) {
+        companion object {
+            val CODEC: Codec<CompletedCarry> = RecordCodecBuilder.create { instance ->
+                instance.group(
+                    Codec.STRING.fieldOf("playerName").forGetter { it.playerName },
+                    Codec.INT.fieldOf("totalCarries").forGetter { it.totalCarries },
+                    Codec.INT.optionalFieldOf("lastKnownCount", 0).forGetter { it.lastKnownCount },
+                    Codec.LONG.fieldOf("timestamp").forGetter { it.timestamp }
+                ).apply(instance, ::CompletedCarry)
+            }
+        }
+    }
 
     data class Carryee(
         val name: String,
@@ -402,17 +414,18 @@ object CarryCounter : Feature("carrycounter") {
 
             completedCarriesMap[name] = updatedCarry
 
-            val carriesList = dataUtils.getData().completedCarries
+            val carriesList = completedCarries.toMutableList()
             val existingIndex = carriesList.indexOfFirst { it.playerName == name }
             if (existingIndex != -1) carriesList[existingIndex] = updatedCarry
             else carriesList.add(updatedCarry)
 
-            dataUtils.save()
+            completedCarries = carriesList
+
             KnitChat.fakeMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime}s")
             Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
             showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000)
 
-            carryeesByName.remove(name)
+            carriesByName.remove(name)
             bossID?.let { carryeesByBossId.remove(it) }
             checkRegistration()
         }

@@ -74,12 +74,12 @@ open class Feature(
     }
 
     open fun onRegister() {
-        if (Debug.debugmode) LOGGER.info("$prefix §fRegistering §b$configKey")
+        if (Debug.debugMode) LOGGER.info("$prefix §fRegistering §b$configKey")
         setupLoops?.invoke()
     }
 
     open fun onUnregister() {
-        if (Debug.debugmode) LOGGER.info("$prefix §fUnregistering §b$configKey")
+        if (Debug.debugMode) LOGGER.info("$prefix §fUnregistering §b$configKey")
         cancelLoops()
     }
 

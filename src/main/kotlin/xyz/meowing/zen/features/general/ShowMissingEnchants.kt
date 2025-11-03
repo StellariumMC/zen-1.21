@@ -90,7 +90,7 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
 
     override fun onRegister() {
         try {
-            val constants = NEUApi.NeuConstantData.getData().getAsJsonObject("enchants")
+            val constants = NEUApi.neuConstantData.getAsJsonObject("enchants")
             enchantsData = constants?.getAsJsonObject("enchants")
             enchantPools = constants?.getAsJsonArray("enchant_pools")
             LOGGER.info("Loaded enchants in ShowMissingEnchants")

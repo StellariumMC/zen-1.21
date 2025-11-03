@@ -262,7 +262,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
         return when (shownBossesOption) {
             0 -> true
             1 -> {
-                CarryCounter.carryees.any {
+                CarryCounter.carries.any {
                     cleanSpawnerNametag.endsWith("by: ${it.name.removeFormatting()}")
                 }
             }
@@ -271,7 +271,7 @@ object SlayerDisplay : Feature("slayerdisplay", true) {
             }
             3 -> {
                 cleanSpawnerNametag.endsWith("by: $cleanPlayerName") ||
-                    CarryCounter.carryees.any {
+                    CarryCounter.carries.any {
                         cleanSpawnerNametag.endsWith("by: ${it.name.removeFormatting()}")
                     }
             }

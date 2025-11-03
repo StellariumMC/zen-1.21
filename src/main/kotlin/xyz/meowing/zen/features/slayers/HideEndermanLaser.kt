@@ -100,7 +100,7 @@ object HideEndermanLaser : Feature("hideendermanlaser", true) {
         val cleanPlayerName = playerName.removeFormatting()
 
         val isMyBoss = cleanSpawnerName.endsWith("by: $cleanPlayerName")
-        val isCarryBoss = CarryCounter.carryees.any {
+        val isCarryBoss = CarryCounter.carries.any {
             cleanSpawnerName.endsWith("by: ${it.name.removeFormatting()}")
         }
 

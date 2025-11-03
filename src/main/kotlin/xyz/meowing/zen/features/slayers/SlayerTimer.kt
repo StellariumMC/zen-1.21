@@ -8,24 +8,25 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.Utils.decodeRoman
 import kotlin.time.Duration
 
 @Module
 object SlayerTimer : Feature("slayertimer", true) {
-    val slayerRecord = DataUtils("slayerRecords", JsonObject())
+    private val slayerData = StoredFile("features/SlayerTimer")
+    var slayerRecord: JsonObject by slayerData.jsonObject("records", JsonObject())
 
     override fun addConfig() {
         ConfigManager
             .addFeature("Slayer timer", "Logs your time to kill slayer bosses to chat.", "Slayers", ConfigElement(
-                    "slayertimer",
-                    ElementType.Switch(false)
+                "slayertimer",
+                ElementType.Switch(false)
             ))
     }
 
@@ -48,17 +49,15 @@ object SlayerTimer : Feature("slayertimer", true) {
 
                 KnitChat.fakeMessage(KnitText.literal(message).onHover(hoverText).toVanilla())
 
-                slayerRecord.setData(slayerRecord.getData().apply {
+                slayerRecord = slayerRecord.deepCopy().apply {
                     addProperty("timeToKill${bossType.replace(" ", "_")}MS", timeTaken.millis)
-                })
-                slayerRecord.save()
+                }
             }
         }
     }
 
     fun getSelectedSlayerRecord(): Long {
-        val data = slayerRecord.getData()
-        return data.get("timeToKill${bossType.replace(" ", "_")}MS")?.asLong ?: Long.MAX_VALUE
+        return slayerRecord.get("timeToKill${bossType.replace(" ", "_")}MS")?.asLong ?: Long.MAX_VALUE
     }
 
     fun sendBossSpawnMessage(timeSinceQuestStart: Duration) {
@@ -68,12 +67,11 @@ object SlayerTimer : Feature("slayertimer", true) {
     }
 }
 
-
 @Command
 object SlayerPBCommand : Commodore("zenslayers", "zenpb") {
     init {
         runs {
-            val data = SlayerTimer.slayerRecord.getData()
+            val data = SlayerTimer.slayerRecord
             if (data.entrySet().isEmpty()) {
                 KnitChat.fakeMessage("$prefix §fYou have no recorded slayer boss kills.")
                 return@runs

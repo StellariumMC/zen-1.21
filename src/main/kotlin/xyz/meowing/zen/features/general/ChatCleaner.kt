@@ -1,5 +1,8 @@
 package xyz.meowing.zen.features.general
 
+import com.google.gson.Gson
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -19,7 +22,6 @@ import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.mixins.AccessorChatHud
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.client.gui.screen.ChatScreen
@@ -34,6 +36,7 @@ import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.KeyEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -44,7 +47,7 @@ import java.util.regex.Pattern
 enum class ChatFilterType { REGEX, EQUALS, CONTAINS }
 
 data class ChatPattern(
-    var pattern: String,
+    val pattern: String,
     val filterType: ChatFilterType
 ) {
     fun matches(message: String): Boolean {
@@ -54,15 +57,25 @@ data class ChatPattern(
             ChatFilterType.REGEX -> try { message.matches(pattern.toRegex()) } catch (_: Exception) { false }
         }
     }
-}
 
-data class ChatPatterns(val patterns: MutableList<ChatPattern> = mutableListOf())
+    companion object {
+        val CODEC: Codec<ChatPattern> = RecordCodecBuilder.create { instance ->
+            instance.group(
+                Codec.STRING.fieldOf("pattern").forGetter { it.pattern },
+                Codec.STRING.xmap(
+                    { ChatFilterType.valueOf(it) },
+                    { it.name }
+                ).fieldOf("filterType").forGetter { it.filterType }
+            ).apply(instance, ::ChatPattern)
+        }
+    }
+}
 
 @Module
 object ChatCleaner : Feature("chatcleaner") {
     private val chatcleanerkey by ConfigDelegate<Int>("chatcleanerkey")
-    val patterns get() = dataUtils.getData().patterns
-    val dataUtils = DataUtils("chatcleaner", ChatPatterns())
+    val patternData = StoredFile("features/ChatCleaner")
+    var patterns: List<ChatPattern> by patternData.list("patterns", ChatPattern.CODEC)
 
     override fun addConfig() {
         ConfigManager
@@ -71,8 +84,8 @@ object ChatCleaner : Feature("chatcleaner") {
                 ElementType.Switch(false)
             ))
             .addFeatureOption("Keybind to add message to filter", "Keybind to add message to filter", "Options", ConfigElement(
-                    "chatcleanerkey",
-                    ElementType.Keybind(GLFW.GLFW_KEY_H)
+                "chatcleanerkey",
+                ElementType.Keybind(GLFW.GLFW_KEY_H)
             ))
             .addFeatureOption("Chat Cleaner Filter GUI", "Chat Cleaner Filter GUI", "GUI", ConfigElement(
                 "chatcleanergui",
@@ -83,7 +96,6 @@ object ChatCleaner : Feature("chatcleaner") {
                 }
             ))
     }
-
 
     init {
         loadDefault()
@@ -117,11 +129,11 @@ object ChatCleaner : Feature("chatcleaner") {
         if (patterns.isEmpty()) {
             try {
                 javaClass.getResourceAsStream("/assets/zen/chatfilter.json")?.use { stream ->
-                    val defaultPatterns = com.google.gson.Gson().fromJson(
+                    val defaultPatterns = Gson().fromJson(
                         stream.bufferedReader().readText(), Array<String>::class.java
                     )
-                    patterns.addAll(defaultPatterns.map { ChatPattern(it, ChatFilterType.REGEX) })
-                    dataUtils.save()
+                    patterns = defaultPatterns.map { ChatPattern(it, ChatFilterType.REGEX) }
+                    patternData.forceSave()
                 }
             } catch (e: Exception) {
                 LOGGER.warn("Caught error while trying to load defaults in ChatCleaner: $e")
@@ -133,7 +145,8 @@ object ChatCleaner : Feature("chatcleaner") {
         if (pattern.isBlank() || patterns.any { it.pattern == pattern && it.filterType == filterType }) return false
         return try {
             if (filterType == ChatFilterType.REGEX) Pattern.compile(pattern)
-            patterns.add(ChatPattern(pattern, filterType))
+            patterns = patterns + ChatPattern(pattern, filterType)
+            patternData.forceSave()
             true
         } catch (_: Exception) {
             false
@@ -142,24 +155,31 @@ object ChatCleaner : Feature("chatcleaner") {
 
     fun removePattern(index: Int): Boolean {
         if (index < 0 || index >= patterns.size) return false
-        patterns.removeAt(index)
+        patterns = patterns.filterIndexed { i, _ -> i != index }
+        patternData.forceSave()
         return true
     }
 
     fun clearAllPatterns() {
-        patterns.clear()
+        patterns = emptyList()
+        patternData.forceSave()
     }
 
     fun updatePattern(index: Int, newPattern: String, filterType: ChatFilterType): Boolean {
         if (index < 0 || index >= patterns.size || newPattern.isBlank()) return false
         return try {
             if (filterType == ChatFilterType.REGEX) Pattern.compile(newPattern)
-            patterns[index] = ChatPattern(newPattern, filterType)
+            patterns = patterns.mapIndexed { i, pattern ->
+                if (i == index) ChatPattern(newPattern, filterType) else pattern
+            }
+            patternData.forceSave()
             true
         } catch (_: Exception) {
             false
         }
     }
+
+    fun getPatterns(): List<ChatPattern> = patterns
 }
 
 @Command
@@ -271,7 +291,7 @@ class ChatCleanerGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     override fun onScreenClose() {
         super.onScreenClose()
-        ChatCleaner.dataUtils.save()
+        ChatCleaner.patternData.forceSave()
     }
 
     private fun createBlock(radius: Float): UIRoundedRectangle = UIRoundedRectangle(radius)

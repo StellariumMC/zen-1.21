@@ -29,7 +29,6 @@ import xyz.meowing.zen.api.PlayerStats
 import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
@@ -47,10 +46,7 @@ import kotlin.collections.isNotEmpty
 
 @Module
 object Debug : Feature() {
-    data class PersistentData(var debugmode: Boolean = false)
-    val data = DataUtils("Debug", PersistentData())
-
-    inline val debugmode get() = data.getData().debugmode
+    var debugMode: Boolean by Zen.saveData.boolean("debugMode", false)
 
     init {
         createCustomEvent<RenderEvent.Entity.Post>("mobid") { event ->
@@ -65,13 +61,13 @@ object Debug : Feature() {
             )
         }
 
-        if (debugmode) {
+        if (debugMode) {
             registerEvent("mobid")
         }
     }
 
     override fun addConfig() {
-        if (!debugmode) return
+        if (!debugMode) return
 
         ConfigManager
             .addFeature("Config Test", "", "Debug", ConfigElement(
@@ -137,13 +133,9 @@ object DebugCommand : Commodore("zendebug", "zd") {
             runs { action: String ->
                 when (action.lowercase()) {
                     "toggle" -> {
-                        Debug.data.getData().debugmode = !Debug.data.getData().debugmode
-                        Debug.data.save()
-                        if (Debug.debugmode) {
-                            Debug.registerEvent("mobid")
-                        } else {
-                            Debug.unregisterEvent("mobid")
-                        }
+                        Debug.debugMode = !Debug.debugMode
+
+                        if (Debug.debugMode) Debug.registerEvent("mobid") else Debug.unregisterEvent("mobid")
                         KnitChat.fakeMessage("$prefix §fToggled dev mode. You will need to restart to see the difference in the Config UI")
                     }
                     "stats" -> {

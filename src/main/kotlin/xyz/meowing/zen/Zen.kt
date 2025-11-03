@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import net.fabricmc.api.ClientModInitializer
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Debug
 import xyz.meowing.zen.utils.LoopUtils
@@ -14,17 +13,22 @@ import org.apache.logging.log4j.Logger
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.loader.KnitModInfo
 import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.GameEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.ServerEvent
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.managers.feature.FeatureManager
 
-data class FirstInstall(val isFirstInstall: Boolean = true)
-
 object Zen : ClientModInitializer {
     private var showLoad = true
-    private var dataUtils: DataUtils<FirstInstall> = DataUtils("zen-data", FirstInstall())
+
+    @JvmStatic
+    val saveData = StoredFile("main/Main")
+
+    @JvmStatic
+    var isFirstInstall: Boolean by saveData.boolean("firstInstall", true)
+        private set
 
     @JvmStatic
     var isInInventory = false
@@ -60,9 +64,7 @@ object Zen : ClientModInitializer {
 
             KnitChat.fakeMessage(loadMessage)
 
-            val data = dataUtils.getData()
-
-            if (data.isFirstInstall) {
+            if (isFirstInstall) {
                 KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
                 KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
 
@@ -73,11 +75,10 @@ object Zen : ClientModInitializer {
                     .toVanilla()
 
                 KnitChat.fakeMessage(discordMessage)
-                dataUtils.setData(data.copy(isFirstInstall = false))
-                dataUtils.save()
+                isFirstInstall = false
             }
 
-            if (Debug.debugmode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
+            if (Debug.debugMode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
             LoopUtils.setTimeout(5000) {
                 UpdateChecker.checkForUpdates()

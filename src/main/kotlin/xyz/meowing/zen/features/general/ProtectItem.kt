@@ -1,10 +1,9 @@
 package xyz.meowing.zen.features.general
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.DataUtils
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.uuid
 import xyz.meowing.zen.utils.Render2D
@@ -29,6 +28,7 @@ import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import com.mojang.serialization.Codec
 import java.awt.Color
 
 //#if MC >= 1.21.9
@@ -43,8 +43,9 @@ import java.awt.Color
  */
 @Module
 object ProtectItem : Feature("protectitem", true) {
-    val protectedItems = DataUtils("protected_items", mutableSetOf<String>())
-    val protectedTypes = DataUtils("protected_types", mutableSetOf<String>())
+    val itemData = StoredFile("features/ProtectItem")
+    var protectedItems: Set<String> by itemData.set("protectedItems", Codec.STRING)
+    var protectedTypes: Set<String> by itemData.set("protectedTypes", Codec.STRING)
 
     override fun addConfig() {
         ConfigManager
@@ -144,10 +145,10 @@ object ProtectItem : Feature("protectitem", true) {
 
     private fun isProtected(item: ItemStack): Boolean {
         val itemUuid = item.uuid
-        if (itemUuid.isNotEmpty() && itemUuid in protectedItems()) return true
+        if (itemUuid.isNotEmpty() && itemUuid in protectedItems) return true
 
         val itemId = item.item.toString()
-        return itemId in protectedTypes()
+        return itemId in protectedTypes
     }
 
     private fun sendProtectionMessage(action: String, itemName: String) {
@@ -175,24 +176,24 @@ object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zen
             val itemUuid = heldItem.uuid
             val itemId = heldItem.item.toString()
             if (itemUuid.isEmpty()) {
-                ProtectItem.protectedTypes.update {
-                    if (itemId in this) {
-                        remove(itemId)
-                        KnitChat.fakeMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
-                    } else {
-                        add(itemId)
-                        KnitChat.fakeMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
-                    }
+                if (itemId in ProtectItem.protectedTypes) {
+                    ProtectItem.protectedTypes -= itemId
+                    ProtectItem.itemData.forceSave()
+                    KnitChat.fakeMessage("$prefix §fRemoved all ${heldItem.name.string} §ffrom protected items!")
+                } else {
+                    ProtectItem.protectedTypes += itemId
+                    ProtectItem.itemData.forceSave()
+                    KnitChat.fakeMessage("$prefix §fAdded all ${heldItem.name.string} §fto protected items! §7(No UUID - protecting by type)")
                 }
             } else {
-                ProtectItem.protectedItems.update {
-                    if (itemUuid in this) {
-                        remove(itemUuid)
-                        KnitChat.fakeMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
-                    } else {
-                        add(itemUuid)
-                        KnitChat.fakeMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
-                    }
+                if (itemUuid in ProtectItem.protectedItems) {
+                    ProtectItem.protectedItems -= itemUuid
+                    ProtectItem.itemData.forceSave()
+                    KnitChat.fakeMessage("$prefix §fRemoved ${heldItem.name.string} §ffrom protected items!")
+                } else {
+                    ProtectItem.protectedItems += itemUuid
+                    ProtectItem.itemData.forceSave()
+                    KnitChat.fakeMessage("$prefix §fAdded ${heldItem.name.string} §fto protected items!")
                 }
             }
         }
@@ -238,8 +239,8 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
     private fun loadInventory() {
         slots.clear()
         val player = player ?: return
-        val protectedSet = ProtectItem.protectedItems()
-        val protectedTypeSet = ProtectItem.protectedTypes()
+        val protectedSet = ProtectItem.protectedItems
+        val protectedTypeSet = ProtectItem.protectedTypes
 
         val guiX = (width - guiWidth) / 2
         val guiY = (height - guiHeight) / 2
@@ -431,33 +432,31 @@ class ItemProtectGUI : Screen(Text.literal("Item Protection")) {
 
     private fun toggleProtection(slot: InventorySlot) {
         if (slot.uuid.isNotEmpty()) {
-            ProtectItem.protectedItems.update {
-                if (slot.uuid in this) {
-                    remove(slot.uuid)
-                    slot.isProtected = false
-                } else {
-                    add(slot.uuid)
-                    slot.isProtected = true
-                }
+            if (slot.uuid in ProtectItem.protectedItems) {
+                ProtectItem.protectedItems -= slot.uuid
+                slot.isProtected = false
+            } else {
+                ProtectItem.protectedItems += slot.uuid
+                slot.isProtected = true
             }
+            ProtectItem.itemData.forceSave()
         } else {
-            ProtectItem.protectedTypes.update {
-                if (slot.itemId in this) {
-                    remove(slot.itemId)
-                    slots.forEach { s ->
-                        if (s.itemId == slot.itemId) {
-                            s.isTypeProtected = false
-                        }
+            if (slot.itemId in ProtectItem.protectedTypes) {
+                ProtectItem.protectedTypes -= slot.itemId
+                slots.forEach { s ->
+                    if (s.itemId == slot.itemId) {
+                        s.isTypeProtected = false
                     }
-                } else {
-                    add(slot.itemId)
-                    slots.forEach { s ->
-                        if (s.itemId == slot.itemId) {
-                            s.isTypeProtected = true
-                        }
+                }
+            } else {
+                ProtectItem.protectedTypes += slot.itemId
+                slots.forEach { s ->
+                    if (s.itemId == slot.itemId) {
+                        s.isTypeProtected = true
                     }
                 }
             }
+            ProtectItem.itemData.forceSave()
         }
     }
 

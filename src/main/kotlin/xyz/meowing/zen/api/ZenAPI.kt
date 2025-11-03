@@ -33,6 +33,7 @@ object ZenAPI {
             LOGGER.warn("Max reconnection attempts ($MAX_RECONNECT_ATTEMPTS) reached. Stopping reconnection.")
             return
         }
+
         val delayMillis = (BASE_RECONNECT_DELAY * 2.0.pow(reconnectAttempts.toDouble())).toLong()
         reconnectAttempts++
         LOGGER.info("Reconnecting in ${delayMillis / 1000} seconds...")

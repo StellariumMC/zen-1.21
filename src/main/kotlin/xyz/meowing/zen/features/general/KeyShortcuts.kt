@@ -1,5 +1,7 @@
 package xyz.meowing.zen.features.general
 
+import com.mojang.serialization.Codec
+import com.mojang.serialization.codecs.RecordCodecBuilder
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.WindowScreen
@@ -15,7 +17,6 @@ import gg.essential.universal.UKeyboard
 import xyz.meowing.zen.ui.constraint.ChildHeightConstraint
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.createBlock
 import org.lwjgl.glfw.GLFW
@@ -28,6 +29,7 @@ import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.KeyEvent
 import xyz.meowing.zen.events.core.MouseEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -35,16 +37,24 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 data class KeybindEntry(
-    var keys: MutableList<Int>,
-    var command: String
-)
-
-data class KeybindData(val bindings: MutableList<KeybindEntry> = mutableListOf())
+    val keys: List<Int>,
+    val command: String
+) {
+    companion object {
+        val CODEC: Codec<KeybindEntry> = RecordCodecBuilder.create { instance ->
+            instance.group(
+                Codec.INT.listOf().fieldOf("keys").forGetter { it.keys },
+                Codec.STRING.fieldOf("command").forGetter { it.command }
+            ).apply(instance, ::KeybindEntry)
+        }
+    }
+}
 
 @Module
 object KeyShortcuts : Feature("keyshortcuts") {
-    val bindings get() = dataUtils.getData().bindings
-    val dataUtils = DataUtils("keybind", KeybindData())
+    val bindingData = StoredFile("features/KeyShortcuts")
+    var bindings: List<KeybindEntry> by bindingData.list("bindings", KeybindEntry.CODEC)
+
     private val pressedKeys = mutableSetOf<Int>()
     private val pressedMouseButtons = mutableSetOf<Int>()
     private val triggeredBindings = mutableSetOf<KeybindEntry>()
@@ -120,22 +130,29 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     fun addBinding(keys: List<Int>, command: String): Boolean {
         if (command.isBlank() || keys.isEmpty() || bindings.any { it.keys == keys }) return false
-        bindings.add(KeybindEntry(keys.toMutableList(), command))
+        bindings = bindings + KeybindEntry(keys, command)
+        bindingData.forceSave()
         return true
     }
 
     fun removeBinding(index: Int): Boolean {
         if (index < 0 || index >= bindings.size) return false
-        bindings.removeAt(index)
+        bindings = bindings.filterIndexed { i, _ -> i != index }
+        bindingData.forceSave()
         return true
     }
 
     fun updateBinding(index: Int, keys: List<Int>, command: String): Boolean {
         if (index < 0 || index >= bindings.size || command.isBlank() || keys.isEmpty()) return false
         if (bindings.any { it.keys == keys && bindings.indexOf(it) != index }) return false
-        bindings[index] = KeybindEntry(keys.toMutableList(), command)
+        bindings = bindings.mapIndexed { i, binding ->
+            if (i == index) KeybindEntry(keys, command) else binding
+        }
+        bindingData.forceSave()
         return true
     }
+
+    fun getBindings(): List<KeybindEntry> = bindings
 }
 
 @Command
@@ -316,7 +333,7 @@ class KeybindGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     override fun onScreenClose() {
         super.onScreenClose()
-        KeyShortcuts.dataUtils.save()
+        KeyShortcuts.bindingData.forceSave()
     }
 
     override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {

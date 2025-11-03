@@ -10,7 +10,6 @@ import gg.essential.elementa.components.*
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.NetworkUtils.createConnection
 import xyz.meowing.zen.utils.TickUtils
@@ -36,10 +35,8 @@ object UpdateChecker {
     private var modrinthDownloadUrl: String? = null
     var forceUpdate = false
 
-    private val settingsData = DataUtils("update_settings", UpdateSettings())
-    private val dontShowForVersion: String? get() = settingsData.getData().dontShowForVersion
+    var dontShowForVersion: String by Zen.saveData.string("dontShowForVersion")
 
-    data class UpdateSettings(val dontShowForVersion: String? = null)
     data class GitHubRelease(val tag_name: String, val html_url: String, val prerelease: Boolean, val assets: List<GitHubAsset>)
     data class GitHubAsset(val name: String, val browser_download_url: String)
     data class ModrinthVersion(val id: String, val version_number: String, val date_published: String, val game_versions: List<String>, val loaders: List<String>, val status: String, val version_type: String, val files: List<ModrinthFile>)
@@ -128,7 +125,6 @@ object UpdateChecker {
     fun getModrinthUrl() = modrinthUrl
     fun getGithubDownloadUrl() = githubDownloadUrl
     fun getModrinthDownloadUrl() = modrinthDownloadUrl
-    fun setDontShowForVersion(version: String) = settingsData.setData(UpdateSettings(version))
 }
 
 class UpdateGUI : WindowScreen(ElementaVersion.V10) {
@@ -266,7 +262,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         } childOf mainContainer
 
         createButton("Don't Show Again", colors["element"]!!, colors["elementHover"]!!) {
-            UpdateChecker.setDontShowForVersion(UpdateChecker.getLatestVersion() ?: "")
+            UpdateChecker.dontShowForVersion = UpdateChecker.getLatestVersion() ?: ""
             client?.setScreen(null)
         }.apply {
             setX(0.percent())

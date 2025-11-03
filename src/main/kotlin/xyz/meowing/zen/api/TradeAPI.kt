@@ -2,9 +2,8 @@ package xyz.meowing.zen.api
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import me.owdding.ktmodules.Module
+import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.utils.DataUtils
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.chestName
@@ -14,15 +13,16 @@ import net.minecraft.registry.Registries
 import net.minecraft.screen.ScreenHandler
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
 
 @Module
 object TradeAPI {
-    data class TradeLogs(val tradeHistory: JsonObject = JsonObject())
+    private val tradeData = StoredFile("api/TradeAPI")
+    private var tradeHistory: JsonObject by tradeData.jsonObject("tradeHistory")
 
-    private val save = DataUtils("TradeAPI", TradeLogs())
     private var inTradeMenu = false
     private var lastTradeMenu: ScreenHandler? = null
     private var tradingWith = ""
@@ -33,11 +33,11 @@ object TradeAPI {
 
     init {
         TickUtils.loop(20) {
-            if (world == null) return@loop
             if (client.currentScreen == null) inTradeMenu = false
+            val world = world ?: return@loop
 
             if (tradingWithSub.isNotEmpty()) {
-                world!!.players.find { it.name.string.contains(tradingWithSub) }?.let {
+                world.players.find { it.name.string.contains(tradingWithSub) }?.let {
                     tradingWith = it.name.string
                 }
             }
@@ -80,10 +80,9 @@ object TradeAPI {
         trade.addProperty("username", tradingWith)
 
         val date = Utils.getFormattedDate()
-        save.updateAndSave {
-            if (!tradeHistory.has(date)) tradeHistory.add(date, JsonArray())
-            tradeHistory[date].asJsonArray.add(trade)
-        }
+        if (!tradeHistory.has(date)) tradeHistory.add(date, JsonArray())
+        tradeHistory[date].asJsonArray.add(trade)
+        tradeData.forceSave()
 
         tradingWith = ""
     }
@@ -97,8 +96,7 @@ object TradeAPI {
                 if (stack.name.string.removeFormatting().endsWith("coins")) {
                     coins += parseCoins(stack.name.string.removeFormatting())
                 } else {
-                    if (!stack.isEmpty)
-                        items.add(createItemJson(stack))
+                    if (!stack.isEmpty) items.add(createItemJson(stack))
                 }
             }
         }
@@ -124,5 +122,5 @@ object TradeAPI {
         }
     }
 
-    fun getTradeHistory(): JsonObject = save().tradeHistory
+    fun getTradeHistory(): JsonObject = tradeHistory
 }

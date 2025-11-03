@@ -3,55 +3,80 @@
 package xyz.meowing.zen.api.data
 
 import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.mojang.serialization.Codec
 import tech.thatgravyboat.skyblockapi.utils.json.Json
 import tech.thatgravyboat.skyblockapi.utils.json.Json.toData
 import tech.thatgravyboat.skyblockapi.utils.json.Json.toJson
 import net.fabricmc.loader.api.FabricLoader
+import xyz.meowing.zen.Zen
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.GameEvent
 import java.io.File
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class StoredFile(path: String) {
+class StoredFile(val path: String) {
     private val file: File = File(FabricLoader.getInstance().configDir.toFile(), "zen/$path.json").apply {
         parentFile.mkdirs()
     }
 
     private var root: JsonObject? = null
-    private var dirty = false
 
     init {
-        EventBus.register<GameEvent.Stop> { if (dirty) save() }
+        EventBus.register<GameEvent.Stop> { save() }
     }
 
     private fun load(): JsonObject {
         if (root != null) return root!!
         return try {
-            if (!file.exists()) JsonObject()
-            else Json.gson.fromJson(file.readText(), JsonObject::class.java) ?: JsonObject()
+            if (!file.exists()) {
+                JsonObject()
+            } else {
+                val content = file.readText()
+                if (content.isBlank()) {
+                    JsonObject()
+                } else {
+                    val element = JsonParser.parseString(content)
+                    if (element.isJsonNull || !element.isJsonObject) {
+                        JsonObject()
+                    } else {
+                        element.asJsonObject
+                    }
+                }
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Zen.LOGGER.error("Caught exception while trying to load StoredFile for $path: $e")
             JsonObject()
         }.also { root = it }
     }
 
     private fun save() {
         try {
-            file.writeText(Json.gson.toJson(root))
-            dirty = false
+            val data = root ?: load()
+            file.writeText(Json.gson.toJson(data))
         } catch (e: Exception) {
-            e.printStackTrace()
+            Zen.LOGGER.error("Caught exception while trying to save StoredFile for $path: $e")
         }
     }
 
     fun reload() {
         root = null
-        dirty = false
     }
 
     fun forceSave() = save()
+
+    fun jsonObject(key: String, default: JsonObject = JsonObject()) = object : ReadWriteProperty<Any?, JsonObject> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>): JsonObject {
+            val obj = load()
+            return if (obj.has(key)) obj.getAsJsonObject(key) else default
+        }
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: JsonObject) {
+            val obj = load()
+            obj.add(key, value)
+        }
+    }
 
     inner class Value<T : Any>(
         private val key: String,
@@ -68,7 +93,6 @@ class StoredFile(path: String) {
             val obj = load()
             value.toJson(codec)?.let {
                 obj.add(key, it)
-                dirty = true
             }
         }
     }
@@ -88,6 +112,13 @@ class StoredFile(path: String) {
 
     fun <K : Any, V : Any> map(key: String, keyCodec: Codec<K>, valueCodec: Codec<V>, default: Map<K, V> = emptyMap()) =
         Value(key, default, Codec.unboundedMap(keyCodec, valueCodec))
+}
+
+class StoredJsonObject(default: JsonObject = JsonObject(), path: String) : ReadWriteProperty<Any?, JsonObject> {
+    private val file = StoredFile(path)
+    private val value = file.jsonObject("value", default)
+    override fun getValue(thisRef: Any?, property: KProperty<*>): JsonObject = value.getValue(thisRef, property)
+    override fun setValue(thisRef: Any?, property: KProperty<*>, value: JsonObject) = this.value.setValue(thisRef, property, value)
 }
 
 class StoredInt(default: Int = 0, path: String) : ReadWriteProperty<Any?, Int> {
