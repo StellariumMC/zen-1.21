@@ -70,7 +70,7 @@ object LaserTimer : Feature(
         Render3D.drawString(
             text,
             //#if MC >= 1.21.9
-            //$$ ent.entityPos,
+            //$$ entity.entityPos,
             //#else
             entity.pos,
             //#endif
