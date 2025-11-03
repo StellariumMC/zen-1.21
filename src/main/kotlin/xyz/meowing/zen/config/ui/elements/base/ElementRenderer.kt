@@ -41,9 +41,10 @@ class ElementRenderer(
                 }
             }
             is ElementType.Slider -> {
+                val initalValue = ConfigManager.getConfigValue(element.configKey)
                 SliderElement(
                     optionName,
-                    ConfigManager.getConfigValue(element.configKey) as? Double ?: type.default,
+                    (initalValue as? Number)?.toDouble() ?: type.default,
                     type.min,
                     type.max,
                     type.showDouble
