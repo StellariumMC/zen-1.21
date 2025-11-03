@@ -4,7 +4,6 @@ import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.decoration.ArmorStandEntity
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -14,6 +13,8 @@ import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -55,13 +56,13 @@ object HighlightStarMobs : Feature("boxstarmobs", island = SkyBlockIsland.THE_CA
             entities.clear()
         }
 
-        register<RenderEvent.EntityGlow> { event ->
+        register<RenderEvent.Entity.Pre> { event ->
             val ent = event.entity
             if (!entities.contains(ent.id)) return@register
 
             if (player?.canSee(event.entity) == true) {
-                event.shouldGlow = true
-                event.glowColor = boxstarmobscolor.toColorInt()
+                ent.glowThisFrame = true
+                ent.glowingColor = boxstarmobscolor.rgb
             }
         }
     }

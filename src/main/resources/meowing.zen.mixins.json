@@ -23,8 +23,7 @@
     "MixinPerspective",
     "MixinPlayerEntityRenderer",
     "MixinStatusEffectsDisplay",
-    "MixinTextRenderer",
-    "MixinWorldRenderer"
+    "MixinTextRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

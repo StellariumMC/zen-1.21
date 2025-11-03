@@ -5,7 +5,6 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.decoration.ArmorStandEntity
@@ -17,6 +16,8 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -80,8 +81,8 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
                 pos,
                 5f,
                 72,
-                firefreezeoverlaycolor.darker().toColorInt(),
-                firefreezeoverlaycolor.toColorInt()
+                firefreezeoverlaycolor.darker().rgb,
+                firefreezeoverlaycolor.rgb
             )
 
             val text = "§b${"%.1f".format(timer.ticks / 20.0)}s"
@@ -109,10 +110,12 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
             }
         }
 
-        register<RenderEvent.EntityGlow> { event ->
-            if (event.entity in frozenEntities) {
-                event.shouldGlow = true
-                event.glowColor = firefreezeoverlaycolor.toColorInt()
+        register<RenderEvent.Entity.Pre> { event ->
+            val entity = event.entity
+
+            if (entity in frozenEntities) {
+                entity.glowThisFrame = true
+                entity.glowingColor = firefreezeoverlaycolor.rgb
             }
         }
     }

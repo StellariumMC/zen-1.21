@@ -11,18 +11,6 @@ import xyz.meowing.knit.api.render.world.RenderContext
 
 sealed class RenderEvent {
     /**
-     * Posted when the game queries the entities to render as glowing,
-     *
-     * @see xyz.meowing.zen.mixins.MixinWorldRenderer
-     * @since 1.2.0
-     */
-    class EntityGlow(
-        val entity: net.minecraft.entity.Entity,
-        var shouldGlow: Boolean,
-        var glowColor: Int
-    ) : Event()
-
-    /**
      * Posted when the game tries to render the guardian lasers.
      *
      * @see xyz.meowing.zen.mixins.MixinGuardianEntityRenderer

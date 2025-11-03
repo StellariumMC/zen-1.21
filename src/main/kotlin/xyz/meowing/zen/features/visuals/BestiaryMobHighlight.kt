@@ -4,7 +4,6 @@ import xyz.meowing.zen.api.EntityDetection.sbMobID
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
 import net.minecraft.util.hit.EntityHitResult
 import xyz.meowing.knit.api.KnitChat
@@ -16,6 +15,8 @@ import xyz.meowing.zen.events.core.MouseEvent
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -36,14 +37,15 @@ object BestiaryMobHighlight : Feature("bestiarymobhighlighter", true) {
     }
 
     override fun initialize() {
-        register<RenderEvent.EntityGlow> { event ->
-            val mob = event.entity.sbMobID ?: return@register
+        register<RenderEvent.Entity.Pre> { event ->
+            val entity = event.entity
+            val mob = entity.sbMobID ?: return@register
             if (trackedMobs.contains(mob)) {
-                val visible = KnitClient.player?.canSee(event.entity)?: false
+                val visible = KnitClient.player?.canSee(entity)?: false
 
                 if (!visible) return@register
-                event.shouldGlow = true
-                event.glowColor = highlightcolor.toColorInt()
+                entity.glowThisFrame = true
+                entity.glowingColor = highlightcolor.rgb
             }
         }
 

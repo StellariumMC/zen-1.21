@@ -6,7 +6,6 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import xyz.meowing.zen.utils.Utils.toColorInt
 import xyz.meowing.zen.utils.Utils.toFloatArray
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
@@ -25,6 +24,8 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.isCurrentlyGlowing
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -91,10 +92,12 @@ object HighlightLivid : Feature(
 
 
     override fun initialize() {
-        createCustomEvent<RenderEvent.EntityGlow>("renderLivid") { event ->
-            if (lividEntity == event.entity) {
-                event.shouldGlow = true
-                event.glowColor = highlightlividcolor.toColorInt()
+        createCustomEvent<RenderEvent.Entity.Pre>("renderLivid") { event ->
+            val entity = event.entity
+
+            if (lividEntity == entity) {
+                entity.isCurrentlyGlowing = true
+                entity.glowingColor = highlightlividcolor.rgb
             }
         }
 

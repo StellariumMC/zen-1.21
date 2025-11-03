@@ -75,10 +75,6 @@ object Utils {
 
     fun String.removeEmotes() = replace(emoteRegex, "")
 
-    fun Color.toColorInt(): Int {
-        return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
-    }
-
     fun Int.toColorFloat(): Float {
         return this / 255f
     }

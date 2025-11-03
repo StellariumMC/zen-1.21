@@ -3,7 +3,6 @@ package xyz.meowing.zen.features.general
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.entity.Entity
 import net.minecraft.entity.mob.MobEntity
 import net.minecraft.entity.passive.PassiveEntity
@@ -15,6 +14,8 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -53,15 +54,13 @@ object EntityHighlight : Feature("entityhighlight") {
     }
 
     override fun initialize() {
-        register<RenderEvent.EntityGlow> { event ->
+        register<RenderEvent.Entity.Pre> { event ->
             val entity = event.entity
             val player = player ?: return@register
-
             if (entity == player || entity.isInvisible || !isEntityUnderCrosshair(entity)) return@register
 
-            val color = getEntityColor(entity)
-            event.shouldGlow = true
-            event.glowColor = color.toColorInt()
+            entity.glowThisFrame = true
+            entity.glowingColor = getEntityColor(entity).rgb
         }
     }
 

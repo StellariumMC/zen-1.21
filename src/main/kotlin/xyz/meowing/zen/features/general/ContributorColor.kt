@@ -5,12 +5,13 @@ import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -32,9 +33,9 @@ object ContributorColor {
                     val colorList = (info["highlightColor"] as? List<Int>)
                     val glowColor = if (colorList?.size == 4) {
                         val (r, g, b, a) = colorList
-                        Color(r, g, b, a).toColorInt()
+                        Color(r, g, b, a).rgb
                     } else {
-                        Color(0, 255, 255, 127).toColorInt()
+                        Color(0, 255, 255, 127).rgb
                     }
 
                     ContributorInfo(
@@ -47,20 +48,22 @@ object ContributorColor {
             },
             onError = {
                 contributorData = mapOf(
-                    "aurielyn" to ContributorInfo("§daurielyn§r", Color(255, 0, 255, 127).toColorInt(), listOf(255, 0, 255, 127)),
-                    "cheattriggers" to ContributorInfo("§cKiwi§r", Color(255, 0, 0, 127).toColorInt(), listOf(255, 0, 0, 127)),
-                    "Aur0raDye" to ContributorInfo("§5Mango 6 7§r", Color(170, 0, 170, 127).toColorInt(), listOf(170, 0, 170, 127)),
-                    "Skyblock_Lobby" to ContributorInfo("§9Skyblock_Lobby§r", Color(85, 85, 255, 127).toColorInt(), listOf(85, 85, 255, 127))
+                    "aurielyn" to ContributorInfo("§daurielyn§r", Color(255, 0, 255, 127).rgb, listOf(255, 0, 255, 127)),
+                    "cheattriggers" to ContributorInfo("§cKiwi§r", Color(255, 0, 0, 127).rgb, listOf(255, 0, 0, 127)),
+                    "Aur0raDye" to ContributorInfo("§5Mango 6 7§r", Color(170, 0, 170, 127).rgb, listOf(170, 0, 170, 127)),
+                    "Skyblock_Lobby" to ContributorInfo("§9Skyblock_Lobby§r", Color(85, 85, 255, 127).rgb, listOf(85, 85, 255, 127))
                 )
                 updateTextReplacements()
             }
         )
 
-        EventBus.register<RenderEvent.EntityGlow> { event ->
-            contributorData?.get(event.entity.name?.string?.removeFormatting())?.let { info ->
-                if (player?.canSee(event.entity) == true) {
-                    event.shouldGlow = true
-                    event.glowColor = info.glowColor
+        EventBus.register<RenderEvent.Entity.Pre> { event ->
+            val entity = event.entity
+
+            contributorData?.get(entity.name?.string?.removeFormatting())?.let { info ->
+                if (player?.canSee(entity) == true) {
+                    entity.glowThisFrame = true
+                    entity.glowingColor = info.glowColor
                 }
             }
         }

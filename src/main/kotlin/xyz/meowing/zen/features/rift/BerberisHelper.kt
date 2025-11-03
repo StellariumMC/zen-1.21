@@ -3,7 +3,6 @@ package xyz.meowing.zen.features.rift
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.block.Blocks
 import net.minecraft.block.ShapeContext
 import net.minecraft.client.render.RenderLayer
@@ -78,7 +77,7 @@ object BerberisHelper : Feature(
                 targetPos.x - camPos.x,
                 targetPos.y - camPos.y,
                 targetPos.z - camPos.z,
-                berberishelpercolor.toColorInt()
+                berberishelpercolor.rgb
             )
         }
     }

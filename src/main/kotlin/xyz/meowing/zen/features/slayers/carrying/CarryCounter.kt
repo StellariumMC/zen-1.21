@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.slayers.carrying
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
@@ -14,7 +13,6 @@ import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.sound.SoundEvents
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.world
@@ -29,6 +27,8 @@ import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
@@ -179,22 +179,26 @@ object CarryCounter : Feature("carrycounter") {
             }
         }
 
-        createCustomEvent<RenderEvent.EntityGlow>("bossGlow") { event ->
+        createCustomEvent<RenderEvent.Entity.Pre>("bossGlow") { event ->
             if (!carrybosshighlight) return@createCustomEvent
-            carryeesByBossId[event.entity.id]?.let {
-                if (player?.canSee(event.entity) == false) return@let
-                event.shouldGlow = true
-                event.glowColor = carrybosscolor.toColorInt()
+            val entity = event.entity
+
+            carryeesByBossId[entity.id]?.let {
+                if (player?.canSee(entity) == false) return@let
+                entity.glowThisFrame = true
+                entity.glowingColor = carrybosscolor.rgb
             }
         }
 
-        createCustomEvent<RenderEvent.EntityGlow>("clientGlow") { event ->
+        createCustomEvent<RenderEvent.Entity.Pre>("clientGlow") { event ->
             if (!carryclienthighlight) return@createCustomEvent
-            val cleanName = event.entity.name.string.removeFormatting()
+            val entity = event.entity
+            val cleanName = entity.name.string.removeFormatting()
+
             carryeesByName[cleanName]?.let {
-                if (player?.canSee(event.entity) == false) return@let
-                event.shouldGlow = true
-                event.glowColor = carryclientcolor.toColorInt()
+                if (player?.canSee(entity) == false) return@let
+                entity.glowThisFrame = true
+                entity.glowingColor = carryclientcolor.rgb
             }
         }
 

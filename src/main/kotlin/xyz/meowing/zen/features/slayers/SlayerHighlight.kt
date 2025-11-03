@@ -9,7 +9,8 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.Utils.toColorInt
+import xyz.meowing.zen.utils.glowThisFrame
+import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
@@ -30,10 +31,12 @@ object SlayerHighlight : Feature("slayerhighlight", true) {
 
 
     override fun initialize() {
-        register<RenderEvent.EntityGlow> { event ->
-            if (player?.canSee(event.entity) == true && event.entity == getSlayerEntity()) {
-                event.shouldGlow = true
-                event.glowColor = slayerhighlightcolor.toColorInt()
+        register<RenderEvent.Entity.Pre> { event ->
+            val entity = event.entity
+
+            if (player?.canSee(entity) == true && entity == getSlayerEntity()) {
+                entity.glowThisFrame = true
+                entity.glowingColor = slayerhighlightcolor.rgb
             }
         }
     }

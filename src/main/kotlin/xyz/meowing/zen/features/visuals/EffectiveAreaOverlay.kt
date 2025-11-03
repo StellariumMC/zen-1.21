@@ -7,7 +7,6 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
-import xyz.meowing.zen.utils.Utils.toColorInt
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
 import net.minecraft.util.math.BlockPos
@@ -71,8 +70,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                                 Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                                 7f,
                                 72,
-                                effectiveareaoverlaycolor.darker().toColorInt(),
-                                effectiveareaoverlaycolor.toColorInt(),
+                                effectiveareaoverlaycolor.darker().rgb,
+                                effectiveareaoverlaycolor.rgb,
                             )
                         }
                         1 -> {

@@ -11,7 +11,6 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.isHolding
 import xyz.meowing.zen.utils.Render3D
-import xyz.meowing.zen.utils.Utils.toColorInt
 import java.awt.Color
 
 @Module
@@ -46,8 +45,8 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", island = SkyBlockIslan
                     //#endif
                     8f,
                     72,
-                    color.darker().toColorInt(),
-                    color.toColorInt()
+                    color.darker().rgb,
+                    color.rgb
                 )
             }
         }
