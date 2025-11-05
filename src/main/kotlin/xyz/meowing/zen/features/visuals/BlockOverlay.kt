@@ -16,34 +16,53 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object BlockOverlay : Feature("blockoverlay") {
-    private val blockoverlaycolor by ConfigDelegate<Color>("blockoverlaycolor")
-    private val blockbordercolor by ConfigDelegate<Color>("blockbordercolor")
-    private val blockoverlayfilled by ConfigDelegate<Boolean>("blockoverlayfilled")
-    private val blockoverlaybordered by ConfigDelegate<Boolean>("blockoverlaybordered")
+object BlockOverlay : Feature(
+    "blockOverlay"
+) {
+    private val blockOverlayColor by ConfigDelegate<Color>("blockOverlay.overlayColor")
+    private val blockBorderColor by ConfigDelegate<Color>("blockOverlay.borderColor")
+    private val blockOverlayFilled by ConfigDelegate<Boolean>("blockOverlay.filled")
+    private val blockOverlayBordered by ConfigDelegate<Boolean>("blockOverlay.bordered")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Block overlay", "", "Visuals", ConfigElement(
-                "blockoverlay",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Block Fill Color", "", "Options", ConfigElement(
-                "blockoverlaycolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 38))
-            ))
-            .addFeatureOption("Block Border Color", "", "Options", ConfigElement(
-                "blockbordercolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
-            .addFeatureOption("Filled block overlay", "", "Options", ConfigElement(
-                "blockoverlayfilled",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Bordered block overlay", "", "Options", ConfigElement(
-                "blockoverlaybordered",
-                ElementType.Switch(true)
-            ))
+            .addFeature(
+                "Block overlay",
+                "Customizes block selection overlay",
+                "Visuals",
+                ConfigElement(
+                    "blockOverlay",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Block fill color",
+                ConfigElement(
+                    "blockOverlay.overlayColor",
+                    ElementType.ColorPicker(Color(0, 255, 255, 38))
+                )
+            )
+            .addFeatureOption(
+                "Block border color",
+                ConfigElement(
+                    "blockOverlay.borderColor",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
+            .addFeatureOption(
+                "Filled block overlay",
+                ConfigElement(
+                    "blockOverlay.filled",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Bordered block overlay",
+                ConfigElement(
+                    "blockOverlay.bordered",
+                    ElementType.Switch(true)
+                )
+            )
     }
 
     override fun initialize() {
@@ -63,7 +82,7 @@ object BlockOverlay : Feature("blockoverlay") {
             val camPos = camera.pos
             event.cancel()
 
-            if (blockoverlaybordered) {
+            if (blockOverlayBordered) {
                 VertexRendering.drawOutline(
                     matrixStack,
                     consumers.getBuffer(RenderLayer.getLines()),
@@ -71,14 +90,14 @@ object BlockOverlay : Feature("blockoverlay") {
                     blockPos.x - camPos.x,
                     blockPos.y - camPos.y,
                     blockPos.z - camPos.z,
-                    blockbordercolor.rgb
+                    blockBorderColor.rgb
                 )
             }
 
-            if (blockoverlayfilled) {
+            if (blockOverlayFilled) {
                 Render3D.drawFilledShapeVoxel(
                     blockShape.offset(blockPos),
-                    blockoverlaycolor,
+                    blockOverlayColor,
                     consumers,
                     matrixStack
                 )

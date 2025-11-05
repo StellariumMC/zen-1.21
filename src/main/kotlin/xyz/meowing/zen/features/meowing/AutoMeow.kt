@@ -14,7 +14,9 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
 
 @Module
-object AutoMeow : Feature("automeow") {
+object AutoMeow : Feature(
+    "autoMeow"
+) {
     private val meows = arrayOf("mroww", "purr", "meowwwwww", "meow :3", "mrow", "moew", "mrow :3", "purrr :3")
     private val channels = mapOf(
         "Guild >" to ("gc" to 0),
@@ -23,25 +25,29 @@ object AutoMeow : Feature("automeow") {
         "Co-op >" to ("cc" to 3),
         "From " to ("r" to 4)
     )
-    private val automeowchannels by ConfigDelegate<Set<Int>>("automeowchannels")
+    private val autoMeowChannels by ConfigDelegate<Set<Int>>("autoMeow.channels")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Auto meow", "Auto Meow", "Meowing", ConfigElement(
-                "automeow",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("", "Replies to messages in chat with a random meow", "", ConfigElement(
-                    "",
-                    ElementType.TextParagraph("Replies to messages in chat with a random meow")
-            ))
-            .addFeatureOption("Auto Meow Response Channels", "", "Options", ConfigElement(
-                "automeowchannels",
-                ElementType.MultiCheckbox(
-                    options = listOf("Guild", "Party", "Officer", "Co-op", "Private Messages"),
-                    default = setOf(0, 1, 2, 3, 4)
+            .addFeature(
+                "Auto meow",
+                "Replies to messages in chat with a random meow",
+                "Meowing",
+                ConfigElement(
+                    "autoMeow",
+                    ElementType.Switch(false)
                 )
-            ))
+            )
+            .addFeatureOption(
+                "Auto meow response channels",
+                ConfigElement(
+                    "autoMeow.channels",
+                    ElementType.MultiCheckbox(
+                        options = listOf("Guild", "Party", "Officer", "Co-op", "Private Messages"),
+                        default = setOf(0, 1, 2, 3, 4)
+                    )
+                )
+            )
     }
 
     override fun initialize() {
@@ -53,7 +59,7 @@ object AutoMeow : Feature("automeow") {
 
             val (cmd, channelIndex) = channels.entries.firstOrNull { text.startsWith(it.key) }?.value ?: ("ac" to -1)
 
-            if (channelIndex !in automeowchannels) return@register
+            if (channelIndex !in autoMeowChannels) return@register
 
             TickUtils.schedule(Random.nextLong(10, 50)) {
                 KnitChat.sendCommand("$cmd ${meows.random()}")

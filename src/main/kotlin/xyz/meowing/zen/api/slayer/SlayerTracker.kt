@@ -1,24 +1,23 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.slayer
 
-import xyz.meowing.zen.api.EntityDetection.bossID
+import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.entity.mob.SpiderEntity
+import tech.thatgravyboat.skyblockapi.api.data.Perk
+import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.skyblock.EntityDetection
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.events.*
+import xyz.meowing.zen.events.EventBus
+import xyz.meowing.zen.events.core.EntityEvent
+import xyz.meowing.zen.events.core.LocationEvent
+import xyz.meowing.zen.events.core.ScoreboardEvent
+import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.features.slayers.SlayerTimer
 import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.SpiderEntity
-import tech.thatgravyboat.skyblockapi.api.data.Perk
-import xyz.meowing.zen.Zen
-import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.events.core.EntityEvent
-import xyz.meowing.zen.events.core.LocationEvent
-import xyz.meowing.zen.events.core.ScoreboardEvent
-import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.events.core.TickEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -132,7 +131,7 @@ object SlayerTracker {
 
         EventBus.register<EntityEvent.Join> { event ->
             TickUtils.scheduleServer(2) {
-                if (bossID != null && event.entity.id == bossID!! + 1 && event.entity is ArmorStandEntity) {
+                if (EntityDetection.bossID != null && event.entity.id == EntityDetection.bossID!! + 1 && event.entity is ArmorStandEntity) {
                     val name = event.entity.name.string.removeFormatting()
                     slayerMobRegex.find(name)?.let { matchResult ->
                         bossType = matchResult.value

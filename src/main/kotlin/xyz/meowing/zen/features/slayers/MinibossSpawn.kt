@@ -15,19 +15,30 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.TitleUtils
 
 @Module
-object MinibossSpawn : Feature("minibossspawn", true) {
-    private val showTitle by ConfigDelegate<Boolean>("minibossspawntitle")
+object MinibossSpawn : Feature(
+    "minibossSpawn",
+    true
+) {
+    private val showTitle by ConfigDelegate<Boolean>("minibossSpawn.title")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Miniboss spawn alert", "Miniboss spawn alert", "Slayers", ConfigElement(
-                "minibossspawn",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Show title on spawn", "", "Options", ConfigElement(
-                "minibossspawntitle",
-                ElementType.Switch(true)
-            ))
+            .addFeature(
+                "Miniboss spawn alert",
+                "Miniboss spawn alert",
+                "Slayers",
+                ConfigElement(
+                    "minibossSpawn",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Show title on spawn",
+                ConfigElement(
+                    "minibossSpawn.title",
+                    ElementType.Switch(true)
+                )
+            )
     }
 
     override fun initialize() {

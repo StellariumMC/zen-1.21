@@ -51,7 +51,9 @@ data class KeybindEntry(
 }
 
 @Module
-object KeyShortcuts : Feature("keyshortcuts") {
+object KeyShortcuts : Feature(
+    "keyShortcuts"
+) {
     val bindingData = StoredFile("features/KeyShortcuts")
     var bindings: List<KeybindEntry> by bindingData.list("bindings", KeybindEntry.CODEC)
 
@@ -61,18 +63,26 @@ object KeyShortcuts : Feature("keyshortcuts") {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Key Shortcuts", "", "General", ConfigElement(
-                "keyshortcuts",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Open Keybind Manager", "Open Keybind Manager", "GUI", ConfigElement(
-                "keyshortcutsgui",
-                ElementType.Button("Open Manager") {
-                    TickUtils.schedule(2) {
-                        client.setScreen(KeybindGui())
+            .addFeature(
+                "Key shortcuts",
+                "Create custom keybinds to execute commands",
+                "General",
+                ConfigElement(
+                    "keyShortcuts",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Open keybind manager",
+                ConfigElement(
+                    "keyShortcuts.guiButton",
+                    ElementType.Button("Open Manager") {
+                        TickUtils.schedule(2) {
+                            client.setScreen(KeybindGui())
+                        }
                     }
-                }
-            ))
+                )
+            )
     }
 
     override fun initialize() {
@@ -151,8 +161,6 @@ object KeyShortcuts : Feature("keyshortcuts") {
         bindingData.forceSave()
         return true
     }
-
-    fun getBindings(): List<KeybindEntry> = bindings
 }
 
 @Command
@@ -163,7 +171,7 @@ object KeybindCommand : Commodore("keybind", "zenkeybind", "zenkb") {
                 val message = KnitText
                     .literal("$prefix §cYou do not have the feature §bKeyShortcuts §cenabled!")
                     .onHover("Click to enable feature.")
-                    .onClick(ClickEvent.RunCommand("/zen updateConfig keyshortcuts true false"))
+                    .onClick(ClickEvent.RunCommand("/zen updateConfig keyShortcuts true false"))
                     .toVanilla()
 
                 KnitChat.fakeMessage(message)

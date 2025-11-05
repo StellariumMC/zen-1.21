@@ -13,14 +13,22 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object BatDeathTitle : Feature("batdeadtitle", true, SkyBlockIsland.THE_CATACOMBS) {
+object BatDeathTitle : Feature(
+    "batDeadTitle",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Bat Death Title", "Shows a title when bats die in dungeons", "Dungeons", ConfigElement(
-                "batdeadtitle",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Bat death title",
+                "Shows a title when bats die in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "batDeadTitle",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

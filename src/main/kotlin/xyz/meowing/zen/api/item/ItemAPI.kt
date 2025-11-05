@@ -1,18 +1,17 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.item
 
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.minecraft.item.ItemStack
+import xyz.meowing.knit.api.scheduler.TimeScheduler
+import xyz.meowing.zen.Zen
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
-import xyz.meowing.zen.utils.LoopUtils
 import xyz.meowing.zen.utils.NetworkUtils
-import net.minecraft.item.ItemStack
-import xyz.meowing.zen.Zen.LOGGER
-import xyz.meowing.zen.Zen.scope
-import xyz.meowing.zen.annotations.Module
 import java.util.concurrent.atomic.AtomicBoolean
 
 @Module
@@ -27,24 +26,24 @@ object ItemAPI {
     private var liveAuctionData by liveAuctionDataFile.jsonObject("data")
 
     init {
-        scope.launch {
+        Zen.scope.launch {
             delay(5000L)
 
             NEUApi.downloadAndProcessRepo()
 
-            LOGGER.info("Loaded ${skyblockItemData.entrySet().size} Items from saved data file")
+            Zen.LOGGER.info("Loaded ${skyblockItemData.entrySet().size} Items from saved data file")
 
             if (skyblockItemData.entrySet().isEmpty()) {
                 updateSkyblockItemData(false)
             } else {
                 initializationComplete.complete(Unit)
-                scope.launch {
+                Zen.scope.launch {
                     updateSkyblockItemData(false)
                 }
             }
         }
 
-        LoopUtils.loop(1000 * 60 * 10) {
+        TimeScheduler.schedule(1000 * 60 * 10) {
             if (!isLoading.get()) {
                 updateSkyblockItemData(false)
             }
@@ -85,7 +84,7 @@ object ItemAPI {
     }
 
     private fun loadNeuRepo(force: Boolean) {
-        LOGGER.info("Loading Skyblock Items from NEU Repo..")
+        Zen.LOGGER.info("Loading Skyblock Items from NEU Repo..")
         skyblockItemData = JsonObject()
 
         try {
@@ -107,9 +106,9 @@ object ItemAPI {
                 skyblockItemData.add(newKey, it.value)
             }
 
-            LOGGER.info("Loaded Skyblock Items from NEU Repo!")
+            Zen.LOGGER.info("Loaded Skyblock Items from NEU Repo!")
         } catch (e: Exception) {
-            LOGGER.error("There was a problem loading NEU Repo.. ${e.message}")
+            Zen.LOGGER.error("There was a problem loading NEU Repo.. ${e.message}")
         }
     }
 
@@ -128,9 +127,9 @@ object ItemAPI {
             return
         }
 
-        scope.launch {
+        Zen.scope.launch {
             try {
-                LOGGER.info("Updating Skyblock Item Data..")
+                Zen.LOGGER.info("Updating Skyblock Item Data..")
                 if (force) {
                     skyblockItemData = JsonObject()
                 }
@@ -154,18 +153,18 @@ object ItemAPI {
     }
 
     private fun loadPricingData() {
-        LOGGER.info("Loading Lowest Item Prices from SBT API")
+        Zen.LOGGER.info("Loading Lowest Item Prices from SBT API")
 
         try {
             NetworkUtils.getJson(
                 url = "https://zen.mrfast-developer.com/pricingData",
                 onSuccess = { json ->
                     if (json.entrySet().isEmpty()) {
-                        LOGGER.warn("There was a problem loading SBT Prices..")
+                        Zen.LOGGER.warn("There was a problem loading SBT Prices..")
                         return@getJson
                     }
 
-                    LOGGER.info("Loaded ${json.entrySet().size} Items From Zen Item API")
+                    Zen.LOGGER.info("Loaded ${json.entrySet().size} Items From Zen Item API")
 
                     json.entrySet().forEach { entry ->
                         val item = entry.value.asJsonObject
@@ -182,7 +181,7 @@ object ItemAPI {
                     }
                 },
                 onError = {
-                    LOGGER.error("There was a problem loading SBT Prices.. ${it.message}")
+                    Zen.LOGGER.error("There was a problem loading SBT Prices.. ${it.message}")
                     it.printStackTrace()
                 }
             )
@@ -191,11 +190,11 @@ object ItemAPI {
                 url = "https://zen.mrfast-developer.com/liveAuctions",
                 onSuccess = { json ->
                     if (json.entrySet().isEmpty()) {
-                        LOGGER.warn("There was a problem loading SBT Live Auctions..")
+                        Zen.LOGGER.warn("There was a problem loading SBT Live Auctions..")
                         return@getJson
                     }
 
-                    LOGGER.info("Loaded ${json.entrySet().size} Live Auctions From Zen Item API")
+                    Zen.LOGGER.info("Loaded ${json.entrySet().size} Live Auctions From Zen Item API")
 
                     json.entrySet().forEach { entry ->
                         val item = entry.value.asJsonObject
@@ -212,13 +211,13 @@ object ItemAPI {
                     }
                 },
                 onError = {
-                    LOGGER.error("There was a problem loading SBT Live Auctions.. ${it.message}")
+                    Zen.LOGGER.error("There was a problem loading SBT Live Auctions.. ${it.message}")
                     it.printStackTrace()
                 }
             )
         } catch (e: Exception) {
             e.printStackTrace()
-            LOGGER.error("There was a problem loading SBT Pricing Data..")
+            Zen.LOGGER.error("There was a problem loading SBT Pricing Data..")
         }
     }
 

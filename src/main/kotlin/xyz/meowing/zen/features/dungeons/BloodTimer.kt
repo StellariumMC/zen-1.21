@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -16,7 +15,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.util.regex.Pattern
 
 @Module
-object BloodTimer : Feature("bloodtimer", island = SkyBlockIsland.THE_CATACOMBS) {
+object BloodTimer : Feature(
+    "bloodTimer",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
     private val bloodstart = Pattern.compile("\\[BOSS] The Watcher: .+")
     private val dialogue = Pattern.compile("\\[BOSS] The Watcher: Let's see how you can handle this\\.")
     private val bloodcamp = Pattern.compile("\\[BOSS] The Watcher: You have proven yourself\\. You may pass\\.")
@@ -25,10 +27,15 @@ object BloodTimer : Feature("bloodtimer", island = SkyBlockIsland.THE_CATACOMBS)
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Blood helper", "Blood camp helper", "Dungeons", ConfigElement(
-                "bloodtimer",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Blood helper",
+                "Shows timers and alerts for Blood Room camping in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "bloodTimer",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

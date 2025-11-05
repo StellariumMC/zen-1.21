@@ -13,29 +13,37 @@ import xyz.meowing.zen.utils.Render2D.TextStyle
 import xyz.meowing.zen.utils.ScoreboardUtils
 
 @Module
-object CommissionDisplay : Feature("commissions", skyblockOnly = true) {
-    private const val name = "Commissions"
+object CommissionDisplay : Feature(
+    "commissionDisplay",
+    skyblockOnly = true
+) {
+    private const val NAME = "Commissions"
     private val commissions = mutableListOf<String>()
     private val hasData get() = commissions.isNotEmpty()
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Commission Display", "", "Mining", ConfigElement(
-                "commissions",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Commission display",
+                "Display active commissions",
+                "Mining",
+                ConfigElement(
+                    "commissionDisplay",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§9§lCommissions:\n§fGoblin Slayer: §c0%")
+        HUDManager.register(NAME, "§9§lCommissions:\n§fGoblin Slayer: §c0%")
 
         register<TablistEvent.Change> { parseTablist() }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(name) && hasData) {
-                val x = HUDManager.getX(name)
-                val y = HUDManager.getY(name)
-                val scale = HUDManager.getScale(name)
+            if (HUDManager.isEnabled(NAME) && hasData) {
+                val x = HUDManager.getX(NAME)
+                val y = HUDManager.getY(NAME)
+                val scale = HUDManager.getScale(NAME)
 
                 getDisplayLines().forEachIndexed { i, line ->
                     Render2D.renderString(event.context, line, x, y + i * 10 * scale, scale, textStyle = TextStyle.DROP_SHADOW)

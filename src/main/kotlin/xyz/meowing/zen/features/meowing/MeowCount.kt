@@ -13,20 +13,23 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object MeowCount : Feature("meowcount") {
+object MeowCount : Feature(
+    "meowCount"
+) {
     private val meowData = StoredFile("features/MeowCount")
     var meowCount: Int by meowData.int("meowCount", 0)
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Meow count", "Meow count", "Meowing", ConfigElement(
-                "meowcount",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("", "Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.", "", ConfigElement(
-                "",
-                ElementType.TextParagraph("Counts how many times you have meowed in chat. You can use the command §c/meowcount §rto check your meow count.")
-            ))
+            .addFeature(
+                "Meow count",
+                "Counts how many times you have meowed in chat. Use §c/meowcount §rto check your meow count",
+                "Meowing",
+                ConfigElement(
+                    "meowCount",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 

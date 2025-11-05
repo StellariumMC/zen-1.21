@@ -9,7 +9,7 @@ sealed class InternalEvent {
         /**
          * Posted when the NEUApi has finished loading the item data.
          *
-         * @see xyz.meowing.zen.api.NEUApi
+         * @see xyz.meowing.zen.api.item.NEUApi
          * @since 1.2.0
          */
         class Load : Event()

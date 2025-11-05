@@ -2,7 +2,7 @@ package xyz.meowing.zen.features.general
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import xyz.meowing.zen.api.NEUApi
+import xyz.meowing.zen.api.item.NEUApi
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
@@ -25,7 +25,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
  * @author NEU Contributors
  */
 @Module
-object ShowMissingEnchants : Feature("showmissingenchants", true) {
+object ShowMissingEnchants : Feature(
+    "showMissingEnchants",
+    true
+) {
     private var enchantsData: JsonObject? = null
     private var enchantPools: JsonArray? = null
     private val itemNameRegex = Regex("""\b(?:COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|SPECIAL|VERY SPECIAL|DIVINE)\b.*\b([A-Z]+)\b""")
@@ -40,10 +43,15 @@ object ShowMissingEnchants : Feature("showmissingenchants", true) {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Show Missing Enchants", "Show Missing Enchants", "General", ConfigElement(
-                "showmissingenchants",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Show missing enchants",
+                "Show missing enchants on your items",
+                "General",
+                ConfigElement(
+                    "showMissingEnchants",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

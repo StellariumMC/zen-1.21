@@ -10,15 +10,22 @@ import xyz.meowing.zen.features.Feature
 import java.util.regex.Pattern
 
 @Module
-object GuildJoinLeave : Feature("guildjoinleave") {
+object GuildJoinLeave : Feature(
+    "guildJoinLeave"
+) {
     private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean guild join/leave", "Clean guild join/leave", "General", ConfigElement(
-                "guildjoinleave",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Clean guild join/leave",
+                "Reformats guild join/leave messages",
+                "General",
+                ConfigElement(
+                    "guildJoinLeave",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {
@@ -41,15 +48,22 @@ object GuildJoinLeave : Feature("guildjoinleave") {
 }
 
 @Module
-object FriendJoinLeave : Feature("friendjoinleave") {
+object FriendJoinLeave : Feature(
+    "friendJoinLeave"
+) {
     private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Clean friend join/leave", "Clean friend join/leave", "General", ConfigElement(
-                "friendjoinleave",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Clean friend join/leave",
+                "Reformats friend join/leave messages",
+                "General",
+                ConfigElement(
+                    "friendJoinLeave",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 

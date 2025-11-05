@@ -22,20 +22,31 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 @Module
-object LarvaSilkLines : Feature("larvasilklines", island = SkyBlockIsland.THE_RIFT) {
+object LarvaSilkLines : Feature(
+    "larvaSilkLines",
+    island = SkyBlockIsland.THE_RIFT
+) {
     private var startingSilkPos: BlockPos? = null
-    private val larvasilklinescolor by ConfigDelegate<Color>("larvasilklinescolor")
+    private val larvaSilkLinesColor by ConfigDelegate<Color>("larvaSilkLines.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Larva silk display", "Larva silk lines display", "Rift", ConfigElement(
-                "larvasilklines",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "larvasilklinescolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Larva Silk display",
+                "Larva silk lines display",
+                "Rift",
+                ConfigElement(
+                    "larvaSilkLines",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "larvaSilkLines.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
 
@@ -47,7 +58,7 @@ object LarvaSilkLines : Feature("larvasilklines", island = SkyBlockIsland.THE_RI
                 val consumers = event.context.consumers()
                 val matrixStack = event.context.matrixStack()
                 val lookingAt = client.crosshairTarget
-                Render3D.drawSpecialBB(startingSilkPos!!, larvasilklinescolor, consumers, matrixStack)
+                Render3D.drawSpecialBB(startingSilkPos!!, larvaSilkLinesColor, consumers, matrixStack)
 
                 if (lookingAt is BlockHitResult && lookingAt.type == HitResult.Type.BLOCK) {
                     val pos = startingSilkPos!!
@@ -55,8 +66,8 @@ object LarvaSilkLines : Feature("larvasilklines", island = SkyBlockIsland.THE_RI
                     val start = Vec3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
                     val finish = Vec3d(lookingAtPos.x + 0.5, lookingAtPos.y + 0.5, lookingAtPos.z + 0.5)
 
-                    Render3D.drawLine(start, finish, 2f, larvasilklinescolor, consumers, matrixStack)
-                    Render3D.drawSpecialBB(lookingAtPos, larvasilklinescolor, consumers, matrixStack)
+                    Render3D.drawLine(start, finish, 2f, larvaSilkLinesColor, consumers, matrixStack)
+                    Render3D.drawSpecialBB(lookingAtPos, larvaSilkLinesColor, consumers, matrixStack)
                 }
             }
         }

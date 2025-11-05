@@ -22,18 +22,18 @@ object CarryHUD {
     private var isRegistered = false
     private var guiClickHandler: EventCall? = null
     private var guiDrawHandler: EventCall? = null
-    private const val name = "CarryHud"
+    private const val NAME = "CarryHud"
 
     fun initialize() {
-        HUDManager.register(name, "$prefix §f§lCarries:\n§7> §bPlayer1§f: §b5§f/§b10 §7(2.3s | 45/hr)\n§7> §bPlayer2§f: §b1§f/§b3 §7(15.7s | 32/hr)")
+        HUDManager.register(NAME, "$prefix §f§lCarries:\n§7> §bPlayer1§f: §b5§f/§b10 §7(2.3s | 45/hr)\n§7> §bPlayer2§f: §b1§f/§b3 §7(15.7s | 32/hr)")
     }
 
     fun renderHUD(context: DrawContext) {
-        if (CarryCounter.carries.isEmpty() || Zen.isInInventory || !HUDManager.isEnabled(name)) return
+        if (CarryCounter.carries.isEmpty() || Zen.isInInventory || !HUDManager.isEnabled(NAME)) return
 
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         buildRenderData()
         val lines = getLines()
@@ -75,14 +75,14 @@ object CarryHUD {
                     guiDrawHandler?.unregister()
                 }
                 isRegistered = shouldRegister
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 isRegistered = false
             }
         }
     }
 
     private fun onGuiRender(context: DrawContext) {
-        if (CarryCounter.carries.isEmpty() || !Zen.isInInventory || !HUDManager.isEnabled(name)) return
+        if (CarryCounter.carries.isEmpty() || !Zen.isInInventory || !HUDManager.isEnabled(NAME)) return
         buildRenderData()
         render(context)
     }
@@ -90,7 +90,7 @@ object CarryHUD {
     private fun onMouseInput() {
         if (CarryCounter.carries.isEmpty() || !Zen.isInInventory) return
 
-        val scale = HUDManager.getScale(name)
+        val scale = HUDManager.getScale(NAME)
         buttons.find {
             KnitMouse.Scaled.x >= it.x && KnitMouse.Scaled.x <= it.x + it.width * scale && KnitMouse.Scaled.y >= it.y && KnitMouse.Scaled.y <= it.y + it.height * scale
         }?.let { button ->
@@ -106,9 +106,9 @@ object CarryHUD {
     }
 
     private fun buildRenderData() {
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         renderItems.clear()
         buttons.clear()
@@ -142,7 +142,7 @@ object CarryHUD {
     }
 
     private fun render(context: DrawContext) {
-        val scale = HUDManager.getScale(name)
+        val scale = HUDManager.getScale(NAME)
         val mouseX = KnitMouse.Scaled.x
         val mouseY = KnitMouse.Scaled.y
 
@@ -160,7 +160,7 @@ object CarryHUD {
 
     private fun renderTooltip(context: DrawContext, mouseX: Double, mouseY: Double) {
         hoveredButton?.let { button ->
-            val scale = HUDManager.getScale(name)
+            val scale = HUDManager.getScale(NAME)
             val tooltipWidth = (client.textRenderer.getWidth(button.tooltip) + 8) * scale
             val tooltipHeight = 16 * scale
             val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (client.window.scaledWidth - tooltipWidth - 2).toDouble()).toInt()

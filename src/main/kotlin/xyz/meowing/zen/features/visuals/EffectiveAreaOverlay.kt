@@ -23,7 +23,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 @Module
-object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
+object EffectiveAreaOverlay : Feature(
+    "effectiveAreaOverlay",
+    true
+) {
     private val items = listOf(
         "BAT_WAND",
         "STARRED_BAT_WAND",
@@ -32,23 +35,34 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
         "SCYLLA",
         "VALKYRIE"
     )
-    private val effectiveareaoverlaycolor by ConfigDelegate<Color>("effectiveareaoverlaycolor")
-    private val renderMethod by ConfigDelegate<Int>("renderMethod")
+    private val color by ConfigDelegate<Color>("effectiveAreaOverlay.color")
+    private val renderMethod by ConfigDelegate<Int>("effectiveAreaOverlay.renderMethod")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Effective Area Overlay", "", "Visuals", ConfigElement(
-                "effectiveareaoverlay",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "effectiveareaoverlaycolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
-            .addFeatureOption("Render Method", "Choose the rendering method", "Options", ConfigElement(
-                "renderMethod",
-                ElementType.Dropdown(listOf("Circle", "Blocks"), 0)
-            ))
+            .addFeature(
+                "Effective area overlay",
+                "Shows your effective farming area",
+                "Visuals",
+                ConfigElement(
+                    "effectiveAreaOverlay",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "effectiveAreaOverlay.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
+            .addFeatureOption(
+                "Render method",
+                ConfigElement(
+                    "effectiveAreaOverlay.renderMethod",
+                    ElementType.Dropdown(listOf("Circle", "Blocks"), 0)
+                )
+            )
     }
 
     var lastBlockHit: BlockPos? = null
@@ -70,8 +84,8 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                                 Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                                 7f,
                                 72,
-                                effectiveareaoverlaycolor.darker().rgb,
-                                effectiveareaoverlaycolor.rgb,
+                                color.darker().rgb,
+                                color.rgb,
                             )
                         }
                         1 -> {
@@ -112,7 +126,7 @@ object EffectiveAreaOverlay : Feature("effectiveareaoverlay", true) {
                             cachedBlockShapes.forEach {
                                 Render3D.drawFilledShapeVoxel(
                                     it as VoxelShape,
-                                    effectiveareaoverlaycolor,
+                                    color,
                                     event.context.consumers(),
                                     event.context.matrixStack()
                                 )

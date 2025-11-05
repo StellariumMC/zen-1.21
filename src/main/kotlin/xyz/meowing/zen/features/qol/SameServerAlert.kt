@@ -12,16 +12,23 @@ import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
-object SameServerAlert : Feature("serveralert") {
-    private val regex = "Sending to server (.+)\\.\\.\\.".toRegex()
+object SameServerAlert : Feature(
+    "serverAlert"
+) {
+    private val regex = Regex("Sending to server (.+)\\.\\.\\.")
     private val servers = mutableMapOf<String, Long>()
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Same server alert", "", "QoL", ConfigElement(
-                "serveralert",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Same server alert",
+                "Alert when joining the same server",
+                "QoL",
+                ConfigElement(
+                    "serverAlert",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

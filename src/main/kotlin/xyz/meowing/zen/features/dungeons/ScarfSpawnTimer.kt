@@ -16,7 +16,7 @@ import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object ScarfSpawnTimer : Feature(
-    "scarfspawntimers",
+    "scarfSpawnTimers",
     island = SkyBlockIsland.THE_CATACOMBS,
     dungeonFloor = listOf(DungeonFloor.F2, DungeonFloor.M2)
 ) {
@@ -36,10 +36,15 @@ object ScarfSpawnTimer : Feature(
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Scarf Spawn Timers", "", "Dungeons", ConfigElement(
-                "scarfspawntimers",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Scarf spawn timers",
+                "Shows spawn timers for Scarf's minions and Scarf in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "scarfSpawnTimers",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
     override fun initialize() {

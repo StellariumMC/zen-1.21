@@ -30,18 +30,26 @@ object BerberisHelper : Feature(
     area = SkyBlockAreas.DREADFARM
 ) {
     private var blockPos: BlockPos? = null
-    private val berberishelpercolor by ConfigDelegate<Color>("berberishelpercolor")
+    private val berberisHelperColor by ConfigDelegate<Color>("berberisHelper.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Berberis Helper", "Berberis highlight", "Rift", ConfigElement(
-                "berberishelper",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "berberishelpercolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Berberis helper",
+                "Berberis highlight",
+                "Rift",
+                ConfigElement(
+                    "berberisHelper",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "berberisHelper.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
 
@@ -77,7 +85,7 @@ object BerberisHelper : Feature(
                 targetPos.x - camPos.x,
                 targetPos.y - camPos.y,
                 targetPos.z - camPos.z,
-                berberishelpercolor.rgb
+                berberisHelperColor.rgb
             )
         }
     }

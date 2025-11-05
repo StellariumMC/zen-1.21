@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
@@ -21,49 +20,57 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object ArrowPoison : Feature("arrowpoison", true) {
-    private const val name = "ArrowPoison"
-    private var twilight = 0
-    private var toxic = 0
+object ArrowPoison : Feature(
+    "arrowPoison",
+    true
+) {
+    private const val NAME = "Arrow Poison"
+    private var twilightCount = 0
+    private var toxicCount = 0
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Arrow poison tracker", "", "HUD", ConfigElement(
-                "arrowpoison",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Arrow poison tracker",
+                "Track arrow poisons present in your inventory",
+                "HUD",
+                ConfigElement(
+                    "arrowPoison",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 
     override fun initialize() {
-        HUDManager.registerCustom(name, 85, 17, this::HUDEditorRender)
+        HUDManager.registerCustom(NAME, 85, 17, this::HUDEditorRender)
 
         register<PacketEvent.Received> { event ->
             if (event.packet is InventoryS2CPacket || event.packet is SetPlayerInventoryS2CPacket || event.packet is ScreenHandlerSlotUpdateS2CPacket) updateCount()
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(name)) render(event.context)
+            if (HUDManager.isEnabled(NAME)) render(event.context)
         }
     }
 
     private fun updateCount() {
-        twilight = 0
-        toxic = 0
+        twilightCount = 0
+        toxicCount = 0
         val inventory = player?.inventory?.mainStacks ?: return
         inventory.forEach { item ->
             if (item == null) return@forEach
             val name = item.name.string.removeFormatting()
-            if (name.contains("Twilight Arrow Poison")) twilight += item.count
-            if (name.contains("Toxic Arrow Poison")) toxic += item.count
+            if (name.contains("Twilight Arrow Poison")) twilightCount += item.count
+            if (name.contains("Toxic Arrow Poison")) toxicCount += item.count
         }
     }
 
     private fun render(drawContext: DrawContext) {
-        if (twilight == 0 && toxic == 0) return
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        if (twilightCount == 0 && toxicCount == 0) return
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
         drawHUD(drawContext, x, y, scale, false)
     }
 
@@ -77,8 +84,8 @@ object ArrowPoison : Feature("arrowpoison", true) {
         val spacing = 4f * scale
         val twilightPotion = ItemStack(Items.PURPLE_DYE)
         val toxicPotion = ItemStack(Items.LIME_DYE)
-        val twilightStr = if (preview) "128" else twilight.toString()
-        val toxicStr = if (preview) "92" else toxic.toString()
+        val twilightStr = if (preview) "128" else twilightCount.toString()
+        val toxicStr = if (preview) "92" else toxicCount.toString()
         val textY = y + (iconSize - 8f) / 2f
         var currentX = x
 

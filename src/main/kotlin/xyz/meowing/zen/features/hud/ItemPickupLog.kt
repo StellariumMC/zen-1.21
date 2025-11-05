@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.api.ItemAPI
+import xyz.meowing.zen.api.item.ItemAPI
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
@@ -23,24 +23,33 @@ import java.awt.Color
 import kotlin.math.abs
 
 @Module
-object ItemPickupLog : Feature("itempickuplog") {
-    private const val name = "Item Pickup Log"
+object ItemPickupLog : Feature(
+    "itempickuplog"
+) {
+    private const val NAME = "Item Pickup Log"
     private var ignoreStacksRegex = listOf("""^§8Quiver.*""".toRegex(), """^§aSkyBlock Menu §7\(Click\)""".toRegex(), """^§bMagical Map""".toRegex())
-    private val abbreviateNumbers by ConfigDelegate<Boolean>("itempickuplogabbreviate")
     private val npcSellingStackRegex = """(.*) §8x\d+""".toRegex()
+    private val abbreviateNumbers by ConfigDelegate<Boolean>("itemPickupLog.abbreviate")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Item Pickup Log", "", "HUD", ConfigElement(
-                "itempickuplog",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Abbreviate Numbers", "", "Options", ConfigElement(
-                "itempickuplogabbreviate",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Item pickup log",
+                "Display picked up items on HUD",
+                "HUD",
+                ConfigElement(
+                    "itemPickupLog",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Abbreviate numbers",
+                ConfigElement(
+                    "itemPickupLog.abbreviate",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     private var previousInventory = mutableMapOf<String, Int>()
     private var currentInventory = mutableMapOf<String, Int>()
@@ -48,7 +57,7 @@ object ItemPickupLog : Feature("itempickuplog") {
     var displayLines = mutableMapOf<String, PickupEntry>()
 
     override fun initialize() {
-        HUDManager.register(name, "§a+5 §fPotato §6$16\n§c-4 §fHay Bale §6$54")
+        HUDManager.register(NAME, "§a+5 §fPotato §6$16\n§c-4 §fHay Bale §6$54")
 
         register<PacketEvent.ReceivedPost> { event ->
             if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
@@ -59,14 +68,14 @@ object ItemPickupLog : Feature("itempickuplog") {
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(name)) render(event.context)
+            if (HUDManager.isEnabled(NAME)) render(event.context)
         }
     }
 
     private fun render(context: DrawContext) {
-        val x = HUDManager.getX(name)
-        val y = HUDManager.getY(name)
-        val scale = HUDManager.getScale(name)
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+        val scale = HUDManager.getScale(NAME)
 
         val currentTime = System.currentTimeMillis()
         val visibleEntries = displayLines.values.filter { !it.isExpired() && it.count != 0 }

@@ -1,4 +1,4 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.item
 
 import xyz.meowing.zen.events.*
 import xyz.meowing.zen.mixins.AccessorPlayerInventory
@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
+import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.api.dungeons.DungeonClass
 import xyz.meowing.zen.api.location.SkyBlockIsland

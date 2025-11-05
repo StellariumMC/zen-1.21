@@ -6,12 +6,12 @@ import kotlinx.coroutines.SupervisorJob
 import net.fabricmc.api.ClientModInitializer
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Debug
-import xyz.meowing.zen.utils.LoopUtils
 import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.loader.KnitModInfo
+import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.GameEvent
@@ -80,7 +80,7 @@ object Zen : ClientModInitializer {
 
             if (Debug.debugMode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
 
-            LoopUtils.setTimeout(5000) {
+            TimeScheduler.schedule(5000) {
                 UpdateChecker.checkForUpdates()
             }
 

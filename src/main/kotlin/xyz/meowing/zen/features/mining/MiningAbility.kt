@@ -20,39 +20,50 @@ import xyz.meowing.zen.utils.Utils
 import kotlin.math.max
 
 @Module
-object MiningAbility : Feature("miningability", skyblockOnly = true) {
+object MiningAbility : Feature(
+    "miningAbility",
+    skyblockOnly = true
+) {
+    private const val NAME = "Mining Ability"
+    private val showTitle by ConfigDelegate<Boolean>("miningAbility.showTitle")
+    private val COOLDOWN_REGEX = Regex("""(\d+(?:\.\d+)?)s""")
 
-    private const val name = "Mining Ability"
-    private var abilityName: String = ""
-    private var cooldownSeconds: Float = 0f
-    private var lastUpdateTime = TimeUtils.zero
     private var hasWidget: Boolean = false
     private var wasOnCooldown: Boolean = false
-    private val showTitle by ConfigDelegate<Boolean>("miningabilitytitle")
-    private val COOLDOWN_REGEX = Regex("""(\d+(?:\.\d+)?)s""")
+    private var lastUpdateTime = TimeUtils.zero
+    private var abilityName: String = ""
+    private var cooldownSeconds: Float = 0f
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Mining Ability", "", "Mining", ConfigElement(
-                "miningability",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Ability Title", "Show Title", "Options", ConfigElement(
-                "miningabilitytitle",
-                ElementType.Switch(true)
-            ))
+            .addFeature(
+                "Mining ability",
+                "Mining ability cooldown tracker",
+                "Mining",
+                ConfigElement(
+                    "miningAbility",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Show title",
+                ConfigElement(
+                    "miningAbility.showTitle",
+                    ElementType.Switch(true)
+                )
+            )
     }
 
     override fun initialize() {
-        HUDManager.register(name, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable")
+        HUDManager.register(NAME, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable")
 
         register<TablistEvent.Change> { parseTablist() }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(name) && hasWidget) {
-                val x = HUDManager.getX(name)
-                val y = HUDManager.getY(name)
-                val scale = HUDManager.getScale(name)
+            if (HUDManager.isEnabled(NAME) && hasWidget) {
+                val x = HUDManager.getX(NAME)
+                val y = HUDManager.getY(NAME)
+                val scale = HUDManager.getScale(NAME)
 
                 getDisplayLines().forEachIndexed { index, line ->
                     Render2D.renderString(event.context, line, x, y + index * 10 * scale, scale, textStyle = TextStyle.DROP_SHADOW)
@@ -114,6 +125,7 @@ object MiningAbility : Feature("miningability", skyblockOnly = true) {
         } else if (!isAvailable) {
             wasOnCooldown = true
         }
+
         val statusText = if (isAvailable) {
             "§a§lAvailable"
         } else {

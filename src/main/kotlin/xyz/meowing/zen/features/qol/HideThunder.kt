@@ -7,12 +7,19 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 
 @Module
-object HideThunder : Feature("hidethunder") {
+object HideThunder : Feature(
+    "hideThunder"
+) {
     override fun addConfig() {
         ConfigManager
-            .addFeature("Hide thunder", "Hide thunder", "QoL", ConfigElement(
-                "hidethunder",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Hide thunder",
+                "Hides thunder strikes",
+                "QoL",
+                ConfigElement(
+                    "hideThunder",
+                    ElementType.Switch(false)
+                )
+            )
     }
 }

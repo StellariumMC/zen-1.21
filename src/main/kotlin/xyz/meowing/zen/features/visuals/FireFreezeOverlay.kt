@@ -21,23 +21,34 @@ import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
-object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
+object FireFreezeOverlay : Feature(
+    "fireFreezeOverlay",
+    true
+) {
     private var activatedPos: Vec3d? = null
     private var overlayTimerId: Long? = null
     private var freezeTimerId: Long? = null
     private var frozenEntities = mutableSetOf<Entity>()
-    private val firefreezeoverlaycolor by ConfigDelegate<Color>("firefreezeoverlaycolor")
+    private val color by ConfigDelegate<Color>("firefreezeoverlaycolor")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Fire freeze overlay", "", "Visuals", ConfigElement(
-                "firefreezeoverlay",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "firefreezeoverlaycolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Fire freeze overlay",
+                "",
+                "Visuals",
+                ConfigElement(
+                    "fireFreezeOverlay",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "fireFreezeOverlay.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
     override fun initialize() {
@@ -81,8 +92,8 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
                 pos,
                 5f,
                 72,
-                firefreezeoverlaycolor.darker().rgb,
-                firefreezeoverlaycolor.rgb
+                color.darker().rgb,
+                color.rgb
             )
 
             val text = "§b${"%.1f".format(timer.ticks / 20.0)}s"
@@ -115,7 +126,7 @@ object FireFreezeOverlay : Feature("firefreezeoverlay", true) {
 
             if (entity in frozenEntities) {
                 entity.glowThisFrame = true
-                entity.glowingColor = firefreezeoverlaycolor.rgb
+                entity.glowingColor = color.rgb
             }
         }
     }

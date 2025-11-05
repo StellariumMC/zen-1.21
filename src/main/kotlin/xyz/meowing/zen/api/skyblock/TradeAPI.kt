@@ -1,27 +1,26 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.skyblock
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
+import net.minecraft.screen.ScreenHandler
+import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.EventBus
+import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
+import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.chestName
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.item.ItemStack
-import net.minecraft.registry.Registries
-import net.minecraft.screen.ScreenHandler
-import xyz.meowing.knit.api.KnitClient.client
-import xyz.meowing.knit.api.KnitClient.world
-import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.utils.ItemUtils.lore
-import xyz.meowing.zen.events.core.ChatEvent
-import xyz.meowing.zen.events.core.GuiEvent
 
 @Module
 object TradeAPI {
     private val tradeData = StoredFile("api/TradeAPI")
-    private var tradeHistory: JsonObject by tradeData.jsonObject("tradeHistory")
+    var tradeHistory: JsonObject by tradeData.jsonObject("tradeHistory")
 
     private var inTradeMenu = false
     private var lastTradeMenu: ScreenHandler? = null
@@ -33,8 +32,8 @@ object TradeAPI {
 
     init {
         TickUtils.loop(20) {
-            if (client.currentScreen == null) inTradeMenu = false
-            val world = world ?: return@loop
+            if (KnitClient.client.currentScreen == null) inTradeMenu = false
+            val world = KnitClient.world ?: return@loop
 
             if (tradingWithSub.isNotEmpty()) {
                 world.players.find { it.name.string.contains(tradingWithSub) }?.let {
@@ -121,6 +120,4 @@ object TradeAPI {
             addProperty("id", Registries.ITEM.getId(stack.item).toString())
         }
     }
-
-    fun getTradeHistory(): JsonObject = tradeHistory
 }

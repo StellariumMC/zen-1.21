@@ -14,19 +14,30 @@ import xyz.meowing.zen.utils.Render3D
 import java.awt.Color
 
 @Module
-object CoherentRodOverlay : Feature("coherentrodoverlay", island = SkyBlockIsland.THE_RIFT) {
-    private val coherentrodoverlaycolor by ConfigDelegate<Color>("coherentrodoverlaycolor")
+object CoherentRodOverlay : Feature(
+    "coherentRodOverlay",
+    island = SkyBlockIsland.THE_RIFT
+) {
+    private val coherentRodOverlayColor by ConfigDelegate<Color>("coherentRodOverlay.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Coherent rod", "Coherent rod radius display", "Rift", ConfigElement(
-                "coherentrodoverlay",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Color", "", "Options", ConfigElement(
-                "coherentrodoverlaycolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Coherent rod overlay",
+                "Coherent rod radius display",
+                "Rift",
+                ConfigElement(
+                    "coherentRodOverlay",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Color",
+                ConfigElement(
+                    "coherentRodOverlay.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
 
@@ -34,7 +45,8 @@ object CoherentRodOverlay : Feature("coherentrodoverlay", island = SkyBlockIslan
         register<RenderEvent.World.Last> { event ->
             if (isHolding("NEARLY_COHERENT_ROD")) {
                 val player = player ?: return@register
-                val color = coherentrodoverlaycolor
+                val color = coherentRodOverlayColor
+
                 Render3D.drawFilledCircle(
                     event.context.consumers(),
                     event.context.matrixStack(),

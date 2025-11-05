@@ -19,38 +19,53 @@ import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
-object EntityHighlight : Feature("entityhighlight") {
-    private val entityhighlightplayercolor by ConfigDelegate<Color>("entityhighlightplayercolor")
-    private val entityhighlightmobcolor by ConfigDelegate<Color>("entityhighlightmobcolor")
-    private val entityhighlightanimalcolor by ConfigDelegate<Color>("entityhighlightanimalcolor")
-    private val entityhighlightothercolor by ConfigDelegate<Color>("entityhighlightothercolor")
+object EntityHighlight : Feature(
+    "entityHighlight"
+) {
+    private val playerColor by ConfigDelegate<Color>("entityHighlight.playerColor")
+    private val mobColor by ConfigDelegate<Color>("entityHighlight.mobColor")
+    private val animalColor by ConfigDelegate<Color>("entityHighlight.animalColor")
+    private val otherColor by ConfigDelegate<Color>("entityHighlight.otherColor")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Entity highlight", "Entity highlight", "General", ConfigElement(
-                "entityhighlight",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Player color", "Player color", "Color", ConfigElement(
-                "entityhighlightplayercolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 255))
-            ))
-            .addFeatureOption("Mob color", "Mob color", "Color", ConfigElement(
-                "entityhighlightmobcolor",
-                ElementType.ColorPicker(Color(255, 0, 0, 255))
-            ))
-            .addFeatureOption("Animal color", "Animal color", "Color", ConfigElement(
-                "entityhighlightanimalcolor",
-                ElementType.ColorPicker(Color(0, 255, 0, 255))
-            ))
-            .addFeatureOption("Other entity color", "Other entity color", "Color", ConfigElement(
-                "entityhighlightothercolor",
-                ElementType.ColorPicker(Color(255, 255, 255, 255))
-            ))
-            .addFeatureOption("Entity highlight width", "Entity highlight width", "Width", ConfigElement(
-                    "entityhighlightwidth",
-                    ElementType.Slider(1.0, 10.0, 2.0, false)
-            ))
+            .addFeature(
+                "Entity highlight",
+                "Highlights entities that you're looking at",
+                "General",
+                ConfigElement(
+                    "entityHighlight",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Player color",
+                ConfigElement(
+                    "entityHighlight.playerColor",
+                    ElementType.ColorPicker(Color(0, 255, 255, 255))
+                )
+            )
+            .addFeatureOption(
+                "Mob color",
+                ConfigElement(
+                    "entityHighlight.mobColor",
+                    ElementType.ColorPicker(Color(255, 0, 0, 255))
+                )
+            )
+            .addFeatureOption(
+                "Animal color",
+                ConfigElement(
+                    "entityHighlight.animalColor",
+                    ElementType.ColorPicker(Color(0, 255, 0, 255))
+                )
+            )
+            .addFeatureOption(
+                "Other entity color",
+                ConfigElement(
+                    "entityHighlight.otherColor",
+                    ElementType.ColorPicker(Color(255, 255, 255, 255))
+                )
+            )
     }
 
     override fun initialize() {
@@ -71,10 +86,10 @@ object EntityHighlight : Feature("entityhighlight") {
 
     private fun getEntityColor(entity: Entity): Color {
         return when (entity) {
-            is PlayerEntity -> entityhighlightplayercolor
-            is PassiveEntity -> entityhighlightanimalcolor
-            is MobEntity -> entityhighlightmobcolor
-            else -> entityhighlightothercolor
+            is PlayerEntity -> playerColor
+            is PassiveEntity -> animalColor
+            is MobEntity -> mobColor
+            else -> otherColor
         }
     }
 }

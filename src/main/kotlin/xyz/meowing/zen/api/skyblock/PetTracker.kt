@@ -1,4 +1,4 @@
-package xyz.meowing.zen.api
+package xyz.meowing.zen.api.skyblock
 
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findThenNull
 import xyz.meowing.zen.annotations.Module

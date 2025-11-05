@@ -18,20 +18,31 @@ import xyz.meowing.zen.utils.glowingColor
 import java.awt.Color
 
 @Module
-object HighlightStarMobs : Feature("boxstarmobs", island = SkyBlockIsland.THE_CATACOMBS) {
-    private val boxstarmobscolor by ConfigDelegate<Color>("boxstarmobscolor")
+object HighlightStarMobs : Feature(
+    "highlightStarMobs",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
     private val entities = mutableListOf<Int>()
+    private val starMobsColor by ConfigDelegate<Color>("highlightStarMobs.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Highlight star mobs", "", "Dungeons", ConfigElement(
-                "boxstarmobs",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Highlight star mobs color", "Highlight star mobs color", "Color", ConfigElement(
-                "boxstarmobscolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Highlight star mobs",
+                "Highlights starred mobs in dungeons",
+                "Dungeons",
+                ConfigElement(
+                    "highlightStarMobs",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Highlight star mobs color",
+                ConfigElement(
+                    "highlightStarMobs.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
     override fun initialize() {
@@ -62,7 +73,7 @@ object HighlightStarMobs : Feature("boxstarmobs", island = SkyBlockIsland.THE_CA
 
             if (player?.canSee(entity) == true) {
                 entity.glowThisFrame = true
-                entity.glowingColor = boxstarmobscolor.rgb
+                entity.glowingColor = starMobsColor.rgb
             }
         }
     }

@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.general
 
-import xyz.meowing.zen.api.ItemAPI
+import xyz.meowing.zen.api.item.ItemAPI
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
@@ -15,9 +15,10 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object PriceData : Feature("pricedata", true) {
-    private val displaySet by ConfigDelegate<Set<Int>>("pricedatadisplay")
-    private val abbreviateNumbers by ConfigDelegate<Boolean>("abbreviatenumbers")
+object PriceData : Feature(
+    "priceData",
+    true
+) {
     private val displayOptions = listOf(
         "Active Listings",
         "Daily Sales",
@@ -33,22 +34,35 @@ object PriceData : Feature("pricedata", true) {
 
     private val tooltipCache = mutableMapOf<String, CacheEntry>()
 
+    private val displaySet by ConfigDelegate<Set<Int>>("priceData.display")
+    private val abbreviateNumbers by ConfigDelegate<Boolean>("priceData.abbreviateNumbers")
+
     override fun addConfig() {
         ConfigManager
-            .addFeature("Price Data", "", "General", ConfigElement(
-                "pricedata",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Price information to show", "Price information to show", "Options", ConfigElement(
-                "pricedatadisplay",
-                ElementType.MultiCheckbox(displayOptions, setOf(0, 1, 2, 3, 4))
-            ))
-            .addFeatureOption("Use abbreviated numbers (1.2M instead of 1,200,000)", "Use abbreviated numbers (1.2M instead of 1,200,000)", "Options", ConfigElement(
-                "abbreviatenumbers",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Price data",
+                "Shows price information for items",
+                "General",
+                ConfigElement(
+                    "priceData",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Info to show",
+                ConfigElement(
+                    "priceData.display",
+                    ElementType.MultiCheckbox(displayOptions, setOf(0, 1, 2, 3, 4))
+                )
+            )
+            .addFeatureOption(
+                "Abbreviate numbers",
+                ConfigElement(
+                    "priceData.abbreviateNumbers",
+                    ElementType.Switch(false)
+                )
+            )
     }
-
 
     private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviateNumber() else formatNumber()
 

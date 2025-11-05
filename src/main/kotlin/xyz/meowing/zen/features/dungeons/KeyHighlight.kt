@@ -15,28 +15,40 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 
 @Module
-object KeyHighlight : Feature("keyhighlight", island = SkyBlockIsland.THE_CATACOMBS) {
-    private val keyhighlightcolor by ConfigDelegate<Color>("keyhighlightcolor")
+object KeyHighlight : Feature(
+    "keyHighlight",
+    island = SkyBlockIsland.THE_CATACOMBS
+) {
+    private val keyHighlightColor by ConfigDelegate<Color>("keyHighlight.color")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Key Highlight", "", "Dungeons", ConfigElement(
-                "keyhighlight",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Key highlight color", "Key highlight color", "Color", ConfigElement(
-                "keyhighlightcolor",
-                ElementType.ColorPicker(Color(0, 255, 255, 127))
-            ))
+            .addFeature(
+                "Key highlight",
+                "Highlights Keys in dungeon",
+                "Dungeons",
+                ConfigElement(
+                    "keyHighlight",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Key highlight color",
+                ConfigElement(
+                    "keyHighlight.color",
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
+                )
+            )
     }
 
     override fun initialize() {
         register<RenderEvent.Entity.Pre> { event ->
             if (event.entity !is ArmorStandEntity) return@register
             val name = event.entity.name.string.removeFormatting()
+
             if (name == "Wither Key" || name == "Blood Key") {
                 val entity = event.entity
-                val color = keyhighlightcolor
+                val color = keyHighlightColor
                 Render3D.drawEntityFilled(
                     event.matrices,
                     event.vertex,

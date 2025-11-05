@@ -37,9 +37,12 @@ enum class FilterType { REGEX, EQUALS, CONTAINS }
 enum class InputType { ITEM_ID, DISPLAY_NAME, LORE }
 
 @Module
-object TrashHighlighter : Feature("trashhighlighter", true) {
-    private val highlightType by ConfigDelegate<Int>("trashhighlighttype")
-    private val color by ConfigDelegate<Color>("trashhighlightercolor")
+object TrashHighlighter : Feature(
+    "trashHighlighter",
+    true
+) {
+    private val highlightColor by ConfigDelegate<Color>("trashHighlighter.color")
+    private val highlightType by ConfigDelegate<Int>("trashHighlighter.type")
 
     private val defaultList = listOf(
         FilteredItem("CRYPT_DREADLORD_SWORD", FilterType.EQUALS, InputType.ITEM_ID),
@@ -105,26 +108,40 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Trash Highlighter", "", "General", ConfigElement(
-                "trashhighlighter",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Highlight color", "Highlight color", "Color", ConfigElement(
-                "trashhighlightercolor",
-                ElementType.ColorPicker(Color(255, 0, 0, 127))
-            ))
-            .addFeatureOption("Highlight type", "Highlight type", "Type", ConfigElement(
-                "trashhighlighttype",
-                ElementType.Dropdown(listOf("Slot", "Border"), 0)
-            ))
-            .addFeatureOption("Trash Highlighter Filter GUI", "Trash Highlighter Filter GUI", "GUI", ConfigElement(
-                "trashhighlightguibutton",
-                ElementType.Button("Open Filter GUI") {
-                    TickUtils.schedule(2) {
-                        client.setScreen(TrashFilterGui())
+            .addFeature(
+                "Trash highlighter",
+                "Highlights the trash items",
+                "General",
+                ConfigElement(
+                    "trashHighlighter",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Highlight color",
+                ConfigElement(
+                    "trashHighlighter.color",
+                    ElementType.ColorPicker(Color(255, 0, 0, 127))
+                )
+            )
+            .addFeatureOption(
+                "Highlight type",
+                ConfigElement(
+                    "trashHighlighter.type",
+                    ElementType.Dropdown(listOf("Slot", "Border"), 0)
+                )
+            )
+            .addFeatureOption(
+                "Trash highlighter filter GUI",
+                ConfigElement(
+                    "trashHighlighter.guiButton",
+                    ElementType.Button("Open Filter GUI") {
+                        TickUtils.schedule(2) {
+                            client.setScreen(TrashFilterGui())
+                        }
                     }
-                }
-            ))
+                )
+            )
     }
 
     override fun initialize() {
@@ -136,7 +153,7 @@ object TrashHighlighter : Feature("trashhighlighter", true) {
             val y = event.slot.y
 
             if (stack.skyblockID.isNotEmpty() && isTrashItem(stack)) {
-                val highlightColor = color.rgb
+                val highlightColor = highlightColor.rgb
 
                 when (highlightType) {
                     0 -> context.fill(x, y, x + 16, y + 16, highlightColor)

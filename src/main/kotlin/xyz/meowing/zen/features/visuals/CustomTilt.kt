@@ -12,53 +12,78 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object CustomTilt : Feature("customtilt") {
-    private val tiltx by ConfigDelegate<Double>("tiltx")
-    private val tilty by ConfigDelegate<Double>("tilty")
-    private val tiltz by ConfigDelegate<Double>("tiltz")
-    private val tilteveryone by ConfigDelegate<Boolean>("tilteveryone")
-    private val animatedtilt by ConfigDelegate<Boolean>("animatedtilt")
-    private val tiltspeed by ConfigDelegate<Double>("tiltspeed")
+object CustomTilt : Feature(
+    "customTilt"
+) {
+    private val tiltX by ConfigDelegate<Double>("customTilt.tiltX")
+    private val tiltY by ConfigDelegate<Double>("customTilt.tiltY")
+    private val tiltZ by ConfigDelegate<Double>("customTilt.tiltZ")
+    private val tiltEveryone by ConfigDelegate<Boolean>("customTilt.tiltEveryone")
+    private val animatedTilt by ConfigDelegate<Boolean>("customTilt.animatedTilt")
+    private val tiltSpeed by ConfigDelegate<Double>("customTilt.tiltSpeed")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Custom tilt", "", "Visuals", ConfigElement(
-                "customtilt",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Tilt X", "", "Options", ConfigElement(
-                "tiltx",
-                ElementType.Slider(-180.0, 180.0, 0.0, true)
-            ))
-            .addFeatureOption("Tilt Y", "", "Options", ConfigElement(
-                "tilty",
-                ElementType.Slider(-180.0, 180.0, 0.0, true)
-            ))
-            .addFeatureOption("Tilt Z", "", "Options", ConfigElement(
-                "tiltz",
-                ElementType.Slider(-180.0, 180.0, 0.0, true)
-            ))
-            .addFeatureOption("Tilt everyone", "", "Options", ConfigElement(
-                "tilteveryone",
-                ElementType.Switch(true)
-            ))
-            .addFeatureOption("Animated tilt", "", "Options", ConfigElement(
-                "animatedtilt",
-                ElementType.Switch(false)
-            ))
-            .addFeatureOption("Tilt speed", "", "Options", ConfigElement(
-                "tiltspeed",
-                ElementType.Slider(0.1, 10.0, 1.0, true)
-            ))
+            .addFeature(
+                "Custom tilt",
+                "Customizes player model tilt angles",
+                "Visuals",
+                ConfigElement(
+                    "customTilt",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Tilt X",
+                ConfigElement(
+                    "customTilt.tiltX",
+                    ElementType.Slider(-180.0, 180.0, 0.0, true)
+                )
+            )
+            .addFeatureOption(
+                "Tilt Y",
+                ConfigElement(
+                    "customTilt.tiltY",
+                    ElementType.Slider(-180.0, 180.0, 0.0, true)
+                )
+            )
+            .addFeatureOption(
+                "Tilt Z",
+                ConfigElement(
+                    "customTilt.tiltZ",
+                    ElementType.Slider(-180.0, 180.0, 0.0, true)
+                )
+            )
+            .addFeatureOption(
+                "Tilt everyone",
+                ConfigElement(
+                    "customTilt.tiltEveryone",
+                    ElementType.Switch(true)
+                )
+            )
+            .addFeatureOption(
+                "Animated tilt",
+                ConfigElement(
+                    "customTilt.animatedTilt",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Tilt speed",
+                ConfigElement(
+                    "customTilt.tiltSpeed",
+                    ElementType.Slider(0.1, 10.0, 1.0, true)
+                )
+            )
     }
 
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->
-            if (tilteveryone || event.entity.id == player?.id) {
-                val multiplier = if (animatedtilt) sin(System.currentTimeMillis() * tiltspeed / 1000.0) else 1.0
-                event.matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((tiltx * multiplier).toFloat()))
-                event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((tilty * multiplier).toFloat()))
-                event.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((tiltz * multiplier).toFloat()))
+            if (tiltEveryone || event.entity.id == player?.id) {
+                val multiplier = if (animatedTilt) sin(System.currentTimeMillis() * tiltSpeed / 1000.0) else 1.0
+                event.matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((tiltX * multiplier).toFloat()))
+                event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((tiltY * multiplier).toFloat()))
+                event.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((tiltZ * multiplier).toFloat()))
             }
         }
     }

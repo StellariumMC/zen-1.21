@@ -7,15 +7,15 @@ import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket
 import net.minecraft.util.math.Vec3d
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
-import xyz.meowing.zen.api.EntityDetection
-import xyz.meowing.zen.api.ItemAbility
+import xyz.meowing.zen.api.skyblock.EntityDetection
+import xyz.meowing.zen.api.item.ItemAbility
 
 sealed class SkyblockEvent {
     sealed class Slayer {
         /**
          * Posted after the EntityTrackerUpdateS2CPacket for a slayer entity has been received and processed.
          *
-         * @see xyz.meowing.zen.api.SlayerTracker
+         * @see xyz.meowing.zen.api.slayer.SlayerTracker
          * @since 1.2.0
          */
         class Spawn(
@@ -27,7 +27,7 @@ sealed class SkyblockEvent {
         /**
          * Posted after the EntityEvent.Death event for a slayer entity has been received and processed.
          *
-         * @see xyz.meowing.zen.api.SlayerTracker
+         * @see xyz.meowing.zen.api.slayer.SlayerTracker
          * @since 1.2.0
          */
         class Death(
@@ -38,7 +38,7 @@ sealed class SkyblockEvent {
         /**
          * Posted to clean up tasks in case of the boss randomly disappearing.
          *
-         * @see xyz.meowing.zen.api.SlayerTracker
+         * @see xyz.meowing.zen.api.slayer.SlayerTracker
          * @since 1.2.0
          */
         class Cleanup : Event()
@@ -46,7 +46,7 @@ sealed class SkyblockEvent {
         /**
          * Posted after the current slayer quest has been failed.
          *
-         * @see xyz.meowing.zen.api.SlayerTracker
+         * @see xyz.meowing.zen.api.slayer.SlayerTracker
          * @since 1.2.0
          */
         class Fail : Event()
@@ -54,7 +54,7 @@ sealed class SkyblockEvent {
         /**
          * Posted after a new slayer quest has been started.
          *
-         * @see xyz.meowing.zen.api.SlayerTracker
+         * @see xyz.meowing.zen.api.slayer.SlayerTracker
          * @since 1.2.0
          */
         class QuestStart : Event()
@@ -63,7 +63,7 @@ sealed class SkyblockEvent {
     /**
      * Posted when an item ability has been used.
      *
-     * @see xyz.meowing.zen.api.ItemAbility
+     * @see ItemAbility
      * @since 1.2.0
      */
     class ItemAbilityUsed(
@@ -73,7 +73,7 @@ sealed class SkyblockEvent {
     /**
      * Posted when a new entity with a nametag corresponding to it has been detected.
      *
-     * @see xyz.meowing.zen.api.EntityDetection
+     * @see EntityDetection
      * @since 1.2.0
      */
     class EntitySpawn(
@@ -83,7 +83,7 @@ sealed class SkyblockEvent {
     /**
      * Posted when the EntityTrackerUpdateS2CPacket for a damage splash has been received and processed.
      *
-     * @see xyz.meowing.zen.api.DamageAPI
+     * @see xyz.meowing.zen.api.skyblock.DamageAPI
      * @since 1.2.0
      */
     class DamageSplash(

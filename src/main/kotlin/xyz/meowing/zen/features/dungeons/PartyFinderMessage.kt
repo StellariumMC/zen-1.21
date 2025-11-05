@@ -12,16 +12,23 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object PartyFinderMessage : Feature("partyfindermsgs") {
+object PartyFinderMessage : Feature(
+    "partyFinderMsgs"
+) {
     private val joinedPattern = Regex("^Party Finder > (.+?) joined the dungeon group! \\((\\w+) Level (\\d+)\\)$")
     private val classSetPattern = Regex("^Party Finder > (.+?) set their class to (\\w+) Level (\\d+)!$")
 
     override fun addConfig() {
         ConfigManager
-            .addFeature("Custom PF Messages", "", "Dungeons", ConfigElement(
-                "partyfindermsgs",
-                ElementType.Switch(false)
-            ))
+            .addFeature(
+                "Custom PF messages",
+                "Custom party finder join and leave messages",
+                "Dungeons",
+                ConfigElement(
+                    "partyFinderMsgs",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
 
