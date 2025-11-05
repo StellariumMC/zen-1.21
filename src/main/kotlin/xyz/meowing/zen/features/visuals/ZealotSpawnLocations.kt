@@ -99,10 +99,7 @@ object ZealotSpawnLocations : Feature(
                 "Box color",
                 ConfigElement(
                     "zealotSpawnVisual.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127)),
-                    { config ->
-                        config["drawZealotSpawnBox"] as? Boolean == true
-                    }
+                    ElementType.ColorPicker(Color(0, 255, 255, 127))
                 )
             )
     }
