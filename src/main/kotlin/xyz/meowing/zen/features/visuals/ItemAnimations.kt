@@ -5,6 +5,9 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.RotationAxis
+import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
+import tech.thatgravyboat.skyblockapi.api.datatype.getData
+import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -22,6 +25,8 @@ object ItemAnimations : Feature(
     private val itemRoll by ConfigDelegate<Double>("itemAnimations.itemRoll")
     val cancelReEquip by ConfigDelegate<Boolean>("itemAnimations.cancelReEquip")
     val swingSpeed by ConfigDelegate<Double>("itemAnimations.swingSpeed")
+    val noSwing by ConfigDelegate<Boolean>("itemAnimations.noSwing")
+    val noSwingTerm by ConfigDelegate<Boolean>("itemAnimations.noSwingTerm")
 
     override fun addConfig() {
         ConfigManager
@@ -97,8 +102,28 @@ object ItemAnimations : Feature(
                     ElementType.Slider(-2.0, 1.0, 0.0, true)
                 )
             )
+            .addFeatureOption(
+                "No swing",
+                ConfigElement(
+                    "itemAnimations.noSwing",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "No terminator swing",
+                ConfigElement(
+                    "itemAnimations.noSwingTerm",
+                    ElementType.Switch(false)
+                )
+            )
     }
 
+    @JvmStatic
+    fun noSwingTerm(): Boolean {
+        return noSwingTerm && KnitPlayer.heldItem?.getData(DataTypes.SKYBLOCK_ID)?.id == "TERMINATOR"
+    }
+
+    @JvmStatic
     fun getItemTransform(): ItemTransform {
         return ItemTransform(
             posX = (itemX * 75.0).toFloat() / 100f,

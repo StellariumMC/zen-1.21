@@ -35,7 +35,7 @@ public abstract class MixinHeldItemRenderer {
     public void zen$onRenderHeldItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
     //#endif
         if (ItemAnimations.INSTANCE.isEnabled() && hand == Hand.MAIN_HAND) {
-            ItemAnimations.INSTANCE.getItemTransform().apply(matrices);
+            ItemAnimations.getItemTransform().apply(matrices);
         }
     }
 

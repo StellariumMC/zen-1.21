@@ -30,7 +30,6 @@ object SlayerStats : Feature(
     true
 ) {
     private const val NAME = "Slayer Stats"
-    private val slayerTimer by ConfigDelegate<Boolean>("slayerTimer")
     private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerStats.lines")
 
     override fun addConfig() {
@@ -69,12 +68,6 @@ object SlayerStats : Feature(
 
         register<GuiEvent.Render.HUD> {
             if (HUDManager.isEnabled(NAME)) render(it.context)
-        }
-
-        register<SkyblockEvent.Slayer.Death> {
-            if (!slayerTimer) {
-                KnitChat.fakeMessage("$prefix §cYou must enable the §eSlayer Timer§c feature for Slayer Stats to work.")
-            }
         }
     }
 
