@@ -45,7 +45,7 @@ class MultiCheckboxElement(
 
     private val optionsContainer = Rectangle(Theme.BgLight.color, 0x00000000, 5f, 0f)
         .setSizing(228f, Size.Pixels, 0f, Size.Pixels)
-        .setPositioning(6f, Pos.ParentPixels, 37f, Pos.ParentPixels)
+        .setPositioning(6f, Pos.ParentPixels, 32f, Pos.ParentPixels)
         .childOf(this)
 
     init {
@@ -101,7 +101,8 @@ class MultiCheckboxElement(
                 .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
                 .childOf(checkbox)
 
-            checkmark.visible = selectedIndices.contains(index)
+            val isSelected = selectedIndices.contains(index)
+            checkmark.visible = isSelected
 
             Text(option, Theme.Text.color, 14f)
                 .setPositioning(24f, Pos.ParentPixels, 0f, Pos.ParentCenter)
@@ -141,9 +142,20 @@ class MultiCheckboxElement(
             invalidateParentLayout()
         }
         optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT) {
-            optionsContainer.children.forEach { child ->
-                child.fadeIn(50)
-                child.children.forEach { it.fadeIn(50) }
+            // TODO: clean-up someday
+            optionsContainer.children.forEachIndexed { index, optionRect ->
+                optionRect.fadeIn(50, includeChildren = false)
+                optionRect.children.forEach { child ->
+                    when (child) {
+                        is Text -> child.fadeIn(50, includeChildren = false)
+                        is Rectangle -> {
+                            child.fadeIn(50, includeChildren = false)
+                            if (selectedIndices.contains(index)) {
+                                child.children.forEach { it.fadeIn(50, includeChildren = false) }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

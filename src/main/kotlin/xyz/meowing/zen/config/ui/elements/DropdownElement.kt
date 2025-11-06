@@ -47,7 +47,7 @@ class DropdownElement(
 
     private val optionsContainer = Rectangle(Theme.BgLight.color, 0x00000000, 5f, 0f)
         .setSizing(228f, Size.Pixels, 0f, Size.Pixels)
-        .setPositioning(6f, Pos.ParentPixels, 37f, Pos.ParentPixels)
+        .setPositioning(6f, Pos.ParentPixels, 32f, Pos.ParentPixels)
         .childOf(this)
 
     private val actualContainer = Container()
@@ -102,9 +102,11 @@ class DropdownElement(
                 .setPositioning(0f, Pos.ParentPixels, 0f, Pos.AfterSibling)
                 .childOf(actualContainer)
 
-            Text(option, Theme.Text.color, 16f)
+            val optionText = Text(option, Theme.Text.color, 16f)
                 .setPositioning(0f, Pos.ParentCenter, 0f, Pos.ParentCenter)
                 .childOf(optionRect)
+
+            optionText.visible = false
 
             optionRect.onHover(
                 { _, _ -> optionRect.colorTo(Theme.Highlight.color, 150, EasingType.EASE_OUT) },
@@ -133,7 +135,7 @@ class DropdownElement(
         isAnimating = true
 
         optionsContainer.visible = true
-        val targetHeight = 32f + options.size * 26f + 12f
+        val targetHeight = 32f + options.size * 26f + 6f
         val containerHeight = options.size * 26f
 
         animateSize(240f, targetHeight, 200, EasingType.EASE_OUT) {
@@ -143,7 +145,10 @@ class DropdownElement(
         optionsContainer.animateSize(228f, containerHeight, 200, EasingType.EASE_OUT) {
             optionsContainer.children.forEach { child ->
                 child.fadeIn(50)
-                child.children.forEach { it.fadeIn(50) }
+                child.children.forEach {
+                    it.visible = true
+                    it.fadeIn(50)
+                }
             }
         }
     }

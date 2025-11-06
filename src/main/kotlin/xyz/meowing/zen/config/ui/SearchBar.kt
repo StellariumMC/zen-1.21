@@ -19,7 +19,7 @@ class SearchBar(
         fontSize = 20f,
         backgroundColor = Theme.Bg.color,
         borderColor = Theme.Primary.color,
-        hoverColor = Theme.BgLight.color,
+        hoverColor = null,
         pressedColor = Theme.BgDark.color,
         borderRadius = 8f,
         borderThickness = 2f,
@@ -34,15 +34,16 @@ class SearchBar(
         setPositioning(0f, Pos.ScreenCenter, -50f, Pos.ScreenPixels)
         alignBottom()
 
-        input.onValueChange { newValue ->
-            text = newValue as String
-            onSearch(text)
-        }
-
-        input.onHover(
-            { _, _ -> input.background.colorTo(Theme.BgLight.color, 200, EasingType.EASE_OUT) },
-            { _, _ -> input.background.colorTo(Theme.Bg.color, 200, EasingType.EASE_IN) }
-        )
+        input
+            .onValueChange { newValue ->
+                text = newValue as String
+                onSearch(text)
+            }
+            .onHover(
+                { _, _ -> input.background.colorTo(Theme.BgLight.color, 200, EasingType.EASE_IN) },
+                { _, _ -> input.background.colorTo(Theme.Bg.color, 200, EasingType.EASE_IN) }
+            )
+            .background.dropShadow(10f, 3f, Theme.BgDark.color)
     }
 
     override fun onRender(mouseX: Float, mouseY: Float) {}
