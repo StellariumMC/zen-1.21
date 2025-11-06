@@ -108,7 +108,7 @@ class Panel(
             true
         }
 
-        category.features.forEachIndexed { index, feature ->
+        category.features.sortedBy { it.featureName }.forEachIndexed { index, feature ->
             val isLast = index == category.features.size - 1
             sections.add(SectionButton(feature, sectionsContainer, onConfigUpdate, isLast))
         }
