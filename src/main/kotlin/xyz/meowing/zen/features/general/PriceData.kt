@@ -9,6 +9,7 @@ import xyz.meowing.zen.utils.ItemUtils.displayName
 import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import xyz.meowing.zen.utils.Utils.formatNumber
 import net.minecraft.text.Text
+import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ItemTooltipEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -24,7 +25,8 @@ object PriceData : Feature(
         "Daily Sales",
         "BIN Price",
         "Auction Price",
-        "Bazaar"
+        "Bazaar",
+        "Raw Craft Cost"
     )
 
     data class CacheEntry(
@@ -141,6 +143,11 @@ object PriceData : Feature(
                         ?.formatPrice() ?: "§7N/A"
                     priceLines.add(Text.literal("§3Bazaar: §e${bazaarBuy} §8[Buy] §7• §a${bazaarSell} §8[Sell]"))
                 }
+            }
+
+            if (5 in displaySet) {
+                val rawCraftCost = stack.getItemValue().price.formatPrice()
+                priceLines.add(Text.literal("§3Raw Craft Cost: §a$rawCraftCost"))
             }
 
             if (priceLines.isNotEmpty()) {
