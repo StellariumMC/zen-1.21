@@ -41,7 +41,7 @@ object Zen : ClientModInitializer {
     val LOGGER: Logger = LogManager.getLogger("zen")
 
     @JvmStatic
-    val modInfo = KnitModInfo("zen", "Zen", "1.1.8")
+    val modInfo = KnitModInfo("zen", "Zen", "1.2.0")
 
     @JvmStatic
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())

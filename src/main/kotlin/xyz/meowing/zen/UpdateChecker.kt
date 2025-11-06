@@ -24,9 +24,8 @@ import java.net.URI
 import java.util.concurrent.CompletableFuture
 
 object UpdateChecker {
-    private const val current = "1.1.8"
-    private const val modrinthProjectId = "stWFyj4m"
-    const val githubRepository = "StellariumMC/zen-1.21"
+    private const val MODRINTH_PROJECT_ID = "stWFyj4m"
+    const val GITHUB_REPO = "StellariumMC/zen-1.21"
     private var isMessageShown = false
     private var latestVersion: String? = null
     private var githubUrl: String? = null
@@ -46,9 +45,9 @@ object UpdateChecker {
         CompletableFuture.supplyAsync {
             val github = checkGitHub()
             val modrinth = checkModrinth()
-            val latest = listOfNotNull(github?.first, modrinth?.first).maxByOrNull { compareVersions(it, current) } ?: return@supplyAsync
+            val latest = listOfNotNull(github?.first, modrinth?.first).maxByOrNull { compareVersions(it, Zen.modInfo.version) } ?: return@supplyAsync
 
-            if ((compareVersions(latest, current) > 0 && latest != dontShowForVersion) || forceUpdate) {
+            if ((compareVersions(latest, Zen.modInfo.version) > 0 && latest != dontShowForVersion) || forceUpdate) {
                 isMessageShown = true
                 forceUpdate = false
                 latestVersion = latest
@@ -62,7 +61,7 @@ object UpdateChecker {
     }
 
     private fun checkGitHub(): Triple<String, String, String?>? = runCatching {
-        val connection = createConnection("https://api.github.com/repos/${githubRepository}/releases")
+        val connection = createConnection("https://api.github.com/repos/${GITHUB_REPO}/releases")
         connection.requestMethod = "GET"
 
         if (connection.responseCode == 200) {
@@ -79,7 +78,7 @@ object UpdateChecker {
     }.getOrNull()
 
     private fun checkModrinth(): Triple<String, String, String?>? = runCatching {
-        val connection = createConnection("https://api.modrinth.com/v2/project/${modrinthProjectId}/version")
+        val connection = createConnection("https://api.modrinth.com/v2/project/${MODRINTH_PROJECT_ID}/version")
         connection.requestMethod = "GET"
 
         if (connection.responseCode == 200) {
@@ -102,7 +101,7 @@ object UpdateChecker {
             filteredVersions.maxByOrNull { it.date_published }?.let { version ->
                 val primaryFile = version.files.firstOrNull { it.primary } ?: version.files.firstOrNull()
                 primaryFile?.let {
-                    Triple(version.version_number, "https://modrinth.com/mod/${modrinthProjectId}/version/${version.id}", it.url)
+                    Triple(version.version_number, "https://modrinth.com/mod/${MODRINTH_PROJECT_ID}/version/${version.id}", it.url)
                 }
             }
         } else null
@@ -119,7 +118,6 @@ object UpdateChecker {
         return 0
     }
 
-    fun getCurrentVersion() = current
     fun getLatestVersion() = latestVersion
     fun getGithubUrl() = githubUrl
     fun getModrinthUrl() = modrinthUrl
@@ -184,7 +182,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
             setTextScale(0.9f.pixels())
         } childOf versionContainer
 
-        UIText("v${UpdateChecker.getCurrentVersion()}").apply {
+        UIText("v${Zen.modInfo.version}").apply {
             setX(0.percent())
             setY(18.75.percent())
             setColor(Color(248, 113, 113))
