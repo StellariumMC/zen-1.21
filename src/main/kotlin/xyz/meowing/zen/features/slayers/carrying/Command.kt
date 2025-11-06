@@ -17,7 +17,7 @@ import java.util.*
 
 @Command
 object CarryCommand : Commodore("carry", "zencarry") {
-    private val carrycounter by ConfigDelegate<Boolean>("carrycounter")
+    private val carrycounter by ConfigDelegate<Boolean>("carryCounter")
     private var currentLogPage = 1
 
     init {
