@@ -22,6 +22,11 @@ import xyz.meowing.zen.managers.config.ConfigManager
 //$$ import net.minecraft.client.input.KeyInput
 //#endif
 
+/**
+ * Inspired from Synthesis's feature "ContainerChat"
+ *
+ * Synthesis's impl: [GitHub](https://github.com/SynthesisMod/Synthesis/blob/main/src/main/java/com/luna/synthesis/features/utilities/ContainerChat.java)
+ */
 @Module
 object ContainerChat : Feature(
     "containerChat"
