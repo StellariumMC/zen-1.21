@@ -2,6 +2,8 @@ package xyz.meowing.zen.mixins;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import org.spongepowered.asm.mixin.Unique;
 import xyz.meowing.zen.events.EventBus;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import xyz.meowing.zen.events.core.GuiEvent;
+import xyz.meowing.zen.features.general.ContainerChat;
 
 /*
  * Modified from Devonian code
@@ -26,6 +29,23 @@ public class MixinHandledScreen {
     @Shadow
     @Final
     protected ScreenHandler handler;
+
+    @Unique
+    private TextFieldWidget zen$chatField;
+
+    @Inject(method = "init", at = @At("RETURN"))
+    private void zen$onInit(CallbackInfo ci) {
+        zen$chatField = ContainerChat.INSTANCE.createInputField((HandledScreen<?>) (Object) this);
+    }
+
+    @Inject(method = "render", at = @At("RETURN"))
+    private void zen$onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (ContainerChat.INSTANCE.shouldDrawInput() && zen$chatField != null) {
+            HandledScreen<?> screen = (HandledScreen<?>) (Object) this;
+            context.fill(2, screen.height - 14, screen.width - 2, screen.height - 2, Integer.MIN_VALUE);
+            zen$chatField.render(context, mouseX, mouseY, delta);
+        }
+    }
 
     @Inject(
             method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V",
