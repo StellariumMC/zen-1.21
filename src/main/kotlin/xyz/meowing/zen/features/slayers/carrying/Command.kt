@@ -23,7 +23,7 @@ object CarryCommand : Commodore("carry", "zencarry") {
     init {
         literal("add") {
             executable {
-                param("player") {
+                param("param0") {
                     suggests {
                         buildList {
                             world?.players?.forEach { player ->
@@ -35,9 +35,10 @@ object CarryCommand : Commodore("carry", "zencarry") {
                         }
                     }
                 }
+
                 runs { player: String, count: Int ->
                     if (!checkEnabled()) return@runs
-                    val carryee = CarryCounter.addCarryee(player, count)
+                    val carryee = CarryCounter.addCarry(player, count)
                     if (carryee != null) {
                         if (carryee.total == count) {
                             KnitChat.fakeMessage("$prefix §fAdded §b$player§f for §b$count§f carries.")
@@ -51,12 +52,13 @@ object CarryCommand : Commodore("carry", "zencarry") {
 
         literal("remove") {
             executable {
-                param("player") {
+                param("param0") {
                     suggests { CarryCounter.carries.map { it.name } }
                 }
+
                 runs { player: String ->
                     if (!checkEnabled()) return@runs
-                    val removed = CarryCounter.removeCarryee(player)
+                    val removed = CarryCounter.removeCarry(player)
                     KnitChat.fakeMessage("$prefix §f${if (removed) "Removed" else "Player not found:"} §b$player")
                 }
             }
@@ -64,12 +66,13 @@ object CarryCommand : Commodore("carry", "zencarry") {
 
         literal("settotal") {
             executable {
-                param("player") {
+                param("param0") {
                     suggests { CarryCounter.carries.map { it.name } }
                 }
+
                 runs { player: String, total: Int ->
                     if (!checkEnabled()) return@runs
-                    val carryee = CarryCounter.findCarryee(player)
+                    val carryee = CarryCounter.findCarry(player)
                     if (carryee != null) {
                         carryee.total = total
                         KnitChat.fakeMessage("$prefix §fSet §b$player§f total to §b$total§f (§b${carryee.count}§f/§b$total§f)")
@@ -82,12 +85,13 @@ object CarryCommand : Commodore("carry", "zencarry") {
 
         literal("setcount") {
             executable {
-                param("player") {
+                param("param0") {
                     suggests { CarryCounter.carries.map { it.name } }
                 }
+
                 runs { player: String, count: Int ->
                     if (!checkEnabled()) return@runs
-                    val carryee = CarryCounter.findCarryee(player)
+                    val carryee = CarryCounter.findCarry(player)
                     if (carryee != null) {
                         carryee.count = count
                         KnitChat.fakeMessage("$prefix §fSet §b$player§f count to §b$count§f (§b$count§f/§b${carryee.total}§f)")
@@ -119,13 +123,14 @@ object CarryCommand : Commodore("carry", "zencarry") {
             runs {
                 if (!checkEnabled()) return@runs
                 val count = CarryCounter.carries.size
-                CarryCounter.clearCarryees()
+                CarryCounter.clearCarries()
                 KnitChat.fakeMessage("$prefix §fCleared §b$count§f carries.")
             }
         }
 
         literal("log", "logs") {
             runs { showLogs(currentLogPage) }
+
             executable {
                 runs { page: Int -> showLogs(page) }
             }
