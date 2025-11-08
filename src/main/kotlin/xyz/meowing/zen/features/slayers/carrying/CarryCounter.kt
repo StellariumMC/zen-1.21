@@ -16,6 +16,7 @@ import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
 import net.minecraft.sound.SoundEvents
 import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.text.KnitText
@@ -48,7 +49,7 @@ object CarryCounter : Feature(
     private val tradeComp = Pattern.compile("^ \\+ (\\d+\\.?\\d*)M coins$")
     private val playerDead = Pattern.compile("^ ☠ (\\w+) was killed by (.+)\\.$")
     private val bossNames = setOf("Voidgloom Seraph", "Revenant Horror", "Tarantula Broodfather", "Sven Packmaster", "Inferno Demonlord")
-    private val carriesByBossId = ConcurrentHashMap<Int, Carryee>()
+    private val carriesByBossId = ConcurrentHashMap<Int, Carry>()
     private val completedCarriesMap = ConcurrentHashMap<String, CompletedCarry>()
     private val bossPerHourCache = ConcurrentHashMap<String, Pair<String, SimpleTimeMark>>()
     private var lastTradedUser: String? = null
@@ -56,7 +57,7 @@ object CarryCounter : Feature(
 
     private val carryData = StoredFile("features/CarryCounter")
     var completedCarries: List<CompletedCarry> by carryData.list("completedCarries", CompletedCarry.CODEC, emptyList())
-    val carriesByName = ConcurrentHashMap<String, Carryee>()
+    val carriesByName = ConcurrentHashMap<String, Carry>()
 
     private val carryCountSend by ConfigDelegate<Boolean>("carryCounter.countSend")
     private val carrySendMsg by ConfigDelegate<Boolean>("carryCounter.sendMsg")
@@ -147,12 +148,12 @@ object CarryCounter : Feature(
         setupLoops {
             loop<ClientTick>(200) {
                 val world = world ?: return@loop
-                val deadCarryees = carriesByBossId.entries.mapNotNull { (bossId, carryee) ->
+                val deadCarries = carriesByBossId.entries.mapNotNull { (bossId, carry) ->
                     val entity = world.getEntityById(bossId)
-                    if (entity == null || !entity.isAlive) carryee else null
+                    if (entity == null || !entity.isAlive) carry else null
                 }
 
-                deadCarryees.forEach {
+                deadCarries.forEach {
                     it.reset()
                 }
             }
@@ -240,8 +241,21 @@ object CarryCounter : Feature(
             }
         }
 
-        CarryHUD.initialize()
-        register<GuiEvent.Render.HUD> { CarryHUD.renderHUD(it.context) }
+        register<GuiEvent.Render.HUD> { event ->
+            if (carries.isEmpty()) return@register
+            val context = event.context
+
+            if (event.renderType != GuiEvent.RenderType.Pre && client.currentScreen == null) {
+                CarryHUD.renderHUD(context)
+            } else {
+                CarryHUD.renderInventoryHUD(context)
+            }
+        }
+
+        register<GuiEvent.Click> { event ->
+            if (carries.isEmpty() || !event.buttonState || event.mouseButton != 0) return@register
+            CarryHUD.onMouseInput()
+        }
     }
 
     private fun loadCompletedCarries() {
@@ -272,10 +286,9 @@ object CarryCounter : Feature(
             unregisterEvent("bossGlow")
             unregisterEvent("clientGlow")
         }
-        CarryHUD.checkRegistration()
     }
 
-    fun addCarryee(name: String, total: Int): Carryee? {
+    fun addCarry(name: String, total: Int): Carry? {
         if (name.isBlank() || total <= 0) return null
         val existing = carriesByName[name]
         if (existing != null) {
@@ -283,13 +296,13 @@ object CarryCounter : Feature(
             return existing
         }
 
-        val carryee = Carryee(name, total)
-        carriesByName[name] = carryee
+        val carry = Carry(name, total)
+        carriesByName[name] = carry
         checkRegistration()
-        return carryee
+        return carry
     }
 
-    fun removeCarryee(name: String): Boolean {
+    fun removeCarry(name: String): Boolean {
         if (name.isBlank()) return false
         val carryee = carriesByName.remove(name) ?: return false
         carryee.bossID?.let { carriesByBossId.remove(it) }
@@ -297,9 +310,9 @@ object CarryCounter : Feature(
         return true
     }
 
-    fun findCarryee(name: String): Carryee? = if (name.isBlank()) null else carriesByName[name]
+    fun findCarry(name: String): Carry? = if (name.isBlank()) null else carriesByName[name]
 
-    fun clearCarryees() {
+    fun clearCarries() {
         carriesByName.clear()
         carriesByBossId.clear()
         checkRegistration()
@@ -323,7 +336,7 @@ object CarryCounter : Feature(
         }
     }
 
-    data class Carryee(
+    data class Carry(
         val name: String,
         var total: Int,
         var count: Int = 0,
