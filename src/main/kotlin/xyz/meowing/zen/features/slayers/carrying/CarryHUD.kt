@@ -18,7 +18,7 @@ object CarryHUD {
         val y: Float,
         val width: Float,
         val height: Float,
-        val action: Runnable,
+        val action: () -> Any,
         val carry: CarryCounter.Carry,
         val tooltip: String
     )
@@ -90,26 +90,17 @@ object CarryHUD {
             listOf(
                 Triple(
                     "§a[+]",
-                    {
-                        if (carry.count < carry.total) carry.count++
-                        Unit
-                    },
+                    { if (carry.count < carry.total) carry.count++ },
                     "§aIncrease"
                 ),
                 Triple(
                     "§c[-]",
-                    {
-                        if (carry.count > 0) carry.count--
-                        Unit
-                    },
+                    { if (carry.count > 0) carry.count-- },
                     "§cDecrease"
                 ),
                 Triple(
                     "§4[×]",
-                    {
-                        CarryCounter.removeCarry(carry.name)
-                        Unit
-                    },
+                    { CarryCounter.removeCarry(carry.name) },
                     "§4Remove"
                 )
             ).forEachIndexed { j, (text, action, tooltip) ->
@@ -122,7 +113,7 @@ object CarryHUD {
                         currentY,
                         18f,
                         10f,
-                        Runnable(action),
+                        action,
                         carry,
                         tooltip
                     )
@@ -134,7 +125,7 @@ object CarryHUD {
                         currentY,
                         18f,
                         10f,
-                        Runnable(action),
+                        action,
                         carry,
                         tooltip
                     )
@@ -159,7 +150,7 @@ object CarryHUD {
     fun onMouseInput() {
         buttons.find {
             mouseX >= it.x && mouseX <= it.x + it.width * scale && mouseY >= it.y && mouseY <= it.y + it.height * scale
-        }?.action?.run()
+        }?.action
     }
 
     private fun renderTooltip(context: DrawContext) {

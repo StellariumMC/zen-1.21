@@ -245,9 +245,9 @@ object CarryCounter : Feature(
             if (carries.isEmpty()) return@register
             val context = event.context
 
-            if (event.renderType != GuiEvent.RenderType.Pre && client.currentScreen == null) {
+            if (client.currentScreen == null) {
                 CarryHUD.renderHUD(context)
-            } else {
+            } else if (event.renderType == GuiEvent.RenderType.Post) {
                 CarryHUD.renderInventoryHUD(context)
             }
         }
