@@ -19,7 +19,8 @@ sealed class GuiEvent {
          * @since 1.2.0
          */
         class HUD(
-            val context: DrawContext
+            val context: DrawContext,
+            val renderType: RenderType
         ) : Event()
 
         /**
@@ -29,17 +30,6 @@ sealed class GuiEvent {
          * @since 1.2.0
          */
         class NVG : Event()
-
-        /**
-         * Posted when everything has finished rendering.
-         *
-         * @see xyz.meowing.knit.api.events.EventBus
-         * @since 1.2.0
-         */
-        class Post(
-            val screen: Screen,
-            val context: DrawContext
-        ) : Event()
     }
 
     /**
@@ -119,5 +109,11 @@ sealed class GuiEvent {
             val slot: net.minecraft.screen.slot.Slot,
             val screen: HandledScreen<ScreenHandler>
         ) : Event()
+    }
+
+    enum class RenderType {
+        Pre,
+        Post
+        ;
     }
 }

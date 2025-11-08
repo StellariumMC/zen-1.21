@@ -16,6 +16,7 @@ import xyz.meowing.zen.events.core.RenderEvent;
 public class MixinEntityRenderDispatcher {
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
     private void zen$onEntityRenderPre(Entity entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo callbackInfo) {
+        if (entity == null) return;
         RenderEvent.Entity.Pre event = new RenderEvent.Entity.Pre(entity, matrices, vertexConsumers, light);
         EventBus.INSTANCE.post(event);
         if (event.getCancelled()) callbackInfo.cancel();
@@ -23,6 +24,7 @@ public class MixinEntityRenderDispatcher {
 
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
     private void zen$onEntityRenderPost(Entity entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo callbackInfo) {
+        if (entity == null) return;
         RenderEvent.Entity.Post event = new RenderEvent.Entity.Post(entity, matrices, vertexConsumers, light);
         EventBus.INSTANCE.post(event);
     }
