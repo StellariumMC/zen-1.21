@@ -40,6 +40,8 @@ object ConfigCommand : Commodore("zen", "ma", "meowaddons") {
 
         runs {
             openConfig()
+            KnitChat.fakeMessage("$prefix §7Opening config screen...")
+            KnitChat.fakeMessage("$prefix §fYou can use §c/zen hud §fto edit HUD locations")
         }
     }
 

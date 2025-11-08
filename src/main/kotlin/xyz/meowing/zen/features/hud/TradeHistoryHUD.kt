@@ -90,7 +90,7 @@ class TradeHistoryHUD : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     init {
         buildGui()
         updateTrades()
-        EventBus.register<GuiEvent.Render.Post> { drawContext = it.context }
+        EventBus.register<GuiEvent.Render.HUD> { drawContext = it.context }
     }
 
     private fun createBlock(radius: Float): UIRoundedRectangle = UIRoundedRectangle(radius)

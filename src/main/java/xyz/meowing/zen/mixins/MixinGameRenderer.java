@@ -15,6 +15,6 @@ import xyz.meowing.zen.events.core.GuiEvent;
 public class MixinGameRenderer {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
     private void zen$afterHudRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, @Local DrawContext context) {
-        EventBus.INSTANCE.post(new GuiEvent.Render.HUD(context));
+        EventBus.INSTANCE.post(new GuiEvent.Render.HUD(context, GuiEvent.RenderType.Pre));
     }
 }

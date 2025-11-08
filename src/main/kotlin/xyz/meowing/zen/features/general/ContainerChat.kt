@@ -140,7 +140,7 @@ object ContainerChat : Feature(
                 field.isFocused -> {
                     //#if MC >= 1.21.9
                     //$$ field.keyPressed(KeyInput(event.key, event.scanCode, 0))
-                    //$$ field.charTyped(CharInput(event.character.digitToInt(), 0))
+                    //$$ field.charTyped(CharInput(event.character.code, 0))
                     //#else
                     field.keyPressed(event.key, event.scanCode, 0)
                     field.charTyped(event.character, 0)
