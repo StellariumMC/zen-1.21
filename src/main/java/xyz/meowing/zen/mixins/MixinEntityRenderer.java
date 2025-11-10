@@ -58,6 +58,7 @@ import static xyz.meowing.zen.features.general.ContributorColor.replaceText;
 //$$             CameraRenderState cameraState,
 //$$             CallbackInfo callbackInfo
 //$$     ) {
+//$$         if (this.zen$currentEntity == null) return;
 //$$         RenderEvent.Entity.Pre event = new RenderEvent.Entity.Pre(this.zen$currentEntity, matrices, null, renderState.light);
 //$$         EventBus.INSTANCE.post(event);
 //$$         if (event.getCancelled()) {
@@ -76,6 +77,7 @@ import static xyz.meowing.zen.features.general.ContributorColor.replaceText;
 //$$             CameraRenderState cameraState,
 //$$             CallbackInfo callbackInfo
 //$$     ) {
+//$$         if (this.zen$currentEntity == null) return;
 //$$         RenderEvent.Entity.Post event = new RenderEvent.Entity.Post(this.zen$currentEntity, matrices, null, renderState.light);
 //$$         EventBus.INSTANCE.post(event);
 //$$     }
