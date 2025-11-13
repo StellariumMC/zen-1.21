@@ -20,7 +20,7 @@ object Render2D {
         x: Float,
         y: Float,
         scale: Float,
-        colors: Int = 0xFFFFFF,
+        colors: Int = Colors.WHITE,
         textStyle: TextStyle = TextStyle.DEFAULT
     ) {
         //#if MC >= 1.21.7
