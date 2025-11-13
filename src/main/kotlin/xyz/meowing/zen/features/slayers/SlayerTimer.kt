@@ -42,9 +42,9 @@ object SlayerTimer : Feature(
         val seconds = timeTaken.millis / 1000.0
         val serverTime = ticks / 20.0
         val content = "$prefix §f$action in §b${"%.2f".format(seconds)}s §7| §b${"%.2f".format(serverTime)}s"
-        val hoverText = "§c${timeTaken}ms §f| §c${"%.0f".format(ticks.toFloat())} ticks"
+        val hoverText = "§c${timeTaken.millis}ms §f| §c${"%.0f".format(ticks.toFloat())} ticks"
 
-        KnitChat.fakeMessage(KnitText.literal(content).onHover(hoverText).toVanilla())
+        KnitChat.fakeMessage(KnitText.literal(content).onHover(hoverText))
         if (action == "You killed your boss") {
             val lastRecord = getSelectedSlayerRecord()
 
@@ -55,7 +55,7 @@ object SlayerTimer : Feature(
                     "$prefix §d§lNew personal best! §r§7${"%.2f".format(lastRecord / 1000.0)}s §r➜ §a${"%.2f".format(seconds)}s"
                 }
 
-                KnitChat.fakeMessage(KnitText.literal(message).onHover(hoverText).toVanilla())
+                KnitChat.fakeMessage(KnitText.literal(message).onHover(hoverText))
 
                 slayerRecord = slayerRecord.deepCopy().apply {
                     addProperty("timeToKill${bossType.replace(" ", "_")}MS", timeTaken.millis)
@@ -71,7 +71,7 @@ object SlayerTimer : Feature(
     fun sendBossSpawnMessage(timeSinceQuestStart: Duration) {
         val content = "$prefix §fBoss spawned after §b${"%.2f".format(timeSinceQuestStart.millis / 1000.0)}s"
         val hoverText = "§c${timeSinceQuestStart}ms"
-        KnitChat.fakeMessage(KnitText.literal(content).onHover(hoverText).toVanilla())
+        KnitChat.fakeMessage(KnitText.literal(content).onHover(hoverText))
     }
 }
 
