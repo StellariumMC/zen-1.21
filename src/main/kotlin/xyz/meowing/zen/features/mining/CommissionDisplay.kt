@@ -35,12 +35,12 @@ object CommissionDisplay : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§9§lCommissions:\n§fGoblin Slayer: §c0%")
+        HUDManager.register(NAME, "§9§lCommissions:\n§fGoblin Slayer: §c0%", "commissionDisplay")
 
         register<TablistEvent.Change> { parseTablist() }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME) && hasData) {
+            if (hasData) {
                 val x = HUDManager.getX(NAME)
                 val y = HUDManager.getY(NAME)
                 val scale = HUDManager.getScale(NAME)

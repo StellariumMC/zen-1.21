@@ -8,12 +8,12 @@ import xyz.meowing.knit.api.KnitPlayer;
 import xyz.meowing.zen.events.EventBus;
 import xyz.meowing.zen.events.core.EntityEvent;
 import xyz.meowing.zen.features.visuals.ItemAnimations;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -23,33 +23,48 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public abstract class MixinLivingEntity extends Entity {
-    @Shadow public float handSwingProgress;
-    @Unique private int zen$animationTicks;
+    @Shadow
+    public float attackAnim;
+    @Unique
+    private int zen$animationTicks;
 
-    public MixinLivingEntity(EntityType<?> type, World world) {
+    public MixinLivingEntity(EntityType<?> type, Level world) {
         super(type, world);
     }
 
-    @Inject(method = "onDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;setPose(Lnet/minecraft/entity/EntityPose;)V"))
-    private void zen$onDeath(DamageSource damageSource, CallbackInfo ci) {
+    @Inject(
+            method = "die",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;setPose(Lnet/minecraft/world/entity/Pose;)V"
+            )
+    )
+    private void zen$onDeath(
+            DamageSource damageSource,
+            CallbackInfo ci
+    ) {
         EventBus.INSTANCE.post(new EntityEvent.Death(this));
     }
 
-    @WrapMethod(method = "tickHandSwing")
-    private void zen$modifySwingPos(Operation<Void> original) {
+    @WrapMethod(
+            method = "updateSwingTime"
+    )
+    private void zen$modifySwingPos(
+            Operation<Void> original
+    ) {
         if (!ItemAnimations.INSTANCE.isEnabled()) {
             original.call();
             return;
         }
 
         if (ItemAnimations.INSTANCE.getNoSwing()) {
-            handSwingProgress = 0F;
+            this.attackAnim = 0F;
             zen$animationTicks = 0;
             return;
         }
 
         if (ItemAnimations.noSwingTerm()) {
-            handSwingProgress = 0F;
+            this.attackAnim = 0F;
             zen$animationTicks = 0;
             return;
         }
@@ -64,12 +79,19 @@ public abstract class MixinLivingEntity extends Entity {
 
         if (zen$animationTicks > swingDuration) zen$animationTicks = 0;
 
-        handSwingProgress = zen$animationTicks == 0 ? 1F : (zen$animationTicks - 1F) / swingDuration;
+        this.attackAnim = zen$animationTicks == 0 ? 1F : (zen$animationTicks - 1F) / swingDuration;
         if (zen$animationTicks > 0) zen$animationTicks++;
     }
 
-    @Inject(method = "swingHand(Lnet/minecraft/util/Hand;Z)V", at = @At("HEAD"))
-    public void zen$onSwing(Hand hand, boolean fromServerPlayer, CallbackInfo ci) {
+    @Inject(
+            method = "swing(Lnet/minecraft/world/InteractionHand;Z)V",
+            at = @At("HEAD")
+    )
+    public void zen$onSwing(
+            InteractionHand hand,
+            boolean fromServerPlayer,
+            CallbackInfo ci
+    ) {
         if (zen$animationTicks == 0 && ItemAnimations.INSTANCE.isEnabled() && !ItemAnimations.INSTANCE.getNoSwing()) {
             zen$animationTicks = 1;
         }

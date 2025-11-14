@@ -5,8 +5,8 @@ import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.text.OrderedText
-import net.minecraft.text.Text
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.network.chat.Component
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
@@ -17,7 +17,7 @@ import java.awt.Color
 @Module
 object ContributorColor {
     private var contributorData: Map<String, ContributorInfo>? = null
-    private val textReplacements = Object2ObjectLinkedOpenHashMap<String, Text>()
+    private val textReplacements = Object2ObjectLinkedOpenHashMap<String, Component>()
 
     data class ContributorInfo(
         val displayName: String,
@@ -61,7 +61,7 @@ object ContributorColor {
             val entity = event.entity
 
             contributorData?.get(entity.name?.string?.removeFormatting())?.let { info ->
-                if (player?.canSee(entity) == true) {
+                if (player?.hasLineOfSight(entity) == true) {
                     entity.glowThisFrame = true
                     entity.glowingColor = info.glowColor
                 }
@@ -72,17 +72,17 @@ object ContributorColor {
     private fun updateTextReplacements() {
         textReplacements.clear()
         contributorData?.forEach { (username, info) ->
-            textReplacements[username] = Text.literal(info.displayName)
+            textReplacements[username] = Component.literal(info.displayName)
         }
     }
 
     @JvmStatic
-    fun replaceText(text: OrderedText): OrderedText {
+    fun replaceText(text: FormattedCharSequence): FormattedCharSequence {
         return if (textReplacements.isEmpty()) text else Utils.replaceMultipleEntriesInOrdered(text, textReplacements)
     }
 
     @JvmStatic
-    fun replaceText(text: Text): Text {
+    fun replaceText(text: Component): Component {
         return if (textReplacements.isEmpty()) text else Utils.replaceMultipleEntriesInText(text, textReplacements)
     }
 }

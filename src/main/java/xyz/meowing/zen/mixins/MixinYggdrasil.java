@@ -14,7 +14,14 @@ import org.spongepowered.asm.mixin.injection.At;
  */
 @Mixin(value = YggdrasilMinecraftSessionService.class)
 public class MixinYggdrasil {
-    @WrapOperation(method = "getPropertySignatureState", at = @At(value = "INVOKE", target = "Lcom/mojang/authlib/properties/Property;hasSignature()Z"), remap = false)
+    @WrapOperation(
+            method = "getPropertySignatureState",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lcom/mojang/authlib/properties/Property;hasSignature()Z"
+            ),
+            remap = false
+    )
     private boolean zen$hasSignature(Property instance, Operation<Boolean> original) {
         boolean hasSig = original.call(instance);
         try {

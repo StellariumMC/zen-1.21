@@ -1,18 +1,18 @@
 package xyz.meowing.zen.features.visuals
 
-import net.minecraft.block.ShapeContext
+import net.minecraft.world.phys.shapes.CollisionContext
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.world.EmptyBlockView
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.shapes.VoxelShape
+import net.minecraft.world.level.EmptyBlockGetter
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
@@ -70,9 +70,9 @@ object EffectiveAreaOverlay : Feature(
 
     override fun initialize() {
         register<RenderEvent.World.Last> { event ->
-            val held = player?.mainHandStack?.skyblockID ?: return@register
+            val held = player?.mainHandItem?.skyblockID ?: return@register
             if (held in items) {
-                val lookingAt = player?.raycast(if (held == "BAT_WAND" || held == "STARRED_BAT_WAND") 45.0 else 9.0, Utils.partialTicks, false) ?: return@register
+                val lookingAt = player?.pick(if (held == "BAT_WAND" || held == "STARRED_BAT_WAND") 45.0 else 9.0, Utils.partialTicks, false) ?: return@register
                 if (lookingAt.type == HitResult.Type.BLOCK) {
                     val blockHit = lookingAt as BlockHitResult
 
@@ -81,7 +81,7 @@ object EffectiveAreaOverlay : Feature(
                             Render3D.drawFilledCircle(
                                 event.context.consumers(),
                                 event.context.matrixStack(),
-                                Vec3d(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
+                                Vec3(blockHit.blockPos.x + 0.5, blockHit.blockPos.y + 1.0, blockHit.blockPos.z + 0.5),
                                 7f,
                                 72,
                                 color.darker().rgb,
@@ -89,7 +89,7 @@ object EffectiveAreaOverlay : Feature(
                             )
                         }
                         1 -> {
-                            val camera = client.gameRenderer.camera
+                            val camera = client.gameRenderer.mainCamera
                             val radius = 6
                             val center = blockHit.blockPos
 
@@ -103,20 +103,20 @@ object EffectiveAreaOverlay : Feature(
                                             // Only include blocks near the sphere surface
                                             if (distance < radius - 0.5 || distance > radius + 0.5) continue@zLoop
 
-                                            val blockPos = center.add(x, y, z)
+                                            val blockPos = center.offset(x, y, z)
                                             val blockState = KnitClient.world?.getBlockState(blockPos) ?: continue@zLoop
 
                                             // Ignore plants
-                                            if (blockState.block is net.minecraft.block.PlantBlock) continue@zLoop
+                                            if (blockState.block is net.minecraft.world.level.block.VegetationBlock) continue@zLoop
 
-                                            val blockShape = blockState.getOutlineShape(
-                                                EmptyBlockView.INSTANCE,
+                                            val blockShape = blockState.getShape(
+                                                EmptyBlockGetter.INSTANCE,
                                                 blockPos,
-                                                ShapeContext.of(camera.focusedEntity)
+                                                CollisionContext.of(camera.entity)
                                             )
                                             if (blockShape.isEmpty) continue@zLoop
 
-                                            cachedBlockShapes.add(blockShape.offset(blockPos))
+                                            cachedBlockShapes.add(blockShape.move(blockPos))
                                         }
                                     }
                                 }

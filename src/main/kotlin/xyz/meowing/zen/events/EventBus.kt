@@ -19,9 +19,9 @@ import net.fabricmc.fabric.api.event.player.AttackEntityCallback
 import net.fabricmc.fabric.api.event.player.UseBlockCallback
 import net.fabricmc.fabric.api.event.player.UseEntityCallback
 import net.fabricmc.fabric.api.event.player.UseItemCallback
-import net.minecraft.network.packet.Packet
-import net.minecraft.network.packet.s2c.play.*
-import net.minecraft.util.ActionResult
+import net.minecraft.network.protocol.Packet
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.world.InteractionResult
 import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.events.Event
 import xyz.meowing.knit.api.events.EventCall
@@ -127,11 +127,11 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
         ScreenEvents.BEFORE_INIT.register { _, screen, _, _ ->
             //#if MC >= 1.21.9
             //$$ ScreenMouseEvents.allowMouseClick(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, true, screen))
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), true, screen))
             //$$ }
             //$$
             //$$ ScreenMouseEvents.allowMouseRelease(screen).register { _, click ->
-            //$$    !post(GuiEvent.Click(click.x, click.y, click.keycode, false, screen))
+            //$$    !post(GuiEvent.Click(click.x, click.y, click.button(), false, screen))
             //$$ }
             //$$
             //$$ ScreenKeyboardEvents.allowKeyPress(screen).register { _, keyInput ->
@@ -164,27 +164,27 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
 
         UseItemCallback.EVENT.register { player, world, hand ->
             post(EntityEvent.Interact(player, world, hand, "USE_ITEM"))
-            ActionResult.PASS
+            InteractionResult.PASS
         }
 
         UseBlockCallback.EVENT.register { player, world, hand, hitResult ->
             post(EntityEvent.Interact(player, world, hand, "USE_BLOCK", hitResult.blockPos))
-            ActionResult.PASS
+            InteractionResult.PASS
         }
 
         UseEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
             post(EntityEvent.Interact(player, world, hand, "USE_ENTITY"))
-            ActionResult.PASS
+            InteractionResult.PASS
         }
 
         AttackBlockCallback.EVENT.register { player, world, hand, pos, direction ->
             post(EntityEvent.Interact(player, world, hand, "ATTACK_BLOCK", pos))
-            ActionResult.PASS
+            InteractionResult.PASS
         }
 
         AttackEntityCallback.EVENT.register { player, world, hand, entity, hitResult ->
             post(EntityEvent.Interact(player, world, hand, "ATTACK_ENTITY"))
-            ActionResult.PASS
+            InteractionResult.PASS
         }
 
         ItemTooltipCallback.EVENT.register { stack, context, type, lines ->
@@ -202,7 +202,7 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
         if (post(PacketEvent.Received(packet))) return true
 
         return when (packet) {
-            is EntitySpawnS2CPacket -> {
+            is ClientboundAddEntityPacket -> {
                 post(EntityEvent.Packet.Spawn(packet))
             }
             else -> false

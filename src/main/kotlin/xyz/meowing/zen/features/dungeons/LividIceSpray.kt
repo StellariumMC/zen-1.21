@@ -6,7 +6,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.dungeons.DungeonFloor
@@ -44,7 +44,7 @@ object LividIceSpray : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register("Livid ice spray timer", "§bIce spray: §c13.2s")
+        HUDManager.register("Livid ice spray timer", "§bIce spray: §c13.2s", "lividIceSpray")
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] Livid: Welcome, you've arrived right on time. I am Livid, the Master of Shadows.") {
@@ -55,7 +55,7 @@ object LividIceSpray : Feature(
         register<LocationEvent.WorldChange> { cleanup() }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled("Livid ice spray timer")) render(event.context)
+            render(event.context)
         }
     }
 
@@ -64,7 +64,7 @@ object LividIceSpray : Feature(
         tickCall.unregister()
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX("Livid ice spray timer")
         val y = HUDManager.getY("Livid ice spray timer")
         val scale = HUDManager.getScale("Livid ice spray timer")

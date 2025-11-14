@@ -50,11 +50,7 @@ object CoherentRodOverlay : Feature(
                 Render3D.drawFilledCircle(
                     event.context.consumers(),
                     event.context.matrixStack(),
-                    //#if MC >= 1.21.9
-                    //$$ player.entityPos,
-                    //#else
-                    player.pos,
-                    //#endif
+                    player.position(),
                     8f,
                     72,
                     color.darker().rgb,

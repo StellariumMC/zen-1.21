@@ -5,7 +5,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.TitleUtils.showTitle
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.ChatEvent
@@ -41,7 +41,7 @@ object KeyAlert : Feature(
 
         register<EntityEvent.Join> { event ->
             if (bloodOpen) return@register
-            if (event.entity !is ArmorStandEntity) return@register
+            if (event.entity !is ArmorStand) return@register
             TickUtils.scheduleServer(2) {
                 val name = event.entity.name?.string?.removeFormatting() ?: return@scheduleServer
                 when {

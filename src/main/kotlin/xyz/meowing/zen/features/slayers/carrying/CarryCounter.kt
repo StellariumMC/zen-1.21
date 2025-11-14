@@ -14,7 +14,7 @@ import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import xyz.meowing.zen.utils.Utils
-import net.minecraft.sound.SoundEvents
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
@@ -149,7 +149,7 @@ object CarryCounter : Feature(
             loop<ClientTick>(200) {
                 val world = world ?: return@loop
                 val deadCarries = carriesByBossId.entries.mapNotNull { (bossId, carry) ->
-                    val entity = world.getEntityById(bossId)
+                    val entity = world.getEntity(bossId)
                     if (entity == null || !entity.isAlive) carry else null
                 }
 
@@ -199,7 +199,7 @@ object CarryCounter : Feature(
             val name = event.name
             if (name.contains("Spawned by")) {
                 val hasBlackhole = event.entity.let { entity ->
-                    world?.entities?.any { worldEnt ->
+                    world?.entitiesForRendering()?.any { worldEnt ->
                         entity.distanceTo(worldEnt) <= 3f && worldEnt.customName?.string?.removeFormatting()?.lowercase()?.contains("black hole") == true
                     }
                 } ?: false
@@ -223,7 +223,7 @@ object CarryCounter : Feature(
             val entity = event.entity
 
             carriesByBossId[entity.id]?.let {
-                if (player?.canSee(entity) == false) return@let
+                if (player?.hasLineOfSight(entity) == false) return@let
                 entity.glowThisFrame = true
                 entity.glowingColor = carryBossColor.rgb
             }
@@ -235,7 +235,7 @@ object CarryCounter : Feature(
             val cleanName = entity.name.string.removeFormatting()
 
             carriesByName[cleanName]?.let {
-                if (player?.canSee(entity) == false) return@let
+                if (player?.hasLineOfSight(entity) == false) return@let
                 entity.glowThisFrame = true
                 entity.glowingColor = carryClientColor.rgb
             }
@@ -245,7 +245,7 @@ object CarryCounter : Feature(
             if (carries.isEmpty()) return@register
             val context = event.context
 
-            if (client.currentScreen == null) {
+            if (client.screen == null) {
                 CarryHUD.renderHUD(context)
             } else if (event.renderType == GuiEvent.RenderType.Post) {
                 CarryHUD.renderInventoryHUD(context)
@@ -356,7 +356,7 @@ object CarryCounter : Feature(
                 isFighting = true
                 bossID = id
                 carriesByBossId[id] = this
-                Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
+                Utils.playSound(SoundEvents.CAT_AMBIENT, 5f, 2f)
                 showTitle("§bBoss spawned", "§bby §c$name", 1000)
                 if (carrySendMsg) KnitChat.fakeMessage("$prefix §fBoss spawned by §c$name")
             }
@@ -469,7 +469,7 @@ object CarryCounter : Feature(
             completedCarries = carriesList
 
             KnitChat.fakeMessage("$prefix §fCarries completed for §b$name §fin §b${sessionTime}s")
-            Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 5f, 2f)
+            Utils.playSound(SoundEvents.CAT_AMBIENT, 5f, 2f)
             showTitle("§fCarries Completed: §b$name", "§b$count§f/§b$total", 3000)
 
             carriesByName.remove(name)

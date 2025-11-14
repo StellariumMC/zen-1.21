@@ -2,15 +2,36 @@
     "required": true,
     "package": "xyz.meowing.zen.mixins",
     "compatibilityLevel": "JAVA_21",
-    "mixins": [
-        "MixinClientConnection",
-        "MixinEntity"
-    ],
     "injectors": {
         "defaultRequire": 1
     },
     "client": [
-        "AccessorWorldRenderer",
-        "MixinEntityRenderDispatcher"
+        "AccessorChatComponent",
+        "MixinAbstractContainerScreen",
+        "MixinCameraType",
+        "MixinChatComponent",
+        "MixinClientPacketListener",
+        "MixinEffectsInInventory",
+        "MixinEntityRenderDispatcher",
+        "MixinFallingBlockRenderer",
+        "MixinFont",
+        "MixinGameRenderer",
+        "MixinGuardianRenderer",
+        "MixinGui",
+        "MixinItemInHandRenderer",
+        "MixinKeyboardHandler",
+        "MixinLightningBoltRenderer",
+        "MixinLocalPlayer",
+        "MixinMouseHandler",
+        "MixinPlayerRenderer",
+        "MixinScreenEffectRenderer"
+    ],
+    "mixins": [
+        "AccessorInventory",
+        "MixinAbstractArrow",
+        "MixinConnection",
+        "MixinEntity",
+        "MixinLivingEntity",
+        "MixinYggdrasil"
     ]
 }

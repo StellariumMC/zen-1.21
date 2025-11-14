@@ -45,7 +45,7 @@ object SlayerHighlight : Feature(
         register<RenderEvent.Entity.Pre> { event ->
             val entity = event.entity
 
-            if (player?.canSee(entity) == true && entity == getSlayerEntity()) {
+            if (player?.hasLineOfSight(entity) == true && entity == getSlayerEntity()) {
                 entity.glowThisFrame = true
                 entity.glowingColor = slayerhighlightcolor.rgb
             }

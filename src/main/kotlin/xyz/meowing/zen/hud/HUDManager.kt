@@ -1,58 +1,85 @@
 package xyz.meowing.zen.hud
 
 import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
+import com.mojang.serialization.DataResult
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.zen.api.data.StoredFile
-import net.minecraft.client.gui.DrawContext
-
-data class HUDPosition(var x: Float, var y: Float, var scale: Float = 1f, var enabled: Boolean = true) {
-    companion object {
-        val CODEC: Codec<HUDPosition> = RecordCodecBuilder.create { instance ->
-            instance.group(
-                Codec.FLOAT.fieldOf("x").forGetter { it.x },
-                Codec.FLOAT.fieldOf("y").forGetter { it.y },
-                Codec.FLOAT.optionalFieldOf("scale", 1f).forGetter { it.scale },
-                Codec.BOOL.optionalFieldOf("enabled", true).forGetter { it.enabled }
-            ).apply(instance, ::HUDPosition)
-        }
-    }
-}
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.set
 
 object HUDManager {
-    private val elements = mutableMapOf<String, String>()
-    private val customRenderers = mutableMapOf<String, (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit>()
-    private val customDimensions = mutableMapOf<String, Pair<Int, Int>>()
+    val elements = mutableMapOf<String, HUDElement>()
+    val customRenderers = mutableMapOf<String, (GuiGraphics) -> Unit>()
+    val customSizes = mutableMapOf<String, Pair<Int, Int>>()
 
-    private val hudData = StoredFile("hud_positions")
-    private var positions: Map<String, HUDPosition> by hudData.map("positions", Codec.STRING, HUDPosition.CODEC, emptyMap())
+    data class HudLayoutData(
+        var x: Float,
+        var y: Float,
+        var scale: Float = 1f
+    ) {
+        companion object {
+            val CODEC: Codec<HudLayoutData> = Codec.FLOAT.listOf().comapFlatMap(
+                { list ->
+                    if (list.size == 3) {
+                        DataResult.success(HudLayoutData(list[0], list[1], list[2]))
+                    } else {
+                        DataResult.error { "Invalid layout data size" }
+                    }
+                },
+                { data -> listOf(data.x, data.y, data.scale) }
+            )
+        }
+    }
 
-    fun register(name: String, exampleText: String) {
-        elements[name] = exampleText
+    private val layoutStore = StoredFile("config/HUD")
+
+    private var layouts by layoutStore.map(
+        "layouts",
+        Codec.STRING,
+        HudLayoutData.CODEC,
+        emptyMap()
+    )
+
+
+    fun register(id: String, text: String, configKey: String? = null) {
+        elements[id] = HUDElement(id, 20f, 20f, 0, 0, text = text, configKey = configKey)
+        loadLayout(id)
     }
 
     fun registerCustom(
-        name: String,
+        id: String,
         width: Int,
         height: Int,
-        customRenderer: (DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit
+        renderer: (GuiGraphics) -> Unit,
+        configKey: String? =  null
     ) {
-        elements[name] = ""
-        customRenderers[name] = customRenderer
-        customDimensions[name] = Pair(width, height)
+        customRenderers[id] = renderer
+        customSizes[id] = width to height
+        elements[id] = HUDElement(id, 20f, 20f, width, height, configKey = configKey)
+        loadLayout(id)
     }
 
-    fun getElements(): Map<String, String> = elements
-    fun getCustomRenderer(name: String): ((DrawContext, Float, Float, Int, Int, Float, Float, Boolean) -> Unit)? = customRenderers[name]
-    fun getCustomDimensions(name: String): Pair<Int, Int>? = customDimensions[name]
+    fun saveAllLayouts() {
+        layouts = elements.mapValues { (_, element) ->
+            HudLayoutData(element.x, element.y, element.scale)
+        }
+        layoutStore.forceSave()
+    }
 
-    fun getX(name: String): Float = positions[name]?.x ?: 50f
-    fun getY(name: String): Float = positions[name]?.y ?: 50f
-    fun getScale(name: String): Float = positions[name]?.scale ?: 1f
-    fun isEnabled(name: String): Boolean = positions[name]?.enabled ?: true
+    fun loadAllLayouts() { layouts.keys.forEach { loadLayout(it) } }
 
-    fun setPosition(name: String, x: Float, y: Float, scale: Float = 1f, enabled: Boolean = true) {
-        positions = positions.toMutableMap().apply {
-            this[name] = HUDPosition(x, y, scale, enabled)
+    fun loadLayout(id: String) {
+        layouts.forEach { (id, layout) ->
+            elements[id]?.apply {
+                x = layout.x
+                y = layout.y
+                scale = layout.scale
+            }
         }
     }
+
+    fun getX(id: String): Float = elements[id]?.x ?: 0f
+    fun getY(id: String): Float = elements[id]?.y ?: 0f
+    fun getScale(id: String): Float = elements[id]?.scale ?: 1f
 }

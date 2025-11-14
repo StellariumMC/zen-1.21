@@ -3,8 +3,8 @@ package xyz.meowing.zen.features.visuals
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.RotationAxis
+import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.math.Axis
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.meowing.knit.api.KnitPlayer
@@ -145,11 +145,11 @@ object ItemAnimations : Feature(
         val rotZ: Float,
         val scale: Float
     ) {
-        fun apply(matrices: MatrixStack) {
+        fun apply(matrices: PoseStack) {
             matrices.translate(posX, posY, posZ)
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(rotX))
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(rotY))
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(rotZ))
+            matrices.mulPose(Axis.XP.rotationDegrees(rotX))
+            matrices.mulPose(Axis.YP.rotationDegrees(rotY))
+            matrices.mulPose(Axis.ZP.rotationDegrees(rotZ))
             matrices.scale(scale, scale, scale)
         }
     }

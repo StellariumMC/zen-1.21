@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.slayers
 
-import net.minecraft.sound.SoundEvents
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
@@ -49,7 +49,7 @@ object MinibossSpawn : Feature(
             if (message.contains("SLAYER MINI-BOSS") && message.contains("has spawned!")) {
                 val minibossName = extractMinibossName(message) ?: return@register
 
-                Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 1f, 1f)
+                Utils.playSound(SoundEvents.CAT_AMBIENT, 1f, 1f)
                 KnitChat.fakeMessage("$prefix §b$minibossName §fspawned.")
 
                 if (showTitle) {

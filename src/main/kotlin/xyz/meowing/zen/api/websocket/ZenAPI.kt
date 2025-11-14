@@ -43,7 +43,7 @@ object ZenAPI {
 
     fun connectToWebsocket() {
         Zen.LOGGER.info("Attempting to connect to WebSocket...")
-        val uuid = (KnitClient.client.session.uuidOrNull ?: KnitClient.client.session.username).toString()
+        val uuid = (KnitClient.client.user.profileId ?: KnitClient.client.user.name).toString()
         val hashedUUID = MessageDigest.getInstance("MD5")
             .digest(uuid.toByteArray())
             .joinToString("") { "%02x".format(it) }

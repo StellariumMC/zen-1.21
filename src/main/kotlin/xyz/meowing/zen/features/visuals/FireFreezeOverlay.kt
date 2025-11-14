@@ -5,10 +5,10 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -25,7 +25,7 @@ object FireFreezeOverlay : Feature(
     "fireFreezeOverlay",
     true
 ) {
-    private var activatedPos: Vec3d? = null
+    private var activatedPos: Vec3? = null
     private var overlayTimerId: Long? = null
     private var freezeTimerId: Long? = null
     private var frozenEntities = mutableSetOf<Entity>()
@@ -54,11 +54,7 @@ object FireFreezeOverlay : Feature(
     override fun initialize() {
         register<SkyblockEvent.ItemAbilityUsed> { event ->
             if (event.ability.itemId == "FIRE_FREEZE_STAFF") {
-                //#if MC >= 1.21.9
-                //$$ activatedPos = player?.entityPos
-                //#else
-                activatedPos = player?.pos
-                //#endif
+                activatedPos = player?.position()
                 frozenEntities.clear()
 
                 overlayTimerId = createTimer(100) {
@@ -73,8 +69,8 @@ object FireFreezeOverlay : Feature(
                         }
                     )
 
-                    world?.entities?.forEach { ent ->
-                        if (ent is LivingEntity && ent !is ArmorStandEntity && !ent.isInvisible && ent != player && ent.squaredDistanceTo(activatedPos) <= 25) {
+                    world?.entitiesForRendering()?.forEach { ent ->
+                        if (ent is LivingEntity && ent !is ArmorStand && !ent.isInvisible && ent != player && ent.distanceToSqr(activatedPos) <= 25) {
                             frozenEntities.add(ent)
                         }
                     }
@@ -111,11 +107,7 @@ object FireFreezeOverlay : Feature(
                 val freezeText = "§b${"%.1f".format(timer.ticks / 20.0)}s"
                 Render3D.drawString(
                     freezeText,
-                    //#if MC >= 1.21.9
-                    //$$ ent.entityPos,
-                    //#else
-                    ent.pos,
-                    //#endif
+                    ent.position(),
                     0x000000
                 )
             }

@@ -2,9 +2,9 @@
 
 package xyz.meowing.zen.events.core
 
-import net.minecraft.entity.Entity
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.entity.Entity
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 import xyz.meowing.zen.api.skyblock.EntityDetection
@@ -21,7 +21,7 @@ sealed class SkyblockEvent {
         class Spawn(
             val entity: Entity?,
             val entityID: Int,
-            val packet: EntityTrackerUpdateS2CPacket
+            val packet: ClientboundSetEntityDataPacket
         ) : Event()
 
         /**
@@ -89,8 +89,8 @@ sealed class SkyblockEvent {
     class DamageSplash(
         val damage: Int,
         val originalName: String,
-        val entityPos: Vec3d,
-        val packet: EntityTrackerUpdateS2CPacket,
+        val entityPos: Vec3,
+        val packet: ClientboundSetEntityDataPacket,
         val entity: Entity
     ) : CancellableEvent()
 }

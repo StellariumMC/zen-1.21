@@ -8,7 +8,7 @@ sealed class KeyEvent {
     /**
      * Posted before the Key Press is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinKeyboard
+     * @see xyz.meowing.zen.mixins.MixinKeyboardHandler
      * @since 1.2.0
      */
     class Press(
@@ -20,7 +20,7 @@ sealed class KeyEvent {
     /**
      * Posted before the Key Release is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinKeyboard
+     * @see xyz.meowing.zen.mixins.MixinKeyboardHandler
      * @since 1.2.0
      */
     class Release(

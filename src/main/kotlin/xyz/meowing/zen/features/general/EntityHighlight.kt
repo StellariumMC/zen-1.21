@@ -3,11 +3,11 @@ package xyz.meowing.zen.features.general
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.entity.Entity
-import net.minecraft.entity.mob.MobEntity
-import net.minecraft.entity.passive.PassiveEntity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.AgeableMob
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.phys.EntityHitResult
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -80,15 +80,15 @@ object EntityHighlight : Feature(
     }
 
     private fun isEntityUnderCrosshair(entity: Entity): Boolean {
-        val crosshairTarget = client.crosshairTarget as? EntityHitResult ?: return false
+        val crosshairTarget = client.hitResult as? EntityHitResult ?: return false
         return crosshairTarget.entity == entity
     }
 
     private fun getEntityColor(entity: Entity): Color {
         return when (entity) {
-            is PlayerEntity -> playerColor
-            is PassiveEntity -> animalColor
-            is MobEntity -> mobColor
+            is Player -> playerColor
+            is AgeableMob -> animalColor
+            is Mob -> mobColor
             else -> otherColor
         }
     }

@@ -5,7 +5,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.annotations.Module

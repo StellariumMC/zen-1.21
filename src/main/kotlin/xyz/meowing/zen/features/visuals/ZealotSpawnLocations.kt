@@ -9,9 +9,9 @@ import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.toFormattedDuration
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockAreas
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -128,11 +128,11 @@ object ZealotSpawnLocations : Feature(
         register<RenderEvent.World.Last> { event ->
             val positions = if (SkyBlockAreas.DRAGONS_NEST.inArea()) zealotSpawns else bruiserSpawns
             positions.forEach { pos ->
-                val aabb = Box(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
+                val aabb = AABB(pos.x - 5.0, pos.y + 0.1, pos.z - 5.0, pos.x + 5.0, pos.y - 3.0, pos.z + 5.0)
                 if (drawZealotSpawnBox) Render3D.drawSpecialBB(aabb, zealotSpawnColor, event.context.consumers(), event.context.matrixStack())
                 Render3D.drawString(
                     displayText,
-                    Vec3d(pos).add(0.0, 1.5, 0.0),
+                    Vec3(pos).add(0.0, 1.5, 0.0),
                     -1
                 )
             }

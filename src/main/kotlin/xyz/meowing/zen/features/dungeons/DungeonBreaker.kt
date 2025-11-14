@@ -7,7 +7,9 @@ import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
+import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
+import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.GuiEvent
@@ -39,12 +41,12 @@ object DungeonBreaker : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§bCharges: §e20§7/§e20§c⸕")
+        HUDManager.register(NAME, "§bCharges: §e20§7/§e20§c⸕", "dungeonBreaker")
 
         register<PacketEvent.ReceivedPost> { event ->
-            if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
-                val stack = event.packet.stack ?: return@register
-                if (stack.skyblockID != "DUNGEONBREAKER") return@register
+            if (event.packet is ClientboundContainerSetSlotPacket) {
+                val stack = event.packet.item ?: return@register
+                if (stack.getData(DataTypes.SKYBLOCK_ID)?.skyblockId != "DUNGEONBREAKER") return@register
 
                 stack.lore.firstNotNullOfOrNull { regex.find(it.removeFormatting()) }?.let { match ->
                     charges = match.groupValues[1].toIntOrNull() ?: 0
@@ -54,7 +56,7 @@ object DungeonBreaker : Feature(
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (max == 0 || !HUDManager.isEnabled(NAME)) return@register
+            if (max == 0) return@register
             val x = HUDManager.getX(NAME)
             val y = HUDManager.getY(NAME)
             val scale = HUDManager.getScale(NAME)

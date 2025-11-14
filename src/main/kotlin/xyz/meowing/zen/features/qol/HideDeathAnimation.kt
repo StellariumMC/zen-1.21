@@ -2,7 +2,7 @@ package xyz.meowing.zen.features.qol
 
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.entity.Entity
+import net.minecraft.world.entity.Entity
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent

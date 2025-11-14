@@ -47,7 +47,7 @@ dependencies {
 
     modImplementation(include("gg.essential:elementa:710")!!)
 
-    modImplementation(include("xyz.meowing:vexel-${mcData}:121")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:124")!!)
 
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)

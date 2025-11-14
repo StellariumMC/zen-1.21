@@ -6,7 +6,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.format
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -137,7 +137,7 @@ object DamageSplash : Feature(
                 else -> "${normalDamageColor.code}$formattedDamage"
             }
 
-            event.entity.customName = Text.literal(newName)
+            event.entity.customName = Component.literal(newName)
         }
     }
 

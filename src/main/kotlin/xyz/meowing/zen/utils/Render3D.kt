@@ -1,20 +1,20 @@
 package xyz.meowing.zen.utils
 
-import net.minecraft.util.shape.VoxelShape
-import net.minecraft.client.font.TextRenderer
-import net.minecraft.client.render.LightmapTextureManager
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.VertexRendering
-import net.minecraft.client.render.debug.DebugRenderer
-import net.minecraft.client.util.BufferAllocator
-import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.entity.Entity
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Box
-import net.minecraft.util.math.Vec3d
-import net.minecraft.world.RaycastContext
+import net.minecraft.world.phys.shapes.VoxelShape
+import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.client.renderer.debug.DebugRenderer
+import com.mojang.blaze3d.vertex.ByteBufferBuilder
+import com.mojang.blaze3d.vertex.PoseStack
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.HitResult
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
+import net.minecraft.world.level.ClipContext
 import org.joml.Matrix4f
 import org.lwjgl.opengl.GL11
 import xyz.meowing.knit.api.KnitClient.client
@@ -33,9 +33,9 @@ object Render3D {
         return min(max(width, range[0]), range[1])
     }
 
-    fun drawEntityFilled(matrices: MatrixStack?, vertexConsumers: VertexConsumerProvider?, x: Double, y: Double, z: Double, width: Float, height: Float, r: Float, g: Float, b: Float, a: Float) {
-        val box = Box(x - width / 2, y, z - width / 2, x + width / 2, y + height, z + width / 2)
-        DebugRenderer.drawBox(
+    fun drawEntityFilled(matrices: PoseStack?, vertexConsumers: MultiBufferSource?, x: Double, y: Double, z: Double, width: Float, height: Float, r: Float, g: Float, b: Float, a: Float) {
+        val box = AABB(x - width / 2, y, z - width / 2, x + width / 2, y + height, z + width / 2)
+        DebugRenderer.renderFilledBox(
             matrices,
             vertexConsumers,
             box,
@@ -48,7 +48,7 @@ object Render3D {
 
     fun drawString(
         text: String,
-        pos: Vec3d,
+        pos: Vec3,
         color: Int = 0xFFFFFF,
         scale: Float = 1.0f,
         yOffset: Float = 0.0f,
@@ -61,20 +61,20 @@ object Render3D {
         ignoreY: Boolean = false,
         shadow: Boolean = true
     ) {
-        val camera = client.gameRenderer.camera
-        val cameraPos = camera.pos
-        val allocator = BufferAllocator(256)
-        val consumers = VertexConsumerProvider.immediate(allocator)
+        val camera = client.gameRenderer.mainCamera
+        val cameraPos = camera.position
+        val allocator = ByteBufferBuilder(256)
+        val consumers = MultiBufferSource.immediate(allocator)
 
-        val dirVec = Vec3d(cameraPos.x - pos.x, 0.0, cameraPos.z - pos.z).normalize()
-        val playerOffsetPos = Vec3d(pos.x + dirVec.x * 0.5, pos.y, pos.z + dirVec.z * 0.5)
+        val dirVec = Vec3(cameraPos.x - pos.x, 0.0, cameraPos.z - pos.z).normalize()
+        val playerOffsetPos = Vec3(pos.x + dirVec.x * 0.5, pos.y, pos.z + dirVec.z * 0.5)
 
-        val renderPos: Vec3d
+        val renderPos: Vec3
         val finalScale: Float
 
         if (dynamic) {
             val player = player ?: return
-            val eyeHeight = player.standingEyeHeight
+            val eyeHeight = player.eyeHeight
             val x = playerOffsetPos.x
             val y = playerOffsetPos.y
             val z = playerOffsetPos.z
@@ -98,14 +98,14 @@ object Render3D {
             else cameraPos.y + eyeHeight + (y + 20 * distToPlayer / 300 - (cameraPos.y + eyeHeight)) / (distToPlayer / distRender)
             val resultZ = cameraPos.z + (z - cameraPos.z) / (distToPlayer / distRender)
 
-            renderPos = Vec3d(resultX, resultY, resultZ)
+            renderPos = Vec3(resultX, resultY, resultZ)
         } else {
             renderPos = playerOffsetPos
             finalScale = scale
         }
 
         val lines = text.split("\n")
-        val fontHeight = client.textRenderer.fontHeight.toFloat()
+        val fontHeight = client.font.lineHeight.toFloat()
         val scaledFontHeight = fontHeight * finalScale * 0.025f
         val totalHeight = lines.size * scaledFontHeight
         val startY = -(totalHeight / 2f) + yOffset
@@ -118,11 +118,11 @@ object Render3D {
                     (renderPos.y - cameraPos.y + lineY).toFloat(),
                     (renderPos.z - cameraPos.z).toFloat()
                 )
-                .rotate(camera.rotation)
+                .rotate(camera.rotation())
                 .scale(finalScale * 0.025f, -(finalScale * 0.025f), finalScale * 0.025f)
 
-            val xOffset = -client.textRenderer.getWidth(line) / 2f
-            client.textRenderer.draw(
+            val xOffset = -client.font.width(line) / 2f
+            client.font.drawInBatch(
                 line,
                 xOffset,
                 0f,
@@ -130,52 +130,44 @@ object Render3D {
                 shadow,
                 positionMatrix,
                 consumers,
-                if (depth) TextRenderer.TextLayerType.NORMAL else TextRenderer.TextLayerType.SEE_THROUGH,
+                if (depth) Font.DisplayMode.NORMAL else Font.DisplayMode.SEE_THROUGH,
                 0,
-                LightmapTextureManager.MAX_LIGHT_COORDINATE
+                LightTexture.FULL_BRIGHT
             )
         }
-        consumers.draw()
+        consumers.endBatch()
     }
 
-    fun drawLineToEntity(entity: Entity, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
+    fun drawLineToEntity(entity: Entity, consumers: MultiBufferSource?, matrixStack: PoseStack?, colorComponents: FloatArray, alpha: Float) {
         val player = player ?: return
-        if (!player.canSee(entity)) return
+        if (!player.hasLineOfSight(entity)) return
 
-        //#if MC >= 1.21.9
-        //$$ val entityPos = entity.entityPos.add(0.0, entity.standingEyeHeight.toDouble(), 0.0)
-        //#else
-        val entityPos = entity.pos.add(0.0, entity.standingEyeHeight.toDouble(), 0.0)
-        //#endif
+        val entityPos = entity.position().add(0.0, entity.eyeHeight.toDouble(), 0.0)
         drawLineToPos(entityPos, consumers, matrixStack, colorComponents, alpha)
     }
 
-    fun drawLineToPos(pos: Vec3d, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, colorComponents: FloatArray, alpha: Float) {
+    fun drawLineToPos(pos: Vec3, consumers: MultiBufferSource?, matrixStack: PoseStack?, colorComponents: FloatArray, alpha: Float) {
         val player = player ?: return
-        val playerPos = player.getCameraPosVec(Utils.partialTicks)
+        val playerPos = player.getEyePosition(Utils.partialTicks)
         val toTarget = pos.subtract(playerPos).normalize()
-        val lookVec = player.getRotationVec(Utils.partialTicks).normalize()
+        val lookVec = player.getViewVector(Utils.partialTicks).normalize()
 
-        if (toTarget.dotProduct(lookVec) < 0.3) return
+        if (toTarget.dot(lookVec) < 0.3) return
 
-        //#if MC >= 1.21.9
-        //$$ val result = player.entityWorld.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
-        //#else
-        val result = player.world.raycast(RaycastContext(playerPos, pos, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, player))
-        //#endif
+        val result = player.level().clip(ClipContext(playerPos, pos, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player))
         if (result.type == HitResult.Type.BLOCK) return
 
         drawLineFromCursor(consumers, matrixStack, pos, colorComponents, alpha)
     }
 
-    fun drawLine(start: Vec3d, finish: Vec3d, thickness: Float, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val cameraPos = client.gameRenderer.camera.pos
+    fun drawLine(start: Vec3, finish: Vec3, thickness: Float, color: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
+        val cameraPos = client.gameRenderer.mainCamera.position
         val matrices = matrixStack ?: return
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
-        val entry = matrices.peek()
-        val consumers = consumers as VertexConsumerProvider.Immediate
-        val buffer = consumers.getBuffer(RenderLayer.getLines())
+        val entry = matrices.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val buffer = consumers.getBuffer(RenderType.lines())
 
         val validThickness = getValidLineWidth(thickness)
         GL11.glLineWidth(validThickness)
@@ -187,49 +179,49 @@ object Render3D {
 
         val direction = finish.subtract(start).normalize().toVector3f()
 
-        buffer.vertex(entry, start.x.toFloat(), start.y.toFloat(), start.z.toFloat())
-            .color(r, g, b, a)
-            .normal(entry, direction)
+        buffer.addVertex(entry, start.x.toFloat(), start.y.toFloat(), start.z.toFloat())
+            .setColor(r, g, b, a)
+            .setNormal(entry, direction)
 
-        buffer.vertex(entry, finish.x.toFloat(), finish.y.toFloat(), finish.z.toFloat())
-            .color(r, g, b, a)
-            .normal(entry, direction)
+        buffer.addVertex(entry, finish.x.toFloat(), finish.y.toFloat(), finish.z.toFloat())
+            .setColor(r, g, b, a)
+            .setNormal(entry, direction)
 
-        consumers.draw(RenderLayer.getLines())
-        matrices.pop()
+        consumers.endBatch(RenderType.lines())
+        matrices.popPose()
     }
 
-    fun drawLineFromCursor(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, point: Vec3d, colorComponents: FloatArray, alpha: Float) {
-        val camera = client.gameRenderer.camera
-        val cameraPos = camera.pos
-        matrixStack?.push()
+    fun drawLineFromCursor(consumers: MultiBufferSource?, matrixStack: PoseStack?, point: Vec3, colorComponents: FloatArray, alpha: Float) {
+        val camera = client.gameRenderer.mainCamera
+        val cameraPos = camera.position
+        matrixStack?.pushPose()
         matrixStack?.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
-        val entry = matrixStack?.peek()
-        val consumers = consumers as VertexConsumerProvider.Immediate
-        val layer = RenderLayer.getLines()
+        val entry = matrixStack?.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val layer = RenderType.lines()
         val buffer = consumers.getBuffer(layer)
 
-        val cameraPoint = cameraPos.add(Vec3d.fromPolar(camera.pitch, camera.yaw))
+        val cameraPoint = cameraPos.add(Vec3.directionFromRotation(camera.xRot, camera.yRot))
         val normal = point.toVector3f().sub(cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat()).normalize()
 
-        buffer.vertex(entry, cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat())
-            .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
-            .normal(entry, normal)
+        buffer.addVertex(entry, cameraPoint.x.toFloat(), cameraPoint.y.toFloat(), cameraPoint.z.toFloat())
+            .setColor(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .setNormal(entry, normal)
 
-        buffer.vertex(entry, point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
-            .color(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
-            .normal(entry, normal)
+        buffer.addVertex(entry, point.x.toFloat(), point.y.toFloat(), point.z.toFloat())
+            .setColor(colorComponents[0], colorComponents[1], colorComponents[2], alpha)
+            .setNormal(entry, normal)
 
-        consumers.draw(layer)
-        matrixStack?.pop()
+        consumers.endBatch(layer)
+        matrixStack?.popPose()
     }
 
-    fun drawFilledCircle(consumers: VertexConsumerProvider?, matrixStack: MatrixStack?, center: Vec3d, radius: Float, segments: Int, borderColor: Int, fillColor: Int) {
-        val camera = client.gameRenderer.camera.pos
-        matrixStack?.push()
+    fun drawFilledCircle(consumers: MultiBufferSource?, matrixStack: PoseStack?, center: Vec3, radius: Float, segments: Int, borderColor: Int, fillColor: Int) {
+        val camera = client.gameRenderer.mainCamera.position
+        matrixStack?.pushPose()
         matrixStack?.translate(-camera.x, -camera.y, -camera.z)
-        val entry = matrixStack?.peek()
-        val consumers = consumers as VertexConsumerProvider.Immediate
+        val entry = matrixStack?.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
 
         val centerX = center.x.toFloat()
         val centerY = center.y.toFloat() + 0.01f
@@ -245,27 +237,27 @@ object Render3D {
         val borderB = (borderColor and 0xFF) / 255f
         val borderA = ((borderColor shr 24) and 0xFF) / 255f
 
-        val triangleBuffer = consumers.getBuffer(RenderLayer.getDebugFilledBox())
-        triangleBuffer.vertex(entry, centerX, centerY, centerZ).color(fillR, fillG, fillB, fillA)
+        val triangleBuffer = consumers.getBuffer(RenderType.debugFilledBox())
+        triangleBuffer.addVertex(entry, centerX, centerY, centerZ).setColor(fillR, fillG, fillB, fillA)
 
         for (i in 0..segments) {
             val angle = Math.PI * 2 * i / segments
             val x = centerX + radius * cos(angle).toFloat()
             val z = centerZ + radius * sin(angle).toFloat()
-            triangleBuffer.vertex(entry, x, centerY, z).color(fillR, fillG, fillB, fillA)
+            triangleBuffer.addVertex(entry, x, centerY, z).setColor(fillR, fillG, fillB, fillA)
 
             if (i > 0) {
                 val prevAngle = Math.PI * 2 * (i - 1) / segments
                 val prevX = centerX + radius * cos(prevAngle).toFloat()
                 val prevZ = centerZ + radius * sin(prevAngle).toFloat()
 
-                triangleBuffer.vertex(entry, centerX, centerY, centerZ).color(fillR, fillG, fillB, fillA)
-                triangleBuffer.vertex(entry, prevX, centerY, prevZ).color(fillR, fillG, fillB, fillA)
-                triangleBuffer.vertex(entry, x, centerY, z).color(fillR, fillG, fillB, fillA)
+                triangleBuffer.addVertex(entry, centerX, centerY, centerZ).setColor(fillR, fillG, fillB, fillA)
+                triangleBuffer.addVertex(entry, prevX, centerY, prevZ).setColor(fillR, fillG, fillB, fillA)
+                triangleBuffer.addVertex(entry, x, centerY, z).setColor(fillR, fillG, fillB, fillA)
             }
         }
 
-        val lineBuffer = consumers.getBuffer(RenderLayer.getLines())
+        val lineBuffer = consumers.getBuffer(RenderType.lines())
         for (i in 0..segments) {
             val angle = Math.PI * 2 * i / segments
             val nextAngle = Math.PI * 2 * ((i + 1) % segments) / segments
@@ -275,46 +267,46 @@ object Render3D {
             val x2 = centerX + radius * cos(nextAngle).toFloat()
             val z2 = centerZ + radius * sin(nextAngle).toFloat()
 
-            val normal = Vec3d((x2 - x1).toDouble(), 0.0, (z2 - z1).toDouble()).normalize().toVector3f()
+            val normal = Vec3((x2 - x1).toDouble(), 0.0, (z2 - z1).toDouble()).normalize().toVector3f()
 
-            lineBuffer.vertex(entry, x1, centerY, z1)
-                .color(borderR, borderG, borderB, borderA)
-                .normal(entry, normal)
-            lineBuffer.vertex(entry, x2, centerY, z2)
-                .color(borderR, borderG, borderB, borderA)
-                .normal(entry, normal)
+            lineBuffer.addVertex(entry, x1, centerY, z1)
+                .setColor(borderR, borderG, borderB, borderA)
+                .setNormal(entry, normal)
+            lineBuffer.addVertex(entry, x2, centerY, z2)
+                .setColor(borderR, borderG, borderB, borderA)
+                .setNormal(entry, normal)
         }
 
-        consumers.draw()
-        matrixStack?.pop()
+        consumers.endBatch()
+        matrixStack?.popPose()
     }
 
-    fun drawSpecialBB(pos: BlockPos, fillColor: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val bb = Box(pos).expand(0.002, 0.002, 0.002)
+    fun drawSpecialBB(pos: BlockPos, fillColor: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
+        val bb = AABB(pos).inflate(0.002, 0.002, 0.002)
         drawSpecialBB(bb, fillColor, consumers, matrixStack)
     }
 
-    fun drawSpecialBB(bb: Box, fillColor: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
+    fun drawSpecialBB(bb: AABB, fillColor: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
         drawFilledBB(bb, fillColor.withAlpha(0.6f), consumers, matrixStack)
         drawOutlinedBB(bb, fillColor.withAlpha(0.9f), consumers, matrixStack)
     }
 
-    fun drawOutlinedBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val camera = client.gameRenderer.camera.pos
+    fun drawOutlinedBB(bb: AABB, color: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
+        val camera = client.gameRenderer.mainCamera.position
         val matrices = matrixStack ?: return
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(-camera.x, -camera.y, -camera.z)
-        val consumers = consumers as VertexConsumerProvider.Immediate
-        val buffer = consumers.getBuffer(RenderLayer.getLines())
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val buffer = consumers.getBuffer(RenderType.lines())
 
         val r = color.red / 255f
         val g = color.green / 255f
         val b = color.blue / 255f
         val a = color.alpha / 255f
 
-        VertexRendering.drawBox(
+        ShapeRenderer.renderLineBox(
             //#if MC >= 1.21.9
-            //$$ matrices.peek(),
+            //$$ matrices.last(),
             //#else
             matrices,
             //#endif
@@ -331,19 +323,19 @@ object Render3D {
             a
         )
 
-        consumers.draw(RenderLayer.getLines())
-        matrices.pop()
+        consumers.endBatch(RenderType.lines())
+        matrices.popPose()
     }
 
-    fun drawFilledBB(bb: Box, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        val aabb = bb.expand(0.001, 0.001, 0.001)
-        val camera = client.gameRenderer.camera.pos
+    fun drawFilledBB(bb: AABB, color: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
+        val aabb = bb.inflate(0.001, 0.001, 0.001)
+        val camera = client.gameRenderer.mainCamera.position
         val matrices = matrixStack ?: return
-        matrices.push()
+        matrices.pushPose()
         matrices.translate(-camera.x, -camera.y, -camera.z)
-        val entry = matrices.peek()
-        val consumers = consumers as VertexConsumerProvider.Immediate
-        val buffer = consumers.getBuffer(RenderLayer.getDebugFilledBox())
+        val entry = matrices.last()
+        val consumers = consumers as MultiBufferSource.BufferSource
+        val buffer = consumers.getBuffer(RenderType.debugFilledBox())
 
         val a = color.alpha / 255f
         val r = color.red / 255f
@@ -357,27 +349,27 @@ object Render3D {
         val maxY = aabb.maxY.toFloat()
         val maxZ = aabb.maxZ.toFloat()
 
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, minX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, maxY, maxZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, minZ).color(r, g, b, a)
-        buffer.vertex(entry, maxX, minY, maxZ).color(r, g, b, a)
+        buffer.addVertex(entry, minX, minY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, minY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, maxY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, maxY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, maxY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, minY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, minY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, minY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, minY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, minX, maxY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, maxY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, maxY, maxZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, minY, minZ).setColor(r, g, b, a)
+        buffer.addVertex(entry, maxX, minY, maxZ).setColor(r, g, b, a)
 
-        consumers.draw(RenderLayer.getDebugFilledBox())
-        matrices.pop()
+        consumers.endBatch(RenderType.debugFilledBox())
+        matrices.popPose()
     }
 
-    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: VertexConsumerProvider?, matrixStack: MatrixStack?) {
-        shape.boundingBoxes.forEach { box ->
+    fun drawFilledShapeVoxel(shape: VoxelShape, color: Color, consumers: MultiBufferSource?, matrixStack: PoseStack?) {
+        shape.toAabbs().forEach { box ->
             drawFilledBB(
                 box,
                 color,

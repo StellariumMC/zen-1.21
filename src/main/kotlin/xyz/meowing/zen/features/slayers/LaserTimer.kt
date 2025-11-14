@@ -61,19 +61,15 @@ object LaserTimer : Feature(
     }
 
     private fun drawString() {
-        val entity = world?.getEntityById(bossID) ?: return
-        if (player?.canSee(entity) != true) return
+        val entity = world?.getEntity(bossID) ?: return
+        if (player?.hasLineOfSight(entity) != true) return
         val ridingEntity = entity.vehicle ?: return
-        val time = maxOf(0.0, TOTAL_TIME - (ridingEntity.age / 20.0))
+        val time = maxOf(0.0, TOTAL_TIME - (ridingEntity.tickCount / 20.0))
         val text = "§bLaser: §c${"%.1f".format(time)}"
 
         Render3D.drawString(
             text,
-            //#if MC >= 1.21.9
-            //$$ entity.entityPos,
-            //#else
-            entity.pos,
-            //#endif
+            entity.position(),
             Color.WHITE.rgb,
             2.0f,
             1.0f

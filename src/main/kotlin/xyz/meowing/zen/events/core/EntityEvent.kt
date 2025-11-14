@@ -2,14 +2,14 @@
 
 package xyz.meowing.zen.events.core
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.item.ItemStack
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket
-import net.minecraft.util.Hand
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.World
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket
+import net.minecraft.world.InteractionHand
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.Level
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 
@@ -18,11 +18,11 @@ sealed class EntityEvent {
         /**
          * Posted when the client receives the EntityTrackerUpdateS2CPacket packet.
          *
-         * @see xyz.meowing.zen.mixins.MixinClientPlayNetworkHandler
+         * @see xyz.meowing.zen.mixins.MixinClientPacketListener
          * @since 1.2.0
          */
         class Metadata(
-            val packet: EntityTrackerUpdateS2CPacket,
+            val packet: ClientboundSetEntityDataPacket,
             val entity: Entity,
             val name: String
         ) : CancellableEvent()
@@ -34,7 +34,7 @@ sealed class EntityEvent {
          * @since 1.2.0
          */
         class Spawn(
-            val packet: EntitySpawnS2CPacket
+            val packet: ClientboundAddEntityPacket
         ) : CancellableEvent()
     }
 
@@ -71,11 +71,11 @@ sealed class EntityEvent {
     /**
      * Posted when the entity is attacked by the player entity.
      *
-     * @see xyz.meowing.zen.mixins.MixinClientPlayerInteraction
+     * @see xyz.meowing.zen.mixins.MixinMultiPlayerGameMode
      * @since 1.2.0
      */
     class Attack(
-        val player: PlayerEntity,
+        val player: Player,
         val target: Entity
     ) : Event()
 
@@ -86,9 +86,9 @@ sealed class EntityEvent {
      * @since 1.2.0
      */
     class Interact(
-        val player: PlayerEntity,
-        val world: World,
-        val hand: Hand,
+        val player: Player,
+        val world: Level,
+        val hand: InteractionHand,
         val action: String,
         val pos: BlockPos? = null
     ) : Event()
@@ -96,7 +96,7 @@ sealed class EntityEvent {
     /**
      * Posted when an entity is hit by a projectile.
      *
-     * @see xyz.meowing.zen.mixins.MixinPersistentProjectileEntity
+     * @see xyz.meowing.zen.mixins.MixinAbstractArrow
      * @since 1.2.0
      */
     class ArrowHit(
@@ -107,7 +107,7 @@ sealed class EntityEvent {
     /**
      * Posted when the player entity tosses out items through their inventory.
      *
-     * @see xyz.meowing.zen.mixins.MixinClientPlayerEntity
+     * @see xyz.meowing.zen.mixins.MixinLocalPlayer
      * @since 1.2.0
      */
     class ItemToss(

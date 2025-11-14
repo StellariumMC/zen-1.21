@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.mining
 
-import net.minecraft.sound.SoundEvents
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -55,12 +55,12 @@ object MiningAbility : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable")
+        HUDManager.register(NAME, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable", "miningAbility")
 
         register<TablistEvent.Change> { parseTablist() }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME) && hasWidget) {
+            if (hasWidget) {
                 val x = HUDManager.getX(NAME)
                 val y = HUDManager.getY(NAME)
                 val scale = HUDManager.getScale(NAME)
@@ -120,7 +120,7 @@ object MiningAbility : Feature(
 
         if (isAvailable && wasOnCooldown && showTitle) {
             showTitle("§aAbility Ready!", null, 2000)
-            Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 1f, 1f)
+            Utils.playSound(SoundEvents.CAT_AMBIENT, 1f, 1f)
             wasOnCooldown = false
         } else if (!isAvailable) {
             wasOnCooldown = true

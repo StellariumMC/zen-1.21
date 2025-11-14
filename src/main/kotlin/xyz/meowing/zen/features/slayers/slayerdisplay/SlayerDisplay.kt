@@ -8,11 +8,11 @@ import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.baseMaxHealth
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.entity.Entity
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.BlazeEntity
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Blaze
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -31,7 +31,7 @@ object SlayerDisplay : Feature(
 ) {
     private val slayerEntities = mutableMapOf<Int, SlayerData>()
     private val nametagData = mutableMapOf<Int, String>()
-    private val killTimers = mutableMapOf<Int, Triple<Long, String, Vec3d>>()
+    private val killTimers = mutableMapOf<Int, Triple<Long, String, Vec3>>()
     private val hiddenArmorStands = mutableSetOf<Int>()
 
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
@@ -163,7 +163,7 @@ object SlayerDisplay : Feature(
         }
 
         configRegister<RenderEvent.Entity.Pre>(listOf("slayerDisplay", "slayerDisplay.hideNametags"), priority = 1000, skyblockOnly = true) { event ->
-            if (event.entity is ArmorStandEntity && hiddenArmorStands.contains(event.entity.id)) {
+            if (event.entity is ArmorStand && hiddenArmorStands.contains(event.entity.id)) {
                 event.cancel()
             }
         }
@@ -187,11 +187,7 @@ object SlayerDisplay : Feature(
                     killTimers[entityId] = Triple(
                         System.currentTimeMillis(),
                         killTimeText,
-                        //#if MC >= 1.21.9
-                        //$$ event.entity.entityPos
-                        //#else
-                        event.entity.pos
-                        //#endif
+                        event.entity.position()
                     )
                 }
             }
@@ -204,7 +200,7 @@ object SlayerDisplay : Feature(
         }
 
         register<RenderEvent.Entity.Post> { event ->
-            if (event.entity is BlazeEntity || event.entity is ArmorStandEntity) return@register
+            if (event.entity is Blaze || event.entity is ArmorStand) return@register
             val entityId = event.entity.id
             val slayerEntityId = entityId - 1
 
@@ -217,14 +213,10 @@ object SlayerDisplay : Feature(
             }
 
             displayText?.takeIf { it.isNotEmpty() }?.let {
-                val depth = player?.canSee(event.entity) != true
+                val depth = player?.hasLineOfSight(event.entity) != true
                 Render3D.drawString(
                     it,
-                    //#if MC >= 1.21.9
-                    //$$ event.entity.entityPos.add(0.0, yOffset, 0.0),
-                    //#else
-                    event.entity.pos.add(0.0, yOffset, 0.0),
-                    //#endif
+                    event.entity.position().add(0.0, yOffset, 0.0),
                     depth = depth,
                     scaleMultiplier = 1.5,
                     smallestDistanceView = 8.0
@@ -258,7 +250,7 @@ object SlayerDisplay : Feature(
 
         getBossType(cleanName)?.let { slayerData.bossType = it }
         val bossType = slayerData.bossType ?: return
-        val entity = world?.getEntityById(slayerEntityId)
+        val entity = world?.getEntity(slayerEntityId)
 
         val hpMatch = hpRegex.find(cleanName)
         val hitsMatch = hitsRegex.find(cleanName)
@@ -429,7 +421,7 @@ object SlayerDisplay : Feature(
         if (3 !in displayOptions) return ""
 
         val ridingEntity = entity.vehicle ?: return ""
-        val time = maxOf(0.0, 8.2 - (ridingEntity.age / 20.0))
+        val time = maxOf(0.0, 8.2 - (ridingEntity.tickCount / 20.0))
         val color = when {
             time > 6.0 -> "§a"
             time > 3.0 -> "§e"

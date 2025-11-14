@@ -7,7 +7,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.entity.mob.EndermanEntity
+import net.minecraft.world.entity.monster.EnderMan
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
@@ -24,7 +24,7 @@ object HideEndermanLaser : Feature(
     true
 ) {
     private val hideForOption by ConfigDelegate<Int>("hideEndermanLaser.forBossType")
-    private val endermanCache = ConcurrentHashMap<Int, EndermanEntity>()
+    private val endermanCache = ConcurrentHashMap<Int, EnderMan>()
     private val nametagData = ConcurrentHashMap<Int, String>()
     private var lastCacheUpdate = 0L
     private var cacheInitialized = false
@@ -73,14 +73,14 @@ object HideEndermanLaser : Feature(
         }
 
         register<SkyblockEvent.Slayer.Spawn> { event ->
-            if (event.entity is EndermanEntity) {
+            if (event.entity is EnderMan) {
                 updateCache()
                 cacheInitialized = true
             }
         }
     }
 
-    private fun getCachedClosestEnderman(guardianEntity: net.minecraft.entity.Entity): EndermanEntity? {
+    private fun getCachedClosestEnderman(guardianEntity: net.minecraft.world.entity.Entity): EnderMan? {
         val currentTick = TickUtils.getCurrentServerTick()
         if (!cacheInitialized || currentTick - lastCacheUpdate >= 5) {
             updateCache()
@@ -88,14 +88,14 @@ object HideEndermanLaser : Feature(
             cacheInitialized = true
         }
 
-        return endermanCache.values.minByOrNull { guardianEntity.squaredDistanceTo(it) }
+        return endermanCache.values.minByOrNull { guardianEntity.distanceToSqr(it) }
     }
 
     private fun updateCache() {
         val slayerEntities = EntityDetection.getSlayerEntities()
 
         endermanCache.clear()
-        slayerEntities.keys.filterIsInstance<EndermanEntity>().forEach { enderman ->
+        slayerEntities.keys.filterIsInstance<EnderMan>().forEach { enderman ->
             endermanCache[enderman.id] = enderman
         }
     }

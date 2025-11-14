@@ -65,10 +65,10 @@ object PartyTracker {
         EventBus.register<GuiEvent.Slot.Click> { event ->
             if (!event.screen.chestName.startsWith("Party Finder")) return@register
 
-            val stackName = event.slot?.stack?.name?.string?.removeFormatting() ?: return@register
+            val stackName = event.slot?.item?.hoverName?.string?.removeFormatting() ?: return@register
             if (!stackName.endsWith("'s Party")) return@register
 
-            val stack = event.slot.stack
+            val stack = event.slot.item
             if (stack.lore.any { it.removeFormatting().startsWith("Requires") }) return@register
 
             hadProblemJoiningParty = false

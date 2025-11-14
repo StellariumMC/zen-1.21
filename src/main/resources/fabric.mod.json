@@ -27,11 +27,7 @@
 		]
 	},
 	"mixins": [
-		"mixins.zen.json",
-		{
-			"config": "meowing.zen.mixins.json",
-			"environment": "*"
-		}
+		"mixins.zen.json"
 	],
 	"depends": {
       "minecraft": "~${minor_mc_version}",

@@ -8,8 +8,8 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.createSkull
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.item.ItemStack
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.zen.annotations.Module
@@ -62,7 +62,7 @@ object MaskTimers : Feature(
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(NAME, 60, 57, this::HUDEditorRender)
+        HUDManager.registerCustom(NAME, 60, 57, this::editorRender, "maskTimers")
 
         register<ChatEvent.Receive> { event ->
             if (event.isActionBar) return@register
@@ -87,7 +87,7 @@ object MaskTimers : Feature(
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME)) render(event.context)
+            render(event.context)
         }
 
         register<LocationEvent.WorldChange> {
@@ -108,7 +108,7 @@ object MaskTimers : Feature(
         hasBonzoMask = checkHelmet("Bonzo's Mask")
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val activeMasks = getActiveMasks()
         if (activeMasks.isEmpty()) return
 
@@ -118,12 +118,15 @@ object MaskTimers : Feature(
         drawHUD(context, x, y, scale, false, activeMasks)
     }
 
-    private fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
+    private fun editorRender(context: GuiGraphics) {
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
         val previewMasks = listOf(
             MaskData(BonzoMask, "153.4s", "§c", true),
             MaskData(SpiritMask, "12.4s", "§b", false),
             MaskData(Phoenix, "60.0s", "§6", true)
         )
+
         drawHUD(context, x, y, 1f, true, previewMasks)
     }
 
@@ -149,10 +152,10 @@ object MaskTimers : Feature(
     }
 
     private fun checkHelmet(name: String): Boolean {
-        return player?.inventory?.getStack(39)?.name?.string?.contains(name) == true
+        return player?.inventory?.getItem(39)?.hoverName?.string?.contains(name) == true
     }
 
-    private fun drawHUD(context: DrawContext, x: Float, y: Float, scale: Float, preview: Boolean, masks: List<MaskData>) {
+    private fun drawHUD(context: GuiGraphics, x: Float, y: Float, scale: Float, preview: Boolean, masks: List<MaskData>) {
         val iconSize = 16f * scale
         val spacing = 2f * scale
         var currentY = y

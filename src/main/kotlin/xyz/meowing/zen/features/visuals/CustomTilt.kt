@@ -3,7 +3,7 @@ package xyz.meowing.zen.features.visuals
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.util.math.RotationAxis
+import com.mojang.math.Axis
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
@@ -81,9 +81,9 @@ object CustomTilt : Feature(
         register<RenderEvent.Player.Pre> { event ->
             if (tiltEveryone || event.entity.id == player?.id) {
                 val multiplier = if (animatedTilt) sin(System.currentTimeMillis() * tiltSpeed / 1000.0) else 1.0
-                event.matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((tiltX * multiplier).toFloat()))
-                event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((tiltY * multiplier).toFloat()))
-                event.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((tiltZ * multiplier).toFloat()))
+                event.matrices.mulPose(Axis.XP.rotationDegrees((tiltX * multiplier).toFloat()))
+                event.matrices.mulPose(Axis.YP.rotationDegrees((tiltY * multiplier).toFloat()))
+                event.matrices.mulPose(Axis.ZP.rotationDegrees((tiltZ * multiplier).toFloat()))
             }
         }
     }

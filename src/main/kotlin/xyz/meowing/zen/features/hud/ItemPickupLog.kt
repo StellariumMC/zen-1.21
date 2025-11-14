@@ -10,9 +10,10 @@ import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.Utils.getRegexGroups
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.item.ItemStack
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
+import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
@@ -57,10 +58,10 @@ object ItemPickupLog : Feature(
     var displayLines = mutableMapOf<String, PickupEntry>()
 
     override fun initialize() {
-        HUDManager.register(NAME, "§a+5 §fPotato §6$16\n§c-4 §fHay Bale §6$54")
+        HUDManager.register(NAME, "§a+5 §fPotato §6$16\n§c-4 §fHay Bale §6$54", "itemPickupLog")
 
         register<PacketEvent.ReceivedPost> { event ->
-            if (event.packet is ScreenHandlerSlotUpdateS2CPacket) {
+            if (event.packet is ClientboundContainerSetSlotPacket) {
                 currentInventory = getCurrentInventoryState()?.toMutableMap() ?: return@register
                 compareInventories(previousInventory, currentInventory)
                 previousInventory = currentInventory
@@ -68,11 +69,11 @@ object ItemPickupLog : Feature(
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME)) render(event.context)
+            if (KnitClient.player != null) render(event.context)
         }
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
@@ -113,7 +114,7 @@ object ItemPickupLog : Feature(
 
         loop@ for (element in mainInventory) {
             if (element == null) continue
-            var displayName = element.name.string ?: "Empty slot"
+            var displayName = element.hoverName.string ?: "Empty slot"
 
             for (regex in ignoreStacksRegex) {
                 if (displayName.matches(regex)) {

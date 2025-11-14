@@ -1,6 +1,6 @@
 package xyz.meowing.zen.utils
 
-import net.minecraft.entity.Entity
+import net.minecraft.world.entity.Entity
 import kotlin.time.Duration
 
 /**
@@ -16,8 +16,8 @@ internal interface EntityAccessor {
     fun `zen$setGlowingThisFrame`(glowing: Boolean)
 }
 
-var Entity.isCurrentlyGlowing: Boolean
-    get() = this.isGlowing
+var Entity.isGlowing: Boolean
+    get() = this.isCurrentlyGlowing
     set(value) {
         (this as EntityAccessor).`zen$setGlowing`(value)
     }
@@ -29,7 +29,7 @@ var Entity.glowTime: Duration
     }
 
 var Entity.glowingColor: Int
-    get() = this.teamColorValue
+    get() = this.teamColor
     set(value) {
         (this as EntityAccessor).`zen$setGlowingColor`(value)
     }

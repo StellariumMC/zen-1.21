@@ -6,7 +6,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.Utils.toColorFloat
-import net.minecraft.entity.decoration.ArmorStandEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.RenderEvent
@@ -43,7 +43,7 @@ object KeyHighlight : Feature(
 
     override fun initialize() {
         register<RenderEvent.Entity.Pre> { event ->
-            if (event.entity !is ArmorStandEntity) return@register
+            if (event.entity !is ArmorStand) return@register
             val name = event.entity.name.string.removeFormatting()
 
             if (name == "Wither Key" || name == "Blood Key") {

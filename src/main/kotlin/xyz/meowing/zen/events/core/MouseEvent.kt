@@ -9,7 +9,7 @@ sealed class MouseEvent {
     /**
      * Posted before the Mouse click is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinMouse
+     * @see xyz.meowing.zen.mixins.MixinMouseHandler
      * @since 1.2.0
      */
     class Click(
@@ -19,7 +19,7 @@ sealed class MouseEvent {
     /**
      * Posted before the Mouse release is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinMouse
+     * @see xyz.meowing.zen.mixins.MixinMouseHandler
      * @since 1.2.0
      */
     class Release(
@@ -29,7 +29,7 @@ sealed class MouseEvent {
     /**
      * Posted before the Mouse scroll is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinMouse
+     * @see xyz.meowing.zen.mixins.MixinMouseHandler
      * @since 1.2.0
      */
     class Scroll(
@@ -40,7 +40,7 @@ sealed class MouseEvent {
     /**
      * Posted before the Mouse move is handled by the game.
      *
-     * @see xyz.meowing.zen.mixins.MixinMouse
+     * @see xyz.meowing.zen.mixins.MixinMouseHandler
      * @since 1.2.0
      */
     class Move : Event()

@@ -2,11 +2,11 @@
 
 package xyz.meowing.zen.events.core
 
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.gui.screen.Screen
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.slot.SlotActionType
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 
@@ -19,7 +19,7 @@ sealed class GuiEvent {
          * @since 1.2.0
          */
         class HUD(
-            val context: DrawContext,
+            val context: GuiGraphics,
             val renderType: RenderType
         ) : Event()
 
@@ -50,7 +50,7 @@ sealed class GuiEvent {
      */
     class Close(
         val screen: Screen,
-        val handler: ScreenHandler
+        val handler: AbstractContainerMenu
     ) : CancellableEvent()
 
     /**
@@ -71,7 +71,7 @@ sealed class GuiEvent {
      * Posted when a keyboard button clicked inside a Screen.
      *
      * @see xyz.meowing.knit.api.events.EventBus
-     * @see xyz.meowing.zen.mixins.MixinKeyboard
+     * @see xyz.meowing.zen.mixins.MixinKeyboardHandler
      * @since 1.2.0
      */
     class Key(
@@ -86,28 +86,28 @@ sealed class GuiEvent {
         /**
          * Posted when a Slot is clicked with a mouse button.
          *
-         * @see xyz.meowing.zen.mixins.MixinHandledScreen
+         * @see xyz.meowing.zen.mixins.MixinAbstractContainerScreen
          * @since 1.2.0
          */
         class Click(
-            val slot: net.minecraft.screen.slot.Slot?,
+            val slot: net.minecraft.world.inventory.Slot?,
             val slotId: Int,
             val button: Int,
-            val actionType: SlotActionType,
-            val handler: ScreenHandler,
-            val screen: HandledScreen<*>
+            val actionType: ClickType,
+            val handler: AbstractContainerMenu,
+            val screen: AbstractContainerScreen<*>
         ) : CancellableEvent()
 
         /**
          * Posted when a Slot is being rendered.
          *
-         * @see xyz.meowing.zen.mixins.MixinHandledScreen
+         * @see xyz.meowing.zen.mixins.MixinAbstractContainerScreen
          * @since 1.2.0
          */
         class Render(
-            val context: DrawContext,
-            val slot: net.minecraft.screen.slot.Slot,
-            val screen: HandledScreen<ScreenHandler>
+            val context: GuiGraphics,
+            val slot: net.minecraft.world.inventory.Slot,
+            val screen: AbstractContainerScreen<AbstractContainerMenu>
         ) : Event()
     }
 

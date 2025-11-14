@@ -1,10 +1,10 @@
 package xyz.meowing.zen.utils
 
-import net.minecraft.client.network.PlayerListEntry
+import net.minecraft.client.multiplayer.PlayerInfo
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.scoreboard.ScoreboardDisplaySlot
-import net.minecraft.world.GameMode
+import net.minecraft.world.scores.DisplaySlot
+import net.minecraft.world.level.GameType
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
@@ -19,22 +19,22 @@ object ScoreboardUtils {
             val scoreboard = player?.scoreboard ?: return emptyList()
             //#endif
 
-            val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return emptyList()
+            val objective = scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return emptyList()
 
             val stringLines = mutableListOf<String>()
-            val scoreHolders = scoreboard.knownScoreHolders.toList()
+            val scoreHolders = scoreboard.trackedPlayers.toList()
 
             // Loop over all known scoreboard entries
             for (scoreHolder in scoreHolders) {
-                if (!scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) continue
+                if (!scoreboard.listPlayerScores(scoreHolder).containsKey(objective)) continue
                 // Only include entries that are part of the current objective
-                val objectivesForEntry = scoreboard.getScoreHolderObjectives(scoreHolder)
+                val objectivesForEntry = scoreboard.listPlayerScores(scoreHolder)
                 if (!objectivesForEntry.containsKey(objective)) continue
 
-                val team = scoreboard.getScoreHolderTeam(scoreHolder.nameForScoreboard)
+                val team = scoreboard.getPlayersTeam(scoreHolder.scoreboardName)
 
                 if (team != null) {
-                    val strLine = team.prefix.string + team.suffix.string
+                    val strLine = team.playerPrefix.string + team.playerSuffix.string
                     if (strLine.trim().isNotEmpty()) stringLines.add(strLine)
                 }
             }
@@ -54,7 +54,7 @@ object ScoreboardUtils {
 
     fun getScoreboardTitle(cleanColor: Boolean = true): String? {
         val scoreboard = world?.scoreboard ?: return null
-        val objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR) ?: return null
+        val objective = scoreboard.getDisplayObjective(DisplaySlot.SIDEBAR) ?: return null
 
         return objective.displayName?.string?.let {
             if (cleanColor) it.removeFormatting() else it
@@ -68,22 +68,22 @@ object ScoreboardUtils {
      **/
     private fun stripAlienCharacters(text: String): String {
         return text.filter {
-            client.textRenderer.getWidth(it.toString()) > 0 || it == '§'
+            client.font.width(it.toString()) > 0 || it == '§'
         }
     }
 
-    fun getTabListEntries(): List<PlayerListEntry> {
-        val networkHandler = client.networkHandler ?: return emptyList()
-        return networkHandler.playerList
-                .sortedWith(compareBy<PlayerListEntry> { it.gameMode == GameMode.SPECTATOR }
-                    .thenBy { it.scoreboardTeam?.name ?: "" }
+    fun getTabListEntries(): List<PlayerInfo> {
+        val networkHandler = client.connection ?: return emptyList()
+        return networkHandler.onlinePlayers
+                .sortedWith(compareBy<PlayerInfo> { it.gameMode == GameType.SPECTATOR }
+                    .thenBy { it.team?.name ?: "" }
                     .thenBy { it.profile.name })
 
     }
 
     fun getTabListEntriesString(): List<String> {
         return getTabListEntries()
-            .mapNotNull { it.displayName?.string }
+            .mapNotNull { it.tabListDisplayName?.string }
             .filter { it.isNotEmpty() }
     }
 }

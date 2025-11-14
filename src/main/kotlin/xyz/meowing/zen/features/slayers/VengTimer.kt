@@ -10,9 +10,9 @@ import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.entity.Entity
-import net.minecraft.entity.mob.BlazeEntity
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.monster.Blaze
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -46,10 +46,10 @@ object VengTimer : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§bVeng proc: §c4.3s")
+        HUDManager.register(NAME, "§bVeng proc: §c4.3s", "vengTimer")
 
         createCustomEvent<GuiEvent.Render.HUD>("render") {
-            if (HUDManager.isEnabled(NAME)) render(it.context)
+            render(it.context)
         }
 
         register<SkyblockEvent.Slayer.QuestStart> {
@@ -67,14 +67,14 @@ object VengTimer : Feature(
         }
 
         register<EntityEvent.Attack> { event ->
-            if (hit || event.target !is BlazeEntity || !isFighting) return@register
+            if (hit || event.target !is Blaze || !isFighting) return@register
 
             val player = player ?: return@register
-            val heldItem = player.mainHandStack ?: return@register
+            val heldItem = player.mainHandItem ?: return@register
 
-            if (event.player.name?.string != player.name?.string || !heldItem.name.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
+            if (event.player.name?.string != player.name?.string || !heldItem.hoverName.string.removeFormatting().contains("Pyrochaos Dagger", true)) return@register
 
-            val nametagEntity = cachedNametag ?: world?.entities?.find { entity ->
+            val nametagEntity = cachedNametag ?: world?.entitiesForRendering()?.find { entity ->
                 val name = entity.name?.string?.removeFormatting() ?: return@find false
                 name.contains("Spawned by") && name.endsWith("by: ${player.name?.string}")
             }?.also { cachedNametag = it }
@@ -92,7 +92,7 @@ object VengTimer : Feature(
         }
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val text = getDisplayText()
         if (text.isEmpty()) return
 

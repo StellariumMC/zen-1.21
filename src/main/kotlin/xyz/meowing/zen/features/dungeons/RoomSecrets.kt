@@ -6,7 +6,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Render2D.width
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.GuiEvent
@@ -37,18 +37,21 @@ object RoomSecrets : Feature(
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(NAME, 50, 30, this::HUDEditorRender)
+        HUDManager.registerCustom(NAME, 50, 30, this::editorRender, "roomSecrets")
 
         register<GuiEvent.Render.HUD> { renderHUD(it.context) }
     }
 
-    fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
-        val matrix = context.matrices
+    fun editorRender(context: GuiGraphics) {
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
+
+        val matrix = context.pose()
         //#if MC >= 1.21.7
         //$$ matrix.pushMatrix()
         //$$ matrix.translate(x, y)
         //#else
-        matrix.push()
+        matrix.pushPose()
         matrix.translate(x, y, 0f)
         //#endif
 
@@ -69,13 +72,12 @@ object RoomSecrets : Feature(
         //#if MC >= 1.21.7
         //$$ matrix.popMatrix()
         //#else
-        matrix.pop()
+        matrix.popPose()
         //#endif
     }
 
-    private fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled(NAME)) return
-        val matrix = context.matrices
+    private fun renderHUD(context: GuiGraphics) {
+        val matrix = context.pose()
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
@@ -85,7 +87,7 @@ object RoomSecrets : Feature(
         //$$ matrix.scale(scale, scale)
         //$$ matrix.translate(x, y)
         //#else
-        matrix.push()
+        matrix.pushPose()
         matrix.scale(scale, scale, 1f)
         matrix.translate(x, y, 0f)
         //#endif
@@ -107,7 +109,7 @@ object RoomSecrets : Feature(
         //#if MC >= 1.21.7
         //$$ matrix.popMatrix()
         //#else
-        matrix.pop()
+        matrix.popPose()
         //#endif
     }
 

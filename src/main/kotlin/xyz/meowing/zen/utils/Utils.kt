@@ -4,18 +4,20 @@ import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIRoundedRectangle
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.entity.LivingEntity
-import net.minecraft.entity.attribute.EntityAttributes
-import net.minecraft.screen.GenericContainerScreenHandler
-import net.minecraft.sound.SoundEvent
-import net.minecraft.text.MutableText
-import net.minecraft.text.OrderedText
-import net.minecraft.text.Style
-import net.minecraft.text.Text
+import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.sounds.SoundEvent
+import net.minecraft.network.chat.MutableComponent
+import net.minecraft.util.FormattedCharSequence
+import net.minecraft.network.chat.Style
+import net.minecraft.network.chat.Component
 import org.apache.commons.lang3.SystemUtils
 import xyz.meowing.knit.api.KnitClient.client
+import xyz.meowing.knit.api.input.KnitInputs
 import java.awt.Color
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -35,11 +37,26 @@ object Utils {
         1000000000000000000L to "e"
     )
 
-    inline val partialTicks get() = client.renderTickCounter.getTickProgress(true)
+    inline val partialTicks get() = client.deltaTracker.getGameTimeDeltaPartialTick(true)
     inline val window get() = client.window
 
     fun playSound(sound: SoundEvent, volume: Float, pitch: Float) {
-        MinecraftClient.getInstance().player?.playSound(sound, volume, pitch)
+        Minecraft.getInstance().player?.playSound(sound, volume, pitch)
+    }
+
+    fun getKeyName(keyCode: Int): String {
+        return when {
+            keyCode == 0 -> "None"
+            keyCode < 0 -> {
+                when (val button = -keyCode - 1) {
+                    0 -> "LMB"
+                    1 -> "RMB"
+                    2 -> "MMB"
+                    else -> "Mouse ${button + 1}"
+                }
+            }
+            else -> KnitInputs.getDisplayName(keyCode)
+        }
     }
 
     fun String?.removeFormatting(): String {
@@ -67,9 +84,9 @@ object Utils {
         return if (scaled < 100 && scaled % 10 != 0L) "${scaled / 10.0}$suffix" else "${scaled / 10}$suffix"
     }
 
-    inline val HandledScreen<*>.chestName: String get() {
-        val screenHandler = this.screenHandler
-        if (screenHandler !is GenericContainerScreenHandler) return ""
+    inline val AbstractContainerScreen<*>.chestName: String get() {
+        val screenHandler = this.menu
+        if (screenHandler !is ChestMenu) return ""
         return this.title.string.trim()
     }
 
@@ -155,7 +172,7 @@ object Utils {
      * Modified code from Aaron's Mod
      * https://github.com/AzureAaron/aaron-mod/blob/master/src/main/java/net/azureaaron/mod/utils/TextTransformer.java
      */
-    fun replaceMultipleEntriesInText(text: Text, replacements: Object2ObjectLinkedOpenHashMap<String, Text>): Text {
+    fun replaceMultipleEntriesInText(text: Component, replacements: Object2ObjectLinkedOpenHashMap<String, Component>): Component {
         if (replacements.isEmpty())
             return text
 
@@ -165,7 +182,7 @@ object Utils {
         if (contentLength == 0)
             return text
 
-        data class ReplacementEntry(val target: String, val replacement: Text, val targetLen: Int)
+        data class ReplacementEntry(val target: String, val replacement: Component, val targetLen: Int)
 
         val entries = ArrayList<ReplacementEntry>(replacements.size)
         var hasAnyMatch = false
@@ -192,7 +209,7 @@ object Utils {
             Optional.empty<Any>()
         }, Style.EMPTY)
 
-        val result = Text.empty() as MutableText
+        val result = Component.empty() as MutableComponent
         var idx = 0
 
         while (idx < contentLength && idx < styledChars.size) {
@@ -211,7 +228,7 @@ object Utils {
 
             if (!found) {
                 val styledChar = styledChars[idx]
-                result.append(Text.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(styledChar.style))
+                result.append(Component.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(styledChar.style))
                 idx++
             }
 
@@ -220,7 +237,7 @@ object Utils {
         return result
     }
 
-    fun replaceMultipleEntriesInOrdered(orderedText: OrderedText, replacements: Object2ObjectLinkedOpenHashMap<String, Text>): OrderedText {
+    fun replaceMultipleEntriesInOrdered(orderedText: FormattedCharSequence, replacements: Object2ObjectLinkedOpenHashMap<String, Component>): FormattedCharSequence {
         if (replacements.isEmpty())
             return orderedText
 
@@ -239,7 +256,7 @@ object Utils {
         if (contentLength == 0)
             return orderedText
 
-        data class ReplacementEntry(val target: String, val replacement: Text, val targetLen: Int)
+        data class ReplacementEntry(val target: String, val replacement: Component, val targetLen: Int)
 
         val entries = ArrayList<ReplacementEntry>(replacements.size)
         var hasAnyMatch = false
@@ -261,7 +278,7 @@ object Utils {
             styleMap[styles[i].first] = styles[i].second
         }
 
-        val result = Text.empty() as MutableText
+        val result = Component.empty() as MutableComponent
         var idx = 0
 
         while (idx < contentLength) {
@@ -280,12 +297,31 @@ object Utils {
 
             if (!found) {
                 val style = styleMap[idx] ?: Style.EMPTY
-                result.append(Text.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(style))
+                result.append(Component.literal(String(Character.toChars(content.codePointAt(idx)))).setStyle(style))
                 idx++
             }
         }
 
-        return result.asOrderedText()
+        return result.visualOrderText
+    }
+
+    fun Component.toLegacyString(): String {
+        val sb = StringBuilder()
+        this.visit({ style, text ->
+            style.color?.let { color ->
+                ChatFormatting.entries.firstOrNull {
+                    it.color == color.value
+                }?.let { sb.append('§').append(it.char) }
+            }
+            if (style.isBold) sb.append("§l")
+            if (style.isItalic) sb.append("§o")
+            if (style.isUnderlined) sb.append("§n")
+            if (style.isStrikethrough) sb.append("§m")
+            if (style.isObfuscated) sb.append("§k")
+            sb.append(text)
+            Optional.empty<Unit>()
+        }, Style.EMPTY)
+        return sb.toString()
     }
 
     fun getFormattedDate(): String {
@@ -376,5 +412,5 @@ object Utils {
         return sign + formatted + suffix
     }
 
-    val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(EntityAttributes.MAX_HEALTH).toInt()
+    val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 }

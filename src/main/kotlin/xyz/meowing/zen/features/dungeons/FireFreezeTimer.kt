@@ -6,8 +6,8 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.sound.SoundEvents
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.dungeons.DungeonFloor
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -40,7 +40,7 @@ object FireFreezeTimer : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§bFire freeze: §c4.3s")
+        HUDManager.register(NAME, "§bFire freeze: §c4.3s", "fireFreezeTimer")
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] The Professor: Oh? You found my Guardians' one weakness?") {
@@ -49,7 +49,7 @@ object FireFreezeTimer : Feature(
                         if (ticks > 0) ticks--
                     },
                     onComplete = {
-                        Utils.playSound(SoundEvents.BLOCK_ANVIL_LAND, 1f, 0.5f)
+                        Utils.playSound(SoundEvents.ANVIL_LAND, 1f, 0.5f)
                         ticks = 0
                     }
                 )
@@ -72,8 +72,8 @@ object FireFreezeTimer : Feature(
         super.onUnregister()
     }
 
-    private fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled(NAME) || ticks <= 0) return
+    private fun renderHUD(context: GuiGraphics) {
+        if (ticks <= 0) return
 
         val text = "§bFire freeze: §c${"%.1f".format(ticks / 20.0)}s"
         val x = HUDManager.getX(NAME)

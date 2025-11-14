@@ -1,8 +1,8 @@
 package xyz.meowing.zen.features.general
 
-import net.minecraft.client.gui.screen.ChatScreen
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.client.gui.widget.TextFieldWidget
+import net.minecraft.client.gui.screens.ChatScreen
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.components.EditBox
 import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
@@ -18,8 +18,8 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 //#if MC >= 1.21.9
-//$$ import net.minecraft.client.input.CharInput
-//$$ import net.minecraft.client.input.KeyInput
+//$$ import net.minecraft.client.input.CharacterEvent
+//$$ import net.minecraft.client.input.KeyEvent
 //#endif
 
 /**
@@ -35,7 +35,7 @@ object ContainerChat : Feature(
     private val reopenChat by ConfigDelegate<Boolean>("containerChat.reopen")
     private val requireCtrl by ConfigDelegate<Boolean>("containerChat.ctrl")
 
-    private var inputField: TextFieldWidget? = null
+    private var inputField: EditBox? = null
     private var historyBuffer = ""
     private var sentHistoryCursor = -1
 
@@ -75,15 +75,15 @@ object ContainerChat : Feature(
 
     override fun initialize() {
         register<GuiEvent.Open> {
-            val chatHud = client.inGameHud?.chatHud ?: return@register
-            sentHistoryCursor = chatHud.messageHistory.size
+            val chatHud = client.gui?.chat ?: return@register
+            sentHistoryCursor = chatHud.recentChat.size
 
             if (reopenChat && inputField?.isFocused == true) {
-                if (client.currentScreen is HandledScreen<*>) {
+                if (client.screen is AbstractContainerScreen<*>) {
                     //#if MC >= 1.21.9
-                    //$$ client.setScreen(ChatScreen(inputField?.text ?: "", true))
+                    //$$ client.setScreen(ChatScreen(inputField?.value ?: "", true))
                     //#else
-                    client.setScreen(ChatScreen(inputField?.text ?: ""))
+                    client.setScreen(ChatScreen(inputField?.value ?: ""))
                     //#endif
                 }
             }
@@ -91,13 +91,13 @@ object ContainerChat : Feature(
 
         register<GuiEvent.Key> { event ->
             if (!KnitKey(event.key).isPressed) return@register
-            if (event.screen !is HandledScreen<*>) return@register
+            if (event.screen !is AbstractContainerScreen<*>) return@register
             val field = inputField ?: return@register
 
             when {
                 event.key == GLFW.GLFW_KEY_ESCAPE && field.isFocused -> {
                     field.isFocused = false
-                    field.text = ""
+                    field.value = ""
                     event.cancel()
                 }
 
@@ -110,20 +110,20 @@ object ContainerChat : Feature(
                 }
 
                 event.key == GLFW.GLFW_KEY_SLASH && !field.isFocused -> {
-                    field.text = "/"
+                    field.value = "/"
                     field.isFocused = true
                     event.cancel()
                 }
 
                 event.key == GLFW.GLFW_KEY_ENTER && field.isFocused -> {
-                    val text = field.text.trim()
+                    val text = field.value.trim()
                     if (text.isNotEmpty()) {
                         KnitChat.sendMessage(text)
-                        sentHistoryCursor = client.inGameHud?.chatHud?.messageHistory?.size ?: 0
+                        sentHistoryCursor = client.gui?.chat?.recentChat?.size ?: 0
                     }
-                    field.text = ""
+                    field.value = ""
                     field.isFocused = false
-                    client.inGameHud?.chatHud?.resetScroll()
+                    client.gui?.chat?.resetChatScroll()
                     event.cancel()
                 }
 
@@ -139,8 +139,8 @@ object ContainerChat : Feature(
 
                 field.isFocused -> {
                     //#if MC >= 1.21.9
-                    //$$ field.keyPressed(KeyInput(event.key, event.scanCode, 0))
-                    //$$ field.charTyped(CharInput(event.character.code, 0))
+                    //$$ field.keyPressed(KeyEvent(event.key, event.scanCode, 0))
+                    //$$ field.charTyped(CharacterEvent(event.character.code, 0))
                     //#else
                     field.keyPressed(event.key, event.scanCode, 0)
                     field.charTyped(event.character, 0)
@@ -159,13 +159,13 @@ object ContainerChat : Feature(
             if (scroll < -1) scroll = -1
             if (!KnitKeyboard.isShiftKeyPressed) scroll *= 7
 
-            client.inGameHud?.chatHud?.scroll(scroll)
+            client.gui?.chat?.scrollChat(scroll)
         }
     }
 
     private fun navigateHistory(direction: Int) {
-        val chatHud = client.inGameHud?.chatHud ?: return
-        val history = chatHud.messageHistory
+        val chatHud = client.gui?.chat ?: return
+        val history = chatHud.recentChat
         val field = inputField ?: return
 
         val newCursor = (sentHistoryCursor + direction).coerceIn(0, history.size)
@@ -174,24 +174,24 @@ object ContainerChat : Feature(
             when {
                 newCursor == history.size -> {
                     sentHistoryCursor = history.size
-                    field.text = historyBuffer
+                    field.value = historyBuffer
                 }
                 else -> {
-                    if (sentHistoryCursor == history.size) historyBuffer = field.text
-                    field.text = history[newCursor]
+                    if (sentHistoryCursor == history.size) historyBuffer = field.value
+                    field.value = history[newCursor]
                     sentHistoryCursor = newCursor
                 }
             }
         }
     }
 
-    fun createInputField(screen: HandledScreen<*>): TextFieldWidget {
-        val field = TextFieldWidget(client.textRenderer, 4, screen.height - 12, screen.width - 8, 12, null)
+    fun createInputField(screen: AbstractContainerScreen<*>): EditBox {
+        val field = EditBox(client.font, 4, screen.height - 12, screen.width - 8, 12, null)
         field.setMaxLength(256)
-        field.setDrawsBackground(false)
+        field.isBordered = false
 
         if (transferText && inputField?.isFocused == true) {
-            field.text = inputField?.text ?: ""
+            field.value = inputField?.value ?: ""
             field.isFocused = true
         }
 

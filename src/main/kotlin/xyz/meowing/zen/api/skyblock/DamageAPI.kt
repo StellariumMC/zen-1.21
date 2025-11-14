@@ -24,11 +24,7 @@ object DamageAPI {
                     SkyblockEvent.DamageSplash(
                         damage,
                         name,
-                        //#if MC >= 1.21.9
-                        //$$ entity.entityPos,
-                        //#else
-                        entity.pos,
-                        //#endif
+                        entity.position(),
                         packet,
                         entity
                     )

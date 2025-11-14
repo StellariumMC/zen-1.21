@@ -2,7 +2,7 @@
 
 package xyz.meowing.zen.events.core
 
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import xyz.meowing.knit.api.events.CancellableEvent
 
 sealed class ChatEvent {
@@ -13,7 +13,7 @@ sealed class ChatEvent {
      * @since 1.2.0
      */
     class Receive(
-        val message: Text,
+        val message: Component,
         val isActionBar: Boolean
     ) : CancellableEvent()
 

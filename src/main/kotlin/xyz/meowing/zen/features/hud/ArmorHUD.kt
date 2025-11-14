@@ -6,9 +6,9 @@ import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
@@ -63,7 +63,13 @@ object ArmorHUD : Feature(
     }
 
     override fun initialize() {
-        HUDManager.registerCustom(NAME, if (armorHudVertical) 16 else 70, if (armorHudVertical) 70 else 16, this::HUDEditorRender)
+        HUDManager.registerCustom(
+            NAME,
+            if (armorHudVertical) 16 else 70,
+            if (armorHudVertical) 70 else 16,
+            this::editorRender,
+            "armorHud"
+        )
 
         setupLoops {
             loop<ClientTick>(20) {
@@ -72,23 +78,24 @@ object ArmorHUD : Feature(
         }
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME)) render(event.context)
+            render(event.context)
         }
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
         drawHUD(context, x, y, scale, false)
     }
 
-    @Suppress("UNUSED")
-    private fun HUDEditorRender(context: DrawContext, x: Float, y: Float, width: Int, height: Int, scale: Float, partialTicks: Float, previewMode: Boolean) {
+    private fun editorRender(context: GuiGraphics) {
+        val x = HUDManager.getX(NAME)
+        val y = HUDManager.getY(NAME)
         drawHUD(context, x, y, 1f, true)
     }
 
-    private fun drawHUD(context: DrawContext, x: Float, y: Float, scale: Float, preview: Boolean) {
+    private fun drawHUD(context: GuiGraphics, x: Float, y: Float, scale: Float, preview: Boolean) {
         val iconSize = 16f * scale
         val spacing = 2f * scale
         val armorToRender = if (preview) exampleArmor else armor

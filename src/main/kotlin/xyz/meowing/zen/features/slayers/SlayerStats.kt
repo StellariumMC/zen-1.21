@@ -11,7 +11,7 @@ import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.toFormattedDuration
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
@@ -64,10 +64,14 @@ object SlayerStats : Feature(
 
 
     override fun initialize() {
-        HUDManager.register(NAME, "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s")
+        HUDManager.register(
+            NAME,
+            "$prefix §f§lSlayer Stats: \n§7> §bBosses Killed§f: §c15\n§7> §bBosses/hr§f: §c12\n§7> §bAvg. kill§f: §c45.2s",
+            "slayerStats"
+        )
 
         register<GuiEvent.Render.HUD> {
-            if (HUDManager.isEnabled(NAME)) render(it.context)
+            render(it.context)
         }
     }
 
@@ -84,7 +88,7 @@ object SlayerStats : Feature(
         KnitChat.fakeMessage("$prefix §fSlayer stats reset!")
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
@@ -94,7 +98,7 @@ object SlayerStats : Feature(
             var currentY = y
             for (line in lines) {
                 Render2D.renderString(context, line, x, currentY, scale)
-                currentY += client.textRenderer.fontHeight + 2
+                currentY += client.font.lineHeight + 2
             }
         }
     }

@@ -1,8 +1,8 @@
 package xyz.meowing.zen.api.skyblock
 
-import net.minecraft.entity.Entity
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.projectile.ArrowEntity
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.projectile.Arrow
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
@@ -36,13 +36,13 @@ object EntityDetection {
             val world = KnitClient.world ?: return@loop
             val player = KnitPlayer.player ?: return@loop
 
-            world.entities.forEach { entity ->
-                if (player.distanceTo(entity) > 30 || entity !is ArmorStandEntity || !entity.hasCustomName() || hashMap.containsKey(entity)) return@forEach
+            world.entitiesForRendering().forEach { entity ->
+                if (player.distanceTo(entity) > 30 || entity !is ArmorStand || !entity.hasCustomName() || hashMap.containsKey(entity)) return@forEach
                 val nameTag = entity.name.string
                 val mobId = if (nameTag.contains("Withermancer")) entity.id - 3 else entity.id - 1
-                val mob = world.getEntityById(mobId) ?: return@forEach
+                val mob = world.getEntity(mobId) ?: return@forEach
 
-                if (!mob.isAlive || mob is ArrowEntity) return@forEach
+                if (!mob.isAlive || mob is Arrow) return@forEach
 
                 val skyblockMob = SkyblockMob(entity, mob)
                 hashMap[entity] = skyblockMob
@@ -57,7 +57,7 @@ object EntityDetection {
         TickUtils.loop(100) {
             bossID?.let { id ->
                 val world = KnitClient.world ?: return@loop
-                val boss = world.getEntityById(id)
+                val boss = world.getEntity(id)
                 if (boss == null || !boss.isAlive) {
                     EventBus.post(SkyblockEvent.Slayer.Cleanup())
                     bossID = null
@@ -72,13 +72,13 @@ object EntityDetection {
 
             val name = event.name
             if (name.contains("Spawned by") && name.endsWith("by: ${player.name.string}")) {
-                val hasBlackhole = world.entities.any {
+                val hasBlackhole = world.entitiesForRendering().any {
                     event.entity.distanceTo(it) <= 3f && it.name?.string?.removeFormatting()?.contains("black hole", true) == true
                 }
 
                 if (!hasBlackhole) {
                     bossID = event.packet.id - 3
-                    SlayerEntity = world.getEntityById(event.packet.id - 3)
+                    SlayerEntity = world.getEntity(event.packet.id - 3)
                     inSlayerFight = true
                     EventBus.post(SkyblockEvent.Slayer.Spawn(event.entity, event.entity.id, event.packet))
                 }

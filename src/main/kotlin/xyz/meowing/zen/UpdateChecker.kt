@@ -14,7 +14,7 @@ import xyz.meowing.zen.utils.NetworkUtils
 import xyz.meowing.zen.utils.NetworkUtils.createConnection
 import xyz.meowing.zen.utils.TickUtils
 import net.fabricmc.loader.api.FabricLoader
-import net.minecraft.util.Util
+import net.minecraft.Util
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import java.awt.Color
@@ -261,7 +261,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
 
         createButton("Don't Show Again", colors["element"]!!, colors["elementHover"]!!) {
             UpdateChecker.dontShowForVersion = UpdateChecker.getLatestVersion() ?: ""
-            client?.setScreen(null)
+            minecraft?.setScreen(null)
         }.apply {
             setX(0.percent())
             setY(0.percent())
@@ -270,7 +270,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         } childOf bottomButtonContainer
 
         createButton("Later", colors["element"]!!, colors["elementHover"]!!) {
-            client?.setScreen(null)
+            minecraft?.setScreen(null)
         }.apply {
             setX(52.percent())
             setY(0.percent())
@@ -382,7 +382,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
             setColor(colors["element"]!!)
             onMouseEnter { setColor(colors["closeHover"]!!) }
             onMouseLeave { setColor(colors["element"]!!) }
-            onMouseClick { client?.setScreen(null) }
+            onMouseClick { minecraft?.setScreen(null) }
 
             UIText("✕").apply {
                 setX(CenterConstraint())
@@ -533,7 +533,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
         val modsDir = FabricLoader.getInstance().gameDir.resolve("mods").toFile().canonicalFile
         if (!modsDir.exists()) modsDir.mkdirs()
 
-        val isWindows = Util.getOperatingSystem() == Util.OperatingSystem.WINDOWS
+        val isWindows = Util.getPlatform() == Util.OS.WINDOWS
         val existingFile = tryDeleteCurrentFile(modsDir, isWindows)
 
         var fileName = "zen-${mcVersion}-${loader}-${latestVersion}.jar"
@@ -563,7 +563,7 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
 
                     TickUtils.schedule(40) {
                         KnitChat.fakeMessage("$prefix §aUpdate downloaded! New version will be loaded when the game restarts.")
-                        client?.setScreen(null)
+                        minecraft?.setScreen(null)
                     }
                 }
                 downloadState = DownloadState.Complete
@@ -603,9 +603,9 @@ class UpdateGUI : WindowScreen(ElementaVersion.V10) {
     private fun openUrl(url: String) {
         try {
             Desktop.getDesktop().browse(URI(url))
-            client?.setScreen(null)
+            minecraft?.setScreen(null)
         } catch (_: Exception) {
-            client?.setScreen(null)
+            minecraft?.setScreen(null)
         }
     }
 }

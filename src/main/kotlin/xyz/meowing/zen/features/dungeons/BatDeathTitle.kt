@@ -3,8 +3,8 @@ package xyz.meowing.zen.features.dungeons
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TitleUtils
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.passive.BatEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.ambient.Bat
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -33,7 +33,7 @@ object BatDeathTitle : Feature(
 
     override fun initialize() {
         register<EntityEvent.Death> {
-            if (it.entity is BatEntity && it.entity.vehicle !is ArmorStandEntity && !DungeonAPI.inBoss) {
+            if (it.entity is Bat && it.entity.vehicle !is ArmorStand && !DungeonAPI.inBoss) {
                 TitleUtils.showTitle("§cBat Dead!", null, 1000)
             }
         }

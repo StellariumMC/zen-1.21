@@ -1,7 +1,7 @@
 package xyz.meowing.zen.api.slayer
 
-import net.minecraft.entity.decoration.ArmorStandEntity
-import net.minecraft.entity.mob.SpiderEntity
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.entity.monster.Spider
 import tech.thatgravyboat.skyblockapi.api.data.Perk
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.skyblock.EntityDetection
@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 object SlayerTracker {
-    private val slayertimer by ConfigDelegate<Boolean>("slayertimer")
+    private val slayertimer by ConfigDelegate<Boolean>("slayerTimer")
     private val slayerMobRegex = "(?<=☠\\s)[A-Za-z]+\\s[A-Za-z]+(?:\\s[IVX]+)?".toRegex()
     private val killRegex = " (?<kills>.*)/(?<target>.*) Kills".toRegex()
     private val tierXp = mapOf("I" to 5, "II" to 25, "III" to 100, "IV" to 500, "V" to 1500)
@@ -131,7 +131,7 @@ object SlayerTracker {
 
         EventBus.register<EntityEvent.Join> { event ->
             TickUtils.scheduleServer(2) {
-                if (EntityDetection.bossID != null && event.entity.id == EntityDetection.bossID!! + 1 && event.entity is ArmorStandEntity) {
+                if (EntityDetection.bossID != null && event.entity.id == EntityDetection.bossID!! + 1 && event.entity is ArmorStand) {
                     val name = event.entity.name.string.removeFormatting()
                     slayerMobRegex.find(name)?.let { matchResult ->
                         bossType = matchResult.value
@@ -143,7 +143,7 @@ object SlayerTracker {
 
         EventBus.register<SkyblockEvent.Slayer.Death> { event ->
             if (!isFightingBoss) return@register
-            if (event.entity is SpiderEntity && !isSpider) {
+            if (event.entity is Spider && !isSpider) {
                 isSpider = true
                 return@register
             }

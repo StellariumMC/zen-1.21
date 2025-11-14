@@ -6,10 +6,10 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.isHolding
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.util.hit.BlockHitResult
-import net.minecraft.util.hit.HitResult
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.Vec3d
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.core.BlockPos
+import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -57,14 +57,14 @@ object LarvaSilkLines : Feature(
             if (isHolding("LARVA_SILK")) {
                 val consumers = event.context.consumers()
                 val matrixStack = event.context.matrixStack()
-                val lookingAt = client.crosshairTarget
+                val lookingAt = client.hitResult
                 Render3D.drawSpecialBB(startingSilkPos!!, larvaSilkLinesColor, consumers, matrixStack)
 
                 if (lookingAt is BlockHitResult && lookingAt.type == HitResult.Type.BLOCK) {
                     val pos = startingSilkPos!!
                     val lookingAtPos = lookingAt.blockPos
-                    val start = Vec3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
-                    val finish = Vec3d(lookingAtPos.x + 0.5, lookingAtPos.y + 0.5, lookingAtPos.z + 0.5)
+                    val start = Vec3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
+                    val finish = Vec3(lookingAtPos.x + 0.5, lookingAtPos.y + 0.5, lookingAtPos.z + 0.5)
 
                     Render3D.drawLine(start, finish, 2f, larvaSilkLinesColor, consumers, matrixStack)
                     Render3D.drawSpecialBB(lookingAtPos, larvaSilkLinesColor, consumers, matrixStack)

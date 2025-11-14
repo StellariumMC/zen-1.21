@@ -1,6 +1,6 @@
 package xyz.meowing.zen.api.skyblock
 
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
@@ -91,9 +91,9 @@ object PlayerStats {
         }
 
         EventBus.register<PacketEvent.Received> { event ->
-            if (event.packet !is ScreenHandlerSlotUpdateS2CPacket) return@register
-            if (event.packet.stack.skyblockID !in setOf("SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) return@register
-            soulflow = event.packet.stack.lore.firstOrNull { it.startsWith("Internalized: ") }?.removePrefix("Internalized: ")?.takeIf { it.isNotBlank() } ?: ""
+            if (event.packet !is ClientboundContainerSetSlotPacket) return@register
+            if (event.packet.item.skyblockID !in setOf("SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) return@register
+            soulflow = event.packet.item.lore.firstOrNull { it.startsWith("Internalized: ") }?.removePrefix("Internalized: ")?.takeIf { it.isNotBlank() } ?: ""
         }
 
     }

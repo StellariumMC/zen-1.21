@@ -6,7 +6,7 @@ import kotlinx.coroutines.SupervisorJob
 import net.fabricmc.api.ClientModInitializer
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Debug
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import xyz.meowing.knit.api.KnitChat

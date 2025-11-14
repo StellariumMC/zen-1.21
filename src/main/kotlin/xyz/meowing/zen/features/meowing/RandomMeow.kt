@@ -6,7 +6,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.Timer
 import xyz.meowing.zen.utils.TitleUtils
 import xyz.meowing.zen.utils.Utils
-import net.minecraft.sound.SoundEvents
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -36,11 +36,11 @@ object RandomMeow : Feature(
             loopDynamic<Timer>({ Random.nextLong(3600000, 21600000) }) {
                 if (Random.nextFloat() >= 0.01f){
                     KnitChat.fakeMessage("$prefix §dmeow.")
-                    Utils.playSound(SoundEvents.ENTITY_CAT_PURREOW, 1f, 1f)
+                    Utils.playSound(SoundEvents.CAT_PURREOW, 1f, 1f)
                     TitleUtils.showTitle("§dmeow.", null, 2000)
                 } else {
                     KnitChat.fakeMessage("$prefix §dboo.")
-                    Utils.playSound(SoundEvents.ENTITY_WARDEN_SONIC_BOOM, 1f, 1f)
+                    Utils.playSound(SoundEvents.WARDEN_SONIC_BOOM, 1f, 1f)
                     TitleUtils.showTitle("§dBOOOOO.", null, 2000)
                 }
             }

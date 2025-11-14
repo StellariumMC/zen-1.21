@@ -40,7 +40,7 @@ object VengDamage : Feature(
         register<SkyblockEvent.DamageSplash> { event ->
             if (nametagID == -1) return@register
 
-            val nametagEntity = world?.getEntityById(nametagID) ?: return@register
+            val nametagEntity = world?.getEntity(nametagID) ?: return@register
             if (event.entity.distanceTo(nametagEntity) > 5) return@register
 
             val entityName = event.originalName.removeFormatting()

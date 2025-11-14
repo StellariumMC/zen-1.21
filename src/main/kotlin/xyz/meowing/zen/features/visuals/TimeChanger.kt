@@ -6,7 +6,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.PacketEvent
 
@@ -38,9 +38,9 @@ object TimeChanger : Feature(
 
     override fun initialize() {
         register<PacketEvent.Received> {
-            if (it.packet is WorldTimeUpdateS2CPacket) {
+            if (it.packet is ClientboundSetTimePacket) {
                 it.cancel()
-                KnitClient.client.world?.setTime((1000L * timeOfDay).toLong(), (1000L * timeOfDay).toLong(), false)
+                KnitClient.client.level?.setTimeFromServer((1000L * timeOfDay).toLong(), (1000L * timeOfDay).toLong(), false)
             }
         }
     }

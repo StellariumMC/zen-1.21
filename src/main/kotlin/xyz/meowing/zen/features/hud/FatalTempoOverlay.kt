@@ -6,7 +6,7 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.displayName
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.Render2D
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.zen.annotations.Module
@@ -39,7 +39,7 @@ object FatalTempoOverlay : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register("Fatal Tempo", "§eFatal Tempo: §a200%")
+        HUDManager.register("Fatal Tempo", "§eFatal Tempo: §a200%", "fatalTempoOverlay")
 
         register<EntityEvent.Interact> {
             checkFatal()
@@ -50,7 +50,7 @@ object FatalTempoOverlay : Feature(
         }
 
         register<GuiEvent.Render.HUD> {
-            if (HUDManager.isEnabled("Fatal Tempo")) render(it.context)
+            render(it.context)
         }
     }
 
@@ -75,7 +75,7 @@ object FatalTempoOverlay : Feature(
         }
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX("Fatal Tempo")
         val y = HUDManager.getY("Fatal Tempo")
         val scale = HUDManager.getScale("Fatal Tempo")

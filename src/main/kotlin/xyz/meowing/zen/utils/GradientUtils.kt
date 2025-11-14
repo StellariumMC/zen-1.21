@@ -1,45 +1,38 @@
 package xyz.meowing.zen.utils
 
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
+import net.minecraft.network.chat.Component
 
 object GradientUtils {
-    fun createText(text: String, startColor: Int, endColor: Int, prefix: String?, suffix: String?): Text {
-        var result = Text.empty()
+    fun createText(text: String, startColor: Int, endColor: Int, prefix: Component?, suffix: Component?): Component {
+        var result = Component.empty()
 
-        if (!prefix.isNullOrEmpty()) {
-            result = result.append(Text.literal(prefix).formatted(Formatting.GRAY))
+        prefix?.takeIf { it.string.isNotEmpty() }?.let {
+            result = result.append(it)
         }
 
-        for (i in text.indices) {
-            val color = interpolateColor(startColor, endColor, i, text.length - 1)
-            result = result.append(Text.literal(text[i].toString()).withColor(color))
+        text.forEachIndexed { i, char ->
+            val color = fineShit(startColor, endColor, i, text.lastIndex)
+            result = result.append(Component.literal(char.toString()).withColor(color))
         }
 
-        if (!suffix.isNullOrEmpty()) {
-            result = result.append(Text.literal(suffix).formatted(Formatting.GRAY))
+        suffix?.takeIf { it.string.isNotEmpty() }?.let {
+            result = result.append(it)
         }
 
         return result
     }
 
-    private fun interpolateColor(startColor: Int, endColor: Int, currentIndex: Int, totalLength: Int): Int {
+    private fun fineShit(startColor: Int, endColor: Int, currentIndex: Int, totalLength: Int): Int {
         if (totalLength == 0) return startColor
 
         val ratio = currentIndex.toDouble() / totalLength
 
-        val startR = (startColor shr 16) and 0xFF
-        val startG = (startColor shr 8) and 0xFF
-        val startB = startColor and 0xFF
-
-        val endR = (endColor shr 16) and 0xFF
-        val endG = (endColor shr 8) and 0xFF
-        val endB = endColor and 0xFF
-
-        val r = (startR + (endR - startR) * ratio).toInt()
-        val g = (startG + (endG - startG) * ratio).toInt()
-        val b = (startB + (endB - startB) * ratio).toInt()
+        val r = interp(startColor shr 16, endColor shr 16, ratio)
+        val g = interp(startColor shr 8, endColor shr 8, ratio)
+        val b = interp(startColor, endColor, ratio)
 
         return (r shl 16) or (g shl 8) or b
     }
+
+    private fun interp(start: Int, end: Int, ratio: Double): Int = ((start and 0xFF) + ((end and 0xFF) - (start and 0xFF)) * ratio).toInt()
 }

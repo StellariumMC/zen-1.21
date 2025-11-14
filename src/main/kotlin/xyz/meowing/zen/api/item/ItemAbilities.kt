@@ -1,7 +1,7 @@
 package xyz.meowing.zen.api.item
 
 import xyz.meowing.zen.events.*
-import xyz.meowing.zen.mixins.AccessorPlayerInventory
+import xyz.meowing.zen.mixins.AccessorInventory
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.TickUtils
@@ -9,7 +9,7 @@ import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.item.ItemStack
+import net.minecraft.world.item.ItemStack
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -63,7 +63,7 @@ object ItemAbility {
             activeCooldowns.clear()
 
             for (i in 0..7) {
-                val inventory = (player?.inventory as? AccessorPlayerInventory)?.main ?: return@loop
+                val inventory = (player?.inventory as? AccessorInventory)?.main ?: return@loop
                 if (inventory[i].isEmpty) continue
 
                 val stack: ItemStack = inventory[i]
@@ -86,10 +86,10 @@ object ItemAbility {
 
         EventBus.register<MouseEvent.Click> { event ->
             if (world == null) return@register
-            val heldItem = player?.mainHandStack ?: return@register
+            val heldItem = player?.mainHandItem ?: return@register
             val skyblockId = heldItem.skyblockID
             val cdItem = cooldowns[skyblockId] ?: return@register
-            val sneaking = player?.isSneaking
+            val sneaking = player?.isShiftKeyDown
 
             if (event.button == 0) {
                 if (sneaking == true) {
@@ -102,11 +102,11 @@ object ItemAbility {
 
         EventBus.register<EntityEvent.Interact> {
             if (world == null) return@register
-            val heldItem = player?.mainHandStack ?: return@register
+            val heldItem = player?.mainHandItem ?: return@register
             val skyblockId = heldItem.skyblockID
             val cdItem = cooldowns[skyblockId] ?: return@register
 
-            if (player?.isSneaking == true) cdItem.sneakRightClick?.let {
+            if (player?.isShiftKeyDown == true) cdItem.sneakRightClick?.let {
                 sendItemAbilityEvent(it)
             } else if (cdItem.rightClick != null) {
                 sendItemAbilityEvent(cdItem.rightClick!!)
@@ -121,7 +121,7 @@ object ItemAbility {
                 justUsedAbility = ItemAbility("Dungeon_Ability")
 
             justUsedAbility?.let { ability ->
-                val skyblockId = player?.mainHandStack?.skyblockID ?: return@register
+                val skyblockId = player?.mainHandItem?.skyblockID ?: return@register
                 if (ability.itemId == skyblockId && clean.startsWith("This ability is on cooldown for") && ability.usedAt.since.millis <= 300) {
                     val currentCooldown = clean.replace("[^0-9]".toRegex(), "").toInt()
                     ability.currentCount = ability.cooldownSeconds - currentCooldown

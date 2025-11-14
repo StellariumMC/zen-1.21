@@ -2,23 +2,28 @@
 
 package xyz.meowing.zen.events.core
 
-import net.minecraft.client.render.VertexConsumerProvider
-import net.minecraft.client.render.entity.state.PlayerEntityRenderState
-import net.minecraft.client.util.math.MatrixStack
+import net.minecraft.client.renderer.MultiBufferSource
+import com.mojang.blaze3d.vertex.PoseStack
 import xyz.meowing.knit.api.events.CancellableEvent
 import xyz.meowing.knit.api.events.Event
 import xyz.meowing.knit.api.render.world.RenderContext
+
+//#if MC >= 1.21.9
+//$$ import net.minecraft.client.renderer.entity.state.AvatarRenderState
+//#else
+import net.minecraft.client.renderer.entity.state.PlayerRenderState
+//#endif
 
 sealed class RenderEvent {
     /**
      * Posted when the game tries to render the guardian lasers.
      *
-     * @see xyz.meowing.zen.mixins.MixinGuardianEntityRenderer
+     * @see xyz.meowing.zen.mixins.MixinGuardianRenderer
      * @since 1.2.0
      */
     class GuardianLaser(
-        val entity: net.minecraft.entity.Entity,
-        val target: net.minecraft.entity.Entity?
+        val entity: net.minecraft.world.entity.Entity,
+        val target: net.minecraft.world.entity.Entity?
     ) : CancellableEvent()
 
     sealed class World {
@@ -61,9 +66,9 @@ sealed class RenderEvent {
          * @since 1.2.0
          */
         class Pre(
-            val entity: net.minecraft.entity.Entity,
-            val matrices: MatrixStack,
-            val vertex: VertexConsumerProvider?,
+            val entity: net.minecraft.world.entity.Entity,
+            val matrices: PoseStack,
+            val vertex: MultiBufferSource?,
             val light: Int
         ) : CancellableEvent()
 
@@ -74,9 +79,9 @@ sealed class RenderEvent {
          * @since 1.2.0
          */
         class Post(
-            val entity: net.minecraft.entity.Entity,
-            val matrices: MatrixStack,
-            val vertex: VertexConsumerProvider?,
+            val entity: net.minecraft.world.entity.Entity,
+            val matrices: PoseStack,
+            val vertex: MultiBufferSource?,
             val light: Int
         ) : Event()
     }
@@ -85,12 +90,16 @@ sealed class RenderEvent {
         /**
          * Posted before the player entity has rendered.
          *
-         * @see xyz.meowing.zen.mixins.MixinPlayerEntityRenderer
+         * @see xyz.meowing.zen.mixins.MixinPlayerRenderer
          * @since 1.2.0
          */
         class Pre(
-            val entity: PlayerEntityRenderState,
-            val matrices: MatrixStack
+            //#if MC >= 1.21.9
+            //$$ val entity: AvatarRenderState,
+            //#else
+            val entity: PlayerRenderState,
+            //#endif
+            val matrices: PoseStack
         ) : CancellableEvent()
     }
 }

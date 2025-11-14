@@ -4,7 +4,7 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.sound.SoundEvents
+import net.minecraft.sounds.SoundEvents
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -36,7 +36,7 @@ object MeowSounds : Feature(
             val match = meowRegex.find(content) ?: return@register
             if (match.groups[1]?.value?.contains("meow", ignoreCase = true) != true) return@register
 
-            Utils.playSound(SoundEvents.ENTITY_CAT_AMBIENT, 0.8f, 1.0f)
+            Utils.playSound(SoundEvents.CAT_AMBIENT, 0.8f, 1.0f)
         }
     }
 }

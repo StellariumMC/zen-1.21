@@ -7,12 +7,12 @@ import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.Utils.toFloatArray
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.entity.Entity
-import net.minecraft.text.Text
-import net.minecraft.util.DyeColor
-import net.minecraft.util.math.BlockPos
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.entity.Entity
+import net.minecraft.network.chat.Component
+import net.minecraft.world.item.DyeColor
+import net.minecraft.core.BlockPos
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
@@ -110,7 +110,7 @@ object HighlightLivid : Feature(
         createCustomEvent<RenderEvent.Entity.Pre>("renderLivid") { event ->
             val entity = event.entity
 
-            if (lividEntity == entity && player?.canSee(entity) == true) {
+            if (lividEntity == entity && player?.hasLineOfSight(entity) == true) {
                 entity.glowThisFrame = true
                 entity.glowingColor = highlightLividColor.rgb
             }
@@ -118,7 +118,7 @@ object HighlightLivid : Feature(
 
         createCustomEvent<RenderEvent.World.Last>("renderLine") { event ->
             lividEntity?.let { entity ->
-                if (player?.canSee(entity) == true) {
+                if (player?.hasLineOfSight(entity) == true) {
                     Render3D.drawLineToEntity(
                         entity,
                         event.context.consumers(),
@@ -134,7 +134,7 @@ object HighlightLivid : Feature(
             if (
                 event.entity != lividEntity &&
                 //#if MC >= 1.21.9
-                //$$ event.entity.displayName?.string?.contains(" Livid") == true
+                //$$ event.entity.nameTag?.string?.contains(" Livid") == true
                 //#else
                 event.entity.name.contains(" Livid")
                 //#endif
@@ -149,7 +149,7 @@ object HighlightLivid : Feature(
             val color = stainedGlassBlocks[state.block] ?: return@createCustomEvent
             val lividType = lividTypes[color] ?: return@createCustomEvent
 
-            world.players.find { it.name.contains(Text.literal(lividType)) }?.let {
+            world.players().find { it.name.contains(Component.literal(lividType)) }?.let {
                 lividEntity = it
                 registerRender()
                 unregisterEvent("tick")

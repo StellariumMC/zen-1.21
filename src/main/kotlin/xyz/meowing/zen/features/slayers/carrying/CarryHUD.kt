@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.slayers.carrying
 
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.util.Colors
+import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.util.CommonColors
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.input.KnitMouse
 import xyz.meowing.zen.Zen.prefix
@@ -49,10 +49,8 @@ object CarryHUD {
     /**
      * Using a method because CarryCounter calls it, to be replaced soon with a proper impl.
      */
-    fun renderHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled(NAME)) return
-
-        val lineHeight = (client.textRenderer.fontHeight + 2) * scale
+    fun renderHUD(context: GuiGraphics) {
+        val lineHeight = (client.font.lineHeight + 2) * scale
         var currentY = y
 
         Render2D.renderString(context, "$prefix §f§lCarries:", x, currentY, scale)
@@ -68,13 +66,11 @@ object CarryHUD {
     /**
      * Using a method because CarryCounter calls it, to be replaced soon with a proper impl.
      */
-    fun renderInventoryHUD(context: DrawContext) {
-        if (!HUDManager.isEnabled(NAME)) return
-
+    fun renderInventoryHUD(context: GuiGraphics) {
         buttons.clear()
         hoveredButton = null
 
-        val lineHeight = (client.textRenderer.fontHeight + 2) * scale
+        val lineHeight = (client.font.lineHeight + 2) * scale
         var currentY = y
 
         Render2D.renderString(context, "$prefix §f§lCarries:", x, currentY, scale)
@@ -84,7 +80,7 @@ object CarryHUD {
             val line = "§7> §b${carry.name}§f: §b${carry.count}§f/§b${carry.total} §7(${carry.getTimeSinceLastBoss()} | ${carry.getBossPerHour()}§7)"
             Render2D.renderString(context, line, x, currentY, scale)
 
-            val textWidth = client.textRenderer.getWidth(line) * scale
+            val textWidth = client.font.width(line) * scale
             val btnX = x + textWidth + (4f * scale)
 
             listOf(
@@ -133,7 +129,7 @@ object CarryHUD {
 
                 Render2D.renderString(
                     context, text, buttonX, currentY, scale,
-                    if (isHovered) Colors.WHITE else 0xAAAAAA,
+                    if (isHovered) CommonColors.WHITE else 0xAAAAAA,
                     Render2D.TextStyle.DEFAULT
                 )
             }
@@ -153,11 +149,11 @@ object CarryHUD {
         }?.action
     }
 
-    private fun renderTooltip(context: DrawContext) {
+    private fun renderTooltip(context: GuiGraphics) {
         hoveredButton?.let { button ->
-            val tooltipWidth = (client.textRenderer.getWidth(button.tooltip) + 8) * scale
+            val tooltipWidth = (client.font.width(button.tooltip) + 8) * scale
             val tooltipHeight = 16 * scale
-            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (client.window.scaledWidth - tooltipWidth - 2).toDouble()).toInt()
+            val tooltipX = (mouseX - tooltipWidth / 2).coerceIn(2.0, (client.window.guiScaledWidth - tooltipWidth - 2).toDouble()).toInt()
             val tooltipY = (mouseY - tooltipHeight - 8 * scale).coerceAtLeast(2.0).toInt()
 
             context.fill(tooltipX, tooltipY, (tooltipX + tooltipWidth).toInt(), (tooltipY + tooltipHeight).toInt(), 0xC8000000.toInt())

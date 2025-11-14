@@ -4,14 +4,14 @@ import com.mojang.authlib.GameProfile
 import xyz.meowing.zen.utils.Utils.getPlayerTexture
 import xyz.meowing.zen.utils.Utils.getPlayerUuid
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import net.minecraft.component.DataComponentTypes
-import net.minecraft.component.type.LoreComponent
-import net.minecraft.component.type.NbtComponent
-import net.minecraft.component.type.ProfileComponent
-import net.minecraft.item.ItemStack
-import net.minecraft.item.Items
-import net.minecraft.nbt.NbtCompound
-import net.minecraft.text.Text
+import net.minecraft.core.component.DataComponents
+import net.minecraft.world.item.component.ItemLore
+import net.minecraft.world.item.component.CustomData
+import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.network.chat.Component
 import xyz.meowing.knit.api.KnitPlayer.player
 import java.util.UUID
 import kotlin.random.Random
@@ -22,12 +22,12 @@ object ItemUtils {
     val strengthRegex = Regex("Strength: \\+(\\d+)")
     val abilityRegex = Regex("Ability:.*RIGHT CLICK")
 
-    inline val ItemStack?.extraAttributes: NbtCompound?
-        get() = this?.getOrDefault(DataComponentTypes.CUSTOM_DATA, NbtComponent.DEFAULT)?.copyNbt()
+    inline val ItemStack?.extraAttributes: CompoundTag?
+        get() = this?.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY)?.copyTag()
 
     inline val ItemStack?.skyblockID: String get() = this?.extraAttributes?.getString("id")?.orElse("") ?: ""
 
-    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponentTypes.LORE)?.lines?.map { it.string } ?: emptyList()
+    inline val ItemStack?.lore: List<String> get() = this?.get(DataComponents.LORE)?.lines?.map { it.string } ?: emptyList()
 
     inline val ItemStack?.uuid: String get() = this?.extraAttributes?.getString("uuid")?.orElse("") ?: ""
 
@@ -41,9 +41,9 @@ object ItemUtils {
 
     inline val ItemStack?.isShortbow: Boolean get() = this?.lore?.any { "Shortbow: Instantly shoots!" in it } == true
 
-    fun isHolding(vararg id: String): Boolean = player?.mainHandStack?.skyblockID in id
+    fun isHolding(vararg id: String): Boolean = player?.mainHandItem?.skyblockID in id
 
-    fun ItemStack.displayName(): String = this.get(DataComponentTypes.CUSTOM_NAME)?.string ?: this.name.string
+    fun ItemStack.displayName(): String = this.get(DataComponents.CUSTOM_NAME)?.string ?: this.hoverName.string
 
     fun createSkull(texture: String, displayName: String? = null, lore: List<String> = emptyList()): ItemStack {
         val uuid = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx".replace("x".toRegex()) {
@@ -53,24 +53,23 @@ object ItemUtils {
 
         try {
             profile.properties.put("textures", com.mojang.authlib.properties.Property("textures", texture))
-        } catch (e: UnsupportedOperationException) {
-        }
+        } catch (_: UnsupportedOperationException) { }
 
         return ItemStack(Items.PLAYER_HEAD).apply {
             set(
-                DataComponentTypes.PROFILE,
+                DataComponents.PROFILE,
                 //#if MC >= 1.21.9
-                //$$ ProfileComponent.ofStatic(profile)
+                //$$ ResolvableProfile.createResolved(profile)
                 //#else
-                ProfileComponent(profile)
+                ResolvableProfile(profile)
                 //#endif
             )
             displayName?.let {
-                set(DataComponentTypes.CUSTOM_NAME, Text.literal(it))
+                set(DataComponents.CUSTOM_NAME, Component.literal(it))
             }
             if (lore.isNotEmpty()) {
-                set(DataComponentTypes.LORE, LoreComponent(
-                    lore.map { Text.literal(it) }
+                set(DataComponents.LORE, ItemLore(
+                    lore.map { Component.literal(it) }
                 ))
             }
         }

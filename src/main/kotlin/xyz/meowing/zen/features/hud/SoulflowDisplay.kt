@@ -4,7 +4,7 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
-import net.minecraft.client.gui.DrawContext
+import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.events.core.GuiEvent
@@ -32,14 +32,14 @@ object SoulflowDisplay : Feature(
     }
 
     override fun initialize() {
-        HUDManager.register(NAME, "§3500⸎ Soulflow")
+        HUDManager.register(NAME, "§3500⸎ Soulflow", "soulflowDisplay")
 
         register<GuiEvent.Render.HUD> { event ->
-            if (HUDManager.isEnabled(NAME)) render(event.context)
+            render(event.context)
         }
     }
 
-    private fun render(context: DrawContext) {
+    private fun render(context: GuiGraphics) {
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)

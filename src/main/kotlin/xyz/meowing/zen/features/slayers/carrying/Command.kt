@@ -26,7 +26,7 @@ object CarryCommand : Commodore("carry", "zencarry") {
                 param("param0") {
                     suggests {
                         buildList {
-                            world?.players?.forEach { player ->
+                            world?.players()?.forEach { player ->
                                 if (player.name.string.isNotBlank() && player.uuid.version() == 4) {
                                     add(player.name.string)
                                 }

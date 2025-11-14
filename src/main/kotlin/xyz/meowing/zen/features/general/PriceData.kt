@@ -8,7 +8,7 @@ import xyz.meowing.zen.features.Timer
 import xyz.meowing.zen.utils.ItemUtils.displayName
 import xyz.meowing.zen.utils.Utils.abbreviateNumber
 import xyz.meowing.zen.utils.Utils.formatNumber
-import net.minecraft.text.Text
+import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ItemTooltipEvent
@@ -30,7 +30,7 @@ object PriceData : Feature(
     )
 
     data class CacheEntry(
-        val lines: List<Text>,
+        val lines: List<Component>,
         val timestamp: Long = System.currentTimeMillis()
     )
 
@@ -90,7 +90,7 @@ object PriceData : Feature(
             }
 
             val pricingData = ItemAPI.getItemInfo(stack) ?: return@register
-            val priceLines = mutableListOf<Text>()
+            val priceLines = mutableListOf<Component>()
 
             if (0 in displaySet) {
                 pricingData.takeIf { it.has("activeBin") || it.has("activeAuc") }?.let {
@@ -98,7 +98,7 @@ object PriceData : Feature(
                     val activeAucNum = if (it.has("activeAuc")) it.get("activeAuc").asInt else -1
                     val activeBin = if (activeBinNum != -1) activeBinNum.formatPrice() else "§7N/A"
                     val activeAuc = if (activeAucNum != -1) activeAucNum.formatPrice() else "§7N/A"
-                    priceLines.add(Text.literal("§3Active Listings: §e${activeBin} §8[BIN] §7• §e${activeAuc} §8[Auction]"))
+                    priceLines.add(Component.literal("§3Active Listings: §e${activeBin} §8[BIN] §7• §e${activeAuc} §8[Auction]"))
                 }
             }
 
@@ -108,7 +108,7 @@ object PriceData : Feature(
                     val soldAucNum = if (it.has("aucSold")) it.get("aucSold").asInt else -1
                     val soldBin = if (soldBinNum != -1) soldBinNum.formatPrice() else "§7N/A"
                     val soldAuc = if (soldAucNum != -1) soldAucNum.formatPrice() else "§7N/A"
-                    priceLines.add(Text.literal("§3Daily Sales: §e${soldBin} §8[BIN] §7• §e${soldAuc} §8[Auction]"))
+                    priceLines.add(Component.literal("§3Daily Sales: §e${soldBin} §8[BIN] §7• §e${soldAuc} §8[Auction]"))
                 }
             }
 
@@ -116,7 +116,7 @@ object PriceData : Feature(
                 pricingData.takeIf { it.has("avgLowestBin") && it.has("lowestBin") }?.let {
                     val avgLowestBin = it.get("avgLowestBin").asLong.formatPrice()
                     val lowestBin = it.get("lowestBin").asLong.formatPrice()
-                    priceLines.add(Text.literal("§3BIN Price: §a${avgLowestBin} §8[Avg] §7• §a${lowestBin} §8[Lowest]"))
+                    priceLines.add(Component.literal("§3BIN Price: §a${avgLowestBin} §8[Avg] §7• §a${lowestBin} §8[Lowest]"))
                 }
             }
 
@@ -124,7 +124,7 @@ object PriceData : Feature(
                 pricingData.takeIf { it.has("avgAucPrice") && it.has("aucPrice") }?.let {
                     val avgAucPrice = it.get("avgAucPrice").asLong.formatPrice()
                     val aucPrice = it.get("aucPrice").asLong.formatPrice()
-                    priceLines.add(Text.literal("§3Auction Price: §a${avgAucPrice} §8[Avg] §7• §a${aucPrice} §8[Next]"))
+                    priceLines.add(Component.literal("§3Auction Price: §a${avgAucPrice} §8[Avg] §7• §a${aucPrice} §8[Next]"))
                 }
             }
 
@@ -141,13 +141,13 @@ object PriceData : Feature(
                         ?.asLong
                         ?.times(multiplier)
                         ?.formatPrice() ?: "§7N/A"
-                    priceLines.add(Text.literal("§3Bazaar: §e${bazaarBuy} §8[Buy] §7• §a${bazaarSell} §8[Sell]"))
+                    priceLines.add(Component.literal("§3Bazaar: §e${bazaarBuy} §8[Buy] §7• §a${bazaarSell} §8[Sell]"))
                 }
             }
 
             if (5 in displaySet) {
                 val rawCraftCost = stack.getItemValue().price.formatPrice()
-                priceLines.add(Text.literal("§3Raw Craft Cost: §a$rawCraftCost"))
+                priceLines.add(Component.literal("§3Raw Craft Cost: §a$rawCraftCost"))
             }
 
             if (priceLines.isNotEmpty()) {

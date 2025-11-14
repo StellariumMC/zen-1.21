@@ -55,6 +55,7 @@ class StoredFile(val path: String) {
         try {
             val data = root ?: load()
             file.writeText(Json.gson.toJson(data))
+            Zen.LOGGER.info("Saved data for $path")
         } catch (e: Exception) {
             Zen.LOGGER.error("Caught exception while trying to save StoredFile for $path: $e")
         }
@@ -69,7 +70,10 @@ class StoredFile(val path: String) {
     fun jsonObject(key: String, default: JsonObject = JsonObject()) = object : ReadWriteProperty<Any?, JsonObject> {
         override fun getValue(thisRef: Any?, property: KProperty<*>): JsonObject {
             val obj = load()
-            return if (obj.has(key)) obj.getAsJsonObject(key) else default
+            if (!obj.has(key)) {
+                obj.add(key, default)
+            }
+            return obj.getAsJsonObject(key)
         }
 
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: JsonObject) {

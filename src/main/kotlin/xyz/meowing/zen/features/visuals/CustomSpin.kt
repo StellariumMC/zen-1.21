@@ -3,7 +3,7 @@ package xyz.meowing.zen.features.visuals
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.util.math.RotationAxis
+import com.mojang.math.Axis
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
@@ -55,7 +55,7 @@ object CustomSpin : Feature(
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->
             if (spinEveryone || event.entity.id == player?.id) {
-                event.matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(getRotation()))
+                event.matrices.mulPose(Axis.YP.rotationDegrees(getRotation()))
             }
         }
     }

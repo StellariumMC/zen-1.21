@@ -3,13 +3,13 @@ package xyz.meowing.zen.features.rift
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.block.Blocks
-import net.minecraft.block.ShapeContext
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexRendering
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket
-import net.minecraft.particle.ParticleTypes
-import net.minecraft.util.math.BlockPos
+import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
+import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.BlockPos
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
@@ -55,8 +55,8 @@ object BerberisHelper : Feature(
 
     override fun initialize() {
         register<PacketEvent.Received> { event ->
-            val packet = event.packet as? ParticleS2CPacket ?: return@register
-            if (packet.parameters.type != ParticleTypes.FIREWORK) return@register
+            val packet = event.packet as? ClientboundLevelParticlesPacket ?: return@register
+            if (packet.particle.type != ParticleTypes.FIREWORK) return@register
             val playerX = player?.x ?: return@register
             val playerZ = player?.z ?: return@register
             if (hypot(playerX - packet.x, playerZ - packet.z) > 20) return@register
@@ -73,14 +73,14 @@ object BerberisHelper : Feature(
             val targetPos = blockPos ?: return@register
             val consumers = event.context.consumers()
             val blockState = world?.getBlockState(targetPos) ?: return@register
-            val camera = client.gameRenderer.camera
-            val blockShape = blockState.getOutlineShape(world, targetPos, ShapeContext.of(camera.focusedEntity))
+            val camera = client.gameRenderer.mainCamera
+            val blockShape = blockState.getShape(world, targetPos, CollisionContext.of(camera.entity))
             if (blockShape.isEmpty) return@register
 
-            val camPos = camera.pos
-            VertexRendering.drawOutline(
+            val camPos = camera.position
+            ShapeRenderer.renderShape(
                 event.context.matrixStack(),
-                consumers.getBuffer(RenderLayer.getLines()),
+                consumers.getBuffer(RenderType.lines()),
                 blockShape,
                 targetPos.x - camPos.x,
                 targetPos.y - camPos.y,

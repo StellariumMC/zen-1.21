@@ -4,8 +4,8 @@ import xyz.meowing.zen.api.skyblock.EntityDetection.sbMobID
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.entity.Entity
-import net.minecraft.util.hit.EntityHitResult
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.EntityHitResult
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitClient.client
@@ -52,7 +52,7 @@ object BestiaryMobHighlight : Feature(
             val entity = event.entity
             val mob = entity.sbMobID ?: return@register
             if (trackedMobs.contains(mob)) {
-                val visible = KnitClient.player?.canSee(entity)?: false
+                val visible = KnitClient.player?.hasLineOfSight(entity)?: false
 
                 if (!visible) return@register
                 entity.glowThisFrame = true
@@ -76,7 +76,7 @@ object BestiaryMobHighlight : Feature(
     }
 
     private fun getTargetEntity(): Entity? {
-        val crosshairTarget = client.crosshairTarget ?: return null
+        val crosshairTarget = client.hitResult ?: return null
         return if (crosshairTarget is EntityHitResult) crosshairTarget.entity else null
     }
 }

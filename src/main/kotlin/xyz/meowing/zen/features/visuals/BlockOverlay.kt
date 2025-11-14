@@ -3,10 +3,10 @@ package xyz.meowing.zen.features.visuals
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
-import net.minecraft.block.ShapeContext
-import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.VertexRendering
-import net.minecraft.world.EmptyBlockView
+import net.minecraft.world.phys.shapes.CollisionContext
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.ShapeRenderer
+import net.minecraft.world.level.EmptyBlockGetter
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.annotations.Module
 import java.awt.Color
@@ -71,21 +71,21 @@ object BlockOverlay : Feature(
             val blockState = event.context.blockState() ?: return@register
             val matrixStack = event.context.matrixStack() ?: return@register
             val consumers = event.context.consumers()
-            val camera = client.gameRenderer.camera
-            val blockShape = blockState.getOutlineShape(
-                EmptyBlockView.INSTANCE,
+            val camera = client.gameRenderer.mainCamera
+            val blockShape = blockState.getShape(
+                EmptyBlockGetter.INSTANCE,
                 blockPos,
-                ShapeContext.of(camera.focusedEntity)
+                CollisionContext.of(camera.entity)
             )
             if (blockShape.isEmpty) return@register
 
-            val camPos = camera.pos
+            val camPos = camera.position
             event.cancel()
 
             if (blockOverlayBordered) {
-                VertexRendering.drawOutline(
+                ShapeRenderer.renderShape(
                     matrixStack,
-                    consumers.getBuffer(RenderLayer.getLines()),
+                    consumers.getBuffer(RenderType.lines()),
                     blockShape,
                     blockPos.x - camPos.x,
                     blockPos.y - camPos.y,
@@ -96,7 +96,7 @@ object BlockOverlay : Feature(
 
             if (blockOverlayFilled) {
                 Render3D.drawFilledShapeVoxel(
-                    blockShape.offset(blockPos),
+                    blockShape.move(blockPos),
                     blockOverlayColor,
                     consumers,
                     matrixStack
