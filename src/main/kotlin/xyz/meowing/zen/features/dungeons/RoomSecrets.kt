@@ -12,6 +12,7 @@ import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.Render2D.pushPop
 
 /**
  * @author Eclipse-5214
@@ -43,37 +44,23 @@ object RoomSecrets : Feature(
     }
 
     fun editorRender(context: GuiGraphics) {
-        val x = HUDManager.getX(NAME)
-        val y = HUDManager.getY(NAME)
-
         val matrix = context.pose()
-        //#if MC >= 1.21.7
-        //$$ matrix.pushMatrix()
-        //$$ matrix.translate(x, y)
-        //#else
-        matrix.pushPose()
-        matrix.translate(x, y, 0f)
-        //#endif
 
-        val text1 = "§fSecrets"
-        val text2 = "§a7§7/§a7"
-        val w1 = text1.width().toFloat()
-        val w2 = text2.width().toFloat()
+        context.pushPop {
+            val text1 = "§fSecrets"
+            val text2 = "§a7§7/§a7"
+            val w1 = text1.width().toFloat()
+            val w2 = text2.width().toFloat()
 
-        //#if MC >= 1.21.7
-        //$$ matrix.translate(25f, 5f)
-        //#else
-        matrix.translate(25f, 5f, 0f)
-        //#endif
+            //#if MC >= 1.21.7
+            //$$ matrix.translate(25f, 5f)
+            //#else
+            matrix.translate(25f, 5f, 0f)
+            //#endif
 
-        Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
-        Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
-
-        //#if MC >= 1.21.7
-        //$$ matrix.popMatrix()
-        //#else
-        matrix.popPose()
-        //#endif
+            Render2D.renderString(context, text1, -w1 / 2f, 0f, 1f)
+            Render2D.renderString(context, text2, -w2 / 2f, 10f, 1f)
+        }
     }
 
     private fun renderHUD(context: GuiGraphics) {

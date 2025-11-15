@@ -74,11 +74,7 @@ object ArrowPoison : Feature(
         drawHUD(drawContext, x, y, scale, false)
     }
 
-    private fun editorRender(context: GuiGraphics) {
-        val x = HUDManager.getX(NAME)
-        val y = HUDManager.getY(NAME)
-        drawHUD(context, x, y, 1f, true)
-    }
+    private fun editorRender(context: GuiGraphics) = drawHUD(context, 0f, 0f, 1f, true)
 
     private fun drawHUD(drawContext: GuiGraphics, x: Float, y: Float, scale: Float, preview: Boolean) {
         val iconSize = 16f * scale

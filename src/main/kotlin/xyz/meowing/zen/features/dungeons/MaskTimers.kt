@@ -32,6 +32,12 @@ object MaskTimers : Feature(
     private val BonzoMask: ItemStack = createSkull("eyJ0aW1lc3RhbXAiOjE1ODc5MDgzMDU4MjYsInByb2ZpbGVJZCI6IjJkYzc3YWU3OTQ2MzQ4MDI5NDI4MGM4NDIyNzRiNTY3IiwicHJvZmlsZU5hbWUiOiJzYWR5MDYxMCIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTI3MTZlY2JmNWI4ZGEwMGIwNWYzMTZlYzZhZjYxZThiZDAyODA1YjIxZWI4ZTQ0MDE1MTQ2OGRjNjU2NTQ5YyJ9fX0=")
     private val Phoenix: ItemStack = createSkull("ewogICJ0aW1lc3RhbXAiIDogMTY0Mjg2NTc3MTM5MSwKICAicHJvZmlsZUlkIiA6ICJiYjdjY2E3MTA0MzQ0NDEyOGQzMDg5ZTEzYmRmYWI1OSIsCiAgInByb2ZpbGVOYW1lIiA6ICJsYXVyZW5jaW8zMDMiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNjZiMWI1OWJjODkwYzljOTc1Mjc3ODdkZGUyMDYwMGM4Yjg2ZjZiOTkxMmQ1MWE2YmZjZGIwZTRjMmFhM2M5NyIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9")
 
+    private val previewMasks = listOf(
+        MaskData(BonzoMask, "153.4s", "§c", true),
+        MaskData(SpiritMask, "12.4s", "§b", false),
+        MaskData(Phoenix, "60.0s", "§6", true)
+    )
+
     private val BonzoRegex = "^Your (?:. )?Bonzo's Mask saved your life!$".toRegex()
 
     private var BonzoTicks = 0.0
@@ -115,20 +121,10 @@ object MaskTimers : Feature(
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
-        drawHUD(context, x, y, scale, false, activeMasks)
+        drawHUD(context, x, y, scale, activeMasks)
     }
 
-    private fun editorRender(context: GuiGraphics) {
-        val x = HUDManager.getX(NAME)
-        val y = HUDManager.getY(NAME)
-        val previewMasks = listOf(
-            MaskData(BonzoMask, "153.4s", "§c", true),
-            MaskData(SpiritMask, "12.4s", "§b", false),
-            MaskData(Phoenix, "60.0s", "§6", true)
-        )
-
-        drawHUD(context, x, y, 1f, true, previewMasks)
-    }
+    private fun editorRender(context: GuiGraphics) = drawHUD(context, 0f, 0f, 1f, previewMasks)
 
     private fun getActiveMasks(): List<MaskData> {
         val masks = mutableListOf<MaskData>()
@@ -155,7 +151,7 @@ object MaskTimers : Feature(
         return player?.inventory?.getItem(39)?.hoverName?.string?.contains(name) == true
     }
 
-    private fun drawHUD(context: GuiGraphics, x: Float, y: Float, scale: Float, preview: Boolean, masks: List<MaskData>) {
+    private fun drawHUD(context: GuiGraphics, x: Float, y: Float, scale: Float, masks: List<MaskData>) {
         val iconSize = 16f * scale
         val spacing = 2f * scale
         var currentY = y

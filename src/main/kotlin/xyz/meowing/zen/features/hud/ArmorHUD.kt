@@ -82,17 +82,13 @@ object ArmorHUD : Feature(
         }
     }
 
+    private fun editorRender(context: GuiGraphics) = drawHUD(context, 0f, 0f, 1f, true)
+
     private fun render(context: GuiGraphics) {
         val x = HUDManager.getX(NAME)
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
         drawHUD(context, x, y, scale, false)
-    }
-
-    private fun editorRender(context: GuiGraphics) {
-        val x = HUDManager.getX(NAME)
-        val y = HUDManager.getY(NAME)
-        drawHUD(context, x, y, 1f, true)
     }
 
     private fun drawHUD(context: GuiGraphics, x: Float, y: Float, scale: Float, preview: Boolean) {
