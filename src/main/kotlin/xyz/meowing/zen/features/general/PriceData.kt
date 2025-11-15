@@ -6,10 +6,10 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.Timer
 import xyz.meowing.zen.utils.ItemUtils.displayName
-import xyz.meowing.zen.utils.Utils.abbreviateNumber
-import xyz.meowing.zen.utils.Utils.formatNumber
 import net.minecraft.network.chat.Component
 import tech.thatgravyboat.skyblockapi.api.item.calculator.getItemValue
+import xyz.meowing.knit.api.utils.NumberUtils.abbreviate
+import xyz.meowing.knit.api.utils.NumberUtils.formatWithCommas
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ItemTooltipEvent
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -66,7 +66,7 @@ object PriceData : Feature(
             )
     }
 
-    private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviateNumber() else formatNumber()
+    private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviate() else formatWithCommas()
 
     override fun initialize() {
         setupLoops {

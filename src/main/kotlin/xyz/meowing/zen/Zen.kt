@@ -6,7 +6,6 @@ import kotlinx.coroutines.SupervisorJob
 import net.fabricmc.api.ClientModInitializer
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Debug
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import xyz.meowing.knit.api.KnitChat
@@ -15,13 +14,23 @@ import xyz.meowing.knit.api.scheduler.TimeScheduler
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.GameEvent
-import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.ServerEvent
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.managers.feature.FeatureManager
+import xyz.meowing.zen.updateChecker.UpdateChecker
 
 object Zen : ClientModInitializer {
     private var showLoad = true
+
+    const val MODRINTH_PROJECT_ID = "stWFyj4m"
+
+    const val GITHUB_REPO = "StellariumMC/zen"
+
+    @JvmStatic
+    val modInfo = KnitModInfo("zen", "Zen", "1.2.0")
+
+    @JvmStatic
+    val prefix = "§7[§bZen§7]"
 
     @JvmStatic
     val saveData = StoredFile("main/Main")
@@ -30,18 +39,8 @@ object Zen : ClientModInitializer {
     var isFirstInstall: Boolean by saveData.boolean("firstInstall", true)
         private set
 
-    @JvmStatic
-    var isInInventory = false
-        private set
-
-    @JvmStatic
-    val prefix = "§7[§bZen§7]"
-
     @JvmField
     val LOGGER: Logger = LogManager.getLogger("zen")
-
-    @JvmStatic
-    val modInfo = KnitModInfo("zen", "Zen", "1.2.0")
 
     @JvmStatic
     val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -64,37 +63,32 @@ object Zen : ClientModInitializer {
 
             KnitChat.fakeMessage(loadMessage)
 
-            if (isFirstInstall) {
-                KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
-                KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+            if (Debug.debugMode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, run §c/zendebug toggle§f to disable.")
 
-                val discordMessage = KnitText
-                    .literal("§7> §cDiscord:§b [Discord]")
-                    .onHover("Discord server")
-                    .onClick("https://discord.gg/KPmHQUC97G")
-                    .toVanilla()
-
-                KnitChat.fakeMessage(discordMessage)
-                isFirstInstall = false
-            }
-
-            if (Debug.debugMode) KnitChat.fakeMessage("$prefix §fYou have debug mode enabled, restart the game if this was not intentional.")
+            showFirstInstall()
 
             TimeScheduler.schedule(5000) {
-                UpdateChecker.checkForUpdates()
+                UpdateChecker.check()
             }
 
             showLoad = false
         }
 
-        EventBus.register<GuiEvent.Open> { event ->
-            if (event.screen is InventoryScreen) isInInventory = true
-        }
-
-        EventBus.register<GuiEvent.Close> {
-            isInInventory = false
-        }
-
         EventBus.post(GameEvent.ModInit.Post())
+    }
+
+    private fun showFirstInstall() {
+        if (isFirstInstall) {
+            KnitChat.fakeMessage("$prefix §fThanks for installing Zen!")
+            KnitChat.fakeMessage("§7> §fUse §c/zen §fto open the config or §c/zen hud §fto edit HUD elements")
+
+            val discordMessage = KnitText
+                .literal("§7> §cDiscord:§b [Discord]")
+                .onHover("Discord server")
+                .onClick("https://discord.gg/KPmHQUC97G")
+
+            KnitChat.fakeMessage(discordMessage)
+            isFirstInstall = false
+        }
     }
 }

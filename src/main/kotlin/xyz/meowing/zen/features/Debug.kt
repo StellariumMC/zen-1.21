@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features
 
 import xyz.meowing.knit.api.KnitChat
-import xyz.meowing.zen.UpdateChecker
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.skyblock.EntityDetection.sbMobID
@@ -16,6 +15,8 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.managers.feature.FeatureManager.features
+import xyz.meowing.zen.updateChecker.StateTracker
+import xyz.meowing.zen.updateChecker.UpdateChecker
 import java.awt.Color
 
 @Module
@@ -168,8 +169,8 @@ object DebugCommand : Commodore("zendebug", "zd") {
                         }
                     }
                     "forceupdate" -> {
-                        UpdateChecker.forceUpdate = true
-                        UpdateChecker.checkForUpdates()
+                        StateTracker.forceUpdate = true
+                        UpdateChecker.check()
                     }
                     else -> {
                         KnitChat.fakeMessage("$prefix §fUsage: §7/§bzendebug §c<toggle|stats|dgutils|regfeats|forceupdate>")

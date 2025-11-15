@@ -11,10 +11,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.text.KnitText
+import xyz.meowing.knit.api.utils.StringUtils.decodeRoman
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
-import xyz.meowing.zen.utils.Utils.decodeRoman
 import kotlin.time.Duration
 
 @Module
@@ -92,7 +92,7 @@ object SlayerPBCommand : Commodore("zenslayers", "zenpb") {
                 if (parts.size < 2) return@mapNotNull null
                 val slayerName = parts.dropLast(1).joinToString(" ")
                 val tierRoman = parts.last()
-                val tier = decodeRoman(tierRoman)
+                val tier = tierRoman.decodeRoman()
                 val seconds = value.asLong / 1000.0
                 Triple(slayerName, "$slayerName $tierRoman", seconds to tier)
             }

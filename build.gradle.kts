@@ -45,8 +45,6 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
 
-    modImplementation(include("gg.essential:elementa:710")!!)
-
     modImplementation(include("xyz.meowing:vexel-${mcData}:124")!!)
 
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
@@ -60,18 +58,9 @@ dependencies {
     include("tech.thatgravyboat:skyblock-api:3.0.17", clocheAction)
 
     when (mcData.version) {
-        MinecraftVersions.VERSION_1_21_10 -> {
-            modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
-            modImplementation(include("gg.essential:universalcraft-1.21.9-fabric:430")!!)
-        }
-        MinecraftVersions.VERSION_1_21_8 -> {
-            modImplementation("com.terraformersmc:modmenu:15.0.0")
-            modImplementation(include("gg.essential:universalcraft-1.21.7-fabric:430")!!)
-        }
-        MinecraftVersions.VERSION_1_21_5 -> {
-            modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
-            modImplementation(include("gg.essential:universalcraft-${mcData}:430")!!)
-        }
+        MinecraftVersions.VERSION_1_21_10 -> modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
+        MinecraftVersions.VERSION_1_21_8 -> modImplementation("com.terraformersmc:modmenu:15.0.0")
+        MinecraftVersions.VERSION_1_21_5 -> modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
         else -> {}
     }
 }

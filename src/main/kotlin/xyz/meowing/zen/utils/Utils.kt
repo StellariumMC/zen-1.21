@@ -1,21 +1,15 @@
 package xyz.meowing.zen.utils
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.components.UIBlock
-import gg.essential.elementa.components.UIRoundedRectangle
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.util.FormattedCharSequence
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.Component
-import org.apache.commons.lang3.SystemUtils
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.input.KnitInputs
 import java.awt.Color
@@ -23,7 +17,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.Optional
-import kotlin.math.absoluteValue
 
 object Utils {
     private val emoteRegex = "[^\\u0000-\\u007F]".toRegex()
@@ -124,48 +117,6 @@ object Utils {
         } catch (e: Exception) {
             null
         }
-    }
-
-    fun decodeRoman(roman: String): Int {
-        val values = mapOf('I' to 1, 'V' to 5, 'X' to 10, 'L' to 50, 'C' to 100, 'D' to 500, 'M' to 1000)
-        var result = 0
-        var prev = 0
-
-        for (char in roman.reversed()) {
-            val current = values[char] ?: 0
-            if (current < prev) result -= current
-            else result += current
-            prev = current
-        }
-        return result
-    }
-
-    fun Long.toFormattedDuration(short: Boolean = false): String {
-        val seconds = this / 1000
-        val days = seconds / 86400
-        val hours = (seconds % 86400) / 3600
-        val minutes = (seconds % 3600) / 60
-        val remainingSeconds = seconds % 60
-
-        if (short) {
-            return when {
-                days > 0 -> "${days}d"
-                hours > 0 -> "${hours}h"
-                minutes > 0 -> "${minutes}m"
-                else -> "${remainingSeconds}s"
-            }
-        }
-
-        return buildString {
-            if (days > 0) append("${days}d ")
-            if (hours > 0) append("${hours}h ")
-            if (minutes > 0) append("${minutes}m ")
-            if (remainingSeconds > 0) append("${remainingSeconds}s")
-        }.trimEnd()
-    }
-
-    fun createBlock(radius: Float = 0f): UIComponent {
-        return if (SystemUtils.IS_OS_MAC_OSX) UIBlock() else UIRoundedRectangle(radius)
     }
 
     /*
@@ -385,32 +336,4 @@ object Utils {
             onError = onError
         )
     }
-
-    fun Number.formatNumber(): String {
-        return "%,.0f".format(Locale.US, this.toDouble())
-    }
-
-    fun Number.abbreviateNumber(): String {
-        val num = this.toDouble().absoluteValue
-        val sign = if (this.toDouble() < 0) "-" else ""
-
-        val (divisor, suffix) = when {
-            num >= 1_000_000_000_000 -> 1_000_000_000_000.0 to "T"
-            num >= 1_000_000_000 -> 1_000_000_000.0 to "B"
-            num >= 1_000_000 -> 1_000_000.0 to "M"
-            num >= 1_000 -> 1_000.0 to "k"
-            else -> return sign + "%.0f".format(Locale.US, num)
-        }
-
-        val value = num / divisor
-        val formatted = if (value % 1.0 == 0.0) {
-            value.toInt().toString()
-        } else {
-            val decimal = "%.1f".format(Locale.US, value)
-            if (decimal.endsWith(".0")) decimal.dropLast(2) else decimal
-        }
-        return sign + formatted + suffix
-    }
-
-    val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()
 }

@@ -1,6 +1,8 @@
 package xyz.meowing.zen.utils
 
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.ai.attributes.Attributes
 import kotlin.time.Duration
 
 /**
@@ -39,3 +41,5 @@ var Entity.glowThisFrame: Boolean
     set(value) {
         (this as EntityAccessor).`zen$setGlowingThisFrame`(value)
     }
+
+val LivingEntity.baseMaxHealth: Int get() = this.getAttributeBaseValue(Attributes.MAX_HEALTH).toInt()

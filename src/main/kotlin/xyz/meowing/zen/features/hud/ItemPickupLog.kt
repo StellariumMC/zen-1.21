@@ -7,14 +7,14 @@ import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
-import xyz.meowing.zen.utils.Utils.abbreviateNumber
-import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.Utils.getRegexGroups
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.item.ItemStack
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.utils.NumberUtils.abbreviate
+import xyz.meowing.knit.api.utils.NumberUtils.formatWithCommas
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PacketEvent
@@ -90,14 +90,14 @@ object ItemPickupLog : Feature(
             if (alpha <= 0) return@forEachIndexed
 
             val colorSymbol = if (entry.count < 0) "§c-" else "§3+"
-            val count = if (abbreviateNumbers) abs(entry.count).abbreviateNumber() else abs(entry.count).formatNumber()
+            val count = if (abbreviateNumbers) abs(entry.count).abbreviate() else abs(entry.count).formatWithCommas()
             var display = "$colorSymbol$count §e${entry.itemName}"
 
             val priceInfo = ItemAPI.getItemInfo(entry.itemId)
             val price = (priceInfo?.get("bazaarSell")?.asDouble ?: priceInfo?.get("lowestBin")?.asDouble ?: 0.0) * entry.count
 
             if (price != 0.0) {
-                val formattedPrice = if (abbreviateNumbers) abs(price).abbreviateNumber() else abs(price).formatNumber()
+                val formattedPrice = if (abbreviateNumbers) abs(price).abbreviate() else abs(price).formatWithCommas()
                 display += " §6$$formattedPrice"
             }
 

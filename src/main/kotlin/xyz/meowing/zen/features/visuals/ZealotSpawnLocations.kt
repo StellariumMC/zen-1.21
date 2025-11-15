@@ -8,10 +8,10 @@ import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.TimeUtils.millis
-import xyz.meowing.zen.utils.Utils.toFormattedDuration
 import net.minecraft.core.BlockPos
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
+import xyz.meowing.knit.api.utils.NumberUtils.toDuration
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockAreas
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -109,7 +109,7 @@ object ZealotSpawnLocations : Feature(
         setupLoops {
             loop<ClientTick>(10) {
                 val timeUntilSpawn = spawnTime.until
-                val remaining = if (timeUntilSpawn.isPositive() && timeUntilSpawn.millis > 1000) timeUntilSpawn.millis.toFormattedDuration() else "§aReady"
+                val remaining = if (timeUntilSpawn.isPositive() && timeUntilSpawn.millis > 1000) timeUntilSpawn.millis.toDuration() else "§aReady"
                 val mobType = if (SkyBlockAreas.DRAGONS_NEST.inArea()) "Zealot" else "Bruiser"
                 displayText = "§d$mobType Spawn: §5$remaining"
             }

@@ -7,18 +7,17 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
-import xyz.meowing.zen.utils.Utils.formatNumber
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
-import xyz.meowing.zen.utils.Utils.toFormattedDuration
 import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.utils.NumberUtils.formatWithCommas
+import xyz.meowing.knit.api.utils.NumberUtils.toDuration
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
-import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.time.Duration
@@ -116,7 +115,7 @@ object SlayerStats : Feature(
             } else {
                 val pauseMark = SlayerTracker.pauseStart
                 val totalTime = TimeUtils.now - SlayerTracker.sessionStart - (pauseMark?.since ?: Duration.ZERO) - SlayerTracker.totalSessionPaused.milliseconds
-                val timeString = totalTime.millis.toFormattedDuration(false)
+                val timeString = totalTime.millis.toDuration(false)
                 list.add(" §7> §bSession time§f: §c$timeString" + if (SlayerTracker.isPaused) " §7(Paused)" else "")
             }
         }
@@ -137,7 +136,7 @@ object SlayerStats : Feature(
                 }
                 5 -> {
                     val xpPH = getBPH() * SlayerTracker.xpPerKill
-                    list.add(" §7> §bXP/hr§f: §c${xpPH.formatNumber()} XP")
+                    list.add(" §7> §bXP/hr§f: §c${xpPH.formatWithCommas()} XP")
                 }
             }
         }

@@ -5,9 +5,6 @@ import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.Render3D
-import xyz.meowing.zen.utils.Utils
-import xyz.meowing.zen.utils.Utils.baseMaxHealth
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -15,6 +12,7 @@ import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.utils.StringUtils.decodeRoman
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.configRegister
 import xyz.meowing.zen.events.core.EntityEvent
@@ -23,6 +21,8 @@ import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.utils.Utils.removeFormatting
+import xyz.meowing.zen.utils.baseMaxHealth
 
 @Module
 object SlayerDisplay : Feature(
@@ -390,7 +390,7 @@ object SlayerDisplay : Feature(
         val slayerMatch = slayerMobRegex.find(cleanName.removeFormatting().replace(",", "")) ?: return null
         val matchedName = slayerMatch.value
         val baseName = matchedName.substringBeforeLast(" ")
-        val tier = Utils.decodeRoman(matchedName.substringAfterLast(" ")).toString()
+        val tier = matchedName.substringAfterLast(" ").decodeRoman().toString()
 
         return BossTypes.entries.find { boss ->
             val bossClean = boss.fullName.removeFormatting()
