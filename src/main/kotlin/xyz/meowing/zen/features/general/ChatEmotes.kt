@@ -40,6 +40,7 @@ object ChatEmotes : Feature(
         ":sloth:" to "( ⬩ ⊝ ⬩ )",
         ":dab:" to "<o/",
         ":cat:" to "ᓚᘏᗢ",
+        "h/" to "ヽ(^◇^*)/"
     )
 
     override fun addConfig() {
