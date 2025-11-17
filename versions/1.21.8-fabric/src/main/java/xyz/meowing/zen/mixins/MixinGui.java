@@ -20,10 +20,7 @@ import static xyz.meowing.zen.features.general.ContributorColor.replaceText;
 
 @Mixin(Gui.class)
 public class MixinGui {
-    /*
-     * Modified from Devonian code
-     * Under GPL 3.0 License
-     */
+
     @Inject(
             method = "renderEffects",
             at = @At("HEAD"),
@@ -52,13 +49,13 @@ public class MixinGui {
         if (HealthManaPercentage.shouldHideVanillaArmor()) ci.cancel();
     }
 
-    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    private void zen$onRenderExperienceBar(GuiGraphics context, int x, CallbackInfo ci) {
+    @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderBackground(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"), cancellable = true)
+    private void zen$onRenderExperienceBarBackground(CallbackInfo ci) {
         if (HealthManaPercentage.shouldHideExpBar()) ci.cancel();
     }
 
-    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    private void zen$onRenderExperienceLevel(GuiGraphics drawContext, DeltaTracker renderTickCounter, CallbackInfo ci) {
+    @Inject(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;renderExperienceLevel(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;I)V"), cancellable = true)
+    private void zen$onRenderExperienceLevel(CallbackInfo ci) {
         if (HealthManaPercentage.shouldHideExpBar()) ci.cancel();
     }
 
