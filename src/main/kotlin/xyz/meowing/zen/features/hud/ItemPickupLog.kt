@@ -25,7 +25,7 @@ import kotlin.math.abs
 
 @Module
 object ItemPickupLog : Feature(
-    "itempickuplog"
+    "itemPickupLog"
 ) {
     private const val NAME = "Item Pickup Log"
     private var ignoreStacksRegex = listOf("""^§8Quiver.*""".toRegex(), """^§aSkyBlock Menu §7\(Click\)""".toRegex(), """^§bMagical Map""".toRegex())
