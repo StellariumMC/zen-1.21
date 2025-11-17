@@ -27,7 +27,10 @@ import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
-object BuffTimers : Feature("buffTimers", true) {
+object BuffTimers : Feature(
+    "buffTimers",
+    true
+) {
     private const val NAME = "BuffTimers"
 
     private const val FLARE_DURATION = 180.0 * 20
@@ -56,7 +59,7 @@ object BuffTimers : Feature("buffTimers", true) {
     }
 
     private val alwaysShow by ConfigDelegate<Boolean>("buffTimers.alwaysShow")
-    private val tickCall: EventCall = EventBus.register<TickEvent.Server> {
+    private val tickCall: EventCall = EventBus.register<TickEvent.Server>(add = false) {
         updateTimers()
         updateItems()
     }
@@ -73,7 +76,10 @@ object BuffTimers : Feature("buffTimers", true) {
         )
             .addFeatureOption(
                 "Always show items",
-                ConfigElement("buffTimers.alwaysShow", ElementType.Switch(false))
+                ConfigElement(
+                    "buffTimers.alwaysShow",
+                    ElementType.Switch(false)
+                )
             )
     }
 
@@ -108,7 +114,9 @@ object BuffTimers : Feature("buffTimers", true) {
         register<PacketEvent.Received> { event ->
             if (event.packet is ClientboundSoundPacket) {
                 val packet = event.packet
-                if (packet.sound.toString().contains("minecraft:entity.wolf.death") && packet.pitch == 1.4920635f && ItemUtils.isHolding("RAGNAROCK_AXE")
+                if (
+                    packet.sound.toString().contains("minecraft:entity.wolf.death") &&
+                    packet.pitch == 1.4920635f && ItemUtils.isHolding("RAGNAROCK_AXE")
                 ) {
                     ragnarock = 400.0
                     tickCall.register()
@@ -137,10 +145,20 @@ object BuffTimers : Feature("buffTimers", true) {
             render(event.context)
         }
 
-        register<LocationEvent.WorldChange> {
-            ragnarock = 0.0; sobh = 0.0; tuba = 0.0; flare = 0.0; orb = 0.0
-            ragnarockItem = null; sobhItem = null; tubaItem = null; flareItem = null; orbItem = null
-        }
+        register<LocationEvent.WorldChange> { reset() }
+    }
+
+    private fun reset() {
+        ragnarock = 0.0
+        sobh = 0.0
+        tuba = 0.0
+        flare = 0.0
+        orb = 0.0
+        ragnarockItem = null
+        sobhItem = null
+        tubaItem = null
+        flareItem = null
+        orbItem = null
     }
 
     private fun getOrbDuration(id: String) = when {
@@ -195,28 +213,22 @@ object BuffTimers : Feature("buffTimers", true) {
     private fun getActiveBuffs(): List<BuffData> {
         val buffs = mutableListOf<BuffData>()
 
-        ragnarockItem?.let {
-            if (ragnarock > 0 || alwaysShow) buffs.add(BuffData(it,
-                if (ragnarock > 0) formatTicks(ragnarock) else "Ready", "§6"))
-        }
-        sobhItem?.let {
-            if (sobh > 0 || alwaysShow) buffs.add(BuffData(it,
-                if (sobh > 0) formatTicks(sobh) else "Ready", "§c"))
-        }
-        tubaItem?.let {
-            if (tuba > 0 || alwaysShow) buffs.add(BuffData(it,
-                if (tuba > 0) formatTicks(tuba) else "Ready", "§7"))
-        }
-        flareItem?.let {
-            if (flare > 0 || alwaysShow) buffs.add(BuffData(it,
-                if (flare > 0) formatTicks(flare) else "Ready", "§4"))
-        }
-        orbItem?.let {
-            if (orb > 0 || alwaysShow) buffs.add(BuffData(it,
-                if (orb > 0) formatTicks(orb) else "Ready", "§4"))
-        }
+        addBuff(ragnarockItem, ragnarock, "§6", buffs)
+        addBuff(sobhItem, sobh, "§c", buffs)
+        addBuff(tubaItem, tuba, "§7", buffs)
+        addBuff(flareItem, flare, "§4", buffs)
+        addBuff(orbItem, orb, "§4", buffs)
 
         return buffs
+    }
+
+    fun addBuff(item: ItemStack?, timer: Double, color: String, buffs: MutableList<BuffData>) {
+        item?.let {
+            if (timer > 0 || alwaysShow) {
+                val timeStr = if (timer > 0) formatTicks(timer) else "Ready"
+                buffs.add(BuffData(it, timeStr, color))
+            }
+        }
     }
 
     private fun formatTicks(t: Double): String {

@@ -16,23 +16,34 @@ import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
-object HealthManaPercentage : Feature("healthmanapercent", true) {
+object HealthManaPercentage : Feature(
+    "healthManaPercent",
+    true
+) {
     private const val HEALTH_NAME = "Health Percentage"
     private const val MANA_NAME = "Mana Percentage"
 
-    private val showHealthPercent by ConfigDelegate<Boolean>("healthmanapercent.showHealth")
-    private val showManaPercent by ConfigDelegate<Boolean>("healthmanapercent.showMana")
-    private val showAbsoluteValues by ConfigDelegate<Boolean>("healthmanapercent.showAbsolute")
+    private val patterns = listOf(
+        Regex("""(§.)(?<currentHealth>[\d,]+)/(?<maxHealth>[\d,]+)❤"""),
+        Regex("""§b(?<currentMana>[\d,]+)/(?<maxMana>[\d,]+)✎( Mana)?"""),
+        Regex("""§a(?<defense>[\d,]+)§a❈ Defense""")
+    )
 
-    private val hideVanillaHearts by ConfigDelegate<Boolean>("healthmanapercent.hideVanillaHearts")
-    private val hideVanillaArmor by ConfigDelegate<Boolean>("healthmanapercent.hideVanillaArmor")
-    private val hideExpBar by ConfigDelegate<Boolean>("healthmanapercent.hideExpBar")
-    private val hideActionBarStats by ConfigDelegate<Boolean>("healthmanapercent.hideActionBarStats")
+    private val showHealthPercent by ConfigDelegate<Boolean>("healthManaPercent.showHealth")
+    private val showManaPercent by ConfigDelegate<Boolean>("healthManaPercent.showMana")
+    private val showAbsoluteValues by ConfigDelegate<Boolean>("healthManaPercent.showAbsolute")
+
+    private val hideVanillaHearts by ConfigDelegate<Boolean>("healthManaPercent.hideVanillaHearts")
+    private val hideVanillaArmor by ConfigDelegate<Boolean>("healthManaPercent.hideVanillaArmor")
+    private val hideExpBar by ConfigDelegate<Boolean>("healthManaPercent.hideExpBar")
+    private val hideActionBarStats by ConfigDelegate<Boolean>("healthManaPercent.hideActionBarStats")
 
     @JvmStatic
     fun shouldHideVanillaHearts(): Boolean = isEnabled() && hideVanillaHearts
+
     @JvmStatic
     fun shouldHideVanillaArmor(): Boolean = isEnabled() && hideVanillaArmor
+
     @JvmStatic
     fun shouldHideExpBar(): Boolean = isEnabled() && hideExpBar
 
@@ -42,35 +53,59 @@ object HealthManaPercentage : Feature("healthmanapercent", true) {
                 "Health/Mana Display",
                 "Show health/mana percentages and hide vanilla HUD elements",
                 "HUD",
-                ConfigElement("healthmanapercent", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent",
+                    ElementType.Switch(false)
+                )
             )
             .addFeatureOption(
                 "Show health percentage",
-                ConfigElement("healthmanapercent.showHealth", ElementType.Switch(true))
+                ConfigElement(
+                    "healthManaPercent.showHealth",
+                    ElementType.Switch(true)
+                )
             )
             .addFeatureOption(
                 "Show mana percentage",
-                ConfigElement("healthmanapercent.showMana", ElementType.Switch(true))
+                ConfigElement(
+                    "healthManaPercent.showMana",
+                    ElementType.Switch(true)
+                )
             )
             .addFeatureOption(
                 "Show absolute values",
-                ConfigElement("healthmanapercent.showAbsolute", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent.showAbsolute",
+                    ElementType.Switch(false)
+                )
             )
             .addFeatureOption(
                 "Hide vanilla hearts",
-                ConfigElement("healthmanapercent.hideVanillaHearts", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent.hideVanillaHearts",
+                    ElementType.Switch(false)
+                )
             )
             .addFeatureOption(
                 "Hide armor icons",
-                ConfigElement("healthmanapercent.hideVanillaArmor", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent.hideVanillaArmor",
+                    ElementType.Switch(false)
+                )
             )
             .addFeatureOption(
                 "Hide experience bar",
-                ConfigElement("healthmanapercent.hideExpBar", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent.hideExpBar",
+                    ElementType.Switch(false)
+                )
             )
             .addFeatureOption(
                 "Hide action bar stats",
-                ConfigElement("healthmanapercent.hideActionBarStats", ElementType.Switch(false))
+                ConfigElement(
+                    "healthManaPercent.hideActionBarStats",
+                    ElementType.Switch(false)
+                )
             )
     }
 
@@ -103,12 +138,6 @@ object HealthManaPercentage : Feature("healthmanapercent", true) {
         if (isEnabled() && hideActionBarStats && event.isActionBar) {
             val text = event.message.string
 
-            val patterns = listOf(
-                Regex("""(§.)(?<currentHealth>[\d,]+)/(?<maxHealth>[\d,]+)❤"""),
-                Regex("""§b(?<currentMana>[\d,]+)/(?<maxMana>[\d,]+)✎( Mana)?"""),
-                Regex("""§a(?<defense>[\d,]+)§a❈ Defense""")
-            )
-
             var cleanedText = text
             patterns.forEach { pattern ->
                 cleanedText = pattern.replace(cleanedText, "")
@@ -138,18 +167,11 @@ object HealthManaPercentage : Feature("healthmanapercent", true) {
         val isOverMax = currentHealth > maxHealth
         val percent = (currentHealth.toDouble() / maxHealth * 100).toInt()
 
-        val (text, color) = if (isOverMax) {
-            if (showAbsoluteValues) {
-                "§6$currentHealth/$maxHealth" to "§6"
-            } else {
-                "§6${percent}%" to "§6"
-            }
+        val color = if (isOverMax) "§6" else "§c"
+        val text = if (showAbsoluteValues) {
+            "$color$currentHealth/$maxHealth"
         } else {
-            if (showAbsoluteValues) {
-                "§c$currentHealth/$maxHealth" to "§c"
-            } else {
-                "§c${percent}%" to "§c"
-            }
+            "$color${percent}%"
         }
 
         val x = HUDManager.getX(HEALTH_NAME)
