@@ -317,6 +317,7 @@ class ChatToTitleGui : VexelScreen("Chat to Title") {
 
         if (ChatToTitle.addPattern(pattern, title, ChatToTitleType.CONTAINS)) {
             inputField.value = ""
+            titleField.value = ""
             renderPatterns()
         }
     }

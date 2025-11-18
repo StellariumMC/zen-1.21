@@ -9,11 +9,17 @@ data class ChatTitlePattern(
     val title: String,
     val filterType: ChatToTitleType
 ) {
+
+    @delegate:Transient
+    private val compiledRegex: Result<Regex> by lazy {
+        runCatching { pattern.toRegex() }
+    }
+
     fun matches(message: String): Boolean {
         return when (filterType) {
             ChatToTitleType.CONTAINS -> message.contains(pattern)
             ChatToTitleType.EQUALS -> message == pattern
-            ChatToTitleType.REGEX -> try { message.matches(pattern.toRegex()) } catch (_: Exception) { false }
+            ChatToTitleType.REGEX -> compiledRegex.getOrNull()?.matches(message) ?: false
         }
     }
 

@@ -69,7 +69,7 @@ object ChatToTitle : Feature(
 
     fun removePattern(index: Int): Boolean {
         if (index < 0 || index >= patterns.size) return false
-        patterns = patterns.filterIndexed { i, _ -> i != index }
+        patterns = patterns.toMutableList().also { it.removeAt(index) }
         patternData.forceSave()
         return true
     }
