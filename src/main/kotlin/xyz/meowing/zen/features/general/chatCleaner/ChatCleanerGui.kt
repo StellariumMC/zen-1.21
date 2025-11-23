@@ -324,17 +324,19 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
 
     private fun updateGuiState(index: Int) {
         val pattern = ChatCleaner.patterns.getOrNull(index) ?: return
-        if(ChatCleaner.updatePattern(index, pattern.pattern, pattern.filterType, !pattern.sendToGui)) {
+        val newSendToGui = !pattern.sendToGui
+        if (ChatCleaner.updatePattern(index, pattern.pattern, pattern.filterType, newSendToGui)) {
             val row = patternRows[index] ?: return
             val button = row.guiButton
 
-            val bgColor = if (!pattern.sendToGui) Theme.Highlight.color else Theme.BgLight.color
+            val bgColor = if (newSendToGui) Theme.Highlight.color else Theme.BgLight.color
+            val textColor = if (newSendToGui) 0xFFFFFFFF.toInt() else Theme.TextMuted.color
 
             button.isHovered = false
             button.isPressed = false
 
             button.backgroundColor(bgColor)
-            button.textColor(if (!pattern.sendToGui) 0xFFFFFFFF.toInt() else Theme.TextMuted.color)
+            button.textColor(textColor)
             button.hoverColor(Theme.Primary.color)
         }
     }
