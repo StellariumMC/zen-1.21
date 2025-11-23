@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.general.chatCleaner
 
-import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.input.KnitKeys
 import xyz.meowing.vexel.animations.EasingType
@@ -26,7 +25,8 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
     data class PatternRow(
         val container: Rectangle,
         val textInput: TextInput,
-        val buttons: List<Button>
+        val buttons: List<Button>,
+        val guiButton: Button
     )
 
     override fun afterInitialization() {
@@ -196,14 +196,34 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
                 )
             }
 
+        val guiButtonContainer = Container(padding = floatArrayOf(0f, 0f, 0f, 8f))
+            .setSizing(220f, Size.Auto, 28f, Size.Pixels)
+            .setPositioning(0f, Pos.AfterSibling, 0f, Pos.ParentCenter)
+            .childOf(row)
+
+        val guiButton = Button("Display in GUI",
+            if (pattern.sendToGui) 0xFFFFFFFF.toInt() else Theme.TextMuted.color, fontSize = 11f)
+            .setSizing(65f, Size.Pixels, 28f, Size.Pixels)
+            .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
+            .backgroundColor(if (pattern.sendToGui) Theme.Highlight.color else Theme.BgLight.color)
+            .borderColor(Theme.BorderMuted.color)
+            .borderRadius(4f)
+            .hoverColors(bg = Theme.Primary.color, text = 0xFFFFFFFF.toInt())
+            .padding(6f)
+            .onClick { _, _, _ ->
+                updateGuiState(index)
+                true
+            }
+            .childOf(guiButtonContainer)
+
         textInput.onValueChange { text ->
-            ChatCleaner.updatePattern(index, text as String, pattern.filterType)
+            ChatCleaner.updatePattern(index, text as String, pattern.filterType, pattern.sendToGui)
         }
 
         val buttons = createFilterButtons(row, index, pattern)
         createDeleteButton(row, index)
 
-        patternRows[index] = PatternRow(row, textInput, buttons)
+        patternRows[index] = PatternRow(row, textInput, buttons, guiButton)
     }
 
     private fun createFilterButtons(parent: Rectangle, index: Int, pattern: ChatPattern): List<Button> {
@@ -276,7 +296,7 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
             return
         }
 
-        if (ChatCleaner.addPattern(pattern, ChatFilterType.CONTAINS)) {
+        if (ChatCleaner.addPattern(pattern, ChatFilterType.CONTAINS, false)) {
             inputField.value = ""
             renderPatterns()
         }
@@ -284,7 +304,7 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
 
     private fun updatePatternType(index: Int, filterType: ChatFilterType) {
         val pattern = ChatCleaner.patterns.getOrNull(index) ?: return
-        if (ChatCleaner.updatePattern(index, pattern.pattern, filterType)) {
+        if (ChatCleaner.updatePattern(index, pattern.pattern, filterType, pattern.sendToGui)) {
             val row = patternRows[index] ?: return
             val types = listOf(ChatFilterType.CONTAINS, ChatFilterType.EQUALS, ChatFilterType.REGEX)
 
@@ -299,6 +319,23 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
                 button.textColor(if (isSelected) 0xFFFFFFFF.toInt() else Theme.TextMuted.color)
                 button.hoverColor(Theme.Primary.color)
             }
+        }
+    }
+
+    private fun updateGuiState(index: Int) {
+        val pattern = ChatCleaner.patterns.getOrNull(index) ?: return
+        if(ChatCleaner.updatePattern(index, pattern.pattern, pattern.filterType, !pattern.sendToGui)) {
+            val row = patternRows[index] ?: return
+            val button = row.guiButton
+
+            val bgColor = if (!pattern.sendToGui) Theme.Highlight.color else Theme.BgLight.color
+
+            button.isHovered = false
+            button.isPressed = false
+
+            button.backgroundColor(bgColor)
+            button.textColor(if (!pattern.sendToGui) 0xFFFFFFFF.toInt() else Theme.TextMuted.color)
+            button.hoverColor(Theme.Primary.color)
         }
     }
 

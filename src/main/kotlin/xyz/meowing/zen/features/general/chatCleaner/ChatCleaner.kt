@@ -16,17 +16,21 @@ import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
+import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.KeyEvent
 import xyz.meowing.zen.features.Feature
+import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.mixins.AccessorChatComponent
+import xyz.meowing.zen.utils.Utils.toLegacyString
 import java.util.regex.Pattern
 
 @Module
 object ChatCleaner : Feature(
     "chatCleaner"
 ) {
+    private const val NAME = "Chat Cleaner"
     private val chatCleanerKey by ConfigDelegate<Int>("chatCleaner.keybind")
     val patternData = StoredFile("features/ChatCleaner")
     var patterns: List<ChatPattern> by patternData.list("patterns", ChatPattern.CODEC)
@@ -67,10 +71,23 @@ object ChatCleaner : Feature(
     }
 
     override fun initialize() {
+        HUDManager.register(NAME, "Your Implosion hit 5 enemies for 1,661,807.6 damage.", "chatCleaner")
+
+        register<GuiEvent.Render.HUD> { event ->
+            ChatCleanerMessageGui.render(event.context)
+        }
+
         register<ChatEvent.Receive> { event ->
             if (event.isActionBar) return@register
             val message = event.message.stripped
-            if (patterns.any { it.matches(message) }) event.cancel()
+
+            val match = patterns.firstOrNull { it.matches(message) }
+            if (match != null) {
+                if (match.sendToGui) {
+                    ChatCleanerMessageGui.addNewMessage(event.message.toLegacyString())
+                }
+                event.cancel()
+            }
         }
 
         register<KeyEvent.Press> { _ ->
@@ -83,7 +100,7 @@ object ChatCleaner : Feature(
                 val text = chat.messages[line].content().stripped
 
                 if (text.isNotEmpty()) {
-                    addPattern(text, ChatFilterType.EQUALS)
+                    addPattern(text, ChatFilterType.EQUALS, false)
                     KnitChat.fakeMessage("$prefix §fAdded §7\"§c$text§7\" §fto filter.")
                 }
             }
@@ -97,7 +114,7 @@ object ChatCleaner : Feature(
                     val defaultPatterns = Gson().fromJson(
                         stream.bufferedReader().readText(), Array<String>::class.java
                     )
-                    patterns = defaultPatterns.map { ChatPattern(it, ChatFilterType.REGEX) }
+                    patterns = defaultPatterns.map { ChatPattern(it, ChatFilterType.REGEX, false) }
                     patternData.forceSave()
                 }
             } catch (e: Exception) {
@@ -106,11 +123,11 @@ object ChatCleaner : Feature(
         }
     }
 
-    fun addPattern(pattern: String, filterType: ChatFilterType): Boolean {
+    fun addPattern(pattern: String, filterType: ChatFilterType, sendToGui: Boolean): Boolean {
         if (pattern.isBlank() || patterns.any { it.pattern == pattern && it.filterType == filterType }) return false
         return try {
             if (filterType == ChatFilterType.REGEX) Pattern.compile(pattern)
-            patterns = patterns + ChatPattern(pattern, filterType)
+            patterns = patterns + ChatPattern(pattern, filterType, sendToGui)
             true
         } catch (_: Exception) {
             false
@@ -127,12 +144,12 @@ object ChatCleaner : Feature(
         patterns = emptyList()
     }
 
-    fun updatePattern(index: Int, newPattern: String, filterType: ChatFilterType): Boolean {
+    fun updatePattern(index: Int, newPattern: String, filterType: ChatFilterType, sendToGui: Boolean): Boolean {
         if (index < 0 || index >= patterns.size || newPattern.isBlank()) return false
         return try {
             if (filterType == ChatFilterType.REGEX) Pattern.compile(newPattern)
             patterns = patterns.mapIndexed { i, pattern ->
-                if (i == index) ChatPattern(newPattern, filterType) else pattern
+                if (i == index) ChatPattern(newPattern, filterType, sendToGui) else pattern
             }
             true
         } catch (_: Exception) {

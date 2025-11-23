@@ -5,7 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 
 data class ChatPattern(
     val pattern: String,
-    val filterType: ChatFilterType
+    val filterType: ChatFilterType,
+    val sendToGui: Boolean
 ) {
     fun matches(message: String): Boolean {
         return when (filterType) {
@@ -22,7 +23,8 @@ data class ChatPattern(
                 Codec.STRING.xmap(
                     { ChatFilterType.valueOf(it) },
                     { it.name }
-                ).fieldOf("filterType").forGetter { it.filterType }
+                ).fieldOf("filterType").forGetter { it.filterType },
+                Codec.BOOL.fieldOf("sendToGui").forGetter { it.sendToGui }
             ).apply(instance, ::ChatPattern)
         }
     }
