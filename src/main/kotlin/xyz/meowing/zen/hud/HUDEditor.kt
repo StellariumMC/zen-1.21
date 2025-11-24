@@ -71,7 +71,7 @@ class HUDEditor : KnitScreen("HUD Editor") {
                 val lines = element.text.split("\n")
                 lines.forEachIndexed { index, line ->
                     val textY = (index * client.font.lineHeight)
-                    context.drawString(client.font, line, 0, textY, 0xFFFFFF)
+                    context.drawString(client.font, line, 0, textY, -1)
                 }
             }
 
@@ -82,7 +82,7 @@ class HUDEditor : KnitScreen("HUD Editor") {
             //#endif
         }
 
-        context.drawString(client.font, "Drag elements. Press ESC to exit.", 10, 10, 0xFFFFFF)
+        context.drawString(client.font, "Drag elements. Press ESC to exit.", 10, 10, -1)
     }
 
     override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int) {
