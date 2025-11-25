@@ -20,10 +20,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
+import xyz.meowing.zen.utils.Render2D.renderBorder
 
-//#if MC >= 1.21.9
-//$$ import xyz.meowing.zen.utils.Render2D.renderOutline
-//#endif
 
 class TradeHistoryHUD : KnitScreen("Trade History") {
     private val formatter = DecimalFormat("#,###")
@@ -64,7 +62,7 @@ class TradeHistoryHUD : KnitScreen("Trade History") {
         val mainY = (screenHeight - mainHeight) / 2
 
         context.fill(mainX, mainY, mainX + mainWidth, mainY + mainHeight, Theme.BgDark.color)
-        context.renderOutline(mainX, mainY, mainWidth, mainHeight, Theme.Primary.color)
+        context.renderBorder(mainX, mainY, mainWidth, mainHeight, Theme.Primary.color)
 
         renderHeader(context, mainX, mainY, mainWidth)
         renderContent(context, mainX, mainY + headerHeight, mainWidth, mainHeight - headerHeight, mouseX, mouseY)
@@ -199,7 +197,7 @@ class TradeHistoryHUD : KnitScreen("Trade History") {
 
     private fun renderTradeCard(context: GuiGraphics, x: Int, y: Int, trade: JsonObject) {
         context.fill(x, y, x + cardWidth, y + cardHeight, Theme.Bg.color)
-        context.renderOutline(x, y, cardWidth, cardHeight, Theme.Primary.color)
+        context.renderBorder(x, y, cardWidth, cardHeight, Theme.Primary.color)
 
         val timestamp = trade.get("timestamp").asLong
         val username = trade.get("username").asString
