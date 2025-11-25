@@ -45,7 +45,7 @@ dependencies {
     modImplementation("net.fabricmc.fabric-api:fabric-api:${mcData.dependencies.fabric.fabricApiVersion}")
     modImplementation("net.fabricmc:fabric-language-kotlin:${mcData.dependencies.fabric.fabricLanguageKotlinVersion}")
 
-    modImplementation(include("xyz.meowing:vexel-${mcData}:124")!!)
+    modImplementation(include("xyz.meowing:vexel-${mcData}:125")!!)
 
     modImplementation(include("net.hypixel:mod-api:1.0.1")!!)
     modImplementation(include("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
