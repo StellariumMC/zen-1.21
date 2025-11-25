@@ -8,11 +8,8 @@ import net.minecraft.network.chat.Component
 import org.lwjgl.glfw.GLFW
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.screen.KnitScreen
+import xyz.meowing.zen.utils.Render2D.renderBorder
 import java.awt.Color
-
-//#if MC >= 1.21.9
-//$$ import xyz.meowing.zen.utils.Render2D.renderOutline
-//#endif
 
 class ProtectItemGUI : KnitScreen("Protect Item GUI") {
     private val slots = mutableListOf<InventorySlot>()
@@ -121,7 +118,7 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
 
         context.fill(guiX, guiY, guiX + guiWidth, guiY + guiHeight, guiBackground)
 
-        context.renderOutline(guiX, guiY, guiX + guiWidth, guiY + guiHeight, guiBorder)
+        context.renderBorder(guiX, guiY, guiWidth, guiHeight, guiBorder)
 
         val title = "Item Protection Manager"
         val titleWidth = font.width(title)
@@ -138,8 +135,6 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
         val instructions = "L to toggle protection • ESC to close"
         val textWidth = font.width(instructions)
         Render2D.renderString(context, instructions, guiX + (guiWidth - textWidth) / 2f, guiY + guiHeight + 5f, 1f, instructionColor, Render2D.TextStyle.DROP_SHADOW)
-
-        super.render(context, mouseX, mouseY, deltaTicks)
     }
 
     private fun renderSlot(context: GuiGraphics, slot: InventorySlot, mouseX: Int, mouseY: Int, index: Int) {
@@ -156,18 +151,18 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
 
         context.fill(slot.x, slot.y, slot.x + slotSize, slot.y + slotSize, slotColor)
 
+        if (!slot.stack.isEmpty) {
+            context.renderItem(slot.stack, slot.x + 1, slot.y + 1)
+            context.renderItemDecorations(font, slot.stack, slot.x + 1, slot.y + 1)
+        }
+
         val borderColor = when {
             slot.isProtected -> protectedBorder
             slot.isTypeProtected -> typeProtectedBorder
             else -> guiBorder
         }
 
-        context.renderOutline(slot.x, slot.y, slot.x + slotSize, slot.y + slotSize, borderColor)
-
-        if (!slot.stack.isEmpty) {
-            context.renderItem(slot.stack, slot.x + 1, slot.y + 1)
-            context.renderItemDecorations(font, slot.stack, slot.x + 1, slot.y + 1)
-        }
+        context.renderBorder(slot.x, slot.y, slotSize, slotSize, borderColor)
     }
 
     private fun renderTooltip(context: GuiGraphics, slot: InventorySlot, mouseX: Int, mouseY: Int) {

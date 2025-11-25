@@ -84,7 +84,7 @@ object Render2D {
         //#endif
     }
 
-    fun GuiGraphics.renderOutline(i: Int, j: Int, k: Int, l: Int, m: Int) {
+    fun GuiGraphics.renderBorder(i: Int, j: Int, k: Int, l: Int, m: Int) {
         this.fill(i, j, i + k, j + 1, m);
         this.fill(i, j + l - 1, i + k, j + l, m);
         this.fill(i, j + 1, i + 1, j + l - 1, m);
