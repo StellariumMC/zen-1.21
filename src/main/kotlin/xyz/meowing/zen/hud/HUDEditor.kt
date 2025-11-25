@@ -7,11 +7,8 @@ import xyz.meowing.knit.api.screen.KnitScreen
 import xyz.meowing.zen.hud.HUDManager.customRenderers
 import xyz.meowing.zen.utils.Render2D.height
 import xyz.meowing.zen.utils.Render2D.width
+import xyz.meowing.zen.utils.Render2D.renderBorder
 import java.awt.Color
-
-//#if MC >= 1.21.9
-//$$ import xyz.meowing.zen.utils.Render2D.renderOutline
-//#endif
 
 class HUDEditor : KnitScreen("HUD Editor") {
     private val borderHoverColor = Color(255, 255, 255).rgb
@@ -56,7 +53,7 @@ class HUDEditor : KnitScreen("HUD Editor") {
             val custom = customRenderers[element.id]
 
             if (custom != null) {
-                context.renderOutline(0, 0, element.width, element.height, borderColor)
+                context.renderBorder(0, 0, element.width, element.height, borderColor)
                 context.fill(0,0, element.width, element.height, Color(30, 35, 45, alpha).rgb)
                 custom(context)
             } else {
@@ -65,7 +62,7 @@ class HUDEditor : KnitScreen("HUD Editor") {
                     element.height = element.text.height()
                 }
 
-                context.renderOutline(-2, -3, element.width + 2, element.height + 2, borderColor)
+                context.renderBorder(-2, -3, element.width + 2, element.height + 2, borderColor)
                 context.fill(-2,-3, element.width + 2, element.height + 2, Color(30, 35, 45, alpha).rgb)
 
                 val lines = element.text.split("\n")
