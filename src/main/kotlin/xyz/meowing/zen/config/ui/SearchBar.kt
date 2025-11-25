@@ -57,12 +57,18 @@ class SearchBar(
         setPositioning(0f, Pos.ScreenCenter, -50f, Pos.ScreenPixels)
         alignBottom()
 
-        editGuiLocationsButton.onClick { _, _, btn ->
+        editGuiLocationsButton.onClick { _, _, _ ->
             TickScheduler.Client.post {
                 client.setScreen(HUDEditor())
             }
             true
         }
+
+        buttonContainer
+            .onHover(
+                { _, _ -> buttonContainer.colorTo(Theme.BgLight.color, 200, EasingType.EASE_IN) },
+                { _, _ -> buttonContainer.colorTo(Theme.Bg.color, 200, EasingType.EASE_IN) }
+            )
 
         input
             .onValueChange { newValue ->
