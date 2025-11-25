@@ -112,7 +112,7 @@ object ConfigManager {
     }
 
     fun createConfigUI() {
-        configUI = ClickGUI()
+        configUI = ClickGUI
 
         FeatureManager.features.forEach { it.addConfig() }
     }

@@ -66,8 +66,14 @@ class SearchBar(
 
         buttonContainer
             .onHover(
-                { _, _ -> buttonContainer.colorTo(Theme.BgLight.color, 200, EasingType.EASE_IN) },
-                { _, _ -> buttonContainer.colorTo(Theme.Bg.color, 200, EasingType.EASE_IN) }
+                { _, _ ->
+                    buttonContainer.colorTo(Theme.BgLight.color, 200, EasingType.EASE_IN)
+                    ClickGUI.updateTooltip("HUD Editor")
+                },
+                { _, _ ->
+                    buttonContainer.colorTo(Theme.Bg.color, 200, EasingType.EASE_IN)
+                    ClickGUI.updateTooltip("")
+                }
             )
 
         input

@@ -1,7 +1,11 @@
 package xyz.meowing.zen.config.ui
 
+import xyz.meowing.knit.api.input.KnitKeyboard
 import xyz.meowing.knit.api.render.KnitResolution
+import xyz.meowing.vexel.components.base.Pos
+import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.core.VexelScreen
+import xyz.meowing.zen.config.ui.elements.FeatureTooltip
 import xyz.meowing.zen.config.ui.elements.base.ConfigValidator
 import xyz.meowing.zen.config.ui.types.ElementType
 import xyz.meowing.zen.config.ui.panels.Panel
@@ -9,12 +13,13 @@ import xyz.meowing.zen.config.ui.elements.MCColorCode
 import xyz.meowing.zen.managers.config.CategoryElement
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
+import xyz.meowing.zen.ui.Theme
 import xyz.meowing.zen.utils.Utils.toColorFromMap
 import java.awt.Color
 
 typealias ConfigData = Map<String, Any>
 
-class ClickGUI : VexelScreen("Zen Config") {
+object ClickGUI : VexelScreen("Zen Config") {
     private val validator = ConfigValidator()
     private val panels = mutableListOf<Panel>()
 
@@ -23,6 +28,7 @@ class ClickGUI : VexelScreen("Zen Config") {
     )
 
     private lateinit var searchBar: SearchBar
+    lateinit var featureTooltip: FeatureTooltip
 
     private val configListeners = mutableMapOf<String, MutableList<(Any) -> Unit>>()
     private val closeListeners = mutableListOf<() -> Unit>()
@@ -61,7 +67,21 @@ class ClickGUI : VexelScreen("Zen Config") {
         searchBar = SearchBar { query ->
             filterPanels(query)
         }
+
         searchBar.childOf(window)
+
+        featureTooltip = FeatureTooltip()
+        featureTooltip.childOf(window)
+
+        Text("Hold down Shift and scroll to scroll horizontally.", Theme.Text.color, 16f)
+            .setPositioning(Pos.ParentPixels, Pos.ParentPixels)
+            .alignLeft()
+            .alignBottom()
+            .childOf(window)
+    }
+
+    fun updateTooltip(description: String) {
+        if (::featureTooltip.isInitialized) featureTooltip.setText(description)
     }
 
     private fun getDefaultValue(type: ElementType?): Any? = when (type) {
@@ -133,6 +153,25 @@ class ClickGUI : VexelScreen("Zen Config") {
                 panel.visible = panel.matchesSearch(query)
             }
         }
+    }
+
+    override fun onMouseScroll(horizontal: Double, vertical: Double) {
+        if (KnitKeyboard.isShiftKeyPressed) {
+            val scrollAmount = vertical.toFloat() * 20f
+
+            val leftmostX = panels.minOfOrNull { it.x } ?: 0f
+            val rightmostX = panels.maxOfOrNull { it.x + Panel.WIDTH } ?: 0f
+
+            val canScrollLeft = leftmostX < 50f
+            val canScrollRight = rightmostX > KnitResolution.windowWidth - 50f
+
+            if ((scrollAmount > 0 && canScrollLeft) || (scrollAmount < 0 && canScrollRight)) {
+                panels.forEach { panel ->
+                    panel.x += scrollAmount
+                }
+            }
+        }
+        super.onMouseScroll(horizontal, vertical)
     }
 
     override fun onCloseGui() {
