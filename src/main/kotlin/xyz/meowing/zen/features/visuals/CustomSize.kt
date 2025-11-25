@@ -3,7 +3,7 @@ package xyz.meowing.zen.features.visuals
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.managers.config.ConfigElement

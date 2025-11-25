@@ -6,7 +6,7 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TickUtils

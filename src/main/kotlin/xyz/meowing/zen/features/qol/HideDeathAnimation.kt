@@ -1,6 +1,6 @@
 package xyz.meowing.zen.features.qol
 
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.world.entity.Entity
 import xyz.meowing.knit.api.KnitClient.world

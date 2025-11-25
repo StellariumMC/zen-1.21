@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.meowing
 
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.Timer
 import xyz.meowing.zen.utils.TitleUtils

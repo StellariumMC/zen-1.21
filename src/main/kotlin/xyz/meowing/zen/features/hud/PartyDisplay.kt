@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.api.hypixel.PartyTracker
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D

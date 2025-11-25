@@ -3,7 +3,7 @@ package xyz.meowing.zen.features.general
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.meowing.zen.api.item.NEUApi
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.Utils.removeFormatting

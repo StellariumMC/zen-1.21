@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.rift
 
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.shapes.CollisionContext

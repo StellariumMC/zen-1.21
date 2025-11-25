@@ -5,7 +5,7 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.KeyEvent
 import xyz.meowing.zen.events.core.MouseEvent
 import xyz.meowing.zen.features.Feature

@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.slayers.slayerdisplay
 
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.Render3D

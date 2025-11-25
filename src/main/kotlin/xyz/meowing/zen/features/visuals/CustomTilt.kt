@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.visuals
 
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import com.mojang.math.Axis
 import xyz.meowing.knit.api.KnitPlayer.player

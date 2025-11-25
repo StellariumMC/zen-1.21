@@ -5,7 +5,7 @@ import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.skyblock.EntityDetection.sbMobID
 import xyz.meowing.zen.api.skyblock.PlayerStats
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.annotations.Command

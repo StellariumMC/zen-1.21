@@ -4,7 +4,7 @@ package xyz.meowing.zen.config.ui.elements.base
 
 import xyz.meowing.vexel.components.base.VexelElement
 import xyz.meowing.zen.config.ui.elements.MCColorCode
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.config.ui.elements.ButtonElement
 import xyz.meowing.zen.config.ui.elements.ColorPickerElement
 import xyz.meowing.zen.config.ui.elements.DropdownElement

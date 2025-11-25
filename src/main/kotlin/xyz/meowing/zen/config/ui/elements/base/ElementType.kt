@@ -1,4 +1,4 @@
-package xyz.meowing.zen.config.ui.types
+package xyz.meowing.zen.config.ui.elements.base
 
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import java.awt.Color

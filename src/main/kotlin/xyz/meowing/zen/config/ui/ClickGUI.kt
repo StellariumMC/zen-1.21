@@ -6,8 +6,7 @@ import xyz.meowing.vexel.components.base.Pos
 import xyz.meowing.vexel.components.core.Text
 import xyz.meowing.vexel.core.VexelScreen
 import xyz.meowing.zen.config.ui.elements.FeatureTooltip
-import xyz.meowing.zen.config.ui.elements.base.ConfigValidator
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.config.ui.panels.Panel
 import xyz.meowing.zen.config.ui.elements.MCColorCode
 import xyz.meowing.zen.managers.config.CategoryElement
@@ -20,7 +19,6 @@ import java.awt.Color
 typealias ConfigData = Map<String, Any>
 
 object ClickGUI : VexelScreen("Zen Config") {
-    private val validator = ConfigValidator()
     private val panels = mutableListOf<Panel>()
 
     private val categoryOrder = listOf(
@@ -97,24 +95,22 @@ object ClickGUI : VexelScreen("Zen Config") {
     }
 
     fun updateConfig(configKey: String, newValue: Any) {
-        val validatedValue = validator.validate(configKey, newValue) ?: return
-
-        val serializedValue = when (validatedValue) {
+        val serializedValue = when (newValue) {
             is Color -> mapOf(
-                "r" to validatedValue.red,
-                "g" to validatedValue.green,
-                "b" to validatedValue.blue,
-                "a" to validatedValue.alpha
+                "r" to newValue.red,
+                "g" to newValue.green,
+                "b" to newValue.blue,
+                "a" to newValue.alpha
             )
-            is Set<*> -> validatedValue.toList()
-            is MCColorCode -> validatedValue.code
-            else -> validatedValue
+            is Set<*> -> newValue.toList()
+            is MCColorCode -> newValue.code
+            else -> newValue
         }
 
         ConfigManager.configValueMap[configKey] = serializedValue
         ConfigManager.saveConfig(false)
 
-        configListeners[configKey]?.forEach { it(validatedValue) }
+        configListeners[configKey]?.forEach { it(newValue) }
     }
 
     fun registerListener(configKey: String, listener: (Any) -> Unit): ClickGUI {

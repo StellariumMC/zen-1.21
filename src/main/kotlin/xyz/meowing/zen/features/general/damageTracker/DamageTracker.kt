@@ -9,7 +9,7 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.SkyblockEvent

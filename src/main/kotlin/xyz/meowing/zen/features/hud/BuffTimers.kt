@@ -8,7 +8,7 @@ import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent

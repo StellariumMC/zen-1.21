@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.api.skyblock.PetTracker
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager

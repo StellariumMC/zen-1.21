@@ -4,7 +4,7 @@ import com.google.gson.JsonObject
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.slayer.SlayerTracker.bossType
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager

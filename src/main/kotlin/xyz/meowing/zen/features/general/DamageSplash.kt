@@ -2,7 +2,7 @@ package xyz.meowing.zen.features.general
 
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.MCColorCode
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.format
 import xyz.meowing.zen.utils.Utils.removeFormatting

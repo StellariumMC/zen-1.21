@@ -1,7 +1,7 @@
 package xyz.meowing.zen.features.general.protectItem
 
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.config.ui.types.ElementType
+import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.ItemUtils.lore
