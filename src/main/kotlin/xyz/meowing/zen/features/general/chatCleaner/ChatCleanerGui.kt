@@ -203,7 +203,7 @@ class ChatCleanerGui : VexelScreen("Chat Cleaner") {
 
         val guiButton = Button("Display in GUI",
             if (pattern.sendToGui) 0xFFFFFFFF.toInt() else Theme.TextMuted.color, fontSize = 11f)
-            .setSizing(65f, Size.Pixels, 28f, Size.Pixels)
+            .setSizing(75f, Size.Pixels, 28f, Size.Pixels)
             .setPositioning(0f, Pos.ParentPixels, 0f, Pos.ParentPixels)
             .backgroundColor(if (pattern.sendToGui) Theme.Highlight.color else Theme.BgLight.color)
             .borderColor(Theme.BorderMuted.color)

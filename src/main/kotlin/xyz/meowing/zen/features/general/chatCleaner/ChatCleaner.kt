@@ -32,6 +32,7 @@ object ChatCleaner : Feature(
 ) {
     private const val NAME = "Chat Cleaner"
     private val chatCleanerKey by ConfigDelegate<Int>("chatCleaner.keybind")
+    private val chatCleanerFilter by ConfigDelegate<Boolean>("chatCleaner.keybindToggle")
     val patternData = StoredFile("features/ChatCleaner")
     var patterns: List<ChatPattern> by patternData.list("patterns", ChatPattern.CODEC)
 
@@ -43,6 +44,13 @@ object ChatCleaner : Feature(
                 "General",
                 ConfigElement(
                     "chatCleaner",
+                    ElementType.Switch(false)
+                )
+            )
+            .addFeatureOption(
+                "Add through keybind",
+                ConfigElement(
+                    "chatCleaner.keybindToggle",
                     ElementType.Switch(false)
                 )
             )
@@ -91,6 +99,7 @@ object ChatCleaner : Feature(
         }
 
         register<KeyEvent.Press> { _ ->
+            if (!chatCleanerFilter) return@register
             if (client.screen !is ChatScreen || !KnitKey(chatCleanerKey).isPressed) return@register
 
             val chat = client.gui.chat as AccessorChatComponent
