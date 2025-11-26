@@ -49,7 +49,7 @@ object Render3D {
     fun drawString(
         text: String,
         pos: Vec3,
-        color: Int = 0xFFFFFF,
+        color: Int = -1,
         scale: Float = 1.0f,
         yOffset: Float = 0.0f,
         depth: Boolean = true,
