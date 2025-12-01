@@ -55,7 +55,7 @@ object DungeonBreaker : Feature(
             }
         }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             if (max == 0) return@register
             val x = HUDManager.getX(NAME)
             val y = HUDManager.getY(NAME)

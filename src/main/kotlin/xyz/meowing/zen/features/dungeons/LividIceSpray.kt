@@ -54,7 +54,7 @@ object LividIceSpray : Feature(
 
         register<LocationEvent.WorldChange> { cleanup() }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             render(event.context)
         }
     }

@@ -241,15 +241,18 @@ object CarryCounter : Feature(
             }
         }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             if (carries.isEmpty()) return@register
-            val context = event.context
+            if (client.screen != null) return@register
 
-            if (client.screen == null) {
-                CarryHUD.renderHUD(context)
-            } else if (event.renderType == GuiEvent.RenderType.Post) {
-                CarryHUD.renderInventoryHUD(context)
-            }
+            CarryHUD.renderHUD(event.context)
+        }
+
+        register<GuiEvent.Render.HUD.Post> { event ->
+            if (carries.isEmpty()) return@register
+            if (client.screen == null) return@register
+
+            CarryHUD.renderInventoryHUD(event.context)
         }
 
         register<GuiEvent.Click> { event ->

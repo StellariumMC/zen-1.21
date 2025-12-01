@@ -40,7 +40,7 @@ object RoomSecrets : Feature(
     override fun initialize() {
         HUDManager.registerCustom(NAME, 50, 30, this::editorRender, "roomSecrets")
 
-        register<GuiEvent.Render.HUD> { renderHUD(it.context) }
+        register<GuiEvent.Render.HUD.Pre> { renderHUD(it.context) }
     }
 
     fun editorRender(context: GuiGraphics) {

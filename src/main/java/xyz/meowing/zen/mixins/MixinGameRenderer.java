@@ -27,6 +27,6 @@ public class MixinGameRenderer {
             CallbackInfo ci,
             @Local GuiGraphics context
     ) {
-        EventBus.INSTANCE.post(new GuiEvent.Render.HUD(context, GuiEvent.RenderType.Pre));
+        EventBus.INSTANCE.post(new GuiEvent.Render.HUD.Pre(context));
     }
 }

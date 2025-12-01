@@ -154,7 +154,7 @@ object EventBus : xyz.meowing.knit.api.events.EventBus(true) {
             //#endif
 
             ScreenEvents.afterRender(screen).register { _, context, mouseX, mouseY, tickDelta ->
-                post(GuiEvent.Render.HUD(context, GuiEvent.RenderType.Post))
+                post(GuiEvent.Render.HUD.Post(context))
             }
         }
 

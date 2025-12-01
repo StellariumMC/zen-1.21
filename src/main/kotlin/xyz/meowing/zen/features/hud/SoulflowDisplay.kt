@@ -34,7 +34,7 @@ object SoulflowDisplay : Feature(
     override fun initialize() {
         HUDManager.register(NAME, "§3500⸎ Soulflow", "soulflowDisplay")
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             render(event.context)
         }
     }

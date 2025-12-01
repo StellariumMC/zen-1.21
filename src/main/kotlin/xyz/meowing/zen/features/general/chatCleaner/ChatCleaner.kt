@@ -81,7 +81,7 @@ object ChatCleaner : Feature(
     override fun initialize() {
         HUDManager.register(NAME, "Your Implosion hit 5 enemies for 1,661,807.6 damage.", "chatCleaner")
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             ChatCleanerMessageGui.render(event.context)
         }
 

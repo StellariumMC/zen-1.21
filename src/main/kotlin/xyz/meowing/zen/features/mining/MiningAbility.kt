@@ -59,7 +59,7 @@ object MiningAbility : Feature(
 
         register<TablistEvent.Change> { parseTablist() }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             if (hasWidget) {
                 val x = HUDManager.getX(NAME)
                 val y = HUDManager.getY(NAME)

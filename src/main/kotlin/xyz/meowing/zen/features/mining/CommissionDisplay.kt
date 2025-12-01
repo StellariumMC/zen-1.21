@@ -39,7 +39,7 @@ object CommissionDisplay : Feature(
 
         register<TablistEvent.Change> { parseTablist() }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             if (hasData) {
                 val x = HUDManager.getX(NAME)
                 val y = HUDManager.getY(NAME)

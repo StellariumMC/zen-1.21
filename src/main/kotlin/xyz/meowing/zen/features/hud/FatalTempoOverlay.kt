@@ -49,7 +49,7 @@ object FatalTempoOverlay : Feature(
             if (event.button == 0) checkFatal()
         }
 
-        register<GuiEvent.Render.HUD> {
+        register<GuiEvent.Render.HUD.Pre> {
             render(it.context)
         }
     }

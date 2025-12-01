@@ -42,7 +42,7 @@ object SlayerHUD : Feature(
     override fun initialize() {
         HUDManager.register(NAME, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤", "slayerHud")
 
-        createCustomEvent<GuiEvent.Render.HUD>("render") {
+        createCustomEvent<GuiEvent.Render.HUD.Pre>("render") {
             render(it.context)
         }
 

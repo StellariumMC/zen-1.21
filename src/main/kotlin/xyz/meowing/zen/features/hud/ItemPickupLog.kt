@@ -68,7 +68,7 @@ object ItemPickupLog : Feature(
             }
         }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             if (KnitClient.player != null) render(event.context)
         }
     }

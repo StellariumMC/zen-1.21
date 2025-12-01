@@ -18,10 +18,15 @@ sealed class GuiEvent {
          * @see xyz.meowing.zen.mixins.MixinGameRenderer
          * @since 1.2.0
          */
-        class HUD(
-            val context: GuiGraphics,
-            val renderType: RenderType
-        ) : Event()
+        sealed class HUD {
+            class Pre(
+                val context: GuiGraphics
+            ) : Event()
+
+            class Post(
+                val context: GuiGraphics
+            ) : Event()
+        }
 
         /**
          * Posted for the elements using NanoVG to render with the NanoVG beginFrame and endFrame already setup.

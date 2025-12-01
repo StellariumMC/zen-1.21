@@ -45,7 +45,7 @@ object PartyDisplay : Feature(
             partyMembers = event.members
         }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             render(event.context)
         }
     }

@@ -49,7 +49,7 @@ object ArrowPoison : Feature(
             if (event.packet is ClientboundContainerSetContentPacket || event.packet is ClientboundSetPlayerInventoryPacket || event.packet is ClientboundContainerSetSlotPacket) updateCount()
         }
 
-        register<GuiEvent.Render.HUD> { event ->
+        register<GuiEvent.Render.HUD.Pre> { event ->
             render(event.context)
         }
     }

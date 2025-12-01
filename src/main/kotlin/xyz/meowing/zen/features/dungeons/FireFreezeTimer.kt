@@ -57,7 +57,7 @@ object FireFreezeTimer : Feature(
             }
         }
 
-        register<GuiEvent.Render.HUD> { renderHUD(it.context) }
+        register<GuiEvent.Render.HUD.Pre> { renderHUD(it.context) }
 
         register<LocationEvent.WorldChange> { ticks = 0 }
     }
