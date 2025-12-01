@@ -325,7 +325,7 @@ class KeybindGui : VexelScreen("Key Shortcuts") {
 
         val handled = window.charType(keyCode, scanCode, typedChar)
         if (!handled && keyCode == KnitKeys.KEY_ESCAPE.code) {
-            close()
+            onClose()
             return true
         }
 
