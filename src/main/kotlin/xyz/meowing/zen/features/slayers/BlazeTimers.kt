@@ -103,7 +103,7 @@ object BlazeTimers : Feature(
             }
         }
 
-        register<GuiEvent.Render.HUD> {
+        register<GuiEvent.Render.HUD.Pre> {
             render(it.context)
         }
     }
