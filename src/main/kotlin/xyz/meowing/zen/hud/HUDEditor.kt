@@ -82,13 +82,15 @@ class HUDEditor : KnitScreen("HUD Editor") {
         context.drawString(client.font, "Drag elements. Press ESC to exit.", 10, 10, -1)
     }
 
-    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int) {
+    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
         val hovered = HUDManager.elements.values.firstOrNull { it.isHovered(mouseX.toFloat(), mouseY.toFloat()) }
         if (hovered != null) {
             dragging = hovered
             offsetX = mouseX.toFloat() - hovered.x
             offsetY = mouseY.toFloat() - hovered.y
         }
+
+        return super.onMouseClick(mouseX, mouseY, button)
     }
 
     override fun onMouseMove(mouseX: Int, mouseY: Int) {
@@ -98,8 +100,9 @@ class HUDEditor : KnitScreen("HUD Editor") {
         }
     }
 
-    override fun onMouseRelease(mouseX: Int, mouseY: Int, button: Int) {
+    override fun onMouseRelease(mouseX: Int, mouseY: Int, button: Int): Boolean {
         dragging = null
+        return super.onMouseRelease(mouseX, mouseY, button)
     }
 
     override fun onMouseScroll(horizontal: Double, vertical: Double) {

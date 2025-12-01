@@ -372,20 +372,22 @@ class TradeHistoryHUD : KnitScreen("Trade History") {
         return if (this == this.toInt().toDouble()) this.toInt().toString() else String.format("%.1f", this)
     }
 
-    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int) {
+    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
         val searchX = width - (width * 0.05f).toInt() - searchBoxWidth - padding
         val searchY = (height * 0.05f).toInt() + (headerHeight - searchBoxHeight) / 2
 
-        searchFocused = mouseX >= searchX && mouseX <= searchX + searchBoxWidth &&
-                mouseY >= searchY && mouseY <= searchY + searchBoxHeight
+        searchFocused = mouseX >= searchX && mouseX <= searchX + searchBoxWidth && mouseY >= searchY && mouseY <= searchY + searchBoxHeight
 
         if (searchFocused) {
             searchCursorPos = searchQuery.length
         }
+
+        return super.onMouseClick(mouseX, mouseY, button)
     }
 
-    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int) {
-        if (!searchFocused) return
+    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int): Boolean {
+        val handled = super.onKeyType(typedChar, keyCode, scanCode)
+        if (!searchFocused) return handled
 
         when {
             keyCode == 259 && searchQuery.isNotEmpty() -> {
@@ -400,6 +402,8 @@ class TradeHistoryHUD : KnitScreen("Trade History") {
                 searchCursorPos = searchQuery.length
             }
         }
+
+        return handled
     }
 
     override fun onMouseScroll(horizontal: Double, vertical: Double) {

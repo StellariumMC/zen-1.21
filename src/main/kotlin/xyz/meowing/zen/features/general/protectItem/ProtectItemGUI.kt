@@ -185,7 +185,7 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
         context.renderComponentTooltip(font, lines, mouseX, mouseY)
     }
 
-    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int) {
+    override fun onMouseClick(mouseX: Int, mouseY: Int, button: Int): Boolean {
         if (button == 0) {
             slots.forEachIndexed { _, slot ->
                 if (mouseX >= slot.x && mouseX <= slot.x + slotSize && mouseY >= slot.y && mouseY <= slot.y + slotSize) {
@@ -193,10 +193,10 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
                 }
             }
         }
+        return super.onMouseClick(mouseX, mouseY, button)
     }
 
-    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int) {
-        super.onKeyType(typedChar, keyCode, scanCode)
+    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int): Boolean {
         when (keyCode) {
             GLFW.GLFW_KEY_ESCAPE -> {
                 onClose()
@@ -208,6 +208,8 @@ class ProtectItemGUI : KnitScreen("Protect Item GUI") {
                 }
             }
         }
+
+        return super.onKeyType(typedChar, keyCode, scanCode)
     }
 
     private fun toggleProtection(slot: InventorySlot) {

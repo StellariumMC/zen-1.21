@@ -319,14 +319,18 @@ class KeybindGui : VexelScreen("Key Shortcuts") {
         }
     }
 
-    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int) {
+    override fun onKeyType(typedChar: Char, keyCode: Int, scanCode: Int): Boolean {
         if (keyCode > 0) keyButton.handleKeyPress(keyCode)
-        if (!keyButton.listening && keyCode != KnitKeys.KEY_ESCAPE.code) {
-            val handled = window.charType(keyCode, scanCode, typedChar)
-            if (!handled && keyCode == KnitKeys.KEY_ESCAPE.code) close()
-        }
-    }
+        if (keyButton.listening) return true
 
+        val handled = window.charType(keyCode, scanCode, typedChar)
+        if (!handled && keyCode == KnitKeys.KEY_ESCAPE.code) {
+            close()
+            return true
+        }
+
+        return handled
+    }
 
     //#if MC >= 1.21.9
     //$$ override fun keyPressed(input: net.minecraft.client.input.KeyEvent?): Boolean {
