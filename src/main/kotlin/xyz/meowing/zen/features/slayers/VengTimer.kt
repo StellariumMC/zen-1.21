@@ -19,6 +19,7 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.utils.TimeUtils.millis
 import kotlin.time.Duration.Companion.seconds
 
 @Module
@@ -106,7 +107,8 @@ object VengTimer : Feature(
     private fun getDisplayText(): String {
         if (hit && startTime.isInFuture) {
             val timeLeft = startTime.until
-            return "§bVeng proc: §c${"%.1f".format(timeLeft)}s"
+            val timeLeftInSeconds = timeLeft.millis / 1000.0
+            return "§bVeng proc: §c${"%.1f".format(timeLeftInSeconds)}s"
         }
         return ""
     }
