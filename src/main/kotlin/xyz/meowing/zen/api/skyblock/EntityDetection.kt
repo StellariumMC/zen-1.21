@@ -5,13 +5,13 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.Arrow
 import xyz.meowing.knit.api.KnitClient
 import xyz.meowing.knit.api.KnitPlayer
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
@@ -32,9 +32,9 @@ object EntityDetection {
     }
 
     init {
-        TickUtils.loop(5) {
-            val world = KnitClient.world ?: return@loop
-            val player = KnitPlayer.player ?: return@loop
+        TickScheduler.Client.repeat(5) {
+            val world = KnitClient.world ?: return@repeat
+            val player = KnitPlayer.player ?: return@repeat
 
             world.entitiesForRendering().forEach { entity ->
                 if (player.distanceTo(entity) > 30 || entity !is ArmorStand || !entity.hasCustomName() || hashMap.containsKey(entity)) return@forEach
@@ -54,9 +54,9 @@ object EntityDetection {
             }
         }
 
-        TickUtils.loop(100) {
+        TickScheduler.Client.repeat(100) {
             bossID?.let { id ->
-                val world = KnitClient.world ?: return@loop
+                val world = KnitClient.world ?: return@repeat
                 val boss = world.getEntity(id)
                 if (boss == null || !boss.isAlive) {
                     EventBus.post(SkyblockEvent.Slayer.Cleanup())

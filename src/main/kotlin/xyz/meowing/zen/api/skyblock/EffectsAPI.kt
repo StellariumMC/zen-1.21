@@ -3,6 +3,7 @@ package xyz.meowing.zen.api.skyblock
 import com.mojang.serialization.Codec
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.world.inventory.ChestMenu
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.EventBus
@@ -10,9 +11,7 @@ import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.utils.ItemUtils.lore
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
-
 
 @Module
 object EffectsAPI {
@@ -54,7 +53,7 @@ object EffectsAPI {
         EventBus.register<GuiEvent.Open> { event ->
             val screen = event.screen as? AbstractContainerScreen<*> ?: return@register
             if (screen.title.string.removeFormatting().contains("Active Effects")) {
-                TickUtils.schedule(3L) {
+                TickScheduler.Client.schedule(3) {
                     scanEffectsMenu(screen)
                 }
             }

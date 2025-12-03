@@ -2,6 +2,7 @@ package xyz.meowing.zen.features.meowing
 
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.managers.config.ConfigElement
@@ -9,7 +10,6 @@ import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import kotlin.random.Random
 
@@ -61,7 +61,7 @@ object AutoMeow : Feature(
 
             if (channelIndex !in autoMeowChannels) return@register
 
-            TickUtils.schedule(Random.nextLong(10, 50)) {
+            TickScheduler.Client.schedule(Random.nextLong(10, 50)) {
                 KnitChat.sendCommand("$cmd ${meows.random()}")
             }
         }

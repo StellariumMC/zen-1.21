@@ -3,6 +3,7 @@ package xyz.meowing.zen.api.slayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Spider
 import tech.thatgravyboat.skyblockapi.api.data.Perk
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.skyblock.EntityDetection
 import xyz.meowing.zen.config.ConfigDelegate
@@ -14,7 +15,6 @@ import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.features.slayers.SlayerTimer
 import xyz.meowing.zen.utils.SimpleTimeMark
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -130,7 +130,7 @@ object SlayerTracker {
         }
 
         EventBus.register<EntityEvent.Join> { event ->
-            TickUtils.scheduleServer(2) {
+            TickScheduler.Server.schedule(2) {
                 if (EntityDetection.bossID != null && event.entity.id == EntityDetection.bossID!! + 1 && event.entity is ArmorStand) {
                     val name = event.entity.name.string.removeFormatting()
                     slayerMobRegex.find(name)?.let { matchResult ->

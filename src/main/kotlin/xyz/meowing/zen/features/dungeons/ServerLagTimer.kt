@@ -1,6 +1,7 @@
 package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.knit.api.KnitChat
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -10,7 +11,6 @@ import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import java.util.regex.Pattern
 
@@ -53,9 +53,9 @@ object ServerLagTimer : Feature(
                     val lagtime = lagtick / 20.0
                     ticking = false
                     sent = true
-                    TickUtils.schedule(2, {
+                    TickScheduler.Client.schedule(2) {
                         KnitChat.fakeMessage("$prefix §fServer lagged for §c${"%.1f".format(lagtime)}s §7| §c${lagtick} ticks§f.")
-                    })
+                    }
                 }
                 else -> {}
             }

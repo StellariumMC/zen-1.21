@@ -4,8 +4,8 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.zen.Zen
 import xyz.meowing.zen.hud.HUDEditor
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.managers.config.ConfigManager.configUI
@@ -17,7 +17,7 @@ object ConfigCommand : Commodore("zen", "ma", "meowaddons") {
     init {
         literal("hud") {
             runs {
-                TickUtils.schedule(1) {
+                TickScheduler.Client.schedule(1) {
                     client.execute {
                         client.setScreen(HUDEditor())
                     }

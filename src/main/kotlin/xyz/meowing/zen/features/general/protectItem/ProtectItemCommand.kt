@@ -2,11 +2,11 @@ package xyz.meowing.zen.features.general.protectItem
 
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.utils.ItemUtils.uuid
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.knit.api.command.Commodore
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Command
 
 @Command
@@ -14,7 +14,7 @@ object ProtectItemCommand : Commodore("protectitem", "zenprotect", "pitem", "zen
     init {
         literal("gui") {
             runs {
-                TickUtils.schedule(2) {
+                TickScheduler.Client.schedule(2) {
                     client.setScreen(ProtectItemGUI())
                 }
             }

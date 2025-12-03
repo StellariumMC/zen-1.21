@@ -4,13 +4,13 @@ import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
-import xyz.meowing.zen.utils.TickUtils
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.phys.Vec3
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
@@ -61,7 +61,7 @@ object FireFreezeOverlay : Feature(
                     overlayTimerId = null
                 }
 
-                TickUtils.scheduleServer(100) {
+                TickScheduler.Server.schedule(100) {
                     freezeTimerId = createTimer(200,
                         onComplete = {
                             frozenEntities.clear()
