@@ -1,6 +1,7 @@
 package xyz.meowing.zen.features.slayers
 
 import net.minecraft.client.gui.GuiGraphics
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.GuiEvent
@@ -10,7 +11,6 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.TimeUtils.millis
@@ -42,7 +42,7 @@ object SoulcryTimer : Feature(
                 startTime = 4.seconds.fromNow
                 active = true
                 registerEvent("render")
-                TickUtils.schedule(79) {
+                TickScheduler.Client.schedule(80) {
                     startTime = TimeUtils.zero
                     active = false
                     unregisterEvent("render")

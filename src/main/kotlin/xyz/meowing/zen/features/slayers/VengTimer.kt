@@ -6,7 +6,6 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -21,6 +20,7 @@ import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.utils.TimeUtils.millis
 import kotlin.time.Duration.Companion.seconds
+import xyz.meowing.knit.api.scheduler.TickScheduler
 
 @Module
 object VengTimer : Feature(
@@ -62,7 +62,7 @@ object VengTimer : Feature(
         }
 
         register<SkyblockEvent.Slayer.Fail> {
-            TickUtils.scheduleServer(10) {
+            TickScheduler.Server.schedule(10) {
                 cleanup()
             }
         }
@@ -84,7 +84,7 @@ object VengTimer : Feature(
                 startTime = 6.seconds.fromNow
                 hit = true
                 registerEvent("render")
-                TickUtils.schedule(119) {
+                TickScheduler.Client.schedule(120) {
                     startTime = TimeUtils.zero
                     hit = false
                     unregisterEvent("render")
