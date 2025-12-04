@@ -6,7 +6,6 @@ import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -19,7 +18,9 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.utils.TimeUtils.millis
 import kotlin.time.Duration.Companion.seconds
+import xyz.meowing.knit.api.scheduler.TickScheduler
 
 @Module
 object VengTimer : Feature(
@@ -61,7 +62,7 @@ object VengTimer : Feature(
         }
 
         register<SkyblockEvent.Slayer.Fail> {
-            TickUtils.scheduleServer(10) {
+            TickScheduler.Server.schedule(10) {
                 cleanup()
             }
         }
@@ -83,7 +84,7 @@ object VengTimer : Feature(
                 startTime = 6.seconds.fromNow
                 hit = true
                 registerEvent("render")
-                TickUtils.schedule(119) {
+                TickScheduler.Client.schedule(120) {
                     startTime = TimeUtils.zero
                     hit = false
                     unregisterEvent("render")
@@ -100,13 +101,14 @@ object VengTimer : Feature(
         val y = HUDManager.getY(NAME)
         val scale = HUDManager.getScale(NAME)
 
-        Render2D.renderString(context, text, x, y, scale)
+        Render2D.renderStringWithShadow(context, text, x, y, scale)
     }
 
     private fun getDisplayText(): String {
         if (hit && startTime.isInFuture) {
             val timeLeft = startTime.until
-            return "§bVeng proc: §c${"%.1f".format(timeLeft)}s"
+            val timeLeftInSeconds = timeLeft.millis / 1000.0
+            return "§bVeng proc: §c${"%.1f".format(timeLeftInSeconds)}s"
         }
         return ""
     }
