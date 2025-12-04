@@ -5,10 +5,10 @@ import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.world.entity.monster.EnderMan
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
@@ -81,7 +81,7 @@ object HideEndermanLaser : Feature(
     }
 
     private fun getCachedClosestEnderman(guardianEntity: net.minecraft.world.entity.Entity): EnderMan? {
-        val currentTick = TickUtils.getCurrentServerTick()
+        val currentTick = TickScheduler.Server.currentTick
         if (!cacheInitialized || currentTick - lastCacheUpdate >= 5) {
             updateCache()
             lastCacheUpdate = currentTick

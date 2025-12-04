@@ -2,10 +2,10 @@ package xyz.meowing.zen.features.dungeons
 
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.TitleUtils.showTitle
 import net.minecraft.world.entity.decoration.ArmorStand
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.ChatEvent
@@ -42,8 +42,8 @@ object KeyAlert : Feature(
         register<EntityEvent.Join> { event ->
             if (bloodOpen) return@register
             if (event.entity !is ArmorStand) return@register
-            TickUtils.scheduleServer(2) {
-                val name = event.entity.name?.string?.removeFormatting() ?: return@scheduleServer
+            TickScheduler.Server.schedule(2) {
+                val name = event.entity.name?.string?.removeFormatting() ?: return@schedule
                 when {
                     name.contains("Wither Key") -> showTitle("§8Wither §fkey spawned!", null, 2000)
                     name.contains("Blood Key") -> showTitle("§cBlood §fkey spawned!", null, 2000)

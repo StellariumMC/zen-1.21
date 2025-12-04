@@ -4,10 +4,10 @@ import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.hud.HUDEditor
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.api.text.KnitText
 import xyz.meowing.knit.api.text.core.ClickEvent
 import xyz.meowing.knit.api.text.core.ColorCodes
@@ -139,7 +139,7 @@ object CarryCommand : Commodore("carry", "zencarry") {
         literal("gui") {
             runs {
                 if (!checkEnabled()) return@runs
-                TickUtils.schedule(2) {
+                TickScheduler.Client.schedule(2) {
                     client.execute { client.setScreen(HUDEditor()) }
                 }
                 KnitChat.fakeMessage("$prefix §fOpened HUD editor.")

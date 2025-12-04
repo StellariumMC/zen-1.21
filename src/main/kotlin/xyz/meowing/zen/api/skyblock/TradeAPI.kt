@@ -2,22 +2,19 @@ package xyz.meowing.zen.api.skyblock
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import net.minecraft.world.item.ItemStack
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.AbstractContainerMenu
 import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
 import tech.thatgravyboat.skyblockapi.api.datatype.getData
 import tech.thatgravyboat.skyblockapi.utils.extentions.getLore
-import tech.thatgravyboat.skyblockapi.utils.extentions.getRawLore
 import xyz.meowing.knit.api.KnitClient
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils
 import xyz.meowing.zen.utils.Utils.chestName
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -37,9 +34,9 @@ object TradeAPI {
     private val theirSlots = listOf(5, 6, 7, 8, 14, 15, 16, 17, 23, 24, 25, 26, 32, 33, 34, 35)
 
     init {
-        TickUtils.loop(20) {
+        TickScheduler.Client.repeat(20) {
             if (KnitClient.client.screen == null) inTradeMenu = false
-            val world = KnitClient.world ?: return@loop
+            val world = KnitClient.world ?: return@repeat
 
             if (tradingWithSub.isNotEmpty()) {
                 world.players().find { it.name.string.contains(tradingWithSub) }?.let {

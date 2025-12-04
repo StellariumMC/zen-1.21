@@ -4,7 +4,6 @@ import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import xyz.meowing.zen.utils.Utils.toFloatArray
 import net.minecraft.world.level.block.state.BlockState
@@ -15,6 +14,7 @@ import net.minecraft.world.item.DyeColor
 import net.minecraft.core.BlockPos
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.dungeons.DungeonFloor
 import xyz.meowing.zen.api.location.SkyBlockIsland
@@ -158,7 +158,7 @@ object HighlightLivid : Feature(
 
         register<ChatEvent.Receive> { event ->
             if (event.message.string.removeFormatting() == "[BOSS] Livid: I respect you for making it to here, but I'll be your undoing.") {
-                TickUtils.scheduleServer(80) {
+                TickScheduler.Server.schedule(80) {
                     registerEvent("tick")
                 }
             }

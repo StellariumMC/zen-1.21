@@ -4,7 +4,6 @@ import xyz.meowing.zen.events.*
 import xyz.meowing.zen.mixins.AccessorInventory
 import xyz.meowing.zen.utils.ItemUtils.lore
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
-import xyz.meowing.zen.utils.TickUtils
 import xyz.meowing.zen.utils.SimpleTimeMark
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.millis
@@ -12,6 +11,7 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.world.item.ItemStack
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
+import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.api.dungeons.DungeonAPI
@@ -56,14 +56,14 @@ object ItemAbility {
     }
 
     init {
-        TickUtils.loop(10) {
-            if (player == null || world == null) return@loop
+        TickScheduler.Client.repeat(10) {
+            if (player == null || world == null) return@repeat
 
             activeCooldowns.replaceAll { _, cooldown -> updateCooldown(cooldown) }
             activeCooldowns.clear()
 
             for (i in 0..7) {
-                val inventory = (player?.inventory as? AccessorInventory)?.main ?: return@loop
+                val inventory = (player?.inventory as? AccessorInventory)?.main ?: return@repeat
                 if (inventory[i].isEmpty) continue
 
                 val stack: ItemStack = inventory[i]
