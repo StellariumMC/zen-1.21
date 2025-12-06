@@ -58,9 +58,18 @@ dependencies {
     include("tech.thatgravyboat:skyblock-api:3.0.23", clocheAction)
 
     when (mcData.version) {
-        MinecraftVersions.VERSION_1_21_10 -> modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
-        MinecraftVersions.VERSION_1_21_8 -> modImplementation("com.terraformersmc:modmenu:15.0.0")
-        MinecraftVersions.VERSION_1_21_5 -> modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
+        MinecraftVersions.VERSION_1_21_10 -> {
+            include(modImplementation(group = "earth.terrarium.olympus", name = "olympus-fabric-1.21.9", version = "1.6.2"))
+            modImplementation("com.terraformersmc:modmenu:16.0.0-rc.1")
+        }
+        MinecraftVersions.VERSION_1_21_8 -> {
+            include(modImplementation(group = "earth.terrarium.olympus", name = "olympus-fabric-1.21.7", version = "1.5.2"))
+            modImplementation("com.terraformersmc:modmenu:15.0.0")
+        }
+        MinecraftVersions.VERSION_1_21_5 -> {
+            include(modImplementation(group = "earth.terrarium.olympus", name = "olympus-fabric-1.21.5", version = "1.3.6"))
+            modImplementation("com.terraformersmc:modmenu:14.0.0-rc.2")
+        }
         else -> {}
     }
 }
