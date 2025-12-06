@@ -22,7 +22,7 @@ object ClickGUI : VexelScreen("Zen Config") {
     private val panels = mutableListOf<Panel>()
 
     private val categoryOrder = listOf(
-        "general", "qol", "hud", "dungeons", "slayers", "visuals", "meowing", "rift", "mining"
+        "general", "qol", "hud", "slayers", "visuals", "meowing", "mining"
     )
 
     private lateinit var searchBar: SearchBar

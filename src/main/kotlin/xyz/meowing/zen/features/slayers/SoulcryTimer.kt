@@ -3,13 +3,10 @@ package xyz.meowing.zen.features.slayers
 import net.minecraft.client.gui.GuiGraphics
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
@@ -19,20 +16,14 @@ import kotlin.time.Duration.Companion.seconds
 @Module
 object SoulcryTimer : Feature(
     "soulcryTimer",
+    "Soulcry cooldown",
+    "Shows Soulcry ability cooldown time",
+    "Slayers",
     true
 ) {
     private const val NAME = "Soulcry Timer"
     private var startTime = TimeUtils.zero
     private var active = false
-
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Soulcry cooldown",
-            "Shows Soulcry ability cooldown",
-            "Slayers",
-            ConfigElement("soulcryTimer", ElementType.Switch(false))
-        )
-    }
 
     override fun initialize() {
         HUDManager.register(NAME, "§c4.0s", "soulcryTimer")
