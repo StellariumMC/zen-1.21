@@ -1,27 +1,28 @@
 package xyz.meowing.zen.api.item
 
-import xyz.meowing.zen.events.*
-import xyz.meowing.zen.mixins.AccessorInventory
-import xyz.meowing.zen.utils.ItemUtils.lore
-import xyz.meowing.zen.utils.ItemUtils.skyblockID
-import xyz.meowing.zen.utils.TickUtils
-import xyz.meowing.zen.utils.SimpleTimeMark
-import xyz.meowing.zen.utils.TimeUtils
-import xyz.meowing.zen.utils.TimeUtils.millis
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.world.item.ItemStack
+import tech.thatgravyboat.skyblockapi.api.datatype.DataTypes
+import tech.thatgravyboat.skyblockapi.api.datatype.getData
+import tech.thatgravyboat.skyblockapi.utils.extentions.stripColor
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
+import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.api.skyblock.PlayerStats
 import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.api.dungeons.DungeonClass
 import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.api.skyblock.PlayerStats
+import xyz.meowing.zen.events.*
 import xyz.meowing.zen.events.core.ChatEvent
-import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.MouseEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
+import xyz.meowing.zen.utils.ItemUtils.lore
+import xyz.meowing.zen.utils.SimpleTimeMark
+import xyz.meowing.zen.utils.TickUtils
+import xyz.meowing.zen.utils.TimeUtils
+import xyz.meowing.zen.utils.TimeUtils.millis
 
 @Module
 object ItemAbility {
@@ -29,6 +30,7 @@ object ItemAbility {
     private val activeCooldowns = hashMapOf<String, Double>()
     private var justUsedAbility: ItemAbility? = null
     private var cooldownReduction = -1
+    private var lastAbilityType: String? = null
 
     data class CooldownItem(
         var sneakRightClick: ItemAbility? = null,
@@ -47,34 +49,17 @@ object ItemAbility {
         var type: String? = null
     )
 
-    private fun sendItemAbilityEvent(ability: ItemAbility) {
-        if (ability.manaCost > PlayerStats.mana) return
-
-        EventBus.post(SkyblockEvent.ItemAbilityUsed(ability))
-        justUsedAbility = ability
-        activeCooldowns[ability.abilityName] = ability.cooldownSeconds
-    }
-
     init {
         TickUtils.loop(10) {
-            if (player == null || world == null) return@loop
+            val player = player ?: return@loop
+            world ?: return@loop
 
             activeCooldowns.replaceAll { _, cooldown -> updateCooldown(cooldown) }
-            activeCooldowns.clear()
+            activeCooldowns.entries.removeIf { it.value <= 0 }
 
-            for (i in 0..7) {
-                val inventory = (player?.inventory as? AccessorInventory)?.main ?: return@loop
-                if (inventory[i].isEmpty) continue
-
-                val stack: ItemStack = inventory[i]
-                setStackCooldown(stack)
-                val skyblockId: String = stack.skyblockID
-
-                if (skyblockId.isNotEmpty() && cooldowns[skyblockId] != null) {
-                    val cdSeconds = cooldowns[skyblockId]?.rightClick?.cooldownSeconds ?: 0.0
-                    val abilityName = cooldowns[skyblockId]?.rightClick?.abilityName ?: "Unknown"
-                    activeCooldowns[abilityName] = cdSeconds / 2.0
-                }
+            repeat(9) { i ->
+                val stack = player.inventory.getItem(i)
+                if (!stack.isEmpty) setStackCooldown(stack)
             }
         }
 
@@ -86,43 +71,40 @@ object ItemAbility {
 
         EventBus.register<MouseEvent.Click> { event ->
             if (world == null) return@register
-            val heldItem = player?.mainHandItem ?: return@register
-            val skyblockId = heldItem.skyblockID
-            val cdItem = cooldowns[skyblockId] ?: return@register
-            val sneaking = player?.isShiftKeyDown
+            if (client.screen != null) return@register
 
-            if (event.button == 0) {
-                if (sneaking == true) {
-                    cdItem.sneakLeftClick?.let { sendItemAbilityEvent(it) }
-                } else if (cdItem.leftClick != null) {
-                    sendItemAbilityEvent(cdItem.leftClick!!)
-                }
-            }
-        }
+            val cdItem = cooldowns[player?.mainHandItem?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId] ?: return@register
+            val sneaking = player?.isShiftKeyDown == true
 
-        EventBus.register<EntityEvent.Interact> {
-            if (world == null) return@register
-            val heldItem = player?.mainHandItem ?: return@register
-            val skyblockId = heldItem.skyblockID
-            val cdItem = cooldowns[skyblockId] ?: return@register
+            val ability = when (event.button) {
+                0 -> if (sneaking) cdItem.sneakLeftClick else cdItem.leftClick
+                1 -> if (sneaking) cdItem.sneakRightClick else cdItem.rightClick
+                else -> null
+            } ?: return@register
 
-            if (player?.isShiftKeyDown == true) cdItem.sneakRightClick?.let {
-                sendItemAbilityEvent(it)
-            } else if (cdItem.rightClick != null) {
-                sendItemAbilityEvent(cdItem.rightClick!!)
-            }
+            if (ability.manaCost > PlayerStats.mana) return@register
+
+            EventBus.post(SkyblockEvent.ItemAbilityUsed(ability))
+            justUsedAbility = ability
+            activeCooldowns[ability.abilityName] = ability.cooldownSeconds
         }
 
         EventBus.register<ChatEvent.Receive> { event ->
             if (event.isActionBar) return@register
-            val clean = event.message.string.removeFormatting()
+            val clean = event.message.stripped
 
-            if (clean.startsWith("Used") && SkyBlockIsland.THE_CATACOMBS.inIsland())
+            if (clean.startsWith("Used") && SkyBlockIsland.THE_CATACOMBS.inIsland()) {
                 justUsedAbility = ItemAbility("Dungeon_Ability")
+            }
 
             justUsedAbility?.let { ability ->
-                val skyblockId = player?.mainHandItem?.skyblockID ?: return@register
-                if (ability.itemId == skyblockId && clean.startsWith("This ability is on cooldown for") && ability.usedAt.since.millis <= 300) {
+                val skyblockId = player?.mainHandItem?.getData(DataTypes.SKYBLOCK_ID)?.skyblockId ?: return@register
+
+                if (
+                    ability.itemId == skyblockId &&
+                    clean.startsWith("This ability is on cooldown for") &&
+                    ability.usedAt.since.millis <= 300
+                ) {
                     val currentCooldown = clean.replace("[^0-9]".toRegex(), "").toInt()
                     ability.currentCount = ability.cooldownSeconds - currentCooldown
                     activeCooldowns[ability.abilityName] = currentCooldown.toDouble()
@@ -132,43 +114,70 @@ object ItemAbility {
     }
 
     private fun setItemAbility(line: String, cdItem: CooldownItem, skyblockId: String) {
-        val abilityName = line.split(": ")[1].split(" {2}")[0]
-        val ability = ItemAbility(skyblockId, abilityName = abilityName)
+        val remaining = line.split("Ability: ").getOrNull(1) ?: return
+        val abilityEnd = remaining.lastIndexOf("  ").takeIf { it != -1 } ?: return
 
-        when {
-            line.endsWith("RIGHT CLICK") -> cdItem.rightClick = ability
-            line.endsWith("LEFT CLICK") -> cdItem.leftClick = ability
-            line.endsWith("SNEAK RIGHT CLICK") -> cdItem.sneakRightClick = ability
-            line.endsWith("SNEAK LEFT CLICK") -> cdItem.sneakLeftClick = ability
+        val abilityName = remaining.take(abilityEnd).trim()
+        val type = remaining.drop(abilityEnd).trim()
+
+        lastAbilityType = type
+        val ability = ItemAbility(skyblockId, abilityName = abilityName, type = type)
+
+        when (type) {
+            "RIGHT CLICK" -> cdItem.rightClick = ability
+            "LEFT CLICK" -> cdItem.leftClick = ability
+            "SNEAK RIGHT CLICK" -> cdItem.sneakRightClick = ability
+            "SNEAK LEFT CLICK" -> cdItem.sneakLeftClick = ability
         }
     }
 
     private fun setCooldownSeconds(clean: String, cdItem: CooldownItem) {
         val cooldownSeconds = clean.replace("[^0-9]".toRegex(), "").toInt().toDouble()
-        listOfNotNull(cdItem.rightClick, cdItem.leftClick, cdItem.sneakRightClick, cdItem.sneakLeftClick).forEach { it.cooldownSeconds = cooldownSeconds }
+        abilityByType(cdItem, lastAbilityType)?.cooldownSeconds = cooldownSeconds
     }
 
     private fun setManaCost(clean: String, cdItem: CooldownItem) {
         val manaCost = clean.replace("[^0-9]".toRegex(), "").toInt()
-        listOfNotNull(cdItem.rightClick, cdItem.leftClick, cdItem.sneakRightClick, cdItem.sneakLeftClick).forEach { it.manaCost = manaCost }
+        abilityByType(cdItem, lastAbilityType)?.manaCost = manaCost
+    }
+
+    private fun abilityByType(cdItem: CooldownItem, type: String?): ItemAbility? = when (type) {
+        "RIGHT CLICK" -> cdItem.rightClick
+        "LEFT CLICK" -> cdItem.leftClick
+        "SNEAK RIGHT CLICK" -> cdItem.sneakRightClick
+        "SNEAK LEFT CLICK" -> cdItem.sneakLeftClick
+        else -> null
     }
 
     private fun setStackCooldown(item: ItemStack) {
         if (world == null) return
-        val skyblockId = item.skyblockID
-        if (cooldowns.containsKey(skyblockId)) return
+        val skyblockId = item.getData(DataTypes.SKYBLOCK_ID)?.skyblockId.takeIf { !cooldowns.containsKey(it) } ?: return
         val cdItem = CooldownItem()
+        var hasAbility = false
 
         item.lore.forEach { line ->
-            val clean = line.removeFormatting()
+            val clean = line.stripColor()
+
             when {
-                clean.contains("Ability: ") -> setItemAbility(clean, cdItem, skyblockId)
-                clean.contains("Cooldown: ") -> setCooldownSeconds(clean, cdItem)
-                clean.contains("Mana Cost: ") -> setManaCost(clean, cdItem)
+                clean.contains("Ability: ") -> {
+                    setItemAbility(clean, cdItem, skyblockId)
+                    hasAbility = true
+                }
+
+                clean.contains("Cooldown: ") && hasAbility -> {
+                    setCooldownSeconds(clean, cdItem)
+                }
+
+                clean.contains("Mana Cost: ") && hasAbility -> {
+                    setManaCost(clean, cdItem)
+                }
             }
         }
 
-        if (listOf(cdItem.rightClick, cdItem.leftClick, cdItem.sneakRightClick, cdItem.sneakLeftClick).any { it != null }) {
+        if (
+            hasAbility &&
+            listOf(cdItem.rightClick, cdItem.leftClick, cdItem.sneakRightClick, cdItem.sneakLeftClick).any { it != null }
+        ) {
             cooldowns[skyblockId] = cdItem
         }
     }
@@ -176,7 +185,11 @@ object ItemAbility {
     private fun updateCooldown(cooldownCount: Double): Double {
         var secondsToAdd = 0.05
 
-        if (SkyBlockIsland.THE_CATACOMBS.inIsland() && cooldownReduction == -1 && DungeonAPI.dungeonClass == DungeonClass.MAGE) {
+        if (
+            SkyBlockIsland.THE_CATACOMBS.inIsland() &&
+            cooldownReduction == -1 &&
+            DungeonAPI.dungeonClass == DungeonClass.MAGE
+        ) {
             cooldownReduction = (DungeonAPI.classLevel / 2) + 25
             if (DungeonAPI.uniqueClass) cooldownReduction += 25
         }

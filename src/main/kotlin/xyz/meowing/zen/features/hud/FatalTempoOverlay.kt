@@ -45,8 +45,8 @@ object FatalTempoOverlay : Feature(
         val item = KnitPlayer.heldItem ?: return
         val extraAttributes = item.extraAttributes ?: return
         val ftLevel = extraAttributes.getCompound("enchantments")
-            .map { it.getInt("ultimate_fatal_tempo") }
-            .orElse(null)?.get() ?: return
+            .flatMap { it.getInt("ultimate_fatal_tempo") }
+            .orElse(null) ?: return
 
         if (ftLevel <= 0) return
 
