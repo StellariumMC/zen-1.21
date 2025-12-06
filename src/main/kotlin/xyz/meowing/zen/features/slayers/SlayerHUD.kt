@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D.width
@@ -12,32 +11,19 @@ import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object SlayerHUD : Feature(
     "slayerHud",
-    true
+    "Slayer HUD",
+    "Displays information about the current slayer boss",
+    "Slayers",
+    skyblockOnly = true
 ) {
     private const val NAME = "Slayer HUD"
     private var timerEntity: Entity? = null
     private var hpEntity: Entity? = null
     private var bossID: Int? = null
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Slayer HUD",
-                "Slayer HUD",
-                "Slayers",
-                ConfigElement(
-                    "slayerHud",
-                    ElementType.Switch(false)
-                )
-            )
-    }
-
 
     override fun initialize() {
         HUDManager.register(NAME, "§c02:59\n§c☠ §bVoidgloom Seraph IV §e64.2M§c❤", "slayerHud")

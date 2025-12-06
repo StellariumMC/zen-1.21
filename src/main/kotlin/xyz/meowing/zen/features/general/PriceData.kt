@@ -18,7 +18,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 @Module
 object PriceData : Feature(
     "priceData",
-    true
+    "Price data",
+    "Shows price information for items",
+    "General",
+    skyblockOnly = true
 ) {
     private val displayOptions = listOf(
         "Active Listings",
@@ -36,35 +39,8 @@ object PriceData : Feature(
 
     private val tooltipCache = mutableMapOf<String, CacheEntry>()
 
-    private val displaySet by ConfigDelegate<Set<Int>>("priceData.display")
-    private val abbreviateNumbers by ConfigDelegate<Boolean>("priceData.abbreviateNumbers")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Price data",
-                "Shows price information for items",
-                "General",
-                ConfigElement(
-                    "priceData",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Info to show",
-                ConfigElement(
-                    "priceData.display",
-                    ElementType.MultiCheckbox(displayOptions, setOf(0, 1, 2, 3, 4))
-                )
-            )
-            .addFeatureOption(
-                "Abbreviate numbers",
-                ConfigElement(
-                    "priceData.abbreviateNumbers",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val infoToShow by config.multiCheckbox("Info to show", displayOptions, setOf(0, 1, 2, 3, 4))
+    private val abbreviateNumbers by config.switch("Abbreviate numbers", true)
 
     private fun Number.formatPrice(): String = if (abbreviateNumbers) abbreviate() else formatWithCommas()
 
@@ -82,7 +58,7 @@ object PriceData : Feature(
             val stack = event.stack
             val itemUuid = stack.displayName()
 
-            val cacheKey = "${itemUuid}_${stack.count}_${displaySet.hashCode()}_${abbreviateNumbers}"
+            val cacheKey = "${itemUuid}_${stack.count}_${infoToShow.hashCode()}_${abbreviateNumbers}"
 
             tooltipCache[cacheKey]?.let { cacheEntry ->
                 event.lines.addAll(cacheEntry.lines)
@@ -92,7 +68,7 @@ object PriceData : Feature(
             val pricingData = ItemAPI.getItemInfo(stack) ?: return@register
             val priceLines = mutableListOf<Component>()
 
-            if (0 in displaySet) {
+            if (0 in infoToShow) {
                 pricingData.takeIf { it.has("activeBin") || it.has("activeAuc") }?.let {
                     val activeBinNum = if (it.has("activeBin")) it.get("activeBin").asInt else -1
                     val activeAucNum = if (it.has("activeAuc")) it.get("activeAuc").asInt else -1
@@ -102,7 +78,7 @@ object PriceData : Feature(
                 }
             }
 
-            if (1 in displaySet) {
+            if (1 in infoToShow) {
                 pricingData.takeIf { it.has("binSold") || it.has("aucSold") }?.let {
                     val soldBinNum = if (it.has("binSold")) it.get("binSold").asInt else -1
                     val soldAucNum = if (it.has("aucSold")) it.get("aucSold").asInt else -1
@@ -112,7 +88,7 @@ object PriceData : Feature(
                 }
             }
 
-            if (2 in displaySet) {
+            if (2 in infoToShow) {
                 pricingData.takeIf { it.has("avgLowestBin") && it.has("lowestBin") }?.let {
                     val avgLowestBin = it.get("avgLowestBin").asLong.formatPrice()
                     val lowestBin = it.get("lowestBin").asLong.formatPrice()
@@ -120,7 +96,7 @@ object PriceData : Feature(
                 }
             }
 
-            if (3 in displaySet) {
+            if (3 in infoToShow) {
                 pricingData.takeIf { it.has("avgAucPrice") && it.has("aucPrice") }?.let {
                     val avgAucPrice = it.get("avgAucPrice").asLong.formatPrice()
                     val aucPrice = it.get("aucPrice").asLong.formatPrice()
@@ -128,7 +104,7 @@ object PriceData : Feature(
                 }
             }
 
-            if (4 in displaySet) {
+            if (4 in infoToShow) {
                 pricingData.takeIf { it.has("bazaarBuy") || it.has("bazaarSell") }?.let {
                     val multiplier = stack.count
                     val bazaarBuy = it.takeIf { it.has("bazaarBuy") }
@@ -145,7 +121,7 @@ object PriceData : Feature(
                 }
             }
 
-            if (5 in displaySet) {
+            if (5 in infoToShow) {
                 val rawCraftCost = stack.getItemValue().price.formatPrice()
                 priceLines.add(Component.literal("§3Raw Craft Cost: §a$rawCraftCost"))
             }

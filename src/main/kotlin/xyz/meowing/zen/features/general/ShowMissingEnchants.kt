@@ -3,7 +3,6 @@ package xyz.meowing.zen.features.general
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import xyz.meowing.zen.api.item.NEUApi
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.extraAttributes
 import xyz.meowing.zen.utils.Utils.removeFormatting
@@ -15,8 +14,6 @@ import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.InternalEvent
 import xyz.meowing.zen.events.core.ItemTooltipEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 /**
  * Module contains modified code from NEU
@@ -27,7 +24,10 @@ import xyz.meowing.zen.managers.config.ConfigManager
 @Module
 object ShowMissingEnchants : Feature(
     "showMissingEnchants",
-    true
+    "Show missing enchants",
+    "Show missing enchants on your items",
+    "General",
+    skyblockOnly = true
 ) {
     private var enchantsData: JsonObject? = null
     private var enchantPools: JsonArray? = null
@@ -40,19 +40,6 @@ object ShowMissingEnchants : Feature(
         val itemUuid: String,
         val enchantIds: Set<String>
     )
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Show missing enchants",
-                "Show missing enchants on your items",
-                "General",
-                ConfigElement(
-                    "showMissingEnchants",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<InternalEvent.NeuAPI.Load> {

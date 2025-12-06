@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.general
 
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.getSBStrength
 import xyz.meowing.zen.utils.ItemUtils.isHolding
@@ -14,35 +12,16 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.PacketEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object RagnarockAlert : Feature(
     "ragAlert",
-    true
+    "Ragnarok alert",
+    "Show alert on ragnarok cast",
+    "General",
+    skyblockOnly = true
 ) {
-    private val ragParty by ConfigDelegate<Boolean>("ragAlert.party")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Ragnarok alert",
-                "Show alert on ragnarok cast",
-                "General",
-                ConfigElement(
-                    "ragAlert",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Send party message",
-                ConfigElement(
-                    "ragAlert.party",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val sendToParty by config.switch("Send to party")
 
     override fun initialize() {
         register<PacketEvent.Received> { event ->
@@ -52,7 +31,7 @@ object RagnarockAlert : Feature(
                 val strengthGain = ((player?.getItemInHand(InteractionHand.MAIN_HAND)?.getSBStrength ?: return@register) * 1.5).toInt()
 
                 showTitle("§cRag §fCasted!", "§c❁ Strength:§b $strengthGain", 2000)
-                if (ragParty) KnitChat.sendCommand("pc Strength from Ragnarok: $strengthGain")
+                if (sendToParty) KnitChat.sendCommand("pc Strength from Ragnarok: $strengthGain")
             }
         }
 

@@ -1,38 +1,24 @@
 package xyz.meowing.zen.features.meowing
 
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.utils.Utils
-import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.sounds.SoundEvents
+import tech.thatgravyboat.skyblockapi.utils.text.TextProperties.stripped
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.ChatEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object MeowSounds : Feature(
-    "meowSounds"
+    "meowSounds",
+    "Meow sounds",
+    "Plays a meow sound when a message containing 'meow' is received in chat",
+    "Meowing"
 ) {
     private val meowRegex = Regex("(?:Guild|Party|Co-op|From|To)? ?>? ?(?:\\[.+?])? ?[a-zA-Z0-9_]+ ?(?:\\[.+?])?: (.+)")
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Meow sounds",
-                "Plays a meow sound when a message containing 'meow' is received in chat",
-                "Meowing",
-                ConfigElement(
-                    "meowSounds",
-                    ElementType.Switch(false)
-                )
-            )
-    }
-
-
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
-            val content = event.message.string.removeFormatting().lowercase()
+            val content = event.message.stripped
             val match = meowRegex.find(content) ?: return@register
             if (match.groups[1]?.value?.contains("meow", ignoreCase = true) != true) return@register
 

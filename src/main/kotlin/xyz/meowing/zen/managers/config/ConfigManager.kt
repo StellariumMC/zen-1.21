@@ -113,8 +113,6 @@ object ConfigManager {
 
     fun createConfigUI() {
         configUI = ClickGUI
-
-        FeatureManager.features.forEach { it.addConfig() }
     }
 
     fun executePending() {

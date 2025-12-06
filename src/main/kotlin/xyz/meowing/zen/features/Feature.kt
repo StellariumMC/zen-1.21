@@ -2,25 +2,27 @@
 
 package xyz.meowing.zen.features
 
-import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.events.Event
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.knit.api.scheduler.TimeScheduler
-import xyz.meowing.zen.Zen
 import xyz.meowing.zen.Zen.LOGGER
-import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.dungeons.DungeonAPI
 import xyz.meowing.zen.api.dungeons.DungeonFloor
 import xyz.meowing.zen.api.location.LocationAPI
 import xyz.meowing.zen.api.location.SkyBlockArea
 import xyz.meowing.zen.api.location.SkyBlockIsland
+import xyz.meowing.zen.config.ConfigDelegate
+import xyz.meowing.zen.config.dsl.ConfigBuilder
 import xyz.meowing.zen.events.EventBus
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.managers.feature.FeatureManager
 
 open class Feature(
     val configKey: String? = null,
+    configName: String? = null,
+    configDescription: String? = null,
+    configCategory: String? = null,
+    configDefault: Boolean = false,
     val skyblockOnly: Boolean = false,
     island: Any? = null,
     area: Any? = null,
@@ -31,8 +33,13 @@ open class Feature(
     val timeHandles = mutableSetOf<TimeScheduler.Handle>()
     val timerIds = mutableSetOf<Long>()
     val namedEventCalls = mutableMapOf<String, EventCall>()
+    private val _key by ConfigDelegate<Boolean>(configKey ?: "")
     private var setupLoops: (() -> Unit)? = null
     private var isRegistered = false
+
+    private var _configBuilder: ConfigBuilder? = null
+    val config: ConfigBuilder
+        get() = _configBuilder ?: throw IllegalStateException("Config not initialized for feature without config parameters")
 
     private val islands: List<SkyBlockIsland> = when (island) {
         is SkyBlockIsland -> listOf(island)
@@ -54,15 +61,25 @@ open class Feature(
 
     init {
         FeatureManager.addFeature(this)
+
+        if (configKey != null && configName != null && configDescription != null && configCategory != null) {
+            _configBuilder = ConfigBuilder(
+                configKey,
+                configName,
+                configDescription,
+                configCategory,
+                configDefault
+            )
+
+            _configBuilder?.feature()
+        }
     }
 
     private fun checkConfig(): Boolean {
         return try {
-            configKey?.let {
-                ConfigManager.getConfigValue(it) as? Boolean ?: false
-            } ?: true
+            _key
         } catch (e: Exception) {
-            Zen.LOGGER.warn("Caught exception in checkConfig(): $e")
+            LOGGER.warn("Caught exception in checkConfig(): $e")
             false
         }
     }
@@ -74,16 +91,12 @@ open class Feature(
     }
 
     open fun onRegister() {
-        if (Debug.debugMode) LOGGER.info("$prefix §fRegistering §b$configKey")
         setupLoops?.invoke()
     }
 
     open fun onUnregister() {
-        if (Debug.debugMode) LOGGER.info("$prefix §fUnregistering §b$configKey")
         cancelLoops()
     }
-
-    open fun addConfig() {}
 
     fun isEnabled(): Boolean = checkConfig() && inSkyblock() && inArea() && inSubarea() && inDungeonFloor()
 

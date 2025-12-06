@@ -12,23 +12,13 @@ import java.util.regex.Pattern
 
 @Module
 object GuildMessage : Feature(
-    "guildMessage"
+    "guildMessage",
+    "Clean guild messages",
+    "Reformats guild messages",
+    "General",
 ) {
     private val guildPattern = Pattern.compile("Guild > (\\[.+?])? ?([a-zA-Z0-9_]+) ?(\\[.+?])?: (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Clean guild messages",
-                "Reformats guild messages",
-                "General",
-                ConfigElement(
-                    "guildMessage",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -63,23 +53,13 @@ object GuildMessage : Feature(
 
 @Module
 object PartyMessage : Feature(
-    "partyMessage"
+    "partyMessage",
+    "Clean party messages",
+    "Reformats party messages",
+    "General",
 ) {
     private val partyPattern = Pattern.compile("Party > (\\[.+?])? ?(.+?): (.+)")
     private val rankPattern = Pattern.compile("\\[(.+?)]")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Clean party messages",
-                "Reformats party messages",
-                "General",
-                ConfigElement(
-                    "partyMessage",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

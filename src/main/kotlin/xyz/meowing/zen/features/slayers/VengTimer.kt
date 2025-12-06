@@ -1,10 +1,7 @@
 package xyz.meowing.zen.features.slayers
 
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.Render2D
 import xyz.meowing.zen.utils.TimeUtils
 import xyz.meowing.zen.utils.TimeUtils.fromNow
@@ -25,6 +22,9 @@ import xyz.meowing.knit.api.scheduler.TickScheduler
 @Module
 object VengTimer : Feature(
     "vengTimer",
+    "Vengeance proc timer",
+    "Displays a timer for when your vengeance damage should proc",
+    "Slayers",
     true
 ) {
     private const val NAME = "Vengeance Timer"
@@ -32,19 +32,6 @@ object VengTimer : Feature(
     private var hit = false
     private var isFighting = false
     private var cachedNametag: Entity? = null
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Vengeance proc timer",
-                "Vengeance proc timer",
-                "Slayers",
-                ConfigElement(
-                    "vengTimer",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         HUDManager.register(NAME, "§bVeng proc: §c4.3s", "vengTimer")

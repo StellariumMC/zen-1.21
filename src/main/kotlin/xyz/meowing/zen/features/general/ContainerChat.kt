@@ -9,13 +9,9 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.input.KnitKey
 import xyz.meowing.knit.api.input.KnitKeyboard
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.MouseEvent
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 //#if MC >= 1.21.9
 //$$ import net.minecraft.client.input.CharacterEvent
@@ -29,49 +25,18 @@ import xyz.meowing.zen.managers.config.ConfigManager
  */
 @Module
 object ContainerChat : Feature(
-    "containerChat"
+    "containerChat",
+    "Container chat",
+    "Allows you to open the chat in any container",
+    "General"
 ) {
-    private val transferText by ConfigDelegate<Boolean>("containerChat.transfer")
-    private val reopenChat by ConfigDelegate<Boolean>("containerChat.reopen")
-    private val requireCtrl by ConfigDelegate<Boolean>("containerChat.ctrl")
+    private val transfer by config.switch("Remember text", true)
+    private val reopenChat by config.switch("Reopen chat", true)
+    private val requireCtrl by config.switch("Require ctrl", true)
 
     private var inputField: EditBox? = null
     private var historyBuffer = ""
     private var sentHistoryCursor = -1
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Container chat",
-                "Allows you to open the chat in any container",
-                "General",
-                ConfigElement(
-                    "containerChat",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Remember text",
-                ConfigElement(
-                    "containerChat.transfer",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Reopen chat",
-                ConfigElement(
-                    "containerChat.reopen",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Ctrl to open chat",
-                ConfigElement(
-                    "containerChat.ctrl",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<GuiEvent.Open> {
@@ -190,7 +155,7 @@ object ContainerChat : Feature(
         field.setMaxLength(256)
         field.isBordered = false
 
-        if (transferText && inputField?.isFocused == true) {
+        if (transfer && inputField?.isFocused == true) {
             field.value = inputField?.value ?: ""
             field.isFocused = true
         }

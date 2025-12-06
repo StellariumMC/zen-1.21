@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.visuals
 
 import net.minecraft.world.phys.shapes.CollisionContext
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render3D
@@ -18,52 +16,19 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
-import java.awt.Color
+import kotlin.math.sqrt
 
 @Module
 object EffectiveAreaOverlay : Feature(
     "effectiveAreaOverlay",
-    true
+    "Effective area overlay",
+    "Shows your effective farming area",
+    "Visuals",
+    skyblockOnly = true
 ) {
-    private val items = listOf(
-        "BAT_WAND",
-        "STARRED_BAT_WAND",
-        "HYPERION",
-        "ASTRAEA",
-        "SCYLLA",
-        "VALKYRIE"
-    )
-    private val color by ConfigDelegate<Color>("effectiveAreaOverlay.color")
-    private val renderMethod by ConfigDelegate<Int>("effectiveAreaOverlay.renderMethod")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Effective area overlay",
-                "Shows your effective farming area",
-                "Visuals",
-                ConfigElement(
-                    "effectiveAreaOverlay",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Color",
-                ConfigElement(
-                    "effectiveAreaOverlay.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-            .addFeatureOption(
-                "Render method",
-                ConfigElement(
-                    "effectiveAreaOverlay.renderMethod",
-                    ElementType.Dropdown(listOf("Circle", "Blocks"), 0)
-                )
-            )
-    }
+    private val items = listOf("BAT_WAND", "STARRED_BAT_WAND", "HYPERION", "ASTRAEA", "SCYLLA", "VALKYRIE")
+    private val color by config.colorPicker("Color")
+    private val renderMethod by config.dropdown("Render method", listOf("Circle", "Blocks"))
 
     var lastBlockHit: BlockPos? = null
     val cachedBlockShapes = mutableSetOf<Any>()
@@ -88,17 +53,18 @@ object EffectiveAreaOverlay : Feature(
                                 color.rgb,
                             )
                         }
+
                         1 -> {
                             val camera = client.gameRenderer.mainCamera
                             val radius = 6
                             val center = blockHit.blockPos
 
-                            if(lastBlockHit != blockHit.blockPos) {
+                            if (lastBlockHit != blockHit.blockPos) {
                                 cachedBlockShapes.clear()
                                 xLoop@ for (x in -radius..radius) {
                                     yLoop@ for (y in -radius..radius) {
                                         zLoop@ for (z in -radius..radius) {
-                                            val distance = Math.sqrt((x * x + y * y + z * z).toDouble())
+                                            val distance = sqrt((x * x + y * y + z * z).toDouble())
 
                                             // Only include blocks near the sphere surface
                                             if (distance < radius - 0.5 || distance > radius + 0.5) continue@zLoop
@@ -109,11 +75,7 @@ object EffectiveAreaOverlay : Feature(
                                             // Ignore plants
                                             if (blockState.block is net.minecraft.world.level.block.VegetationBlock) continue@zLoop
 
-                                            val blockShape = blockState.getShape(
-                                                EmptyBlockGetter.INSTANCE,
-                                                blockPos,
-                                                CollisionContext.of(camera.entity)
-                                            )
+                                            val blockShape = blockState.getShape(EmptyBlockGetter.INSTANCE, blockPos, CollisionContext.of(camera.entity))
                                             if (blockShape.isEmpty) continue@zLoop
 
                                             cachedBlockShapes.add(blockShape.move(blockPos))
@@ -121,6 +83,7 @@ object EffectiveAreaOverlay : Feature(
                                     }
                                 }
                             }
+
                             lastBlockHit = blockHit.blockPos
 
                             cachedBlockShapes.forEach {

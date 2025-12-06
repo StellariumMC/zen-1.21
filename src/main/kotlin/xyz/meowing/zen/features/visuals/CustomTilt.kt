@@ -1,81 +1,25 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import com.mojang.math.Axis
 import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
 import kotlin.math.sin
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object CustomTilt : Feature(
-    "customTilt"
+    "customTilt",
+    "Custom tilt",
+    "Customizes player model tilt angles",
+    "Visuals"
 ) {
-    private val tiltX by ConfigDelegate<Double>("customTilt.tiltX")
-    private val tiltY by ConfigDelegate<Double>("customTilt.tiltY")
-    private val tiltZ by ConfigDelegate<Double>("customTilt.tiltZ")
-    private val tiltEveryone by ConfigDelegate<Boolean>("customTilt.tiltEveryone")
-    private val animatedTilt by ConfigDelegate<Boolean>("customTilt.animatedTilt")
-    private val tiltSpeed by ConfigDelegate<Double>("customTilt.tiltSpeed")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Custom tilt",
-                "Customizes player model tilt angles",
-                "Visuals",
-                ConfigElement(
-                    "customTilt",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Tilt X",
-                ConfigElement(
-                    "customTilt.tiltX",
-                    ElementType.Slider(-180.0, 180.0, 0.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Tilt Y",
-                ConfigElement(
-                    "customTilt.tiltY",
-                    ElementType.Slider(-180.0, 180.0, 0.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Tilt Z",
-                ConfigElement(
-                    "customTilt.tiltZ",
-                    ElementType.Slider(-180.0, 180.0, 0.0, true)
-                )
-            )
-            .addFeatureOption(
-                "Tilt everyone",
-                ConfigElement(
-                    "customTilt.tiltEveryone",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Animated tilt",
-                ConfigElement(
-                    "customTilt.animatedTilt",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Tilt speed",
-                ConfigElement(
-                    "customTilt.tiltSpeed",
-                    ElementType.Slider(0.1, 10.0, 1.0, true)
-                )
-            )
-    }
+    private val tiltX by config.slider("Tilt X", 0.0, -180.0, 180.0, true)
+    private val tiltY by config.slider("Tilt Y", 0.0, -180.0, 180.0, true)
+    private val tiltZ by config.slider("Tilt Z", 0.0, -180.0, 180.0, true)
+    private val tiltEveryone by config.switch("Tilt everyone", true)
+    private val animatedTilt by config.switch("Animated tilt", false)
+    private val tiltSpeed by config.slider("Tilt speed", 1.0, 0.1, 10.0, true)
 
     override fun initialize() {
         register<RenderEvent.Player.Pre> { event ->

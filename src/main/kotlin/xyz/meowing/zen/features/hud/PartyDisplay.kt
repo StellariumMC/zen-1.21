@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.api.hypixel.PartyTracker
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -10,28 +9,16 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PartyEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object PartyDisplay : Feature(
-    "partyDisplay"
+    "partyDisplay",
+    "Party display HUD",
+    "Display party members on HUD",
+    "HUD",
 ) {
     private const val NAME = "Party Display"
     private var partyMembers = mapOf<String, PartyTracker.PartyMember>()
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Party display HUD",
-                "Display party members on HUD",
-                "HUD",
-                ConfigElement(
-                    "partyDisplay",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
 
     override fun initialize() {

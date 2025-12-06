@@ -8,73 +8,37 @@ import xyz.meowing.knit.api.KnitClient.client
 import xyz.meowing.knit.api.input.KnitKey
 import xyz.meowing.knit.api.input.KnitKeys
 import xyz.meowing.knit.api.input.KnitMouse
-import xyz.meowing.knit.api.scheduler.TickScheduler
 import xyz.meowing.zen.Zen.LOGGER
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.data.StoredFile
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.KeyEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.mixins.AccessorChatComponent
 import xyz.meowing.zen.utils.Utils.toLegacyString
 import java.util.regex.Pattern
 
 @Module
 object ChatCleaner : Feature(
-    "chatCleaner"
+    "chatCleaner",
+    "Chat cleaner",
+    "Filter out unwanted chat messages using custom patterns",
+    "General",
 ) {
     private const val NAME = "Chat Cleaner"
-    private val chatCleanerKey by ConfigDelegate<Int>("chatCleaner.keybind")
-    private val chatCleanerFilter by ConfigDelegate<Boolean>("chatCleaner.keybindToggle")
+    private val keybindToggle by config.switch("Add through keybind")
+    private val keybind by config.keybind("Keybind to add msg", KnitKeys.KEY_RIGHT_ALT.code)
     val patternData = StoredFile("features/ChatCleaner")
     var patterns: List<ChatPattern> by patternData.list("patterns", ChatPattern.CODEC)
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Chat cleaner",
-                "Filter out unwanted chat messages using custom patterns",
-                "General",
-                ConfigElement(
-                    "chatCleaner",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Add through keybind",
-                ConfigElement(
-                    "chatCleaner.keybindToggle",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Keybind to add message to filter",
-                ConfigElement(
-                    "chatCleaner.keybind",
-                    ElementType.Keybind(KnitKeys.KEY_H.code)
-                )
-            )
-            .addFeatureOption(
-                "Chat cleaner filter GUI",
-                ConfigElement(
-                    "chatCleaner.guiButton",
-                    ElementType.Button("Open Filter GUI") {
-                        TickScheduler.Client.post {
-                            client.setScreen(ChatCleanerGui())
-                        }
-                    }
-                )
-            )
-    }
-
     init {
+        config.button("Open Filter GUI") {
+            client.setScreen(ChatCleanerGui())
+        }
+
         loadDefault()
     }
 
@@ -99,8 +63,8 @@ object ChatCleaner : Feature(
         }
 
         register<KeyEvent.Press> { _ ->
-            if (!chatCleanerFilter) return@register
-            if (client.screen !is ChatScreen || !KnitKey(chatCleanerKey).isPressed) return@register
+            if (!keybindToggle) return@register
+            if (client.screen !is ChatScreen || !KnitKey(keybind).isPressed) return@register
 
             val chat = client.gui.chat as AccessorChatComponent
             val line = chat.getMessageLineIdx(chat.toChatLineMX(KnitMouse.Scaled.x), chat.toChatLineMY(KnitMouse.Scaled.y))

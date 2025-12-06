@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.zen.api.skyblock.EntityDetection
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.slayers.carrying.CarryCounter
 import xyz.meowing.zen.utils.TickUtils
@@ -14,44 +12,21 @@ import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.LocationEvent
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import java.util.concurrent.ConcurrentHashMap
 
 @Module
 object HideEndermanLaser : Feature(
     "hideEndermanLaser",
-    true
+    "Hide enderman laser",
+    "Hides the laser for voidgloom slayer",
+    "Slayers",
+    skyblockOnly = true
 ) {
-    private val hideForOption by ConfigDelegate<Int>("hideEndermanLaser.forBossType")
+    private val hideForOption by config.dropdown("Hide for", listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"))
     private val endermanCache = ConcurrentHashMap<Int, EnderMan>()
     private val nametagData = ConcurrentHashMap<Int, String>()
     private var lastCacheUpdate = 0L
     private var cacheInitialized = false
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Hide enderman laser",
-                "",
-                "Slayers",
-                ConfigElement(
-                    "hideEndermanLaser",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Hide for",
-                ConfigElement(
-                    "hideEndermanLaser.forBossType",
-                    ElementType.Dropdown(
-                        listOf("All bosses", "Carries", "Mine", "Mine and carries", "Not mine/carries"),
-                        0
-                    )
-                )
-            )
-    }
-
 
     override fun initialize() {
         register<RenderEvent.GuardianLaser> { event ->

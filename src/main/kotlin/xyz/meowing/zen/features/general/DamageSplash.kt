@@ -1,22 +1,21 @@
 package xyz.meowing.zen.features.general
 
-import xyz.meowing.zen.config.ConfigDelegate
 import xyz.meowing.zen.config.ui.elements.MCColorCode
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.format
 import xyz.meowing.zen.utils.Utils.removeFormatting
 import net.minecraft.network.chat.Component
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import java.text.DecimalFormat
 
 @Module
 object DamageSplash : Feature(
-    "damagesplash",
-    true
+    "damageSplash",
+    "Damage splash",
+    "Customize damage numbers that appear above mobs",
+    "General",
+    skyblockOnly = true
 ) {
     enum class DamageType(val displayName: String) {
         CRIT("Crit Hits"),
@@ -29,89 +28,14 @@ object DamageSplash : Feature(
     private val allSymbols = setOf('✧', '✯', '⚔', '+', '❤', '♞', '☄', '✷', 'ﬗ')
     private val commaFormatter = DecimalFormat("#,###")
 
-    private val enableRainbow by ConfigDelegate<Boolean>("damageSplash.rainbow")
-    private val normalDamageColor by ConfigDelegate<MCColorCode>("damageSplash.normalColor")
-    private val criticalDamageColor by ConfigDelegate<MCColorCode>("damageSplash.criticalColor")
-    private val enabledColors by ConfigDelegate<Set<Int>>("damageSplash.rainbowColors")
-    private val showFormatted by ConfigDelegate<Boolean>("damageSplash.formatted")
-    private val useCommas by ConfigDelegate<Boolean>("damageSplash.commas")
-    private val cancelTypes by ConfigDelegate<Set<Int>>("damageSplash.cancelTypes")
-    private val cancelAll by ConfigDelegate<Boolean>("damageSplash.cancelAll")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Damage splash",
-                "Customize damage numbers that appear above mobs",
-                "General",
-                ConfigElement(
-                    "damageSplash",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show formatted numbers",
-                ConfigElement(
-                    "damageSplash.formatted",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Use comma separators",
-                ConfigElement(
-                    "damageSplash.commas",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Cancel all damage splash",
-                ConfigElement(
-                    "damageSplash.cancelAll",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Cancel specific damage types",
-                ConfigElement(
-                    "damageSplash.cancelTypes",
-                    ElementType.MultiCheckbox(
-                        options = DamageType.entries.map { it.displayName },
-                        default = setOf()
-                    )
-                )
-            )
-            .addFeatureOption(
-                "Rainbow damage with symbols",
-                ConfigElement(
-                    "damageSplash.rainbow",
-                    ElementType.Switch(true)
-                )
-            )
-            .addFeatureOption(
-                "Normal damage color",
-                ConfigElement(
-                    "damageSplash.normalColor",
-                    ElementType.MCColorPicker(MCColorCode.AQUA)
-                )
-            )
-            .addFeatureOption(
-                "Symbol damage color",
-                ConfigElement(
-                    "damageSplash.criticalColor",
-                    ElementType.MCColorPicker(MCColorCode.WHITE)
-                )
-            )
-            .addFeatureOption(
-                "Rainbow colors to use",
-                ConfigElement(
-                    "damageSplash.rainbowColors",
-                    ElementType.MultiCheckbox(
-                        options = listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"),
-                        default = setOf(0, 1, 2, 3)
-                    )
-                )
-            )
-    }
+    private val showFormatted by config.switch("Show formatted numbers", true)
+    private val enableRainbow by config.switch("Rainbow text", true)
+    private val normalDamageColor by config.mcColorPicker("Normal damage color", MCColorCode.AQUA)
+    private val criticalDamageColor by config.mcColorPicker("Crit damage color", MCColorCode.RED)
+    private val enabledColors by config.multiCheckbox("Rainbow colors to use", listOf("Gold", "Red", "Yellow", "White", "Green", "Aqua", "Light Purple", "Blue"), setOf(0, 1, 2, 3))
+    private val commas by config.switch("Use commas", true)
+    private val cancelTypes by config.multiCheckbox("Filtered types", DamageType.entries.map { it.displayName })
+    private val cancelAll by config.switch("Cancel all types", false)
 
     override fun initialize() {
         register<SkyblockEvent.DamageSplash>(priority = 1000) { event ->
@@ -127,7 +51,7 @@ object DamageSplash : Feature(
 
             val formattedDamage = when {
                 showFormatted -> format(event.damage)
-                useCommas -> commaFormatter.format(event.damage)
+                commas -> commaFormatter.format(event.damage)
                 else -> event.damage.toString()
             }
 

@@ -3,9 +3,6 @@ package xyz.meowing.zen.features.qol
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.TimeUtils
@@ -13,23 +10,13 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 
 @Module
 object SameServerAlert : Feature(
-    "serverAlert"
+    "serverAlert",
+    "Same server alert",
+    "Alert when joining the same server",
+    "QoL",
 ) {
     private val regex = Regex("Sending to server (.+)\\.\\.\\.")
     private val servers = mutableMapOf<String, Long>()
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Same server alert",
-                "Alert when joining the same server",
-                "QoL",
-                ConfigElement(
-                    "serverAlert",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

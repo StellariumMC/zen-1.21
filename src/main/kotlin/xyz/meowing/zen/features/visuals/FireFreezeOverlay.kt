@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.visuals
 
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Render3D
 import xyz.meowing.zen.utils.TickUtils
@@ -14,42 +12,22 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.events.core.SkyblockEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.glowThisFrame
 import xyz.meowing.zen.utils.glowingColor
-import java.awt.Color
 
 @Module
 object FireFreezeOverlay : Feature(
     "fireFreezeOverlay",
-    true
+    "Fire freeze overlay",
+    "Shows an overlay for the fire freeze ability",
+    "Visuals",
+    skyblockOnly = true
 ) {
     private var activatedPos: Vec3? = null
     private var overlayTimerId: Long? = null
     private var freezeTimerId: Long? = null
     private var frozenEntities = mutableSetOf<Entity>()
-    private val color by ConfigDelegate<Color>("firefreezeoverlaycolor")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Fire freeze overlay",
-                "",
-                "Visuals",
-                ConfigElement(
-                    "fireFreezeOverlay",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Color",
-                ConfigElement(
-                    "fireFreezeOverlay.color",
-                    ElementType.ColorPicker(Color(0, 255, 255, 127))
-                )
-            )
-    }
+    private val color by config.colorPicker("Color")
 
     override fun initialize() {
         register<SkyblockEvent.ItemAbilityUsed> { event ->

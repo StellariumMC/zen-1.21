@@ -2,8 +2,6 @@ package xyz.meowing.zen.features.slayers
 
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.slayer.SlayerTracker
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -18,49 +16,30 @@ import xyz.meowing.knit.api.utils.NumberUtils.toDuration
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 @Module
 object SlayerStats : Feature(
     "slayerStats",
-    true
+    "Slayer stats",
+    "Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats.",
+    "Slayers",
+    skyblockOnly = true
 ) {
     private const val NAME = "Slayer Stats"
-    private val slayerStatsLines by ConfigDelegate<Set<Int>>("slayerStats.lines")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Slayer stats",
-                "Shows slayer statistics such as total bosses killed, bosses per hour, and average kill time. §c/slayerstats reset §rto reset stats.",
-                "Slayers",
-                ConfigElement(
-                    "slayerStats",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Lines to show",
-                ConfigElement(
-                    "slayerStats.lines",
-                    ElementType.MultiCheckbox(
-                        options = listOf(
-                            "Show Bosses Killed",
-                            "Show Bosses/hr",
-                            "Show Average kill time",
-                            "Show Average spawn time",
-                            "Show Total Session time",
-                            "Show XP/hr"
-                        ),
-                        default = setOf(0, 1, 4, 5)
-                    )
-                )
-            )
-    }
-
+    private val lines by config.multiCheckbox(
+        "Lines to show",
+        listOf(
+            "Show Bosses Killed",
+            "Show Bosses/hr",
+            "Show Average kill time",
+            "Show Average spawn time",
+            "Show Total Session time",
+            "Show XP/hr"
+        ),
+        setOf(0, 1, 4, 5)
+    )
 
     override fun initialize() {
         HUDManager.register(
@@ -109,7 +88,7 @@ object SlayerStats : Feature(
 
         val list = mutableListOf("$prefix §f§lSlayer Stats: ")
 
-        if (slayerStatsLines.contains(4)) {
+        if (lines.contains(4)) {
             if (SlayerTracker.sessionStart.isZero) {
                 list.add(" §7> §bSession time§f: §c-")
             } else {
@@ -120,7 +99,7 @@ object SlayerStats : Feature(
             }
         }
 
-        slayerStatsLines.sorted().forEach { line ->
+        lines.sorted().forEach { line ->
             when (line) {
                 0 -> list.add(" §7> §bBosses Killed§f: §c${SlayerTracker.sessionBossKills}")
                 1 -> list.add(" §7> §bBosses/hr§f: §c${if (SlayerTracker.sessionBossKills == 0) "-" else getBPH()}")

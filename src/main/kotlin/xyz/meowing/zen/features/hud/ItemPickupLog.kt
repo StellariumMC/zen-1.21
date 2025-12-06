@@ -1,8 +1,6 @@
 package xyz.meowing.zen.features.hud
 
 import xyz.meowing.zen.api.item.ItemAPI
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
@@ -18,39 +16,20 @@ import xyz.meowing.knit.api.utils.NumberUtils.formatWithCommas
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PacketEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import java.awt.Color
 import kotlin.math.abs
 
 @Module
 object ItemPickupLog : Feature(
-    "itemPickupLog"
+    "itemPickupLog",
+    "Item pickup log",
+    "Display picked up items on HUD",
+    "HUD",
 ) {
     private const val NAME = "Item Pickup Log"
     private var ignoreStacksRegex = listOf("""^§8Quiver.*""".toRegex(), """^§aSkyBlock Menu §7\(Click\)""".toRegex(), """^§bMagical Map""".toRegex())
     private val npcSellingStackRegex = """(.*) §8x\d+""".toRegex()
-    private val abbreviateNumbers by ConfigDelegate<Boolean>("itemPickupLog.abbreviate")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Item pickup log",
-                "Display picked up items on HUD",
-                "HUD",
-                ConfigElement(
-                    "itemPickupLog",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Abbreviate numbers",
-                ConfigElement(
-                    "itemPickupLog.abbreviate",
-                    ElementType.Switch(false)
-                )
-            )
-    }
+    private val abbreviate by config.switch("Abbreviate numbers")
 
     private var previousInventory = mutableMapOf<String, Int>()
     private var currentInventory = mutableMapOf<String, Int>()
@@ -90,14 +69,14 @@ object ItemPickupLog : Feature(
             if (alpha <= 0) return@forEachIndexed
 
             val colorSymbol = if (entry.count < 0) "§c-" else "§3+"
-            val count = if (abbreviateNumbers) abs(entry.count).abbreviate() else abs(entry.count).formatWithCommas()
+            val count = if (abbreviate) abs(entry.count).abbreviate() else abs(entry.count).formatWithCommas()
             var display = "$colorSymbol$count §e${entry.itemName}"
 
             val priceInfo = ItemAPI.getItemInfo(entry.itemId)
             val price = (priceInfo?.get("bazaarSell")?.asDouble ?: priceInfo?.get("lowestBin")?.asDouble ?: 0.0) * entry.count
 
             if (price != 0.0) {
-                val formattedPrice = if (abbreviateNumbers) abs(price).abbreviate() else abs(price).formatWithCommas()
+                val formattedPrice = if (abbreviate) abs(price).abbreviate() else abs(price).formatWithCommas()
                 display += " §6$$formattedPrice"
             }
 

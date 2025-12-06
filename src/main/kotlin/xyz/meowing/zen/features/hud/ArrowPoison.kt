@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.Render2D
@@ -16,31 +15,18 @@ import xyz.meowing.knit.api.KnitPlayer.player
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.PacketEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object ArrowPoison : Feature(
     "arrowPoison",
-    true
+    "Arrow poison tracker",
+    "Track arrow poisons present in your inventory",
+    "HUD",
+    skyblockOnly = true
 ) {
     private const val NAME = "Arrow Poison"
     private var twilightCount = 0
     private var toxicCount = 0
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Arrow poison tracker",
-                "Track arrow poisons present in your inventory",
-                "HUD",
-                ConfigElement(
-                    "arrowPoison",
-                    ElementType.Switch(false)
-                )
-            )
-    }
-
 
     override fun initialize() {
         HUDManager.registerCustom(NAME, 85, 17, this::editorRender, "arrowPoison")

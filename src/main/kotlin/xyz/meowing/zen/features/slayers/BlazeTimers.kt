@@ -22,8 +22,11 @@ import xyz.meowing.zen.events.core.TickEvent
 
 @Module
 object BlazeTimers : Feature(
-    "blazetimers",
-    true,
+    "blazeTimers",
+    "Blaze timers",
+    "Shows Polar Bear and Wisp splash timers",
+    "Slayers",
+    skyblockOnly = true
 ) {
     private const val NAME = "BlazeTimers"
     private const val POLAR_EFFECT = "Smoldering Polarization I"
@@ -46,18 +49,6 @@ object BlazeTimers : Feature(
         return listOf(
             TimerData(polarSkull, "1:00:00", "§a"),
             TimerData(wispSplash, "20:00", "§b")
-        )
-    }
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-            "Blaze Timers",
-            "Shows Polar Bear and Wisp splash timers",
-            "Slayers",
-            ConfigElement(
-                "blazetimers",
-                ElementType.Switch(false))
         )
     }
 

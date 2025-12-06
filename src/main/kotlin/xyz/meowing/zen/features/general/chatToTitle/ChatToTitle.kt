@@ -1,10 +1,7 @@
 package xyz.meowing.zen.features.general.chatToTitle
 
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.utils.TitleUtils.showTitle
@@ -14,20 +11,11 @@ import java.util.regex.Pattern
 @Module
 object ChatToTitle : Feature(
     "chatToTitle",
+    "Chat to title",
+    "Create title on chat message",
+    "General",
     skyblockOnly = true
 ){
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Chat to title",
-            "Create title on chat message",
-            "General",
-            ConfigElement(
-                "chatToTitle",
-                ElementType.Switch(true)
-            )
-        )
-    }
-
     val patternData = StoredFile("features/ChatToTitle")
     var patterns: List<ChatTitlePattern> by patternData.list("patterns", ChatTitlePattern.CODEC)
 

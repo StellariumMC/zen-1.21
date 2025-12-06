@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.meowing
 
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.features.Timer
 import xyz.meowing.zen.utils.TitleUtils
@@ -9,28 +8,16 @@ import xyz.meowing.zen.utils.Utils
 import net.minecraft.sounds.SoundEvents
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import kotlin.random.Random
 
 @Module
 object RandomMeow : Feature(
-    "randomMeow"
+    "randomMeow",
+    "Random meows",
+    "Send random meows in chat",
+    "Meowing",
+    true
 ) {
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Random meows",
-                "Send random meows in chat",
-                "Meowing",
-                ConfigElement(
-                    "randomMeow",
-                    ElementType.Switch(true)
-                )
-            )
-    }
-
-
     override fun initialize() {
         setupLoops {
             loopDynamic<Timer>({ Random.nextLong(3600000, 21600000) }) {

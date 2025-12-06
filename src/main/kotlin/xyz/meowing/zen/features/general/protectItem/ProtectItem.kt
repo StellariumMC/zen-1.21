@@ -1,7 +1,6 @@
 package xyz.meowing.zen.features.general.protectItem
 
 import xyz.meowing.zen.Zen.prefix
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.api.data.StoredFile
 import xyz.meowing.zen.utils.ItemUtils.lore
@@ -18,8 +17,6 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.location.SkyBlockIsland
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import com.mojang.serialization.Codec
 import net.minecraft.network.chat.Component
 import xyz.meowing.zen.utils.Utils.toLegacyString
@@ -32,32 +29,19 @@ import xyz.meowing.zen.utils.Utils.toLegacyString
 @Module
 object ProtectItem : Feature(
     "protectItem",
-    true
+    "Item protection",
+    "Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi",
+    "General",
+    skyblockOnly = true
 ) {
     val itemData = StoredFile("features/ProtectItem")
     var protectedItems: Set<String> by itemData.set("protectedItems", Codec.STRING)
     var protectedTypes: Set<String> by itemData.set("protectedTypes", Codec.STRING)
 
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Item protection",
-                "Tries to prevent you from dropping items that you have protected using §c/protectitem\n§7Aliases: /pitem, /zenpi",
-                "General",
-                ConfigElement(
-                    "protectItem",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Protect item GUI",
-                ConfigElement(
-                    "protectItem.guiButton",
-                    ElementType.Button("Open GUI") {
-                        client.setScreen(ProtectItemGUI())
-                    }
-                )
-            )
+    init {
+        config.button("Open GUI") {
+            client.setScreen(ProtectItemGUI())
+        }
     }
 
     override fun initialize() {

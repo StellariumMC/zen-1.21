@@ -1,6 +1,5 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
 import xyz.meowing.zen.utils.ItemUtils.displayName
@@ -13,30 +12,18 @@ import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.EntityEvent
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.MouseEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object FatalTempoOverlay : Feature(
     "fatalTempoOverlay",
-    true
+    "Fatal tempo overlay",
+    "Display fatal tempo stacks",
+    "HUD",
+    skyblockOnly = true
 ) {
     private val hits = mutableListOf<Long>()
     private var level = 0
     private var currentPercent = 0
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Fatal tempo overlay",
-                "Display fatal tempo stacks",
-                "HUD",
-                ConfigElement(
-                    "fatalTempoOverlay",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         HUDManager.register("Fatal Tempo", "§eFatal Tempo: §a200%", "fatalTempoOverlay")

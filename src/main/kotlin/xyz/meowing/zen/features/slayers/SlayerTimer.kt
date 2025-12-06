@@ -4,10 +4,7 @@ import com.google.gson.JsonObject
 import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.api.slayer.SlayerTracker.bossType
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.Feature
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.TimeUtils.millis
 import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.knit.api.text.KnitText
@@ -20,23 +17,13 @@ import kotlin.time.Duration
 @Module
 object SlayerTimer : Feature(
     "slayerTimer",
-    true
+    "Slayer timer",
+    "Logs your time to kill slayer bosses to chat.",
+    "Slayers",
+    skyblockOnly = true
 ) {
     private val slayerData = StoredFile("features/SlayerTimer")
     var slayerRecord: JsonObject by slayerData.jsonObject("records", JsonObject())
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Slayer timer",
-                "Logs your time to kill slayer bosses to chat.",
-                "Slayers",
-                ConfigElement(
-                    "slayerTimer",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     fun sendTimerMessage(action: String, timeTaken: Duration, ticks: Int) {
         val seconds = timeTaken.millis / 1000.0

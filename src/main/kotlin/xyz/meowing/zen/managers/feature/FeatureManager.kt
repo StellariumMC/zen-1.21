@@ -103,7 +103,6 @@ object FeatureManager {
             if (feature.hasDungeonFloors()) dungeonFloorFeatures.add(feature)
             if (feature.skyblockOnly) skyblockFeatures.add(feature)
 
-            feature.addConfig()
             feature.initialize()
             feature.configKey?.let { registerListener(it, feature) }
             feature.update()

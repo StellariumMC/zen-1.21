@@ -11,22 +11,12 @@ import java.util.regex.Pattern
 
 @Module
 object GuildJoinLeave : Feature(
-    "guildJoinLeave"
+    "guildJoinLeave",
+    "Clean guild join/leave",
+    "Reformats guild join/leave messages",
+    "General",
 ) {
     private val guildPattern = Pattern.compile("^§2Guild > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Clean guild join/leave",
-                "Reformats guild join/leave messages",
-                "General",
-                ConfigElement(
-                    "guildJoinLeave",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->
@@ -49,23 +39,12 @@ object GuildJoinLeave : Feature(
 
 @Module
 object FriendJoinLeave : Feature(
-    "friendJoinLeave"
+    "friendJoinLeave",
+    "Clean friend join/leave",
+    "Reformats friend join/leave messages",
+    "General",
 ) {
     private val friendPattern = Pattern.compile("^§aFriend > §r(§[a-f0-9])(\\w+) §r§e(\\w+)\\.§r$")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Clean friend join/leave",
-                "Reformats friend join/leave messages",
-                "General",
-                ConfigElement(
-                    "friendJoinLeave",
-                    ElementType.Switch(false)
-                )
-            )
-    }
-
 
     override fun initialize() {
         register<ChatEvent.Receive> { event ->

@@ -7,7 +7,7 @@ class FeatureElement(
 ) : ConfigContainer {
     val options: MutableMap<String, MutableList<OptionElement>> = mutableMapOf()
 
-    fun addFeatureOption(
+    fun addOption(
         optionName: String,
         element: ConfigElement
     ): FeatureElement {

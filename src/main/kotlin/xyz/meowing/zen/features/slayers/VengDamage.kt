@@ -4,33 +4,21 @@ import xyz.meowing.knit.api.KnitChat
 import xyz.meowing.knit.api.KnitClient.world
 import xyz.meowing.zen.Zen.prefix
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.utils.Utils.removeFormatting
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import tech.thatgravyboat.skyblockapi.utils.regex.RegexUtils.findGroup
 
 @Module
 object VengDamage : Feature(
     "vengDamage",
-    true
+    "Vengeance damage message",
+    "Logs your vengeance damage procs in chat",
+    "Slayers",
+    skyblockOnly = true
 ) {
     private var nametagID = -1
     private val vengRegex = Regex("^(?<damage>\\d+(?:,\\d+)*)ﬗ$")
-
-    override fun addConfig() {
-        ConfigManager.addFeature(
-            "Vengeance damage tracker",
-            "Vengeance damager tracker",
-            "Slayers",
-            ConfigElement(
-                "vengDamage",
-                ElementType.Switch(false)
-            )
-        )
-    }
 
     override fun initialize() {
         register<SkyblockEvent.Slayer.Spawn> { event ->

@@ -1,7 +1,5 @@
 package xyz.meowing.zen.features.hud
 
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.features.ClientTick
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
@@ -12,12 +10,13 @@ import net.minecraft.world.item.Items
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.events.core.GuiEvent
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 
 @Module
 object ArmorHUD : Feature(
-    "armorHud"
+    "armorHud",
+    "Armor HUD",
+    "Display armor pieces on HUD",
+    "HUD",
 ) {
     private const val NAME = "Armor HUD"
     private var armor = emptyList<ItemStack?>()
@@ -29,44 +28,14 @@ object ArmorHUD : Feature(
         ItemStack(Items.DIAMOND_BOOTS)
     )
 
-    private val armorHudVertical by ConfigDelegate<Boolean>("armorHud.vertical")
-    private val armorPieces by ConfigDelegate<Set<Int>>("armorHud.pieces")
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Armor HUD",
-                "Display armor pieces on HUD",
-                "HUD",
-                ConfigElement(
-                    "armorHud",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Vertical armor HUD",
-                ConfigElement(
-                    "armorHud.vertical",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Armor pieces to render",
-                ConfigElement(
-                    "armorHud.pieces",
-                    ElementType.MultiCheckbox(
-                        listOf("Helmet", "Chestplate", "Leggings", "Boots"),
-                        setOf(0, 1, 2, 3)
-                    )
-                )
-            )
-    }
+    private val vertical by config.switch("Render vertically", false)
+    private val armorPieces by config.multiCheckbox("Pices to render", listOf("Helmet", "Chestplate", "Leggings", "Boots"), setOf(0, 1, 2, 3))
 
     override fun initialize() {
         HUDManager.registerCustom(
             NAME,
-            if (armorHudVertical) 16 else 70,
-            if (armorHudVertical) 70 else 16,
+            if (vertical) 16 else 70,
+            if (vertical) 70 else 16,
             this::editorRender,
             "armorHud"
         )
@@ -103,7 +72,7 @@ object ArmorHUD : Feature(
         armorToRender.reversed().forEachIndexed { index, item ->
             if (selectedPieces.contains(index)) {
                 if (item != null) Render2D.renderItem(context, item, currentX, currentY, scale)
-                if (armorHudVertical) currentY += iconSize + spacing
+                if (vertical) currentY += iconSize + spacing
                 else currentX += iconSize + spacing
             }
         }

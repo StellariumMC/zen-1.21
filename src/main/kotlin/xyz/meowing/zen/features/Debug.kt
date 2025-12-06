@@ -11,6 +11,7 @@ import xyz.meowing.knit.api.command.Commodore
 import xyz.meowing.zen.annotations.Command
 import xyz.meowing.zen.annotations.Module
 import xyz.meowing.zen.api.dungeons.DungeonAPI
+import xyz.meowing.zen.config.dsl.Config
 import xyz.meowing.zen.events.core.RenderEvent
 import xyz.meowing.zen.managers.config.ConfigElement
 import xyz.meowing.zen.managers.config.ConfigManager
@@ -34,104 +35,19 @@ object Debug : Feature() {
 
         if (debugMode) {
             registerEvent("mobid")
+
+            val debug by Config("Config test", "Config Debug Stuff", "Debug")
+            debug.switch("Switch")
+            debug.button("Click me!") { Zen.LOGGER.info("Button clicked!") }
+            debug.slider("Slider", 50.0, 0.0, 100.0, false)
+            debug.slider("Slider double", 50.0, 0.0, 100.0, true)
+            debug.dropdown("Dropdown", listOf("Option 1", "Option 2", "Option 3", "Option 4"))
+            debug.multiCheckbox("Multi-checkbox", listOf("Feature A", "Feature B", "Feature C", "Feature D", "Feature E"))
+            debug.textInput("Text input", "Default text", "Enter text here...")
+            debug.textParagraph("This is a text paragraph element used for displaying information or instructions to the user. It can contain multiple lines of text.")
+            debug.colorPicker("Colorpicker")
+            debug.keybind("Keybind")
         }
-    }
-
-    override fun addConfig() {
-        if (!debugMode) return
-
-        ConfigManager
-            .addFeature(
-                "Config test",
-                "",
-                "Debug",
-                ConfigElement(
-                    "debug",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Switch",
-                ConfigElement(
-                    "debug.testSwitch",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Button",
-                ConfigElement(
-                    "debug.testButton",
-                    ElementType.Button("Click Me!") {
-                        Zen.LOGGER.info("Button clicked!")
-                    }
-                )
-            )
-            .addFeatureOption(
-                "Slider",
-                ConfigElement(
-                    "debug.testSlider",
-                    ElementType.Slider(0.0, 100.0, 50.0, false)
-                )
-            )
-            .addFeatureOption(
-                "Slider double",
-                ConfigElement(
-                    "debug.testSliderDouble",
-                    ElementType.Slider(0.0, 10.0, 5.5, true)
-                )
-            )
-            .addFeatureOption(
-                "Dropdown",
-                ConfigElement(
-                    "debug.testDropdown",
-                    ElementType.Dropdown(listOf("Option 1", "Option 2", "Option 3", "Option 4"), 0)
-                )
-            )
-            .addFeatureOption(
-                "Text input",
-                ConfigElement(
-                    "debug.testTextInput",
-                    ElementType.TextInput("Default text", "Enter text here...", 50)
-                )
-            )
-            .addFeatureOption(
-                "Empty text input",
-                ConfigElement(
-                    "debug.testTextInputEmpty",
-                    ElementType.TextInput("", "Type something...", 100)
-                )
-            )
-            .addFeatureOption(
-                "Text paragraph",
-                ConfigElement(
-                    "debug.testParagraph",
-                    ElementType.TextParagraph("This is a text paragraph element used for displaying information or instructions to the user. It can contain multiple lines of text.")
-                )
-            )
-            .addFeatureOption(
-                "Color picker",
-                ConfigElement(
-                    "debug.testColorPicker",
-                    ElementType.ColorPicker(Color(100, 200, 255))
-                )
-            )
-            .addFeatureOption(
-                "Keybind",
-                ConfigElement(
-                    "debug.testKeybind",
-                    ElementType.Keybind(82)
-                )
-            )
-            .addFeatureOption(
-                "Multi checkbox",
-                ConfigElement(
-                    "debug.testMultiCheckbox",
-                    ElementType.MultiCheckbox(
-                        options = listOf("Feature A", "Feature B", "Feature C", "Feature D", "Feature E"),
-                        default = setOf(0, 2)
-                    )
-                )
-            )
     }
 }
 

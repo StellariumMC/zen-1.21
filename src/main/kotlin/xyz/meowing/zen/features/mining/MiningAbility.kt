@@ -2,10 +2,6 @@ package xyz.meowing.zen.features.mining
 
 import net.minecraft.sounds.SoundEvents
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.core.GuiEvent
 import xyz.meowing.zen.events.core.TablistEvent
 import xyz.meowing.zen.features.Feature
@@ -22,10 +18,13 @@ import kotlin.math.max
 @Module
 object MiningAbility : Feature(
     "miningAbility",
+    "Mining ability",
+    "Mining ability cooldown tracker",
+    "Mining",
     skyblockOnly = true
 ) {
     private const val NAME = "Mining Ability"
-    private val showTitle by ConfigDelegate<Boolean>("miningAbility.showTitle")
+    private val showTitle by config.switch("Show title")
     private val COOLDOWN_REGEX = Regex("""(\d+(?:\.\d+)?)s""")
 
     private var hasWidget: Boolean = false
@@ -33,26 +32,6 @@ object MiningAbility : Feature(
     private var lastUpdateTime = TimeUtils.zero
     private var abilityName: String = ""
     private var cooldownSeconds: Float = 0f
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-                "Mining ability",
-                "Mining ability cooldown tracker",
-                "Mining",
-                ConfigElement(
-                    "miningAbility",
-                    ElementType.Switch(false)
-                )
-            )
-            .addFeatureOption(
-                "Show title",
-                ConfigElement(
-                    "miningAbility.showTitle",
-                    ElementType.Switch(true)
-                )
-            )
-    }
 
     override fun initialize() {
         HUDManager.register(NAME, "§9§lPickaxe Ability:\n§fMining Speed Boost: §aAvailable", "miningAbility")

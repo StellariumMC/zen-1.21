@@ -7,8 +7,6 @@ import net.minecraft.world.item.Items
 import xyz.meowing.knit.api.KnitPlayer
 import xyz.meowing.knit.api.events.EventCall
 import xyz.meowing.zen.annotations.Module
-import xyz.meowing.zen.config.ConfigDelegate
-import xyz.meowing.zen.config.ui.elements.base.ElementType
 import xyz.meowing.zen.events.EventBus
 import xyz.meowing.zen.events.core.ChatEvent
 import xyz.meowing.zen.events.core.EntityEvent
@@ -19,8 +17,6 @@ import xyz.meowing.zen.events.core.SkyblockEvent
 import xyz.meowing.zen.events.core.TickEvent
 import xyz.meowing.zen.features.Feature
 import xyz.meowing.zen.hud.HUDManager
-import xyz.meowing.zen.managers.config.ConfigElement
-import xyz.meowing.zen.managers.config.ConfigManager
 import xyz.meowing.zen.utils.ItemUtils
 import xyz.meowing.zen.utils.ItemUtils.skyblockID
 import xyz.meowing.zen.utils.Render2D
@@ -29,7 +25,10 @@ import xyz.meowing.zen.utils.Utils.removeFormatting
 @Module
 object BuffTimers : Feature(
     "buffTimers",
-    true
+    "Buff timers",
+    "Shows timers for various item buffs and abilities",
+    "HUD",
+    skyblockOnly = true
 ) {
     private const val NAME = "BuffTimers"
 
@@ -58,30 +57,13 @@ object BuffTimers : Feature(
         )
     }
 
-    private val alwaysShow by ConfigDelegate<Boolean>("buffTimers.alwaysShow")
+    private val alwaysShow by config.switch("Always show")
     private val tickCall: EventCall = EventBus.register<TickEvent.Server>(add = false) {
         updateTimers()
         updateItems()
     }
 
     data class BuffData(val item: ItemStack, val timeStr: String, val color: String)
-
-    override fun addConfig() {
-        ConfigManager
-            .addFeature(
-            "Buff timers",
-            "Shows timers for various item buffs and abilities",
-            "HUD",
-            ConfigElement("buffTimers", ElementType.Switch(false))
-        )
-            .addFeatureOption(
-                "Always show items",
-                ConfigElement(
-                    "buffTimers.alwaysShow",
-                    ElementType.Switch(false)
-                )
-            )
-    }
 
     override fun initialize() {
         HUDManager.registerCustom(NAME, 60, 75, this::editorRender, "buffTimers")
